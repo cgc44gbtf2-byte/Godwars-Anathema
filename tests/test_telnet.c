@@ -92,7 +92,7 @@ static void options(void)
             begin();
             send_bytes(bytes, sizeof(bytes));
             command_is("look");
-            if (verb == 251 || (verb == 253 && option != 1)) {
+            if (verb == 251 || (verb == 253 && option != 1 && option != 201)) {
                 unsigned char expected[] = {255, verb == 251 ? 254 : 252,
                     (unsigned char)option};
                 assert(d.outtop == 3 && memcmp(d.outbuf, expected, 3) == 0);

@@ -25,8 +25,9 @@ reuse an important password.
 
 ## Supported scope
 
-This stage fixes **transport framing for ordinary text play**, not enhanced
-client packages or automatic mapping.
+Ordinary text play is retained. Optional **GMCP vitals** are now supported;
+see [the packet schema and client notes](GMCP.md). Automatic mapping and
+client interface packages are not included.
 
 | Feature | Current server behavior |
 | --- | --- |
@@ -34,8 +35,9 @@ client packages or automatic mapping.
 | Telnet negotiation, including fragmented packets | Parsed before command input |
 | Password ECHO acknowledgements | Existing WILL/WONT ECHO flow retained |
 | TTYPE, NAWS and other unsupported options | Declined, subnegotiation discarded |
-| GMCP, MSDP, MXP and MCCP | Not implemented; unsupported negotiation declined |
-| Structured vitals, party data and automatic room maps | Not supplied by this server |
+| GMCP | Optional Char.Vitals and Anathema.Vitals, authenticated self-only snapshots |
+| MSDP, MXP and MCCP | Not implemented; unsupported negotiation declined |
+| Party data and automatic room maps | Not supplied by this server |
 | UTF-8 command input | Not added; legacy ASCII canonicalization remains |
 
 Client aliases, text triggers and locally scripted interfaces can still use
@@ -54,6 +56,8 @@ command layer still does not treat it as a printable input character.
 Unknown positive option requests receive WONT or DONT. Negative
 acknowledgements do not cause reply loops. DO/DONT ECHO acknowledge the
 server's existing password-echo advertisements without undoing them.
+DO/DONT GMCP change only descriptor-local telemetry state. The server offers
+GMCP once per new TCP connection; refusal leaves ordinary text play unchanged.
 Subnegotiation is discarded through IAC SE, including embedded NUL, newlines
 and escaped IAC. No client-supplied protocol data executes commands.
 
@@ -75,6 +79,13 @@ handoffs, initializing their framing state to ordinary data. Invalid states,
 verbs and extra handoff fields are rejected before restoring any session.
 Player-save format is unchanged.
 
+GMCP is not serialized into the handoff. After successful recovery, WONT GMCP
+then WILL GMCP reset and renegotiate the inherited client before any new
+vitals. Cancelled/failed exec leaves the existing negotiation unchanged.
+Copyover refuses a control packet partway through actual transmission rather
+than truncating it. Let output drain before retrying. Wholly unsent buffered
+text/snapshots may still be discarded; vitals are refreshed after recovery.
+
 An older binary does **not** understand the version 2 handoff. To roll back,
 use a checked save and normal stop/start with backups, not a live copyover
 from this binary into an older executable.
@@ -92,6 +103,9 @@ that unread bytes remain for a later game-loop turn.
 and verb, and malformed version 2 handoffs. `tests/smoke_copyover.py` carries
 an incomplete client subnegotiation through the production executable's
 real exec and verifies a subsequent save on the same TCP connection.
+It also decodes real GMCP JSON, checks that no vitals arrive during login,
+and verifies reset, renegotiation and fresh snapshots across actual exec.
+The pending-login and new-arrival connections still exercise plain text play.
 
 These are transport-level regression checks. They are **not** recorded GUI
 sessions in real Mudlet or MudForge releases, a live hosted-bridge test, a TLS

@@ -17,6 +17,7 @@
 #include "restart.h"
 #include "atomic_save.h"
 #include "telnet_input.h"
+#include "gmcp.h"
 
 #define HANDOFF_MAGIC "ANATHEMA_COPYOVER 2\n"
 #define HANDOFF_LEGACY_MAGIC "ANATHEMA_COPYOVER 1\n"
@@ -142,6 +143,13 @@ void restart_copyover(CHAR_DATA *ch)
         if (d->descriptor<3 || d->descriptor>=FD_SETSIZE ||
             !connected_socket((int)d->descriptor) ||
             !add_flags(h,(int)d->descriptor)) goto aborted;
+        /* Only an actually started control packet must drain before exec.
+         * Wholly unsent snapshots can be discarded and refreshed after the
+         * client reset, without making ordinary queued text block copyover. */
+        if (d->telnet_output_state != TELNET_DATA) {
+            log_string("Copyover paused: partially transmitted Telnet control packet.");
+            goto aborted;
+        }
         if (!descriptor_is_in_game(d)) continue; /* Close only on successful exec. */
         CHAR_DATA *owner=player_save_owner(d->original ? d->original : d->character);
         if (owner==NULL || !host_valid(d->host) ||
@@ -199,7 +207,7 @@ aborted:
             log_string("WARNING: failed to restore descriptor flags after cancelled copyover.");
     if (published && unlink(COPYOVER_FILE)<0)
         log_string("WARNING: could not remove cancelled copyover manifest.");
-    stc("Copyover cancelled. Check primary saves, drafts/editors, dirty areas, sockets and executable. Sessions remain running.\n\r",ch);
+    stc("Copyover cancelled. Check primary saves, drafts/editors, dirty areas, pending client output, sockets and executable. Sessions remain running.\n\r",ch);
     log_string("Copyover cancelled before exec; player sessions retained.");
     free(h);
 }
@@ -281,6 +289,7 @@ bool copyover_recover(void)
         if (ch->in_room==NULL) { close_socket(d); continue; }
         ch->next=char_list; char_list=ch;
         char_to_room(ch,ch->in_room); d->connected=CON_PLAYING;
+        if (!gmcp_recover(d)) { close_socket(d); continue; }
         send_to_char("Copyover recovery complete.\n\r",ch);
         do_look(ch,"");
     }

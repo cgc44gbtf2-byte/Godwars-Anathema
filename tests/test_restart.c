@@ -19,6 +19,7 @@
 #include "atomic_save.h"
 #include "restart.h"
 #include "telnet_input.h"
+#include "gmcp.h"
 
 extern char *string_space, *top_string;
 extern void init_mm(void);
@@ -167,6 +168,19 @@ static void copyover_failures(void)
                access(COPYOVER_FILE,F_OK)!=0);
     }
     restart_test_manifest_fault=SAVE_FAULT_NONE;
+    const unsigned char gmcp_states[] = {GMCP_NEW,GMCP_OFFERED,GMCP_ACTIVE,GMCP_DISABLED};
+    for (size_t i=0;i<sizeof(gmcp_states);++i) {
+        d->gmcp_state=gmcp_states[i];
+        d->telnet_output_state=TELNET_SUBNEGOTIATION;
+        memcpy(d->outbuf,"\xff\xfa\xc9X",4); d->outtop=4; d->outbuf[4]='\0';
+        do_copyover(ch,"");
+        assert(restart_test_exec_count==0 && ch->desc==d &&
+               d->gmcp_state==gmcp_states[i] &&
+               !memcmp(d->outbuf,"\xff\xfa\xc9X",4) &&
+               access(COPYOVER_FILE,F_OK)!=0);
+    }
+    d->gmcp_state=GMCP_NEW; d->telnet_output_state=TELNET_DATA;
+    d->outtop=0; d->outbuf[0]='\0';
     do_copyover(ch,""); /* exec probe returns ENOEXEC, not a real restart. */
     assert(restart_test_exec_count==1 && ch->desc==d && fileno(fpReserve)==reserve_fd &&
            fcntl((int)control,F_GETFD)==before_control &&

@@ -257,6 +257,10 @@ struct	descriptor_data
     bool                password_save_pending;
     unsigned char       telnet_state;
     unsigned char       telnet_verb;
+    unsigned char       gmcp_state;
+    char                gmcp_cache[2048]; /* Matches GMCP_CACHE_SIZE; transient. */
+    unsigned char       telnet_output_state;
+    bool                snoop_text_started;
     char		inbuf		[4 * MAX_INPUT_LENGTH];
     char		incomm		[MAX_INPUT_LENGTH];
     char		inlast		[MAX_INPUT_LENGTH];

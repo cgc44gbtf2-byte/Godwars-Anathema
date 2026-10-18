@@ -45,7 +45,7 @@ class TelnetLayoutChecks(unittest.TestCase):
 
 
 class SmokeWaitChecks(unittest.TestCase):
-    def wait(self, chunks, needle=None, timeout=25):
+    def wait(self, chunks, needle=None, timeout=25, trace=None, ready=None):
         class FakeSocketModule:
             class timeout(Exception):
                 pass
@@ -73,7 +73,7 @@ class SmokeWaitChecks(unittest.TestCase):
         namespace = {"time": Clock(), "socket": FakeSocketModule}
         exec(compile(ast.Module(body=[function], type_ignores=[]), "<smoke-wait>", "exec"),
              namespace)
-        return namespace["until"](Client(), needle, timeout)
+        return namespace["until"](Client(), needle, timeout, trace, ready)
 
     def test_delayed_greeting_retries_read_not_connection(self):
         self.assertEqual(self.wait([None, None, b"greeting"]), b"greeting")
@@ -93,6 +93,13 @@ class SmokeWaitChecks(unittest.TestCase):
     def test_unbounded_output_still_fails(self):
         with self.assertRaisesRegex(AssertionError, "unbounded"):
             self.wait([b"x" * 2_000_000], b"never")
+
+    def test_text_needle_does_not_skip_fragmented_metadata(self):
+        seen = bytearray()
+        self.assertEqual(
+            self.wait([b"Saved.", None, b"metadata"], b"Saved.",
+                      trace=seen.extend, ready=lambda: b"metadata" in seen),
+            b"Saved.metadata")
 
 
 if __name__ == "__main__":

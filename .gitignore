@@ -4,6 +4,7 @@
 /tests/test_combat_calculations
 /tests/test_combat_damage_death
 /tests/test_telnet
+/tests/test_gmcp
 *.o
 *.d
 Genesis/src/merc

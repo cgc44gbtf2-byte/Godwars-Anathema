@@ -59,6 +59,7 @@
 
 #include "merc.h"
 #include "telnet_input.h"
+#include "gmcp.h"
 #include "restart.h"
 
 
@@ -662,7 +663,13 @@ record_descriptor_activity(d);
 	{
 	    d_next = d->next;
 
-	    if ( ( d->fcommand || d->outtop > 0 ) )
+    if (!gmcp_update(d)) {
+        if (d->character != NULL) do_autosave(d->character, "");
+        d->outtop = 0;
+        close_socket(d);
+        continue;
+    }
+    if ( ( d->fcommand || d->outtop > 0 ) )
 	    {
 		if ( !process_output( d, TRUE ) )
 		{
@@ -943,7 +950,13 @@ if (merc_down) break; /* Do not mutate world state after the final checkpoint. *
 	{
 	    d_next = d->next;
 
-	    if ( ( d->fcommand || d->outtop > 0 )
+    if (!gmcp_update(d)) {
+        if (d->character != NULL) do_autosave(d->character, "");
+        d->outtop = 0;
+        close_socket(d);
+        continue;
+    }
+    if ( ( d->fcommand || d->outtop > 0 )
 	    &&   FD_ISSET(d->descriptor, &out_set) )
 	    {
 		if ( !process_output( d, TRUE ) )
@@ -1123,6 +1136,7 @@ void new_descriptor( int control )
      */
     dnew->next			= descriptor_list;
     descriptor_list		= dnew;
+    if (!gmcp_offer(dnew)) { close_socket(dnew); return; }
 
     /*
      * Send the greeting.
@@ -1622,18 +1636,6 @@ return FALSE;
 	return TRUE;
 
     /*
-     * Snoop-o-rama.
-     */
-    if ( d->snoop_by != NULL )
-    {
-	if (d->snoop_by->character != NULL &&  IS_IMM(d->snoop_by->character))
-	{
-	    write_to_buffer( d->snoop_by, "% ", 2 );
-	    write_to_buffer( d->snoop_by, d->outbuf, d->outtop );
-	}
-    }
-
-    /*
      * OS-dependent output.
      */
     written = write_descriptor_bytes( d->descriptor, d->outbuf, d->outtop );
@@ -1642,7 +1644,9 @@ return FALSE;
 	d->outtop = 0;
 	return FALSE;
     }
+    telnet_snoop_output(d, (const unsigned char *)d->outbuf, (size_t)written);
     d->outtop -= written;
+    if (d->outtop == 0) d->snoop_text_started = FALSE;
     memmove( d->outbuf, d->outbuf + written, d->outtop );
     d->outbuf[d->outtop] = '\0';
     return TRUE;

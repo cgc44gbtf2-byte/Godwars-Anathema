@@ -29,7 +29,8 @@ and this repository does not provide a running game server.
   corpse descriptions are bounded.
 - **MudForge / Mudlet:** Telnet option messages are kept out of commands,
   including fragmented packets and negotiations interrupted by copyover.
-  This is ordinary text-client support, not GMCP vitals or automatic maps.
+  GMCP-capable clients can also receive health, mana and applicable class
+  resources without scraping prompts. Automatic maps are not included.
 - **Reliability:** safer player saves, reconnects, shutdowns, item ownership
   and conjured-item shop handling.
 

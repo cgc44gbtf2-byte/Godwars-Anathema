@@ -18,6 +18,7 @@ TESTS += tests/test_admin_gate
 TESTS += tests/test_combat_calculations
 TESTS += tests/test_combat_damage_death
 TESTS += tests/test_telnet
+TESTS += tests/test_gmcp
 
 all:
 	$(MAKE) -C Genesis/src
@@ -26,7 +27,7 @@ tests/%: tests/%.c $(ENGINE_SOURCES) $(ENGINE_HEADERS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_comm: tests/test_comm.c $(ENGINE_SOURCES) $(ENGINE_HEADERS)
-	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< Genesis/src/telnet_input.c $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< Genesis/src/telnet_input.c Genesis/src/gmcp.c $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_gameplay: tests/test_gameplay.c $(ENGINE_SOURCES) $(ENGINE_HEADERS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< Genesis/src/act_info.c Genesis/src/classes/werewolf/wwauspice.c Genesis/src/classes/mage/mage.c $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
@@ -51,6 +52,7 @@ check-layout:
 	python3 tests/test_class_layout.py
 	python3 tests/test_combat_layout.py
 	python3 tests/test_telnet_layout.py
+	python3 tests/test_gmcp_layout.py
 	python3 tests/test_security_commands.py
 	python3 tests/test_bootstrap_staff.py
 
@@ -59,7 +61,7 @@ test: check-layout $(TESTS)
 
 # Link the real engine, including actual safety, combat and interpreter paths.
 # Only the server entry point is renamed; no real accounts/world files load.
-tests/test_combat_status tests/test_vampire tests/test_basic_buffs tests/test_class_handlers tests/test_vampire_modules tests/test_damage_messages tests/test_transformations tests/test_clans tests/test_class_gear tests/test_drow_ammo tests/test_lifecycle_ownership tests/test_autosave_recovery tests/test_highlander_counter tests/test_stance_style tests/test_admin_gate tests/test_combat_calculations tests/test_combat_damage_death tests/test_telnet: tests/%: tests/%.c $(ENGINE_OBJECTS)
+tests/test_combat_status tests/test_vampire tests/test_basic_buffs tests/test_class_handlers tests/test_vampire_modules tests/test_damage_messages tests/test_transformations tests/test_clans tests/test_class_gear tests/test_drow_ammo tests/test_lifecycle_ownership tests/test_autosave_recovery tests/test_highlander_counter tests/test_stance_style tests/test_admin_gate tests/test_combat_calculations tests/test_combat_damage_death tests/test_telnet tests/test_gmcp: tests/%: tests/%.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 # Separate test objects keep sanitizer flags out of the production executable.

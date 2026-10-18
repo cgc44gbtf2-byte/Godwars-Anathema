@@ -12,5 +12,7 @@ enum {
 };
 
 bool telnet_state_valid(unsigned int state, unsigned int verb);
+bool telnet_write(DESCRIPTOR_DATA *d, const unsigned char *bytes, size_t count);
+void telnet_snoop_output(DESCRIPTOR_DATA *d, const unsigned char *bytes, size_t count);
 bool telnet_input(DESCRIPTOR_DATA *d, const unsigned char *bytes, size_t count);
 #endif
