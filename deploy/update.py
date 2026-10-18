@@ -392,6 +392,49 @@ def builder_account(service):
     return account
 
 
+def copy_state(source, destination):
+    """Pin directory descriptors; never follow source links during root backup."""
+    def copy_directory(source_fd, target, depth):
+        require(depth <= 128, "Runtime directory nesting exceeds backup limit")
+        target.mkdir(mode=0o700)
+        with os.scandir(source_fd) as entries:
+            for entry in entries:
+                value = entry.stat(follow_symlinks=False)
+                output = target / entry.name
+                if stat.S_ISLNK(value.st_mode):
+                    os.symlink(os.readlink(entry.name, dir_fd=source_fd), output)
+                elif stat.S_ISDIR(value.st_mode):
+                    child = os.open(entry.name, os.O_RDONLY | os.O_DIRECTORY |
+                                    os.O_NOFOLLOW, dir_fd=source_fd)
+                    try:
+                        copy_directory(child, output, depth + 1)
+                    finally:
+                        os.close(child)
+                else:
+                    require(stat.S_ISREG(value.st_mode), "Special runtime files cannot be backed up")
+                    child = os.open(entry.name, os.O_RDONLY | os.O_NOFOLLOW |
+                                    os.O_NONBLOCK, dir_fd=source_fd)
+                    try:
+                        opened = os.fstat(child)
+                        require(stat.S_ISREG(opened.st_mode), "Runtime file changed type during backup")
+                        remaining = opened.st_size
+                        fd = os.open(output, os.O_WRONLY | os.O_CREAT | os.O_EXCL |
+                                     os.O_NOFOLLOW, 0o600)
+                        with os.fdopen(fd, "wb") as stream:
+                            while remaining:
+                                chunk = os.read(child, min(remaining, 1024 * 1024))
+                                require(chunk, "Runtime file shrank during backup")
+                                stream.write(chunk)
+                                remaining -= len(chunk)
+                    finally:
+                        os.close(child)
+    source_fd = os.open(source, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        copy_directory(source_fd, destination, 0)
+    finally:
+        os.close(source_fd)
+
+
 def snapshot(value, record, online):
     if not STORE.exists():
         STORE.mkdir(mode=0o700)
@@ -405,7 +448,7 @@ def snapshot(value, record, online):
                                                        time.gmtime()), dir=STORE))
     # mkdtemp's random suffix matches BACKUP_ID on supported CPython.
     require(BACKUP_ID.fullmatch(folder.name), "Invalid generated backup ID")
-    shutil.copytree(DATA, folder / "state", symlinks=True)
+    copy_state(DATA, folder / "state")
     for directory, _, names in os.walk(folder / "state", topdown=False, followlinks=False):
         for name in names:
             path = Path(directory) / name

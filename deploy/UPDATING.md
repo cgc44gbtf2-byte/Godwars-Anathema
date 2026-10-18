@@ -95,6 +95,10 @@ symlinks to copy external targets. **Copyover-mode snapshots are online and
 not globally point-in-time consistent**; maintenance-restart snapshots are
 taken with this service stopped. Neither captures unsaved memory or writes
 made by unrelated processes.
+Snapshot reads use directory descriptors and no-follow opens, rejecting
+special files and file-to-symlink/FIFO swaps. Snapshot directories/files
+are restricted to root (0700/0600); original ownership and timestamps are
+not a filesystem-image restoration contract.
 
 To restore a previously backed-up binary:
 

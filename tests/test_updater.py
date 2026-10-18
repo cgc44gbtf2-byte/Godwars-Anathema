@@ -362,6 +362,49 @@ class BuildIntegrationTests(unittest.TestCase):
             self.assertEqual(secret.read_text(), "synthetic-private-fixture")
 
 
+class SnapshotRaceTests(unittest.TestCase):
+    def race(self, directory=False, fifo=False):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "source"
+            source.mkdir()
+            private = root / "outside"
+            private.mkdir()
+            (private / "private").write_text("must not enter backup")
+            if directory:
+                (source / "live").mkdir()
+            else:
+                (source / "live").write_text("ordinary state")
+            original = u.os.open
+            def swapping_open(path, flags, *args, **kwargs):
+                if path == "live" and "dir_fd" in kwargs:
+                    if directory:
+                        (source / "live").rmdir()
+                    else:
+                        (source / "live").unlink()
+                    if fifo:
+                        os.mkfifo(source / "live")
+                    else:
+                        (source / "live").symlink_to(
+                            private if directory else private / "private")
+                return original(path, flags, *args, **kwargs)
+            with mock.patch.object(u.os, "open", side_effect=swapping_open):
+                with self.assertRaises((OSError, u.UpdateError)):
+                    u.copy_state(source, root / "snapshot")
+            for path in (root / "snapshot").rglob("*"):
+                if path.is_file() and not path.is_symlink():
+                    self.assertNotIn(b"must not enter backup", path.read_bytes())
+
+    def test_file_swapped_to_external_link_fails_closed(self):
+        self.race()
+
+    def test_directory_swapped_to_external_link_fails_closed(self):
+        self.race(directory=True)
+
+    def test_file_swapped_to_fifo_never_blocks(self):
+        self.race(fifo=True)
+
+
 class DeployTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
