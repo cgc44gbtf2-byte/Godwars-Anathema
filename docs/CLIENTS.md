@@ -15,6 +15,10 @@ default game port is 4000; an operator can choose another.
   The game endpoint must be reachable from that bridge; your private
   `127.0.0.1` test server is not a public game endpoint.
 
+The configured public endpoint is **137.184.145.164**, TCP **4000**. No IP
+allowlist is added. Actual host availability/firewall configuration is not
+established by the repository's isolated tests.
+
 Mudlet's connection guide:
 <https://wiki.mudlet.org/w/Manual%3AIntroduction>.
 
@@ -26,8 +30,9 @@ reuse an important password.
 ## Supported scope
 
 Ordinary text play is retained. Optional **GMCP vitals** are now supported;
-see [the packet schema and client notes](GMCP.md). Automatic mapping and
-client interface packages are not included.
+see [the packet schema and client notes](GMCP.md).
+The [optional Mudlet HUD](../clients/mudlet/README.md) is included separately.
+Automatic mapping is not included; MudForge widgets remain client-specific.
 
 | Feature | Current server behavior |
 | --- | --- |

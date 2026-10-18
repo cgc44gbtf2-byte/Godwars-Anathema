@@ -53,8 +53,9 @@ check-layout:
 	python3 tests/test_combat_layout.py
 	python3 tests/test_telnet_layout.py
 	python3 tests/test_gmcp_layout.py
+	python3 tests/test_mudlet_hud.py
 	python3 tests/test_security_commands.py
-	python3 tests/test_bootstrap_staff.py
+	python3 tests/test_setup.py
 
 test: check-layout $(TESTS)
 	@set -e; for t in $(TESTS); do ./$$t; done

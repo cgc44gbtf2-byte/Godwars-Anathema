@@ -5,6 +5,32 @@ This branch focuses on fixing class abilities, protecting player saves and
 making the legacy code easier to maintain. It is not a finished balance pass,
 and this repository does not provide a running game server.
 
+Game endpoint: **137.184.145.164:4000** (ordinary TCP/Telnet, no IP allowlist).
+This is the configured address, not a claim that the host has been deployed
+or checked from this checkout.
+
+## Quick install and startup — fresh Debian / Ubuntu
+
+After cloning this private repository onto your server:
+
+```sh
+python3 deploy/setup.py                       # preview, no host changes
+sudo python3 deploy/setup.py --apply --start  # fresh install and boot startup
+```
+
+This installs build dependencies, builds as the unprivileged service account,
+imports only world data from `Genesis.zip`, installs systemd and starts it.
+Review historical world content and licensing first. It refuses existing
+installations rather than replacing players, accounts or custom server state.
+It does not configure provider/host firewalls; allow inbound TCP 4000 if needed.
+For an already installed server: `sudo systemctl start anathema.service`.
+
+Create **Luto** through normal signup, log in and type **`authorize`** in full.
+Luto receives the highest staff level; HP/mana/class stats are unchanged.
+There is no offline account creation, Yami promotion or bootstrap secret.
+This intentionally trusts control of the Luto account, not real-world identity.
+See [installation details and upgrades](deploy/INSTALL.md).
+
 ## Player updates
 
 - **Vampires:** consent-based discipline teaching and five Path of Blood
@@ -36,16 +62,18 @@ and this repository does not provide a running game server.
 
 There are ten classes: Vampire, Werewolf, Highlander, Mage, Sorcerer, Monk,
 Ninja, Drow, Dragon and Elementalist. Hybrids are **not enabled**.
-Your server operator supplies the game address, port and permitted connection
-method. Classic Telnet traffic is plaintext: never reuse an important password.
+Connect to **137.184.145.164**, port **4000**.
+Classic Telnet traffic is plaintext: never reuse an important password.
 
 ### MudForge and Mudlet
 
-Use your operator's game host and port for a TCP/Telnet connection.
+Use **137.184.145.164:4000** for a TCP/Telnet connection.
 Mudlet's **Secure/TLS** option requires a separately configured TLS endpoint;
 this server's normal socket is not TLS. MudForge's browser version supplies
 its own bridge, so the game does not need a WebSocket listener.
 See [client setup, tested scope and copyover rollback notes](docs/CLIENTS.md).
+An [optional Mudlet vitals HUD with XML import and Lua source](clients/mudlet/README.md)
+shows health, mana and class resources without automating combat.
 
 ## Download and build — Debian / Ubuntu
 
@@ -56,7 +84,7 @@ GitHub SSH access.
 
 ```sh
 sudo apt-get update
-sudo apt-get install -y build-essential libcrypt-dev git ca-certificates python3 unzip
+sudo apt-get install -y build-essential libcrypt-dev git ca-certificates python3 unzip luajit
 git clone --branch Godwars-Anathema git@github.com:cgc44gbtf2-byte/Godwars-Anathema.git
 cd Godwars-Anathema
 make -j2
@@ -96,9 +124,10 @@ cd Genesis/area
 ../src/merc 4000
 ```
 
-The game listens on all network interfaces. Block external TCP 4000 first,
-or use a restricted VPN/SSH connection. A private GitHub repository does not
-make the running server private. Stop a local foreground instance with Ctrl+C;
+The game listens on all network interfaces, with no IP allowlist. The intended
+public endpoint is `137.184.145.164:4000`; host/provider firewalls may need an
+inbound TCP 4000 rule. A private GitHub repository does not make the running
+server private. Stop a local foreground instance with Ctrl+C;
 forced kills and disk failures can still lose unsaved progress.
 
 After completing the systemd installation, use:
@@ -113,8 +142,7 @@ sudo systemctl stop anathema.service
 Enable startup on boot only after verifying the game starts and saves correctly:
 `sudo systemctl enable anathema.service`.
 For the first owner accounts, see
-[offline Yami/Luto staff setup](deploy/INSTALL.md#first-staff-accounts-yami-and-luto);
-there is no name-based in-game self-promotion.
+[in-game Luto authorization](deploy/INSTALL.md#owner-account-luto).
 
 ## More information
 

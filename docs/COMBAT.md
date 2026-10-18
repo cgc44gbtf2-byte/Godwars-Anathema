@@ -55,8 +55,9 @@ Both production and full-engine tests link the new owners exactly once.
    command and persisted staff accounts are not changed. Inspect live
    account/audit records separately if this code has been exposed publicly;
    repository tests cannot determine whether anyone used it.
-    First-staff setup instead uses the operator-only offline bootstrap
-    documented in `deploy/INSTALL.md`, after account creation and logout.
+   The later operator-requested Luto-only `authorize` policy is explicit and
+   separate: it intentionally trusts that account name, with no secret. Its
+   current behavior and risks are documented in `deploy/INSTALL.md`.
 
 No new class powers, costs, gear stats, counters or save schema are introduced.
 Malformed training values are repaired in memory; the usual successful
@@ -72,12 +73,15 @@ combat relaxation, silver hand promotion, grip toggling, shield versus claw
 style selection, all eleven class/no-class style-cap profiles, five advanced
 stance prerequisites, fight-list insertion/removal and safety entry guards.
 It runs in both `make test` and `make sanitize`, without loading live accounts.
-`tests/test_admin_gate.c` verifies the historical eligibility of the two
-names without creating accounts; the static command-table test ensures the
-name-gated elevation path is no longer available.
-`tests/test_bootstrap_staff.py` uses synthetic files to check offline-lock
-refusal, both role mappings, byte-preservation, protected snapshots, unsafe
-paths/permissions, divergent credentials and interrupted two-file replacement.
+`tests/test_admin_gate.c` now tests the operator-requested, explicitly
+name-based **Luto-only `authorize`** policy, direct-input guards, durable
+highest rank and unchanged HP/mana. The old `relevel` and offline bootstrap
+tool stay removed. This policy trusts control of the Luto name, not real-world
+ownership; see [owner setup and risks](../deploy/INSTALL.md#owner-account-luto).
+`tests/smoke_owner.py` tests actual TCP signup and promotion with synthetic
+Luto/Yami accounts in an isolated world. `tests/test_setup.py` validates
+world-only imports, fail-closed fresh-install handling and simulated host
+orchestration; it does not execute root installation on a production host.
 
 ## Remaining staged work
 

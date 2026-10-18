@@ -1,4 +1,4 @@
-"""No name-derived staff elevation path may re-enter the player command table."""
+"""The legacy relevel stays removed; only the explicit Luto policy is allowed."""
 from pathlib import Path
 import re
 import unittest
@@ -27,6 +27,12 @@ class StaffGateChecks(unittest.TestCase):
         source = (SRC / "kav_wiz.c").read_text()
         self.assertNotRegex(source, r'(?s)is_name\s*\(\s*ch->name\s*,'
                             r'.{0,300}\bLEV_(?:ST|IMP)\b')
+        owner = (SRC / "owner_authorize.c").read_text()
+        self.assertIn('str_cmp(ch->name, "Luto")', owner)
+        self.assertNotIn('"Yami"', owner)
+        self.assertIn("PLAYER_SAVE_PRIMARY", owner)
+        self.assertIn('(!direct_input || str_cmp(command, "authorize"))',
+                      (SRC / "interp.c").read_text())
 
 
 if __name__ == "__main__":

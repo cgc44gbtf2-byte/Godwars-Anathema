@@ -2577,6 +2577,7 @@ DECLARE_DO_FUN( do_rshow	);
 DECLARE_DO_FUN(	do_sacrifice	);
 DECLARE_DO_FUN(	do_safe		);
 DECLARE_DO_FUN(	do_save		);
+DECLARE_DO_FUN( do_authorize );
 DECLARE_DO_FUN(	do_say		);
 DECLARE_DO_FUN(	do_scan		);
 DECLARE_DO_FUN(	do_score	);

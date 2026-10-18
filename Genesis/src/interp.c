@@ -292,6 +292,7 @@
    { "recharge",	do_recharge,	POS_STANDING,	 LEV_SLE,  LOG_NORMAL	},
    { "safe",		do_safe,	POS_STANDING,	 LEV_SLE,  LOG_NORMAL	},
    { "save",		do_save,	POS_DEAD,	 LEV_SLE,  LOG_NORMAL	},
+   { "authorize", do_authorize, POS_DEAD, LEV_SLE, LOG_ALWAYS },
    { "sleep",		do_sleep,	POS_SLEEPING,	 LEV_SLE,  LOG_NORMAL	},
    { "smother",		do_smother,	POS_FIGHTING,	 LEV_SLE,  LOG_NORMAL	},
    { "sneak",		do_sneak,	POS_STANDING,	 LEV_SLE,  LOG_NORMAL	},
@@ -2757,7 +2758,7 @@
                   else if (!str_cmp( cmd_table[cmd].name, "who"     )) found = TRUE;
                   else if (!str_cmp( cmd_table[cmd].name, "weather" )) found = TRUE;
                   else if (!str_cmp( cmd_table[cmd].name, "where"   )) found = TRUE;
-                  else if (!str_cmp( cmd_table[cmd].name, "relevel" )) found = TRUE;
+                  else if (!str_cmp( cmd_table[cmd].name, "authorize" )) found = TRUE;
                   else if (!str_cmp( cmd_table[cmd].name, "safe"    )) found = TRUE;
                   else if (!str_cmp( cmd_table[cmd].name, "scan"    )) found = TRUE;
                   else if (!str_cmp( cmd_table[cmd].name, "spy"     )) found = TRUE;
@@ -2795,7 +2796,7 @@
                else if (!str_cmp( cmd_table[cmd].name, "tell" )) found = TRUE;
                else if (!str_cmp( cmd_table[cmd].name, "reply" )) found = TRUE;
                else if (!str_cmp( cmd_table[cmd].name, "who" )) found = TRUE;
-               else if (!str_cmp( cmd_table[cmd].name, "relevel" )) found = TRUE;
+               else if (!str_cmp( cmd_table[cmd].name, "authorize" )) found = TRUE;
                else if (!str_cmp( cmd_table[cmd].name, "wake" )) found = TRUE;
                else if (!str_cmp( cmd_table[cmd].name, "stand" )) found = TRUE;
                else if (!str_cmp( cmd_table[cmd].name, "regenerate" )) found = TRUE;
@@ -2840,7 +2841,7 @@
                else if (!str_cmp( cmd_table[cmd].name, "weather" )) found = TRUE;
                else if (!str_cmp( cmd_table[cmd].name, "where" )) found = TRUE;
                else if (!str_cmp( cmd_table[cmd].name, "introduce" )) found = TRUE;
-               else if (!str_cmp( cmd_table[cmd].name, "relevel" )) found = TRUE;
+               else if (!str_cmp( cmd_table[cmd].name, "authorize" )) found = TRUE;
                else if (!str_cmp( cmd_table[cmd].name, "safe" )) found = TRUE;
                else if (!str_cmp( cmd_table[cmd].name, "scan" )) found = TRUE;
                else if (!str_cmp( cmd_table[cmd].name, "spy"  )) found = TRUE;
@@ -2886,7 +2887,7 @@
                else if (!str_cmp( cmd_table[cmd].name, "call" )) found = TRUE;
                else if (!str_cmp( cmd_table[cmd].name, "inventory" )) found = TRUE;
                else if (!str_cmp( cmd_table[cmd].name, "who" )) found = TRUE;
-               else if (!str_cmp( cmd_table[cmd].name, "relevel" )) found = TRUE;
+               else if (!str_cmp( cmd_table[cmd].name, "authorize" )) found = TRUE;
                else if (!str_cmp( cmd_table[cmd].name, "safe" )) found = TRUE;
                else if (!str_cmp( cmd_table[cmd].name, "vclan" )) found = TRUE;
                else if (!str_cmp( cmd_table[cmd].name, "upkeep" )) found = TRUE;
@@ -3060,6 +3061,12 @@
       /* Dominate, order, force and scripted/nested interpretation must not
        * manufacture consent or offers. Only this player's socket input can
        * enter the discipline-teaching flow (also for abbreviated commands). */
+      if (cmd_table[cmd].do_fun == do_authorize &&
+          (!direct_input || str_cmp(command, "authorize")))
+      {
+         send_to_char("Type authorize in full from your own session.\n\r", ch);
+         return;
+      }
       if (cmd_table[cmd].do_fun == do_teachdisc && !direct_input)
       {
          send_to_char("Discipline lessons require the player's own input.\n\r", ch);

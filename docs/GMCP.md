@@ -2,8 +2,9 @@
 
 GMCP is optional. Enable GMCP in your client and reconnect to the operator's
 normal game endpoint. Clients without it retain ordinary text play.
-This adds **server data**, not a bundled HUD, autohealer, mapper or party panel.
-Your client/version may need widget configuration or a script/plugin.
+The server adds **data**, not an autohealer, mapper or party panel.
+An [optional Mudlet HUD](../clients/mudlet/README.md) is now supplied separately;
+MudForge still needs its own widget/plugin configuration.
 
 ## Packages
 

@@ -7,6 +7,36 @@ with systemd. Resolve the original Diku/Merc/God Wars licensing and permission
 requirements before operating or redistributing the game; this deployment
 does not grant them.
 
+## Quick fresh install
+
+Endpoint: **137.184.145.164:4000**, public TCP/Telnet, no IP allowlist.
+After cloning this private repository to a supported host with Python 3:
+
+```sh
+python3 deploy/setup.py
+sudo python3 deploy/setup.py --apply --start
+```
+
+Preview makes no host changes. Apply installs distro build dependencies,
+creates the unprivileged `anathema` service account, builds in temporary
+service-owned staging (not as root), installs the protected binary/layout,
+imports only flat `.are`/`.hlp`/`area.lst` world data from `Genesis.zip`,
+verifies systemd and enables/starts the service. Historical accounts, notes,
+bans, executables and copyover files are not imported.
+Use `--world-archive /path/to/reviewed.zip` for another compatible world archive.
+Review world content and resolve licensing/permissions before applying.
+
+This is **fresh-install only**: existing directories, unit, user or group cause
+refusal before package installation. It is not a transaction; if a later step
+fails, inspect partial state instead of deleting it or repeatedly applying.
+It never replaces existing game state or changes firewall rules.
+For an existing installation use the upgrade instructions below.
+
+Start: `sudo systemctl start anathema.service`. Stop: `sudo systemctl stop
+anathema.service`. Status/logs: `sudo systemctl status anathema.service` and
+`sudo journalctl -u anathema.service -n 50 --no-pager`.
+Create Luto in game and type `authorize`; see [owner setup](#owner-account-luto).
+
 ## 1. Prepare and preserve existing state
 
 **Drow ammunition:** ensure existing bolt template `29659` is loaded and valid
@@ -148,14 +178,12 @@ access; administrator provisioning is a separate, audited operator task.
 
 **The game binds IPv4 INADDR_ANY, not just localhost. Telnet traffic, including
 passwords, is plaintext.** Password hashing at rest does not protect it on the
-wire. Establish a host and provider firewall **before** starting the server.
-For private use, keep TCP 4000 blocked externally and use a VPN or SSH tunnel.
-Do not assume a reverse proxy makes direct port 4000 safe.
+wire. The requested endpoint is public `137.184.145.164:4000`, with no IP
+allowlist. Do not assume a private repository or reverse proxy encrypts direct
+port 4000 traffic.
 
 On hosts already using UFW, inspect the policy with `sudo ufw status verbose`.
-With an established default-deny incoming policy, an optional restricted rule
-is `sudo ufw allow from 192.0.2.10 to any port 4000 proto tcp` (replace the
-documentation address with the actual trusted client/VPN address).
+If UFW is already active, the public game rule is `sudo ufw allow 4000/tcp`.
 Do not enable/reset a firewall remotely without first preserving SSH access.
 If intentionally offering public plaintext telnet, explicitly accept that
 risk before adding a public TCP 4000 rule; tell users never to reuse passwords.
@@ -173,7 +201,7 @@ sudo systemctl status anathema.service
 sudo journalctl -u anathema.service -n 100 --no-pager
 ```
 
-Enable boot startup only after checking a successful boot, restricted
+Enable boot startup only after checking a successful boot, public game
 connectivity, a newly created test character's save/reload, and OLC writes:
 
 ```sh
@@ -254,52 +282,27 @@ save, OLC and descriptor-preserving exec. `LimitNOFILE=1024` matches the
 select-based design; raising it is not a supported scaling fix. Journal
 output can contain player identifiers; restrict log and backup access.
 
-## First staff accounts: Yami and Luto
+## Owner account: Luto
 
-The old name-gated in-game `relevel` command is removed: character names do not
-prove server ownership. There is no automatic promotion on registration/login,
-and no bootstrap password or token in the MUD.
+The offline bootstrap tool is removed. Create **Luto** through normal signup,
+finish login, then type **`authorize`** in full with no arguments. Only Luto's
+own authenticated, unswitched, uncharmed playing session can use it; normal
+force/order/nested interpretation and command abbreviations are rejected.
+It sets level (and the engine's derived trust) to **`LEV_ST` / maximum level 7**, saves the
+primary, then saves the backup. It changes no HP, mana, class, gear or skills.
+Yami and all other names have no name-based promotion through `authorize`.
+`relevel` remains removed; existing authenticated staff tools are unchanged.
 
-The operator-only `deploy/bootstrap_staff.py` replaces the unsafe first-staff
-path. It maps **Yami to `LEV_ST` (7), 500,000 HP/mana**, and **Luto to
-`LEV_IMP` (6), 300,000 HP/mana**, matching the two historical role/resource
-tiers. It changes only the player section's level and current/maximum HP/mana;
-passwords, gear, inventory and other saved fields remain unchanged.
+This intentionally grants authority by account name, **without a token,
+IP restriction or proof of real-world ownership**, as requested. Anyone able
+to create, rename to, or control the Luto account can acquire highest staff
+authority. Protect its game password. The repository being private does not
+protect an unclaimed name on the public server. No owner account is created
+or altered by the installer, and login itself does not grant promotion.
 
-1. Create each account normally and verify you own it. Save and log out so
-   both primary and backup files exist and contain the same password and level.
-2. Stop the service and verify it exited. Do **not** start it, run copyover,
-   or allow another writer during the bootstrap.
-3. From the reviewed source checkout, preview and apply as the server operator:
-
-```sh
-sudo systemctl stop anathema.service
-sudo python3 deploy/bootstrap_staff.py --account Yami
-sudo python3 deploy/bootstrap_staff.py --account Yami --apply
-sudo python3 deploy/bootstrap_staff.py --account Luto
-sudo python3 deploy/bootstrap_staff.py --account Luto --apply
-sudo systemctl start anathema.service
-```
-
-Log in again afterward; no in-game `relevel` is needed. The default data root is
-`/var/lib/anathema`; custom installations must pass an absolute `--root` and
-use the same private `player/`, `backup/` and `clans/Lock` layout. The tool holds
-the existing clan lock and refuses an already-running process that holds it.
-This is a defensive check, **not** a substitute for stopping all game processes
-or a general lock used by every possible player-save writer.
-
-The root must belong to the operator running the tool (root for the documented
-installation), with no group/world writes. Save directories/files must be
-private, regular and consistently owned; symlinks, hard-linked save files,
-malformed saves, absent backups, divergent credentials/levels and repeated
-promotions fail closed. Originals are preserved in operator-owned, mode-0700
-`bootstrap-backups/`, with mode-0600 files. Treat them as credentials-bearing
-backups: never put them in Git, chat or a public archive.
-
-Each replacement is staged, synced and atomic, but the two destination renames
-are **not one transaction**. If an apply is interrupted or reports an error,
-keep the service stopped and inspect both saves and the private originals.
-Restore the original primary/backup files with their service ownership and
-private permissions before retrying; existing snapshots are never overwritten.
-This tool does not prove account ownership, audit previously granted staff,
-or protect against permanent storage failure.
+A failed primary save restores the prior runtime rank and reports failure;
+post-rename storage/sync failures can leave disk state uncertain, so inspect
+storage before retrying. Backup failures after primary success retain the
+authorized rank and use the existing save retry queue. Existing offline
+bootstrap backups are not removed or imported; preserve them privately if
+they contain real account history.

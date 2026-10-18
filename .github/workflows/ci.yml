@@ -18,7 +18,7 @@ jobs:
     container: ${{ matrix.image }}
     steps:
       - name: Install distro toolchain
-        run: apt-get update && apt-get install -y --no-install-recommends ca-certificates git build-essential libcrypt-dev systemd python3
+        run: apt-get update && apt-get install -y --no-install-recommends ca-certificates git build-essential libcrypt-dev systemd python3 luajit
       - uses: actions/checkout@v4
       - name: Build
         run: make -j2
@@ -34,6 +34,7 @@ jobs:
         run: |
           python3 tests/smoke_shutdown.py
           python3 tests/smoke_copyover.py
+          python3 tests/smoke_owner.py
       - name: Address and undefined-behavior sanitizers
         env:
           ASAN_OPTIONS: detect_leaks=0:halt_on_error=1
@@ -44,3 +45,4 @@ jobs:
           make -j2 CFLAGS="-std=gnu17 -DMERC -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer" LDFLAGS="-fsanitize=address,undefined"
           python3 tests/smoke_shutdown.py
           python3 tests/smoke_copyover.py
+          python3 tests/smoke_owner.py
