@@ -22,6 +22,11 @@ and this repository does not provide a running game server.
   thresholds. Stance/style handling and class-ability error checks are being
   cleaned up without a general damage rebalance. Brittle Bones now expires
   without walking into the recycled-effect list.
+- **Kills and rewards:** Highest-level and highest-XP kill records track the
+  single best kill rather than adding later kills to the record. Players
+  editing in-game still count toward the online XP bonus.
+- **Death text:** Invalid custom death text uses a safe default, and long
+  corpse descriptions are bounded.
 - **Reliability:** safer player saves, reconnects, shutdowns, item ownership
   and conjured-item shop handling.
 

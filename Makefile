@@ -16,6 +16,7 @@ TESTS += tests/test_highlander_counter
 TESTS += tests/test_stance_style
 TESTS += tests/test_admin_gate
 TESTS += tests/test_combat_calculations
+TESTS += tests/test_combat_damage_death
 
 all:
 	$(MAKE) -C Genesis/src
@@ -53,14 +54,17 @@ test: check-layout $(TESTS)
 
 # Link the real engine, including actual safety, combat and interpreter paths.
 # Only the server entry point is renamed; no real accounts/world files load.
-tests/test_combat_status tests/test_vampire tests/test_basic_buffs tests/test_class_handlers tests/test_vampire_modules tests/test_damage_messages tests/test_transformations tests/test_clans tests/test_class_gear tests/test_drow_ammo tests/test_lifecycle_ownership tests/test_autosave_recovery tests/test_highlander_counter tests/test_stance_style tests/test_admin_gate tests/test_combat_calculations: tests/%: tests/%.c $(ENGINE_OBJECTS)
+tests/test_combat_status tests/test_vampire tests/test_basic_buffs tests/test_class_handlers tests/test_vampire_modules tests/test_damage_messages tests/test_transformations tests/test_clans tests/test_class_gear tests/test_drow_ammo tests/test_lifecycle_ownership tests/test_autosave_recovery tests/test_highlander_counter tests/test_stance_style tests/test_admin_gate tests/test_combat_calculations tests/test_combat_damage_death: tests/%: tests/%.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 # Separate test objects keep sanitizer flags out of the production executable.
-tests/test_restored_spells: tests/test_restored_spells.c $(filter-out tests/stun_engine/fight.o,$(ENGINE_OBJECTS)) tests/restored_fight.o
-	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(filter-out tests/stun_engine/fight.o,$(ENGINE_OBJECTS)) tests/restored_fight.o $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+tests/test_restored_spells: tests/test_restored_spells.c $(filter-out tests/stun_engine/fight.o tests/stun_engine/combat_damage.o,$(ENGINE_OBJECTS)) tests/restored_fight.o tests/restored_damage.o
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(filter-out tests/stun_engine/fight.o tests/stun_engine/combat_damage.o,$(ENGINE_OBJECTS)) tests/restored_fight.o tests/restored_damage.o $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/restored_fight.o: Genesis/src/fight.c $(ENGINE_HEADERS)
+	$(CC) $(TEST_CPPFLAGS) -DMERC -DCOMBAT_CALLBACK_TESTING $(CFLAGS) $(TEST_FLAGS) -c $< -o $@
+
+tests/restored_damage.o: Genesis/src/combat_damage.c $(ENGINE_HEADERS)
 	$(CC) $(TEST_CPPFLAGS) -DMERC -DCOMBAT_CALLBACK_TESTING $(CFLAGS) $(TEST_FLAGS) -c $< -o $@
 
 tests/stun_engine/%.o: Genesis/src/%.c $(ENGINE_HEADERS)
@@ -88,4 +92,4 @@ sanitize:
 clean:
 	rm -f tests/restart_engine.o
 	$(MAKE) -C Genesis/src clean
-	rm -f $(TESTS) tests/buffers_interp.o $(ENGINE_OBJECTS) $(LEGACY_CLASS_OBJECTS) tests/stun_comm.o tests/restored_fight.o
+	rm -f $(TESTS) tests/buffers_interp.o $(ENGINE_OBJECTS) $(LEGACY_CLASS_OBJECTS) tests/stun_comm.o tests/restored_fight.o tests/restored_damage.o

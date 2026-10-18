@@ -16,7 +16,10 @@ in the shared engine.
 | `combat_status.c` | Target liveness, action pauses and immunity/reuse timers |
 | `combat_initiative.c` | Pulse spacing from stats, class powers, stances and status effects |
 | `combat_defense.c` | Soak, avoidance rolls, visibility penalties and avoidance-breaking |
-| `fight.c` | Remaining attack loop, damage caps/application, death/rewards and action commands |
+| `combat_damage.c` | Shared damage, hit points, damage caps and safety/reaction boundaries |
+| `combat_death.c` | Wound positions, corpse/head lifecycle, player/NPC death and announcements |
+| `combat_rewards.c` | XP, group rewards and class points |
+| `fight.c` | Remaining attack loop, damage wording and combat action commands |
 | `core.c` | General formatted output and legacy item/output helpers; no fight-list management |
 | `handler.c` | Equipment-derived flags and effects; styles call its existing refresh helper after hand promotion |
 | `save.c` | Save format and load-time normalization, not combat decisions |
@@ -79,10 +82,9 @@ paths/permissions, divergent credentials and interrupted two-file replacement.
 ## Remaining staged work
 
 The request covers the shared combat system, not just these initial owners.
-Initiative and shared defense calculations now have explicit owners.
-Next extract and characterize damage caps/application,
-death/rewards and generic combat commands from `fight.c`. Give each a single
-owner and keep legacy public entry points compatible. Spell dispatch remains
+Initiative, defense, damage, death and rewards now have explicit owners.
+Next extract and characterize the attack loop, damage wording and generic
+combat commands from `fight.c`. Keep legacy public entry points compatible. Spell dispatch remains
 in `magic.c` and class abilities remain in their class modules; audit their
 engine boundaries instead of moving unrelated code wholesale.
 
@@ -125,6 +127,42 @@ than silently rebalanced.
 `tests/test_combat_calculations.c` is included in normal and sanitizer gates.
 `get_soak()` is not a pure getter: checking it can consume a Brittle Bones
 charge. Do not cache, precompute or call it an extra time as an optimization.
+
+## Damage, death and reward follow-up
+
+The new baseline is private head `bbfd008d9347487ef99af54b489e96595bc503e0`.
+The added real-engine suite passes baseline HP-position boundaries, normal
+damage cap/soak, legacy signed healing, group XP, Drow class points and
+custom messages before the file moves. Separate sanitizer probes reproduced
+incorrect highest-kill records, NPC killer crash, unsafe `%n` custom
+formatting, HP subtraction overflow, a null damage actor, long-corpse-name
+stack overflow and missed online occupancy for a player in the area editor.
+
+The fixes retain the normal formulas and per-hit RNG order. Highest-level
+and highest-XP records now keep their actual maximum instead of accumulating
+each new maximum. The existing in-world descriptor classifier counts editing
+players toward the ten-online XP bonus and skips detached descriptors.
+Death announcements render only two `%s` names and literal `%%`, rejecting
+unsupported format directives without interpreting saved strings as code.
+NPC killers use their short description without dereferencing PC data.
+Corpse descriptions and fatality logs are bounded; malformed corpse
+templates fall back to ordinary text. HP subtraction saturates on numeric
+overflow but preserves ordinary damage and historical signed healing.
+
+The 16 relocated function bodies match the independently fixed baseline:
+12 byte-identical and four different only in whitespace, with every string
+and character literal identical. The special restored-spell test still links
+its callback-instrumented *damage* object, not the uninjected production
+object. `tests/test_combat_damage_death.c` covers normal/ASan+UBSan native
+cases, including corpse item/vanish transfer and shadow-plane flags with
+synthetic objects. It loads no live accounts or world.
+
+**Not claimed:** end-to-end live player death, decapitation, disk-failure
+recovery, reward math at arbitrary malformed/huge values, all NPC corpse
+templates, real multiplayer fairness, or a measured speedup. Existing NPC
+level thresholds, Monk Cloak-of-Life recovery position, HP cap side effects
+from Brittle Bones and normal reward multipliers remain intentionally
+unchanged; character death/save interactions require separate live staging.
 
 ## Optimization rules
 
