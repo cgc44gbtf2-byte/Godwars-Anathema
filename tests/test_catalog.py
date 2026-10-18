@@ -3,7 +3,6 @@ import collections
 import pathlib
 import re
 import unittest
-import zipfile
 
 SRC = pathlib.Path(__file__).resolve().parents[1] / "Genesis" / "src"
 
@@ -17,9 +16,8 @@ def engine_sources():
 
 def bundled_objects(path):
     """Read object records only; colored descriptions also begin with '#'.
-    This is a reference archive, not evidence of deployed area contents."""
-    with zipfile.ZipFile(SRC.parents[1] / "Genesis.zip") as archive:
-        text = archive.read("Genesis/area/" + path).decode("latin1")
+    These are the versioned seed files, not evidence of live server state."""
+    text = (SRC.parent / "area" / path).read_text(encoding="latin1")
     section = text.split("#OBJECTS", 1)[1]
     result = {}
     for match in re.finditer(r"^#(\d+)\s*\n(.*?)(?=^#\d+\s*$|\Z)",
@@ -145,17 +143,14 @@ class CatalogChecks(unittest.TestCase):
         # Read only the area files named by area.lst, never account archives.
         kinds = {"obj": "OBJECTS", "mob": "MOBILES", "room": "ROOMS"}
         world = {kind: set() for kind in kinds.values()}
-        with zipfile.ZipFile(SRC.parents[1] / "Genesis.zip") as archive:
-            loaded = set(re.findall(r"[^\s$]+\.are",
-                archive.read("Genesis/area/area.lst").decode("latin1")))
-            for name in archive.namelist():
-                if not name.startswith("Genesis/area/") or pathlib.PurePosixPath(name).name not in loaded:
-                    continue
-                text = archive.read(name).decode("latin1")
-                for kind, body in re.findall(
-                    r"^#(OBJECTS|MOBILES|ROOMS)\s*\n(.*?)(?=^#[A-Z$]|\Z)",
-                    text, re.M | re.S):
-                    world[kind].update(int(n) for n in re.findall(r"^#(\d+)\s*$", body, re.M))
+        area = SRC.parent / "area"
+        loaded = set(re.findall(r"[^\s$]+\.are", (area / "area.lst").read_text()))
+        for name in loaded:
+            text = (area / name).read_text(encoding="latin1")
+            for kind, body in re.findall(
+                r"^#(OBJECTS|MOBILES|ROOMS)\s*\n(.*?)(?=^#(?:AREA|AREADATA|HELPS|MOBILES|OBJECTS|ROOMS|RESETS|SHOPS|SPECIALS|\$)(?:\s|$)|\Z)",
+                text, re.M | re.S):
+                world[kind].update(int(n) for n in re.findall(r"^#(\d+)\s*$", body, re.M))
         header = (SRC / "merc.h").read_text()
         constants = {name: int(value) for name, value in re.findall(
             r"^#define\s+(\w+)\s+\(?([0-9]+)\)?\s*(?:/\*.*)?$", header, re.M)}

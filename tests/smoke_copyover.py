@@ -6,7 +6,7 @@ import subprocess
 import sys
 import tempfile
 import time
-import zipfile
+from world_fixture import stage_world
 from gmcp_probe import GMCPProbe
 
 repo = pathlib.Path(__file__).resolve().parents[1]
@@ -38,13 +38,7 @@ with tempfile.TemporaryDirectory(prefix="anathema-copyover-") as directory:
     for name in ("area", "player", "backup", "notes", "log", "clans"):
         (runtime / name).mkdir(mode=0o700)
     (runtime / "src").symlink_to(repo / "Genesis/src", target_is_directory=True)
-    with zipfile.ZipFile(repo / "Genesis.zip") as archive:
-        for name in archive.namelist():
-            path = pathlib.PurePosixPath(name)
-            if str(path.parent) == "Genesis/area" and (
-                path.suffix in (".are", ".hlp") or path.name == "area.lst"
-            ):
-                (runtime / "area" / path.name).write_bytes(archive.read(name))
+    stage_world(repo, runtime)
     subprocess.run([str(repo / "tests/test_restart"), "--seed",
                     str(runtime / "area")], check=True)
     with socket.socket() as reservation:

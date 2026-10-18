@@ -10,7 +10,7 @@ does not grant them.
 ## Quick fresh install
 
 Endpoint: **137.184.145.164:4000**, public TCP/Telnet, no IP allowlist.
-After cloning this private repository to a supported host with Python 3:
+After cloning this repository to a supported host with Python 3:
 
 ```sh
 python3 deploy/setup.py
@@ -20,10 +20,12 @@ sudo python3 deploy/setup.py --apply --start
 Preview makes no host changes. Apply installs distro build dependencies,
 creates the unprivileged `anathema` service account, builds in temporary
 service-owned staging (not as root), installs the protected binary/layout,
-imports only flat `.are`/`.hlp`/`area.lst` world data from `Genesis.zip`,
+imports only flat `.are`/`.hlp`/`area.lst` data from the checked-in `Genesis/area/`,
 verifies systemd and enables/starts the service. Historical accounts, notes,
 bans, executables and copyover files are not imported.
-Use `--world-archive /path/to/reviewed.zip` for another compatible world archive.
+Use `--world-dir /path/to/reviewed/area` for another reviewed world, or
+`--world-archive /path/to/reviewed.zip` for an explicit legacy ZIP import.
+The legacy ZIP is not the default: it does not contain the current world fixes.
 Review world content and resolve licensing/permissions before applying.
 
 This is **fresh-install only**: existing directories, unit, user or group cause
@@ -141,10 +143,27 @@ No PID file, wrapper loop or socket unit is needed.
 
 ## 4. Install reviewed world data, not historical accounts
 
-The source checkout does not include the runtime world. Supply authorized,
-reviewed `.are` / `.hlp` files and `area.lst`. If using the retained archive,
-first list its contents, then extract **only** these world-data names into
-a new, private staging directory as your ordinary user:
+The source checkout includes 69 seed world/help files in `Genesis/area/`,
+not historical accounts or live server state. The quick installer validates
+`area.lst` and imports this unpacked seed by default.
+
+For the manual installation in this guide, after reviewing the files:
+
+```sh
+sudo install -o anathema -g anathema -m 0600 \
+  Genesis/area/*.are Genesis/area/*.hlp Genesis/area/area.lst \
+  /var/lib/anathema/area/
+```
+
+Only use that command for a fresh, empty runtime world. Do not overwrite a
+running/customized world's area files without backups and a reviewed migration.
+See [world audit and limits](../docs/WORLD_AUDIT.md).
+
+### Optional legacy archive import
+
+If deliberately importing a different reviewed legacy world, first list its
+contents, then extract **only** world-data names into a new private staging
+directory as your ordinary user:
 
 ```sh
 unzip -l Genesis.zip

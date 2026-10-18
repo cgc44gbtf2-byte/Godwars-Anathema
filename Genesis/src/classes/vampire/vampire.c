@@ -114,7 +114,7 @@ void do_teachdisc(CHAR_DATA *ch, char *argument)
     disc = discipline_id(accepting ? third : second);
     if (disc < 0)
     {
-        stc("That is not a supported Genesis discipline.\n\r", ch);
+        stc("That is not a supported Anathema discipline.\n\r", ch);
         return;
     }
     teacher = accepting ? get_char_room(ch, second) : ch;

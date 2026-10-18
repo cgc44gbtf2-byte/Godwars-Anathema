@@ -5,13 +5,17 @@ This branch focuses on fixing class abilities, protecting player saves and
 making the legacy code easier to maintain. It is not a finished balance pass,
 and this repository does not provide a running game server.
 
+Created by LaWaylon (Luto).
+Copyright (c) 2026 LaWaylon (Luto) - Anathema modifications.
+Original code/world credits, copyrights and license obligations remain intact.
+
 Game endpoint: **137.184.145.164:4000** (ordinary TCP/Telnet, no IP allowlist).
 This is the configured address, not a claim that the host has been deployed
 or checked from this checkout.
 
 ## Quick install and startup — fresh Debian / Ubuntu
 
-After cloning this private repository onto your server:
+After cloning this repository onto your server:
 
 ```sh
 python3 deploy/setup.py                       # preview, no host changes
@@ -19,7 +23,7 @@ sudo python3 deploy/setup.py --apply --start  # fresh install and boot startup
 ```
 
 This installs build dependencies, builds as the unprivileged service account,
-imports only world data from `Genesis.zip`, installs systemd and starts it.
+imports the unpacked `Genesis/area/` world, installs systemd and starts it.
 Review historical world content and licensing first. It refuses existing
 installations rather than replacing players, accounts or custom server state.
 It does not configure provider/host firewalls; allow inbound TCP 4000 if needed.
@@ -106,23 +110,25 @@ For a new Debian/Ubuntu server, follow the
 [step-by-step installation guide](deploy/INSTALL.md). It covers the service
 account, private data directories, world-data import, firewall and systemd.
 
-World data is required before the game can boot: `area.lst` and every
-referenced area/help file must be present. The retained `Genesis.zip` is an
-unpatched historical archive, not an installer. Follow the guide's
-[world-data-only import](deploy/INSTALL.md#4-install-reviewed-world-data-not-historical-accounts);
-never copy its historical player accounts, passwords, executable or object
-files over this checkout.
+The checkout includes **69 unpacked world/help files** in `Genesis/area/`,
+including `area.lst` and all 65 listed files. No historical accounts, logs,
+notes or archive executable are unpacked. The retained `Genesis.zip` is
+unpatched historical reference material, not an installer.
 
-For a **fresh local test**, after supplying reviewed world files in
-`Genesis/area/`, create the empty runtime directories and start in the
-foreground:
+For a **local test as an ordinary user**, build and start from the repository:
 
 ```sh
-umask 077
-mkdir -p Genesis/area Genesis/player Genesis/backup Genesis/notes Genesis/log Genesis/clans
-cd Genesis/area
-../src/merc 4000
+make run
+# Optional: make run PORT=4040
+# Validate without starting: python3 tools/start_local.py --check
 ```
+
+`make run` validates the world, prepares private runtime directories, changes
+into `Genesis/area/` and starts the patched binary in the foreground. It
+preserves existing saves and refuses runtime symlinks or foreign-owned
+directories. It refuses root: for a root SSH session use the fresh systemd
+installer above, which runs the service as `anathema`.
+The [world audit](docs/WORLD_AUDIT.md) records fixed dependencies and limits.
 
 The game listens on all network interfaces, with no IP allowlist. The intended
 public endpoint is `137.184.145.164:4000`; host/provider firewalls may need an

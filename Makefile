@@ -10,7 +10,8 @@ ENGINE_HEADERS = $(wildcard Genesis/src/*.h Genesis/src/classes/*.h Genesis/src/
 ENGINE_OBJECTS = $(patsubst Genesis/src/%.c,tests/stun_engine/%.o,$(ENGINE_SOURCES))
 LEGACY_CLASS_OBJECTS = $(addprefix tests/stun_engine/,$(notdir $(CLASS_MODULE_SOURCES:.c=.o)))
 
-.PHONY: all test check-layout sanitize clean
+.PHONY: all run test check-layout sanitize clean
+PORT ?= 4000
 TESTS += tests/test_restart
 TESTS += tests/test_highlander_counter
 TESTS += tests/test_stance_style
@@ -19,9 +20,13 @@ TESTS += tests/test_combat_calculations
 TESTS += tests/test_combat_damage_death
 TESTS += tests/test_telnet
 TESTS += tests/test_gmcp
+TESTS += tests/test_world_integrity
 
 all:
 	$(MAKE) -C Genesis/src
+
+run: all
+	python3 tools/start_local.py --port "$(PORT)"
 
 tests/%: tests/%.c $(ENGINE_SOURCES) $(ENGINE_HEADERS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
@@ -56,6 +61,7 @@ check-layout:
 	python3 tests/test_mudlet_hud.py
 	python3 tests/test_security_commands.py
 	python3 tests/test_setup.py
+	python3 tests/test_world_layout.py
 
 test: check-layout $(TESTS)
 	@set -e; for t in $(TESTS); do ./$$t; done
@@ -63,6 +69,9 @@ test: check-layout $(TESTS)
 # Link the real engine, including actual safety, combat and interpreter paths.
 # Only the server entry point is renamed; no real accounts/world files load.
 tests/test_combat_status tests/test_vampire tests/test_basic_buffs tests/test_class_handlers tests/test_vampire_modules tests/test_damage_messages tests/test_transformations tests/test_clans tests/test_class_gear tests/test_drow_ammo tests/test_lifecycle_ownership tests/test_autosave_recovery tests/test_highlander_counter tests/test_stance_style tests/test_admin_gate tests/test_combat_calculations tests/test_combat_damage_death tests/test_telnet tests/test_gmcp: tests/%: tests/%.c $(ENGINE_OBJECTS)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
+tests/test_world_integrity: tests/test_world_integrity.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 # Separate test objects keep sanitizer flags out of the production executable.

@@ -444,7 +444,7 @@ int main( int argc, char **argv )
      */
 #if defined(macintosh) || defined(MSDOS)
     boot_db( );
-    log_string( "GW: Genesis is ready to rock." );
+    log_string( "Godwars: Anathema is ready to rock." );
     game_loop_mac_msdos( );
 #endif
 
@@ -452,7 +452,7 @@ int main( int argc, char **argv )
     if (!fCopyOver)
           control = init_socket( port );
     boot_db( );
-    sprintf( log_buf, "GW: Genesis is ready to rock on port %d.", port );
+    sprintf( log_buf, "Godwars: Anathema is ready to rock on port %d.", port );
     log_string( log_buf );
     if (fCopyOver && !copyover_recover()) {
         log_string("Copyover recovery refused invalid or unreadable handoff; exiting.");
@@ -2346,7 +2346,7 @@ if ( !password_matches( argument, ch->pcdata->pwd, FALSE ) )
 
 
     case CON_READ_MOTD:
-	write_to_buffer(d, "\n\rWelcome to Godwars: Genesis.\n\r", 0);
+write_to_buffer(d, "\n\rWelcome to Godwars: Anathema.\n\r", 0);
 	ch->next	= char_list;
 	char_list	= ch;
 	d->connected	= CON_PLAYING;

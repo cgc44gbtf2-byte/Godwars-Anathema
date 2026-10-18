@@ -83,7 +83,7 @@ void attempt_copyover( void )
 	    continue;
 	}
 	fprintf(fp, "%li %s %s\n", d->descriptor, d->character->name, d->host);
-	write_to_descriptor(d->descriptor, "GENESIS IS ATTEMPTING TO NOT CRASH.  OH THE HUMANITY.\n\r", 0);
+write_to_descriptor(d->descriptor, "ANATHEMA IS ATTEMPTING TO RECOVER FROM A CRASH.\n\r", 0);
     }
 
     fprintf(fp, "-1\n");

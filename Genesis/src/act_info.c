@@ -1892,7 +1892,7 @@ void do_time( CHAR_DATA *ch, char *argument )
     else if (day % 10 == 3)	suf = "rd";
     else			suf = "th";
 
-    sprintf(buf, "It is %li o'clock %s, Day of %s, %li%s the Month of %s.\n\rGW: Genesis started up at %s\rThe system time is %s\r",
+    sprintf(buf, "It is %li o'clock %s, Day of %s, %li%s the Month of %s.\n\rGodwars: Anathema started up at %s\rThe system time is %s\r",
 	(time_info.hour % 12 == 0) ? 12 : time_info.hour % 12, time_info.hour >= 12 ? "pm" : "am", day_name[day % 7],
 	day, suf, month_name[time_info.month], str_boot_time, (char *) ctime(&current_time));
 

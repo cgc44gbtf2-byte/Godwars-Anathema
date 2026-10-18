@@ -6,7 +6,7 @@ import socket
 import subprocess
 import tempfile
 import time
-import zipfile
+from world_fixture import stage_world
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
 
@@ -36,7 +36,7 @@ def signup(client, name):
     client.sendall(b"m\n"); until(client, b"support ANSI")
     # The legacy line reader coalesces adjacent line endings. Wait for MOTD
     # before sending its Enter, rather than pipelining a swallowed blank line.
-    client.sendall(b"n\n"); until(client, b"Important Changes")
+    client.sendall(b"n\n"); until(client, b"Anathema modifications")
     client.sendall(b"\n"); until(client, b"Welcome to Godwars")
 
 
@@ -45,12 +45,7 @@ with tempfile.TemporaryDirectory(prefix="anathema-owner-wire-") as directory:
     for name in ("area", "player", "backup", "notes", "log", "clans"):
         (runtime / name).mkdir(mode=0o700)
     (runtime / "src").symlink_to(REPO / "Genesis/src", target_is_directory=True)
-    with zipfile.ZipFile(REPO / "Genesis.zip") as archive:
-        for name in archive.namelist():
-            path = pathlib.PurePosixPath(name)
-            if str(path.parent) == "Genesis/area" and (
-                path.suffix in (".are", ".hlp") or path.name == "area.lst"):
-                (runtime / "area" / path.name).write_bytes(archive.read(name))
+    stage_world(REPO, runtime)
     with socket.socket() as reservation:
         reservation.bind(("127.0.0.1", 0))
         port = reservation.getsockname()[1]

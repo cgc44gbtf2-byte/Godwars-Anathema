@@ -22,25 +22,46 @@ BUILD_ROOT = Path("/var/tmp")
 
 
 def world_files(archive):
-    """Read only flat area/help/list data; never import accounts or runtime state."""
+    """Read flat world data from an unpacked directory or a legacy ZIP."""
+    archive = Path(archive)
     files, seen, total = {}, set(), 0
-    with zipfile.ZipFile(archive) as source:
-        for entry in source.infolist():
-            path = PurePosixPath(entry.filename)
-            if str(path.parent) != "Genesis/area" or not (
-                path.suffix.lower() in (".are", ".hlp") or path.name == "area.lst"
-            ):
+    if archive.is_symlink():
+        raise ValueError("World source must not be a symlink")
+    if archive.is_dir():
+        for path in sorted(archive.iterdir()):
+            if not (path.suffix.lower() in (".are", ".hlp") or path.name == "area.lst"):
                 continue
-            if (not path.name or "\\" in path.name or path.name.casefold() in seen or
-                    stat.S_ISLNK(entry.external_attr >> 16) or entry.is_dir()):
+            if "\\" in path.name or path.name.casefold() in seen:
                 raise ValueError("Unsafe/duplicate world-data entry")
-            total += entry.file_size
-            if total > LIMIT or entry.file_size > 16 * 1024 * 1024 or len(files) >= 2000:
+            fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+            with os.fdopen(fd, "rb") as stream:
+                info = os.fstat(stream.fileno())
+                if not stat.S_ISREG(info.st_mode):
+                    raise ValueError("World-data entries must be regular files")
+                data = stream.read(16 * 1024 * 1024 + 1)
+            total += len(data)
+            if total > LIMIT or len(data) > 16 * 1024 * 1024 or len(files) >= 2000:
                 raise ValueError("World-data size limit exceeded")
             seen.add(path.name.casefold())
-            files[path.name] = source.read(entry)
+            files[path.name] = data
+    else:
+        with zipfile.ZipFile(archive) as source:
+            for entry in source.infolist():
+                path = PurePosixPath(entry.filename)
+                if str(path.parent) != "Genesis/area" or not (
+                    path.suffix.lower() in (".are", ".hlp") or path.name == "area.lst"
+                ):
+                    continue
+                if (not path.name or "\\" in path.name or path.name.casefold() in seen or
+                        stat.S_ISLNK(entry.external_attr >> 16) or entry.is_dir()):
+                    raise ValueError("Unsafe/duplicate world-data entry")
+                total += entry.file_size
+                if total > LIMIT or entry.file_size > 16 * 1024 * 1024 or len(files) >= 2000:
+                    raise ValueError("World-data size limit exceeded")
+                seen.add(path.name.casefold())
+                files[path.name] = source.read(entry)
     if "area.lst" not in files:
-        raise ValueError("Archive needs Genesis/area/area.lst")
+        raise ValueError("World source needs area.lst")
     names = files["area.lst"].decode("ascii").split()
     if not names or names[-1] != "$" or "$" in names[:-1]:
         raise ValueError("area.lst must end with one $")
@@ -158,16 +179,20 @@ def install(files, start):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--world-archive", type=Path, default=REPO / "Genesis.zip")
+    world = parser.add_mutually_exclusive_group()
+    world.add_argument("--world-dir", type=Path, help="reviewed unpacked world directory")
+    world.add_argument("--world-archive", type=Path, help="explicit legacy ZIP import")
     parser.add_argument("--apply", action="store_true")
     parser.add_argument("--start", action="store_true", help="enable/start only after successful install")
     args = parser.parse_args()
     if args.start and not args.apply:
         parser.error("--start requires --apply")
-    files = world_files(args.world_archive)
+    source = args.world_dir or args.world_archive or REPO / "Genesis/area"
+    files = world_files(source)
     print("Fresh install:", APP, DATA, UNIT, flush=True)
     print("Endpoint:", f"{HOST}:{PORT}", "- listens on all interfaces; no IP allowlist", flush=True)
     print("World files:", len(files), "- no historical player accounts, notes or runtime files", flush=True)
+    print("World source:", source, flush=True)
     print("Review world content and resolve original licensing before operation.", flush=True)
     if not args.apply:
         print("Preview only. Apply: sudo python3 deploy/setup.py --apply --start")

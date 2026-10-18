@@ -8,20 +8,14 @@ import socket
 import subprocess
 import tempfile
 import time
-import zipfile
+from world_fixture import stage_world
 
 repo = pathlib.Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory(prefix="anathema-stop-") as directory:
     runtime = pathlib.Path(directory)
     for name in ("area", "player", "backup", "notes", "log", "clans"):
         (runtime / name).mkdir(mode=0o700)
-    with zipfile.ZipFile(repo / "Genesis.zip") as archive:
-        for name in archive.namelist():
-            path = pathlib.PurePosixPath(name)
-            if str(path.parent) == "Genesis/area" and (
-                path.suffix in (".are", ".hlp") or path.name == "area.lst"
-            ):
-                (runtime / "area" / path.name).write_bytes(archive.read(name))
+    stage_world(repo, runtime)
     with socket.socket() as reservation:
         reservation.bind(("127.0.0.1", 0))
         port = reservation.getsockname()[1]

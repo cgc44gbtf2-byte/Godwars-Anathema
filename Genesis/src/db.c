@@ -1134,11 +1134,23 @@ void load_rooms( FILE *fp )
 		pexit->key		= fread_number( fp );
 		pexit->vnum		= fread_number( fp );
 
-		switch ( locks )
-		{
-		case 1: pexit->exit_info = EX_ISDOOR;                break;
-		case 2: pexit->exit_info = EX_ISDOOR | EX_PICKPROOF; break;
-		}
+/* Match save_area's 0..8 encoding, including all protection combinations.
+ * Resets restore rs_flags, so initializing only exit_info loses every door
+ * on the very first area_update during boot. */
+if (locks < 0 || locks > 8)
+{
+    bug("Load_rooms: invalid door encoding %li.", locks);
+    exit(1);
+}
+if (locks > 0)
+{
+    long protections = locks - 1;
+    pexit->exit_info = EX_ISDOOR
+        | ((protections & 1) ? EX_PICKPROOF : 0)
+        | ((protections & 2) ? EX_BASHPROOF : 0)
+        | ((protections & 4) ? EX_PASSPROOF : 0);
+}
+pexit->rs_flags = pexit->exit_info;
 
 		pRoomIndex->exit[door]	= pexit;
 		top_exit++;
@@ -1421,8 +1433,10 @@ void reset_area( AREA_DATA *pArea )
 		        && !IS_SET( pExit->exit_info, EX_BASHED ) )
 		    {
 			pExit->exit_info = pExit->rs_flags;
-			if ( ( pExit->to_room != NULL )
-			&& ( pExit = pExit->to_room->exit[rev_dir[iExit]] ) != NULL )
+if ( ( pExit->to_room != NULL )
+&& pExit->to_room->exit[rev_dir[iExit]] != NULL
+&& pExit->to_room->exit[rev_dir[iExit]]->to_room == pRoomIndex
+&& ( pExit = pExit->to_room->exit[rev_dir[iExit]] ) != NULL )
 			{
 			    pExit->exit_info = pExit->rs_flags;
 			    /* nail the other side */
