@@ -805,7 +805,7 @@ long get_damcap( CHAR_DATA *ch )
 	    case CLASS_WEREWOLF:
 		if (get_tribe(ch, TRIBE_SHADOW_LORDS) >= 1) max_dam += 100;
 		if (get_tribe(ch, TRIBE_GET_OF_FENRIS) >= 1) max_dam += 100;
-		if (get_tribe(ch, AUSPICE_PHILODOX) >= 3) max_dam += 100;
+		if (get_auspice(ch, AUSPICE_PHILODOX) >= 3) max_dam += 100;
 		if (IS_SET(ch->act, PLR_WOLFMAN)) max_dam += ch->pcdata->wolf * 1.5;
 		if (ch->pcdata->rank >= 5) max_dam += 500;
 		else max_dam += (ch->pcdata->rank + 1) * 100;
@@ -900,7 +900,12 @@ long get_soak( CHAR_DATA *victim )
 	    if (paf->type == gsn_brittle_bones)
 	    {
 		paf->modifier--;
-		if (paf->modifier == 0) affect_strip(victim, gsn_brittle_bones);
+		if (paf->modifier == 0)
+		{
+		    /* affect_strip recycles this node and replaces its next link. */
+		    affect_strip(victim, gsn_brittle_bones);
+		    break;
+		}
 	    }
 	}
     }

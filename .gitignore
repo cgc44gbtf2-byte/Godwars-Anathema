@@ -1,6 +1,7 @@
 /tests/test_highlander_counter
 /tests/test_stance_style
 /tests/test_admin_gate
+/tests/test_combat_calculations
 *.o
 *.d
 Genesis/src/merc
