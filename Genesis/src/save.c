@@ -869,6 +869,10 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
     if (found) {
         clan_sync_player(ch);
         refresh_equipment_state(ch);
+        /* Objects are restored after #PLAYER.  Only now can the selected
+         * style be reconciled with the actual hands/claws without losing
+         * a valid two-hand grip or rejecting a repaired legacy style. */
+        update_style(ch);
     }
     return found;
 }
@@ -1184,6 +1188,26 @@ bool load_char_short( DESCRIPTOR_DATA *d, char *name )
 				    break;				\
 				}
 
+/* Keep the persisted format intact.  Older files may use -1 as the
+ * inactive stance marker; only invalid indexes and impossible training
+ * values are repaired before another command or combat tick sees them. */
+static void normalize_combat_training( CHAR_DATA *ch )
+{
+    int i;
+
+    if (ch->stance[0] < -1 || ch->stance[0] > STANCE_SWALLOW)
+	ch->stance[0] = STANCE_NONE;
+    for (i = STANCE_VIPER; i <= STANCE_SWALLOW; ++i)
+	ch->stance[i] = URANGE(0, ch->stance[i], 200);
+    if (ch->stance[11] < STANCE_NONE || ch->stance[11] > STANCE_SWALLOW)
+	ch->stance[11] = STANCE_NONE;
+
+    if (ch->style[0] < STYLE_UNARMED || ch->style[0] > STYLE_TWOWEAPON)
+	ch->style[0] = STYLE_UNARMED;
+    for (i = STYLE_UNARMED; i <= STYLE_TWOWEAPON; ++i)
+	ch->style[i] = URANGE(0, ch->style[i], 200);
+}
+
 void fread_char( CHAR_DATA *ch, FILE *fp )
 {
     char buf[MSL];
@@ -1408,6 +1432,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
             {
                 /* Older saves may contain this runtime-only marker. */
                 REMOVE_BIT(ch->extra,EXTRA_SWITCH);
+                normalize_combat_training(ch);
                 return;
             }
 	    KEY( "Exp",		ch->exp,		fread_number( fp ) );

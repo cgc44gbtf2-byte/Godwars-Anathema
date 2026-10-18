@@ -466,7 +466,6 @@
    { "primalanger",	do_primalanger, POS_FIGHTING,    LEV_AWA,  LOG_NORMAL 	},
    { "rage",		do_rage,	POS_FIGHTING,	 LEV_AWA,  LOG_NORMAL	},
    { "regenerate",	do_regenerate,	POS_DEAD,	 LEV_AWA,  LOG_NORMAL	},
-   { "relevel",		do_relevel,	POS_DEAD,	 LEV_SLE,  LOG_ALWAYS	},
    { "reshapeobject",	do_reshape,	POS_STANDING,	 LEV_AWA,  LOG_NORMAL	},
    { "roleplay",        do_roleplay,    POS_DEAD,        LEV_AWA,  LOG_NORMAL   },
    { "scry",		do_scry,	POS_STANDING,	 LEV_AWA,  LOG_NORMAL	},

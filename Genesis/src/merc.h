@@ -2555,7 +2555,6 @@ DECLARE_DO_FUN(	do_recite	);
 DECLARE_DO_FUN(	do_redirect	);
 DECLARE_DO_FUN(	do_regenerate	);
 DECLARE_DO_FUN(	do_release	);
-DECLARE_DO_FUN(	do_relevel	);
 DECLARE_DO_FUN(	do_remove	);
 DECLARE_DO_FUN(	do_rename	);
 DECLARE_DO_FUN(	do_repeat	);
@@ -3331,9 +3330,11 @@ SF *	spec_lookup	args( ( const char *name ) );
 
 /* style.c */
 void	update_style	args( ( CHAR_DATA *ch ) );
-void	improve_stance	args( ( CHAR_DATA *ch ) );
 void	improve_style	args( ( CHAR_DATA *ch ) );
 void	improve_weapon	args( ( CHAR_DATA *ch, long skill ) );
+
+/* stance.c */
+void	improve_stance	args( ( CHAR_DATA *ch ) );
 
 /* update.c */
 void	gain_condition	args( ( CHAR_DATA *ch, long iCond, long value ) );

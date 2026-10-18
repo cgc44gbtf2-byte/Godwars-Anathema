@@ -13,11 +13,11 @@ include classes/modules.mk
 CLASS_OBJECTS = $(CLASS_MODULE_SOURCES:.c=.o)
 
 O_FILES = atomic_save.o act_comm.o act_info.o act_move.o act_obj.o act_wiz.o bit.o board.o \
-  clan.o clans.o clearclass.o combat_status.o comm.o const.o core.o db.o \
+  clan.o clans.o clearclass.o combat_rules.o combat_state.o combat_status.o comm.o const.o core.o db.o \
   fight.o flag.o handler.o interp.o player_save.o restart.o \
   kav_info.o kav_wiz.o magic.o memwatch.o more.o \
   olc.o random.o rename.o rot_wiz.o save.o signals.o \
-  special.o stance.o string.o transformation.o trap.o update.o wizutil.o $(CLASS_OBJECTS)
+  special.o stance.o style.o string.o transformation.o trap.o update.o wizutil.o $(CLASS_OBJECTS)
 
 merc: $(O_FILES)
 	$(CC) $(LDFLAGS) -o $@ $(O_FILES) $(LDLIBS)

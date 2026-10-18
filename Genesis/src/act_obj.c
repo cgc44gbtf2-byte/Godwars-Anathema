@@ -1064,37 +1064,6 @@ void do_remove( CHAR_DATA *ch, char *argument )
 }
 
 
-void do_grip( CHAR_DATA *ch, char *argument )
-{
-    OBJ_DATA *obj;
-
-    if ((obj = get_eq_char(ch, WEAR_WEAPON)) == NULL)
-    {
-	stc("You aren't wearing a weapon to grip in both hands.\n\r", ch);
-	return;
-    }
-
-    if (ch->style[0] == STYLE_TWOHAND)
-    {
-	ch->style[0] = STYLE_ONEHAND;
-	act("You shift $p into one hand.", ch, obj, NULL, TO_CHAR);
-	act("$n shifts $p into one hand.", ch, obj, NULL, TO_ROOM);
-	return;
-    }
-
-    if (get_eq_char(ch, WEAR_HOLD) != NULL)
-    {
-	stc("You've already got something in your off hand.\n\r", ch);
-	return;
-    }
-
-    ch->style[0] = STYLE_TWOHAND;
-    act("You grip $p in both hands.", ch, obj, NULL, TO_CHAR);
-    act("$n grips $p in both hands.", ch, obj, NULL, TO_ROOM);
-    return;
-}
-
-
 void do_sacrifice( CHAR_DATA *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];

@@ -1,4 +1,6 @@
 /tests/test_highlander_counter
+/tests/test_stance_style
+/tests/test_admin_gate
 *.o
 *.d
 Genesis/src/merc
@@ -37,3 +39,6 @@ Genesis/notes/
 Genesis/area/
 Genesis/clans/
 memwatch.log
+bootstrap-backups/
+__pycache__/
+*.py[cod]

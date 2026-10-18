@@ -131,7 +131,7 @@ void violence_update( void )
 void multi_hit( CHAR_DATA *ch, CHAR_DATA *victim )
 {
     OBJ_DATA *wield;
-    long sn, dt, style = ch->style[0];
+    long sn, dt, style;
 
     if (ch == NULL || victim == NULL || IS_COMBAT_PAUSED(ch)) return;
     if (ch->position < POS_SLEEPING || is_safe(ch, victim)) return;
@@ -148,6 +148,7 @@ void multi_hit( CHAR_DATA *ch, CHAR_DATA *victim )
 	return;
     }
 
+    style = ch->style[0];
     if ((wield = get_eq_char(ch, WEAR_WEAPON)) != NULL)
     {
 	if (style == STYLE_UNARMED || style == STYLE_NATURAL)
@@ -741,189 +742,6 @@ void hurt_person( CHAR_DATA *ch, CHAR_DATA *victim, long dam )
 
 
 
-bool is_safe( CHAR_DATA *ch, CHAR_DATA *victim )
-{
-    if (ch->in_room != victim->in_room) return TRUE;
-    if (IS_NPC(victim) && IS_SET(victim->act, ACT_NOKILL))
-    {
-	stc("That mobile cannot be attacked.\n\r", ch);
-	return TRUE;
-    }
-
-    if (IS_AFFECTED(ch, AFF_ETHEREAL) && !IS_AFFECTED(victim, AFF_ETHEREAL))
-    {
-	stc("You cannot while ethereal.\n\r", ch);
-	return TRUE;
-    }
-    if (!IS_AFFECTED(ch, AFF_ETHEREAL) && IS_AFFECTED(victim, AFF_ETHEREAL))
-    {
-	stc("You cannot fight an ethereal person.\n\r", ch);
-	return TRUE;
-    }
-    if (IS_POLYAFF(ch, POLY_MIST) || IS_POLYAFF(victim, POLY_MIST))
-    {
-	stc("People in mist form may not enter combat.\n\r", ch);
-	return TRUE;
-    }
-    if (IS_POLYAFF(ch, POLY_SHADOW) || IS_POLYAFF(victim, POLY_SHADOW))
-    {
-	stc("People in smoke form may not enter combat.\n\r", ch);
-	return TRUE;
-    }
-    if (IS_AFFECTED(ch, AFF_DEEPUMBRA) && !IS_AFFECTED(victim, AFF_DEEPUMBRA))
-    {
-	act("You are too insubstantial!", ch, NULL, victim, TO_CHAR );
-	return TRUE;
-    }
-    if (!IS_AFFECTED(ch, AFF_DEEPUMBRA) && IS_AFFECTED(victim, AFF_DEEPUMBRA))
-    {
-	act( "$E is too insubstantial!", ch, NULL, victim, TO_CHAR );
-	return TRUE;
-    }
-    if (IS_AFFECTED(ch, AFF_SHADOWPLANE) && !IS_AFFECTED(victim, AFF_SHADOWPLANE))
-    {
-	act("You are too insubstantial!", ch, NULL, victim, TO_CHAR);
-	return TRUE;
-    }
-    if (!IS_AFFECTED(ch, AFF_SHADOWPLANE) && IS_AFFECTED(victim, AFF_SHADOWPLANE))
-    {
-	if (!IS_MAGE(ch) || !IS_SET(ch->xtra, XTRA_MAGE_CARESS))
-	{
-	    act("$E is too insubstantial!", ch, NULL, victim, TO_CHAR);
-	    return TRUE;
-	}
-    }
-    if (!IS_NPC(victim) && IS_FLAG(victim, FLAG_AFK))
-    {
-        stc("They are AFK!\n\r", ch);
-        return TRUE;
-    }
-    if (!IS_NPC(ch) && IS_FLAG(ch, FLAG_AFK))
-    {
-	stc("Not while afk!\n\r", ch);
-	return TRUE;
-    }
-    if (!IS_NPC(victim) && victim->desc == NULL && victim->position != POS_FIGHTING)
-    {   
-	stc("They are currently LINK-DEAD!\n\r", ch);
-	return TRUE;
-    }
-    if (IS_SET(ch->in_room->room_flags, ROOM_SAFE) && ch->status < 5)
-    {
-        stc("Something in the air prevents you from attacking.\n\r", ch);
-        return TRUE;
-    }
-    if (victim == NULL || victim->in_room == NULL) return TRUE;
-    if (IS_SET(victim->in_room->room_flags, ROOM_SAFE) && victim->status < 5)
-    {
-	stc("Something in the air prevents you from attacking.\n\r", ch);
-	return TRUE;
-    }
-    if (IS_MORE(ch, MORE_HEAD) || IS_EXTRA(ch, EXTRA_OSWITCH))
-    {
-	stc("Objects cannot fight!\n\r", ch);
-	return TRUE;
-    }
-    if (IS_MORE(victim, MORE_HEAD) || IS_EXTRA(victim, EXTRA_OSWITCH))
-    {
-	stc("You cannot attack an object.\n\r", ch);
-	return TRUE;
-    }
-    if (IS_VAMPAFF(ch, VAM_EARTHMELDED) || IS_VAMPAFF(victim, VAM_EARTHMELDED))
-    {
-	stc("Earthmelded players can't enter combat.\n\r", ch);
-	return TRUE;
-    }
-
-    if (victim->fighting == ch) return FALSE;
-    if (victim->fight_timer > 0) return FALSE;
-
-    if (IS_NPC(ch) && (!IS_NPC(victim) && !CAN_PK(victim)) && IS_SET(ch->act, ACT_COMMANDED))
-    {
-	stc("You may not attack people without a PK flag.\n\r", ch);
-	return TRUE;
-    }
-    if (IS_NPC(victim) && !CAN_PK(ch) && IS_SET(victim->act, ACT_COMMANDED))
-    {
-	stc("You need a PK flag to attack player controlled mobs.\n\r", ch);
-	return TRUE;
-    }
-    if (IS_NPC(ch) && ch->level < 700 && IS_EXTRA(victim, EXTRA_AWE) && (ch->position != POS_FIGHTING))
-    {
-	stc("You like them too much to attack them.\n\r", ch);
-	return TRUE;
-    }
-    if (IS_ITEMAFF(ch, ITEMA_PEACE))
-    {
-	send_to_char( "You are unable to attack them.\n\r", ch );
-	return TRUE;
-    }
-    if (IS_ITEMAFF(victim, ITEMA_PEACE))
-    {
-	stc("They look FAR too imposing to attack!\n\r", ch);
-	return TRUE;
-    }
-
-    if (IS_NPC(ch) || IS_NPC(victim)) return FALSE;
-
-    if (ch->desc == NULL || victim->desc == NULL)
-    {
-	if (victim->position != POS_FIGHTING && victim->position > POS_STUNNED)
-	{
-	    stc("They are currently link dead.\n\r", ch);
-	    return TRUE;
-	}
-    }
-    if (IS_MORE(ch, MORE_LOYAL) && strlen(ch->pcdata->conding) > 1 && !str_cmp(ch->pcdata->conding, victim->name))
-    {
-	stc("You refuse to attack your master!\n\r", ch);
-	return TRUE;
-    }
-    else if (strlen(ch->pcdata->love) > 1 && !str_cmp(ch->pcdata->love, victim->name))
-    {
-	stc("How could you attack someone you love?!\n\r", ch);
-	return TRUE;
-    }
-
-    return FALSE;
-}
-
-bool auto_safe( CHAR_DATA *ch, CHAR_DATA *victim )
-{
-    if (ch->in_room != victim->in_room) return TRUE;
-    if (IS_NPC(victim) && IS_SET(victim->act, ACT_NOKILL)) return TRUE;
-    if (IS_AFFECTED(ch, AFF_ETHEREAL) && !IS_AFFECTED(victim, AFF_ETHEREAL)) return TRUE;
-    if (!IS_AFFECTED(ch, AFF_ETHEREAL) && IS_AFFECTED(victim, AFF_ETHEREAL)) return TRUE;
-    if (IS_POLYAFF(ch, POLY_MIST) || IS_POLYAFF(victim, POLY_MIST)) return TRUE;
-    if (IS_POLYAFF(ch, POLY_SHADOW) || IS_POLYAFF(victim, POLY_SHADOW)) return TRUE;
-    if (IS_AFFECTED(ch, AFF_DEEPUMBRA) && !IS_AFFECTED(victim, AFF_DEEPUMBRA)) return TRUE;
-    if (!IS_AFFECTED(ch, AFF_DEEPUMBRA) && IS_AFFECTED(victim, AFF_DEEPUMBRA)) return TRUE;
-    if (IS_AFFECTED(ch, AFF_SHADOWPLANE) && !IS_AFFECTED(victim, AFF_SHADOWPLANE)) return TRUE;
-    if (!IS_AFFECTED(ch, AFF_SHADOWPLANE) && IS_AFFECTED(victim, AFF_SHADOWPLANE)) return TRUE;
-    if (ch->in_room == NULL || IS_SET(ch->in_room->room_flags, ROOM_SAFE)) return TRUE;
-    if (IS_MORE(ch, MORE_HEAD) || IS_EXTRA(ch, EXTRA_OSWITCH)) return TRUE;
-    if (IS_MORE(victim, MORE_HEAD) || IS_EXTRA(victim, EXTRA_OSWITCH)) return TRUE;
-    if (IS_VAMPAFF(ch, VAM_EARTHMELDED) || IS_VAMPAFF(victim, VAM_EARTHMELDED)) return TRUE;
-
-    if (victim->fighting == ch) return FALSE;
-
-    if (IS_NPC(ch) && !CAN_PK(victim) && IS_SET(ch->act, ACT_COMMANDED)) return TRUE;
-    if (IS_NPC(victim) && !CAN_PK(ch) && IS_SET(victim->act, ACT_COMMANDED)) return TRUE;
-    if (IS_NPC(ch) && ch->level < 700 && IS_EXTRA(victim, EXTRA_AWE)) return TRUE;
-    if (IS_ITEMAFF(ch, ITEMA_PEACE)) return TRUE;
-    if (IS_ITEMAFF(victim, ITEMA_PEACE)) return TRUE;
-
-    if (IS_NPC(ch) || IS_NPC(victim)) return FALSE;
-
-    if ((ch->desc == NULL || victim->desc == NULL) && victim->position != POS_FIGHTING && victim->position > POS_STUNNED) return TRUE;
-
-    if (IS_MORE(ch, MORE_LOYAL) && strlen(ch->pcdata->conding) > 1 && !str_cmp(ch->pcdata->conding, victim->name)) return TRUE;
-    if (strlen(ch->pcdata->love) > 1 && !str_cmp(ch->pcdata->love, victim->name)) return TRUE;
-
-    return FALSE;
-}
-
-
 long mod_damcap( CHAR_DATA *ch, CHAR_DATA *victim )
 {
     long max_dam, soak;
@@ -1196,6 +1014,10 @@ long breakavoid( CHAR_DATA *ch )
 	if (ch->level < 750) return ch->level/10;
 	else return 75 + (ch->level - 750)/100;
     }
+
+    /* A partial or corrupt save must not become an array index. */
+    if (style < STYLE_UNARMED || style > STYLE_TWOWEAPON)
+	style = STYLE_UNARMED;
 
     chance += char_hitroll(ch)/150;
     chance += char_stat(ch, STAT_DEX);/*10*/
@@ -2100,21 +1922,6 @@ void do_kick( CHAR_DATA *ch, char *argument )
     WAIT_STATE( ch, 12);
     one_hit(ch, victim, TYPE_UNARMED, "kick");
     return;
-}
-
-long dambonus( CHAR_DATA *ch, CHAR_DATA *victim, long dam )
-{
-    if (dam < 1) return 1;
-    if (ch->stance[0] < 1) return dam;
-
-    if (IS_STANCE(ch, STANCE_BULL)) dam *= 1 + (ch->stance[STANCE_BULL] * 0.01);
-    else if (IS_STANCE(ch, STANCE_DRAGON)) dam *= 1 + (ch->stance[STANCE_DRAGON] * 0.01);
-    else if (IS_STANCE(ch, STANCE_TIGER)) dam *= 1 + (ch->stance[STANCE_TIGER] * 0.01);
-
-    if (IS_STANCE(victim, STANCE_CRAB)) dam /= 1 + (victim->stance[STANCE_CRAB] * 0.01);
-    else if (IS_STANCE(victim, STANCE_DRAGON)) dam /= 1 + (victim->stance[STANCE_DRAGON] * 0.01);
-    else if (IS_STANCE(victim, STANCE_SWALLOW)) dam /= 1 + (victim->stance[STANCE_SWALLOW] * 0.01);
-    return dam;
 }
 
 void do_punch( CHAR_DATA *ch, char *argument )

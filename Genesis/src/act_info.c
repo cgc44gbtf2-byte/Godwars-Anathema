@@ -361,20 +361,6 @@ bool get_drow( CHAR_DATA *ch, long power )
     else return FALSE;
 }
 
-long get_style( CHAR_DATA *ch, long style )
-{
-    if (style < STYLE_UNARMED || style > STYLE_TWOWEAPON)
-    {
-	bug("Get_style: out of style range", 0);
-	return 0;
-    }
-
-    if (ch->style[style] < 0) ch->style[style] = 0;
-    if (ch->style[style] > 200) ch->style[style] = 200;
-
-    return ch->style[style];
-}
-
 long char_hitroll( CHAR_DATA *ch )
 {
     long hr = GET_HITROLL(ch);

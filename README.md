@@ -1,5 +1,123 @@
 # Godwars: Anathema
 
+Godwars: Anathema is a text-based multiplayer RPG built from Genesis.
+This branch focuses on fixing class abilities, protecting player saves and
+making the legacy code easier to maintain. It is not a finished balance pass,
+and this repository does not provide a running game server.
+
+## Player updates
+
+- **Vampires:** consent-based discipline teaching and five Path of Blood
+  abilities: Taste of Blood, Blood Rage, Blood Potency, Theft of Vitae and
+  Cauldron of Blood.
+- **Highlanders:** Counter can respond to incoming weapon or unarmed melee
+  attacks while using the required katana. It does not counter spells or
+  ranged attacks.
+- **Monks:** Stun Fist is restored with recovery and temporary stun immunity.
+- **Drow:** `drowarmor bolts [1-20]` crafts bolts for 100 Drow points each.
+  Shooting still uses one bolt and 500 Drow points.
+- **Combat:** Gathering-style damage messages keep Genesis's existing damage
+  thresholds. Stance/style handling and class-ability error checks are being
+  cleaned up without a general damage rebalance.
+- **Reliability:** safer player saves, reconnects, shutdowns, item ownership
+  and conjured-item shop handling.
+
+There are ten classes: Vampire, Werewolf, Highlander, Mage, Sorcerer, Monk,
+Ninja, Drow, Dragon and Elementalist. Hybrids are **not enabled**.
+Your server operator supplies the game address, port and permitted connection
+method. Classic Telnet traffic is plaintext: never reuse an important password.
+
+## Download and build — Debian / Ubuntu
+
+Supported CI targets: Debian 12/13 and Ubuntu 22.04/24.04.
+Use an ordinary user to build; do not run the game as root.
+The repository is private, so cloning requires your existing authorized
+GitHub SSH access.
+
+```sh
+sudo apt-get update
+sudo apt-get install -y build-essential libcrypt-dev git ca-certificates python3 unzip
+git clone --branch Godwars-Anathema git@github.com:cgc44gbtf2-byte/Godwars-Anathema.git
+cd Godwars-Anathema
+make -j2
+make test
+python3 tests/test_catalog.py
+```
+
+The executable is `Genesis/src/merc`. Optional extra checks:
+
+```sh
+make sanitize
+make -j2
+```
+
+## Install and start
+
+**For an existing server, stop and back up its complete state before upgrading.**
+For a new Debian/Ubuntu server, follow the
+[step-by-step installation guide](deploy/INSTALL.md). It covers the service
+account, private data directories, world-data import, firewall and systemd.
+
+World data is required before the game can boot: `area.lst` and every
+referenced area/help file must be present. The retained `Genesis.zip` is an
+unpatched historical archive, not an installer. Follow the guide's
+[world-data-only import](deploy/INSTALL.md#4-install-reviewed-world-data-not-historical-accounts);
+never copy its historical player accounts, passwords, executable or object
+files over this checkout.
+
+For a **fresh local test**, after supplying reviewed world files in
+`Genesis/area/`, create the empty runtime directories and start in the
+foreground:
+
+```sh
+umask 077
+mkdir -p Genesis/area Genesis/player Genesis/backup Genesis/notes Genesis/log Genesis/clans
+cd Genesis/area
+../src/merc 4000
+```
+
+The game listens on all network interfaces. Block external TCP 4000 first,
+or use a restricted VPN/SSH connection. A private GitHub repository does not
+make the running server private. Stop a local foreground instance with Ctrl+C;
+forced kills and disk failures can still lose unsaved progress.
+
+After completing the systemd installation, use:
+
+```sh
+sudo systemctl start anathema.service
+sudo systemctl status anathema.service
+sudo journalctl -u anathema.service -n 50 --no-pager
+sudo systemctl stop anathema.service
+```
+
+Enable startup on boot only after verifying the game starts and saves correctly:
+`sudo systemctl enable anathema.service`.
+For the first owner accounts, see
+[offline Yami/Luto staff setup](deploy/INSTALL.md#first-staff-accounts-yami-and-luto);
+there is no name-based in-game self-promotion.
+
+## More information
+
+- [Classes, skills, costs and known gaps](deploy/CLASS_AUDIT.md)
+- [Class gear and crafted supplies](deploy/CLASS_GEAR.md)
+- [Clan management](deploy/CLAN_MANAGEMENT.md)
+- [Combat code organization and remaining work](docs/COMBAT.md)
+- [Licensing](#licensing)
+
+## Licensing
+
+Original Diku/Merc/God Wars notices are preserved. Referenced permission/license
+documents were absent from the supplied archive; resolve those requirements
+before operating or redistributing the game. This branch grants no new rights.
+
+<details>
+<summary>Developer maintenance history and technical details</summary>
+
+These notes describe successive maintenance stages. Their suite counts refer
+to those stages; the current suite list is maintained in the root `Makefile`.
+The original Diku/Merc/God Wars permissions still need to be resolved before
+operating or redistributing the game; this branch grants no new rights.
+
 Class gear inventory, prices, corrected bugs and remaining content gaps:
 [deploy/CLASS_GEAR.md](deploy/CLASS_GEAR.md).
 
@@ -358,6 +476,14 @@ a familiar, matching Control Illusion's existing rule. Previously retargeting
 overwrote the caster's pointer but left the first NPC bound. Regression tests
 cover Dominate ranks 3–7, cross-power bindings and rebinding after NPC removal.
 
+## Shared combat organization
+
+The first staged shared-engine cleanup separates stance behavior, equipment
+styles, fight-list ownership and combat safety. See [the combat ownership,
+repair and optimization notes](docs/COMBAT.md) for the current boundaries,
+regression coverage and remaining attack/defense/damage/death extraction.
+This is not a balance rewrite or a claim of measured performance gains.
+
 ## Combat damage wording
 
 Gathering's wording is compressed into Genesis's existing seven damage bands;
@@ -438,3 +564,5 @@ the existing Heart's Blood health payment covers the shortfall. Regression
 cases check empty and partially stocked pools alongside the actual health
 and mana charge. This does not change spell price constants or the
 five-quintessence Heart's Blood shortfall limit.
+
+</details>

@@ -52,7 +52,7 @@ From the patched repository root (the directory containing `Genesis/src`):
 ```sh
 sudo apt-get update
 sudo apt-get install --no-install-recommends build-essential libcrypt-dev \
-  git ca-certificates unzip
+  git ca-certificates python3 unzip
 make -j2
 make test
 ```
@@ -253,3 +253,53 @@ denials, `NoExecPaths=/`, or arbitrary syscall filters without testing boot,
 save, OLC and descriptor-preserving exec. `LimitNOFILE=1024` matches the
 select-based design; raising it is not a supported scaling fix. Journal
 output can contain player identifiers; restrict log and backup access.
+
+## First staff accounts: Yami and Luto
+
+The old name-gated in-game `relevel` command is removed: character names do not
+prove server ownership. There is no automatic promotion on registration/login,
+and no bootstrap password or token in the MUD.
+
+The operator-only `deploy/bootstrap_staff.py` replaces the unsafe first-staff
+path. It maps **Yami to `LEV_ST` (7), 500,000 HP/mana**, and **Luto to
+`LEV_IMP` (6), 300,000 HP/mana**, matching the two historical role/resource
+tiers. It changes only the player section's level and current/maximum HP/mana;
+passwords, gear, inventory and other saved fields remain unchanged.
+
+1. Create each account normally and verify you own it. Save and log out so
+   both primary and backup files exist and contain the same password and level.
+2. Stop the service and verify it exited. Do **not** start it, run copyover,
+   or allow another writer during the bootstrap.
+3. From the reviewed source checkout, preview and apply as the server operator:
+
+```sh
+sudo systemctl stop anathema.service
+sudo python3 deploy/bootstrap_staff.py --account Yami
+sudo python3 deploy/bootstrap_staff.py --account Yami --apply
+sudo python3 deploy/bootstrap_staff.py --account Luto
+sudo python3 deploy/bootstrap_staff.py --account Luto --apply
+sudo systemctl start anathema.service
+```
+
+Log in again afterward; no in-game `relevel` is needed. The default data root is
+`/var/lib/anathema`; custom installations must pass an absolute `--root` and
+use the same private `player/`, `backup/` and `clans/Lock` layout. The tool holds
+the existing clan lock and refuses an already-running process that holds it.
+This is a defensive check, **not** a substitute for stopping all game processes
+or a general lock used by every possible player-save writer.
+
+The root must belong to the operator running the tool (root for the documented
+installation), with no group/world writes. Save directories/files must be
+private, regular and consistently owned; symlinks, hard-linked save files,
+malformed saves, absent backups, divergent credentials/levels and repeated
+promotions fail closed. Originals are preserved in operator-owned, mode-0700
+`bootstrap-backups/`, with mode-0600 files. Treat them as credentials-bearing
+backups: never put them in Git, chat or a public archive.
+
+Each replacement is staged, synced and atomic, but the two destination renames
+are **not one transaction**. If an apply is interrupted or reports an error,
+keep the service stopped and inspect both saves and the private originals.
+Restore the original primary/backup files with their service ownership and
+private permissions before retrying; existing snapshots are never overwritten.
+This tool does not prove account ownership, audit previously granted staff,
+or protect against permanent storage failure.
