@@ -28,6 +28,7 @@
 #include <sys/types.h>
 #endif
 #include <stdio.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -38,6 +39,8 @@
  */
 void	dam_message	args( ( CHAR_DATA *ch, CHAR_DATA *victim, long dam, long dt, char *message ) );
 void	death_cry	args( ( CHAR_DATA *ch ) );
+static bool format_death_names(char *out, size_t size, const char *pattern,
+                               const char *first, const char *second);
 
 /*
  * Control the fights going on.
@@ -428,8 +431,9 @@ void one_hit( CHAR_DATA *ch, CHAR_DATA *victim, long dt, char *message )
  */
 void damage( CHAR_DATA *ch, CHAR_DATA *victim, long dam, long dt, char *message )
 {
-    ROOM_INDEX_DATA *combat_room = ch->in_room;
-    if (victim == NULL || victim->position == POS_DEAD) return;
+    ROOM_INDEX_DATA *combat_room;
+    if (ch == NULL || victim == NULL || victim->position == POS_DEAD) return;
+    combat_room = ch->in_room;
 
     if (victim != ch)
     {
@@ -539,7 +543,7 @@ void damage( CHAR_DATA *ch, CHAR_DATA *victim, long dam, long dt, char *message 
 
 bool hurt_fighting( CHAR_DATA *ch, CHAR_DATA *victim )
 {
-    if (victim->position == POS_DEAD) return FALSE;
+    if (ch == NULL || victim == NULL || victim->position == POS_DEAD) return FALSE;
 
     if (victim != ch)
     {
@@ -569,7 +573,11 @@ bool hurt_fighting( CHAR_DATA *ch, CHAR_DATA *victim )
 
 void hurt_person( CHAR_DATA *ch, CHAR_DATA *victim, long dam )
 {
-    victim->hit -= dam;
+    if (ch == NULL || victim == NULL) return;
+    /* Preserve legacy signed healing without overflowing the HP subtraction. */
+    if (dam > 0 && victim->hit < LONG_MIN + dam) victim->hit = LONG_MIN;
+    else if (dam < 0 && victim->hit > LONG_MAX + dam) victim->hit = LONG_MAX;
+    else victim->hit -= dam;
 
     if (IS_IMM(victim) && victim->hit < 1) victim->hit = victim->max_hit;
 
@@ -620,16 +628,16 @@ void hurt_person( CHAR_DATA *ch, CHAR_DATA *victim, long dam )
 
 	if (!IS_NPC(victim))
 	{
-	    sprintf(log_buf, "%s killed by %s at %li",victim->name,(IS_NPC(ch) ? ch->short_descr : ch->name),victim->in_room->vnum);
+	    snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s killed by %s at %li",victim->name,(IS_NPC(ch) ? ch->short_descr : ch->name),victim->in_room != NULL ? victim->in_room->vnum : 0);
 	    log_string(log_buf);
 	    if (!CAN_PK(victim))
 	    {
-		sprintf(log_buf, "#G%s doesn't have a PK flag!#n", victim->name);
+		snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "#G%s doesn't have a PK flag!#n", victim->name);
 		log_string(log_buf);
 	    }
 	    if (!CAN_PK(ch))
 	    {
-		sprintf(log_buf, "#G%s doesn't have a PK flag!#n", ch->name);
+		snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "#G%s doesn't have a PK flag!#n", ch->name);
 		log_string(log_buf);
 	    }
 	}
@@ -670,7 +678,7 @@ long mod_damcap( CHAR_DATA *ch, CHAR_DATA *victim )
 {
     long max_dam, soak;
 
-    if (victim == NULL) return 0;
+    if (ch == NULL || victim == NULL) return 0;
 
     max_dam = get_damcap(ch);
     soak = get_soak(victim);
@@ -700,7 +708,9 @@ long mod_damcap( CHAR_DATA *ch, CHAR_DATA *victim )
 long get_damcap( CHAR_DATA *ch )
 {
     CHAR_DATA *victim;
-    long max_dam = 500 + (char_stat(ch, STAT_STR) * 100);
+    long max_dam;
+    if (ch == NULL) return 0;
+    max_dam = 500 + (char_stat(ch, STAT_STR) * 100);
 
     if (IS_ITEMAFF(ch, ITEMA_ARTIFACT)) max_dam += 100;
     if (IS_ITEMAFF(ch, ITEMA_VORPAL)) max_dam += 500;
@@ -773,6 +783,7 @@ long get_damcap( CHAR_DATA *ch )
  */
 void update_pos( CHAR_DATA *victim )
 {
+    if (victim == NULL) return;
     if ( victim->hit > 0 )
     {
     	if ( victim->position <= POS_STUNNED )
@@ -868,11 +879,13 @@ void make_corpse( CHAR_DATA *ch, CHAR_DATA *maker )
 
     if (ch->in_room != NULL) corpse->specpower = ch->in_room->vnum;
 
-    sprintf( buf, corpse->short_descr, name );
+    if (!format_death_names(buf, sizeof(buf), corpse->short_descr, name, NULL))
+	snprintf(buf, sizeof(buf), "the corpse of %s", name);
     free_string( corpse->short_descr );
     corpse->short_descr = str_dup( buf );
 
-    sprintf( buf, corpse->description, name );
+    if (!format_death_names(buf, sizeof(buf), corpse->description, name, NULL))
+	snprintf(buf, sizeof(buf), "The corpse of %s is lying here.", name);
     free_string( corpse->description );
     corpse->description = str_dup( buf );
 
@@ -1059,7 +1072,7 @@ void behead( CHAR_DATA *victim, CHAR_DATA *ch )
 
     SET_BIT(victim->more, MORE_HEAD);
     SET_BIT(victim->affected_by, AFF_POLYMORPH);
-    sprintf(buf, "the severed head of %s", victim->name);
+    snprintf(buf, sizeof(buf), "the severed head of %s", victim->name);
     free_string(victim->morph);
     victim->morph = str_dup(buf);
     do_call(victim, "all");
@@ -1075,6 +1088,7 @@ void group_gain( CHAR_DATA *ch, CHAR_DATA *victim )
     long xp;
     int count = 0, connected = 0;
 
+    if (ch == NULL || victim == NULL || ch->in_room == NULL) return;
     for (gch = ch->in_room->people; gch != NULL; gch = gch->next_in_room)
 	if (is_same_group(gch, ch)) count++;
 
@@ -1082,8 +1096,9 @@ void group_gain( CHAR_DATA *ch, CHAR_DATA *victim )
     {
 	CHAR_DATA *wch;
 
-	if (d->connected != CON_PLAYING && (d->connected < 10 || d->connected > 14)) continue;
+	if (!descriptor_is_in_game(d)) continue;
 	wch = (d->original != NULL) ? d->original : d->character;
+	if (wch == NULL) continue;
 	if (IS_BUI(wch)) continue;
 
 	connected++;
@@ -1130,9 +1145,9 @@ void group_gain( CHAR_DATA *ch, CHAR_DATA *victim )
 	}
 
         gch->pcdata->score[SCORE_TOTAL_LEVEL] += victim->level;
-        if (victim->level > gch->pcdata->score[SCORE_HIGH_LEVEL]) gch->pcdata->score[SCORE_HIGH_LEVEL] += victim->level;
+        if (victim->level > gch->pcdata->score[SCORE_HIGH_LEVEL]) gch->pcdata->score[SCORE_HIGH_LEVEL] = victim->level;
         gch->pcdata->score[SCORE_TOTAL_XP] += xp;
-        if (xp > gch->pcdata->score[SCORE_HIGH_XP]) gch->pcdata->score[SCORE_HIGH_XP] += xp;
+        if (xp > gch->pcdata->score[SCORE_HIGH_XP]) gch->pcdata->score[SCORE_HIGH_XP] = xp;
 	gch->exp += xp;
     }
 
@@ -2162,17 +2177,51 @@ void do_destroy( CHAR_DATA *ch, char *argument )
     return;
 }
 
+/* Death templates accept names (%s, at most two) and literal percent (%%).
+ * Never give a persisted format string to printf as executable formatting. */
+static bool format_death_names(char *out, size_t size, const char *pattern,
+                               const char *first, const char *second)
+{
+    size_t used = 0;
+    int names = 0;
+    if (out == NULL || size == 0 || pattern == NULL) return FALSE;
+    out[0] = '\0';
+    for (; *pattern != '\0'; ++pattern) {
+        char literal[2] = {*pattern, '\0'};
+        const char *text = literal;
+        if (*pattern == '%') {
+            ++pattern;
+            if (*pattern == '%') text = "%";
+            else if (*pattern == 's' && names < 2) {
+                text = names++ == 0 ? first : second;
+                if (text == NULL) { out[0] = '\0'; return FALSE; }
+            } else { out[0] = '\0'; return FALSE; }
+        }
+        while (*text != '\0' && used < size - 1) out[used++] = *text++;
+        out[used] = '\0';
+    }
+    return TRUE;
+}
+
 void death_message( CHAR_DATA *ch, CHAR_DATA *victim )
 {
     char buf[MSL];
     char *chsex;
+    const char *killer, *target;
     if (ch == NULL || victim == NULL) return;
     chsex = ch->sex == SEX_FEMALE ? "her" : "his";
+    killer = IS_NPC(ch) ? ch->short_descr : ch->name;
+    if (killer == NULL) killer = "someone";
+    target = victim->name != NULL ? victim->name : "someone";
 
-    if (!IS_BUI(ch) && ch == victim) sprintf(buf, "#r%s#n has just died!", ch->name);
-    else if (strlen(ch->pcdata->cdest) >= 2) sprintf(buf, ch->pcdata->cdest, ch->name, victim->name);
-    else if (IS_IMM(ch)) sprintf(buf, "#r%s#n has slain #r%s#n in cold blood!", ch->name, victim->name);
-    else sprintf(buf, "#r%s#n has summoned forth %s hatred to destroy #r%s#n!", ch->name, chsex, victim->name);
+    if (!IS_BUI(ch) && ch == victim) snprintf(buf, sizeof(buf), "#r%s#n has just died!", killer);
+    else if (!IS_NPC(ch) && ch->pcdata != NULL && ch->pcdata->cdest != NULL &&
+             strlen(ch->pcdata->cdest) >= 2 &&
+             format_death_names(buf, sizeof(buf), ch->pcdata->cdest, killer, target)) {
+        /* Safely rendered custom text is already in buf. */
+    }
+    else if (IS_IMM(ch)) snprintf(buf, sizeof(buf), "#r%s#n has slain #r%s#n in cold blood!", killer, target);
+    else snprintf(buf, sizeof(buf), "#r%s#n has summoned forth %s hatred to destroy #r%s#n!", killer, chsex, target);
 
     buf[0] = UPPER(buf[0]);
     do_fatality(ch, buf);
