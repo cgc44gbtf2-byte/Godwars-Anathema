@@ -15,6 +15,8 @@ OWNERS = {
     "combat_rules.c": ("is_safe", "auto_safe"),
     "combat_status.c": ("combat_pair_in_room", "combat_target_live",
                         "combat_status_update"),
+    "combat_initiative.c": ("get_speed",),
+    "combat_defense.c": ("get_soak", "check_avoid", "avoidblow", "breakavoid"),
 }
 
 
@@ -54,11 +56,13 @@ class CombatLayoutChecks(unittest.TestCase):
     def test_regression_is_part_of_default_test_and_sanitizer_path(self):
         selected = make_values(ROOT, "TESTS")
         self.assertEqual(selected.count("tests/test_stance_style"), 1)
+        self.assertEqual(selected.count("tests/test_combat_calculations"), 1)
         makefile = (ROOT / "Makefile").read_text()
         self.assertRegex(makefile, r"(?s)sanitize:.*?\$\(MAKE\) test")
 
     def test_extracted_licensed_code_keeps_notices(self):
-        for owner in ("style.c", "combat_state.c", "combat_rules.c"):
+        for owner in ("style.c", "combat_state.c", "combat_rules.c",
+                      "combat_initiative.c", "combat_defense.c"):
             source = (SRC / owner).read_text()
             self.assertIn("Original Diku Mud copyright", source)
             self.assertIn("Merc Diku Mud improvments copyright", source)

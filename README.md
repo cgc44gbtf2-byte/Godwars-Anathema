@@ -16,9 +16,12 @@ and this repository does not provide a running game server.
 - **Monks:** Stun Fist is restored with recovery and temporary stun immunity.
 - **Drow:** `drowarmor bolts [1-20]` crafts bolts for 100 Drow points each.
   Shooting still uses one bolt and 500 Drow points.
+- **Werewolves:** Philodox's damage-cap bonus now checks Philodox training
+  rather than an unrelated tribe rank.
 - **Combat:** Gathering-style damage messages keep Genesis's existing damage
   thresholds. Stance/style handling and class-ability error checks are being
-  cleaned up without a general damage rebalance.
+  cleaned up without a general damage rebalance. Brittle Bones now expires
+  without walking into the recycled-effect list.
 - **Reliability:** safer player saves, reconnects, shutdowns, item ownership
   and conjured-item shop handling.
 

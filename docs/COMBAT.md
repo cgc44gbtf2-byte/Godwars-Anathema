@@ -14,7 +14,9 @@ in the shared engine.
 | `combat_state.c` | Starting/stopping fights and linked fight-list membership |
 | `combat_rules.c` | Explicit-command and automatic safety policies |
 | `combat_status.c` | Target liveness, action pauses and immunity/reuse timers |
-| `fight.c` | Remaining attack loop, speed/defense calculations, damage, death/rewards and action commands |
+| `combat_initiative.c` | Pulse spacing from stats, class powers, stances and status effects |
+| `combat_defense.c` | Soak, avoidance rolls, visibility penalties and avoidance-breaking |
+| `fight.c` | Remaining attack loop, damage caps/application, death/rewards and action commands |
 | `core.c` | General formatted output and legacy item/output helpers; no fight-list management |
 | `handler.c` | Equipment-derived flags and effects; styles call its existing refresh helper after hand promotion |
 | `save.c` | Save format and load-time normalization, not combat decisions |
@@ -77,7 +79,8 @@ paths/permissions, divergent credentials and interrupted two-file replacement.
 ## Remaining staged work
 
 The request covers the shared combat system, not just these initial owners.
-Next extract and characterize defenses/initiative, damage application,
+Initiative and shared defense calculations now have explicit owners.
+Next extract and characterize damage caps/application,
 death/rewards and generic combat commands from `fight.c`. Give each a single
 owner and keep legacy public entry points compatible. Spell dispatch remains
 in `magic.c` and class abilities remain in their class modules; audit their
@@ -88,6 +91,40 @@ characterization tests. Keep callback instrumentation used by restored-spell
 tests intact. Run the full normal/sanitizer suites, catalog/layout checks,
 production build, isolated TCP/TERM and actual copyover smoke checks.
 CI covers Debian 12/13 and Ubuntu 22.04/24.04.
+
+## Defense and initiative follow-up
+
+The follow-up baseline is private head
+`5946f6c39f273e2c5993679b1f7e25a18ce3324e`. A new native-engine suite passed
+against the original calculations before extraction, covering all ten
+classes plus unclassed actors, all six styles, stance suppression,
+per-operation integer truncation, NPC level thresholds and fixed-seed RNG
+progression. Blindness/blind-fighting, unarmed penalties and beginner's
+luck are checked without loading a world or real players.
+
+Two additional assertions failed on that baseline and passed after fixes:
+
+- `get_soak()` continued through an affect's replaced `next` link after
+  `affect_strip()` recycled it. It could decrement unrelated recycled effects.
+  Iteration now stops after stripping the matching effect type. Expiring one
+  or several Brittle Bones effects leaves live unrelated effects and the
+  recycled pool untouched. This is a recycled-list bug, not evidence of a
+  confirmed heap use-after-free: this engine recycles rather than frees nodes.
+- Werewolf damage caps queried `get_tribe(AUSPICE_PHILODOX)`, accidentally
+  testing Children of Gaia. The existing +100 bonus now requires Philodox
+  auspice rank 3; tribe rank alone no longer grants it. No price, rank
+  threshold or bonus amount changed.
+
+The five moved function bodies are byte-identical to the separately fixed
+baseline. Four are also identical to the original baseline; only
+`get_soak()` contains the deliberate recycled-list repair. The Philodox
+repair remains in `get_damcap()` in `fight.c`. Existing NPC threshold
+discontinuities, six-pulse speed floor and RNG order are preserved rather
+than silently rebalanced.
+
+`tests/test_combat_calculations.c` is included in normal and sanitizer gates.
+`get_soak()` is not a pure getter: checking it can consume a Brittle Bones
+charge. Do not cache, precompute or call it an extra time as an optimization.
 
 ## Optimization rules
 
