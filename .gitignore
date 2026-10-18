@@ -3,6 +3,7 @@
 /tests/test_admin_gate
 /tests/test_combat_calculations
 /tests/test_combat_damage_death
+/tests/test_telnet
 *.o
 *.d
 Genesis/src/merc

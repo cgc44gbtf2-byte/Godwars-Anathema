@@ -27,6 +27,9 @@ and this repository does not provide a running game server.
   editing in-game still count toward the online XP bonus.
 - **Death text:** Invalid custom death text uses a safe default, and long
   corpse descriptions are bounded.
+- **MudForge / Mudlet:** Telnet option messages are kept out of commands,
+  including fragmented packets and negotiations interrupted by copyover.
+  This is ordinary text-client support, not GMCP vitals or automatic maps.
 - **Reliability:** safer player saves, reconnects, shutdowns, item ownership
   and conjured-item shop handling.
 
@@ -34,6 +37,14 @@ There are ten classes: Vampire, Werewolf, Highlander, Mage, Sorcerer, Monk,
 Ninja, Drow, Dragon and Elementalist. Hybrids are **not enabled**.
 Your server operator supplies the game address, port and permitted connection
 method. Classic Telnet traffic is plaintext: never reuse an important password.
+
+### MudForge and Mudlet
+
+Use your operator's game host and port for a TCP/Telnet connection.
+Mudlet's **Secure/TLS** option requires a separately configured TLS endpoint;
+this server's normal socket is not TLS. MudForge's browser version supplies
+its own bridge, so the game does not need a WebSocket listener.
+See [client setup, tested scope and copyover rollback notes](docs/CLIENTS.md).
 
 ## Download and build — Debian / Ubuntu
 

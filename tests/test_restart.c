@@ -18,6 +18,7 @@
 #include "merc.h"
 #include "atomic_save.h"
 #include "restart.h"
+#include "telnet_input.h"
 
 extern char *string_space, *top_string;
 extern void init_mm(void);
@@ -135,6 +136,10 @@ static void probe(void)
     assert(fcntl(login_fd,F_GETFD)&FD_CLOEXEC);
     assert(fcntl(reserve_fd,F_GETFD)&FD_CLOEXEC);
     struct stat st; assert(stat(COPYOVER_FILE,&st)==0 && (st.st_mode&0777)==0600);
+    FILE *fp=fopen(COPYOVER_FILE,"r"); assert(fp);
+    char header[64]; assert(fgets(header,sizeof(header),fp));
+    assert(!strcmp(header,"ANATHEMA_COPYOVER 2\n"));
+    assert(fclose(fp)==0);
 }
 
 static void copyover_failures(void)
@@ -225,6 +230,31 @@ static void recover(void)
     assert(char_list && char_list->gold==987 && char_list->desc &&
            char_list->desc->descriptor==fd && char_list->desc->connected==CON_PLAYING &&
            access(COPYOVER_FILE,F_OK)!=0);
+    assert(char_list->desc->telnet_state==TELNET_DATA &&
+           char_list->desc->telnet_verb==0);
+    clean();
+    /* Restore every partial framing state, including each pending verb. */
+    for (unsigned int state=TELNET_DATA; state<=TELNET_SUBNEGOTIATION_COMMAND; ++state) {
+        for (unsigned int verb=0; verb<=254; ++verb) {
+            if (!telnet_state_valid(state,verb)) continue;
+            fd=pair();
+            snprintf(text,sizeof(text),"ANATHEMA_COPYOVER 2\n%d Recover host %u %u\n-1\n",
+                     fd,state,verb);
+            manifest(text); assert(copyover_recover());
+            assert(char_list->desc->telnet_state==state &&
+                   char_list->desc->telnet_verb==verb);
+            clean();
+        }
+    }
+    fd=pair();
+    const char *invalid[]={"5 0","-1 0","2 0","2 250","2 255","3 251",
+                          "0 1","0 0 extra","0","0 9999999999999999999999"};
+    for (size_t i=0; i<sizeof(invalid)/sizeof(invalid[0]); ++i) {
+        snprintf(text,sizeof(text),"ANATHEMA_COPYOVER 2\n%d Recover host %s\n-1\n",
+                 fd,invalid[i]);
+        manifest(text); assert(!copyover_recover() && !char_list && !descriptor_list);
+    }
+    close(fd);
     clean();
 }
 

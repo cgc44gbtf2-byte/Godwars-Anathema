@@ -2,7 +2,7 @@
  * Isolated comm.c regressions (no server or player files are loaded).
  * From mudfix:
  * cc -std=gnu17 -DMERC -Dunix -ffunction-sections -fdata-sections \
- *   tests/test_comm.c -Wl,--gc-sections \
+ *   tests/test_comm.c Genesis/src/telnet_input.c -Wl,--gc-sections \
  *   -lcrypt -o /tmp/test_comm
  * /tmp/test_comm
  */

@@ -58,6 +58,7 @@
 #include <crypt.h>
 
 #include "merc.h"
+#include "telnet_input.h"
 #include "restart.h"
 
 
@@ -1319,30 +1320,33 @@ void close_socket2( DESCRIPTOR_DATA *dclose )
 
 bool read_from_descriptor( DESCRIPTOR_DATA *d )
 {
-    long iStart;
+    size_t iStart = 0, received = 0, budget;
+    unsigned char raw[4 * MAX_INPUT_LENGTH];
+
+    if (d == NULL) return FALSE;
 
     /* Hold horses if pending command already. */
     if ( d->incomm[0] != '\0' )
 	return TRUE;
 
     /* Check for overflow. */
-    iStart = strlen(d->inbuf);
+    while (iStart < sizeof(d->inbuf) && d->inbuf[iStart] != '\0') ++iStart;
     if ( iStart >= sizeof(d->inbuf) - 10 )
     {
-	if (d != NULL && d->character != NULL)
-	    sprintf( log_buf, "%s input overflow!", d->character->lasthost );
-	else
-	    sprintf( log_buf, "%s input overflow!", d->host );
+const char *host = d->character != NULL ? d->character->lasthost : d->host;
+snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s input overflow!",
+         host != NULL ? host : "(unknown)");
 	log_string( log_buf );
 
 	write_to_descriptor( d->descriptor,
 	    "\n\r*** PUT A LID ON IT!!! ***\n\r", 0 );
 	return FALSE;
     }
+    budget = sizeof(d->inbuf) - 10 - iStart;
 
     /* Snarf input. */
 #if defined(macintosh)
-    for ( ; ; )
+    for ( ; received < budget; ++received )
     {
 	long c;
 	c = getc( stdin );
@@ -1351,24 +1355,25 @@ bool read_from_descriptor( DESCRIPTOR_DATA *d )
 	putc( c, stdout );
 	if ( c == '\r' )
 	    putc( '\n', stdout );
-	d->inbuf[iStart++] = c;
-	if ( iStart > sizeof(d->inbuf) - 10 )
-	    break;
+{
+    unsigned char byte = (unsigned char)c;
+    if (!telnet_input(d, &byte, 1)) return FALSE;
+}
     }
 #endif
 
 #if defined(MSDOS) || defined(unix)
-    for ( ; iStart < sizeof(d->inbuf) - 10; )
+    for ( ; received < budget; )
     {
 	long nRead;
 
-	nRead = read( d->descriptor, d->inbuf + iStart,
-	    sizeof(d->inbuf) - 10 - iStart );
+nRead = read(d->descriptor, raw, budget - received);
 	if ( nRead > 0 )
 	{
-	    iStart += nRead;
-    d->inbuf[iStart] = '\0';
-	    if ( d->inbuf[iStart-1] == '\n' || d->inbuf[iStart-1] == '\r' )
+    received += (size_t)nRead;
+    if (!telnet_input(d, raw, (size_t)nRead)) return FALSE;
+    iStart = strlen(d->inbuf);
+    if (iStart > 0 && (d->inbuf[iStart-1] == '\n' || d->inbuf[iStart-1] == '\r'))
 		break;
 	}
 	else if ( nRead == 0 )
@@ -1388,7 +1393,6 @@ else if ( errno == EWOULDBLOCK || errno == EAGAIN )
     }
 #endif
 
-    d->inbuf[iStart] = '\0';
     return TRUE;
 }
 
@@ -1786,7 +1790,7 @@ void write_to_buffer( DESCRIPTOR_DATA *d, const char *txt, long length )
 	    return;
 	}
 	outbuf = alloc_mem(2 * d->outsize);
-	strncpy(outbuf, d->outbuf, d->outtop);
+memcpy(outbuf, d->outbuf, (size_t)d->outtop);
 	free_mem(d->outbuf, d->outsize);
 	d->outbuf   = outbuf;
 	d->outsize *= 2;
@@ -1794,7 +1798,7 @@ void write_to_buffer( DESCRIPTOR_DATA *d, const char *txt, long length )
     /*
      * Copy.
      */
-    strncpy(d->outbuf + d->outtop, tb, length);
+    memcpy(d->outbuf + d->outtop, tb, (size_t)length);
     d->outtop += length;
     d->outbuf[d->outtop] = '\0';
     return;

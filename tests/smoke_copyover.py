@@ -83,11 +83,13 @@ with tempfile.TemporaryDirectory(prefix="anathema-copyover-") as directory:
 
             # Production restart.c, real execl, original PID and active TCP socket.
             pid = process.pid
-            staff.sendall(b"copyover\n")
+            # A partial client subnegotiation must remain out of command input
+            # across execl; its remaining payload includes a misleading command.
+            staff.sendall(b"copyover\n\xff\xfa\x18Mud")
             until(staff, b"Copyover recovery complete.")
             assert process.poll() is None and process.pid == pid
             assert not (runtime / "area/copyover.data").exists()
-            staff.sendall(b"save\n")
+            staff.sendall(b"Forge\nnot-a-command\xff\xf0save\n")
             until(staff, b"Saved.")
             pending.settimeout(5)
             try:

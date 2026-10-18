@@ -16,11 +16,17 @@
 #include "merc.h"
 #include "restart.h"
 #include "atomic_save.h"
+#include "telnet_input.h"
 
-#define HANDOFF_MAGIC "ANATHEMA_COPYOVER 1\n"
+#define HANDOFF_MAGIC "ANATHEMA_COPYOVER 2\n"
+#define HANDOFF_LEGACY_MAGIC "ANATHEMA_COPYOVER 1\n"
 extern int port, control;
 extern bool write_to_descriptor(long fd, char *text, long length);
-struct handoff_row { int fd; char name[256], host[256]; };
+struct handoff_row {
+    int fd;
+    char name[256], host[256];
+    unsigned int telnet_state, telnet_verb;
+};
 struct fd_flags { int fd, flags; };
 struct handoff {
     size_t count, flag_count;
@@ -115,8 +121,9 @@ static int write_handoff(FILE *fp, void *context)
     struct handoff *h=context;
     if (fputs(HANDOFF_MAGIC,fp)==EOF) return -1;
     for (size_t i=0; i<h->count; ++i)
-        if (fprintf(fp,"%d %s %s\n",h->rows[i].fd,h->rows[i].name,
-                    h->rows[i].host)<0) return -1;
+        if (fprintf(fp,"%d %s %s %u %u\n",h->rows[i].fd,h->rows[i].name,
+                    h->rows[i].host,h->rows[i].telnet_state,
+                    h->rows[i].telnet_verb)<0) return -1;
     return fputs("-1\n",fp)==EOF ? -1 : 0;
 }
 
@@ -138,10 +145,12 @@ void restart_copyover(CHAR_DATA *ch)
         if (!descriptor_is_in_game(d)) continue; /* Close only on successful exec. */
         CHAR_DATA *owner=player_save_owner(d->original ? d->original : d->character);
         if (owner==NULL || !host_valid(d->host) ||
-            !row_unique(h,(int)d->descriptor,owner->name)) goto aborted;
+            !row_unique(h,(int)d->descriptor,owner->name) ||
+            !telnet_state_valid(d->telnet_state,d->telnet_verb)) goto aborted;
         struct handoff_row *row=&h->rows[h->count++];
         row->fd=(int)d->descriptor;
         strcpy(row->name,owner->name); strcpy(row->host,d->host);
+        row->telnet_state=d->telnet_state; row->telnet_verb=d->telnet_verb;
     }
     struct atomic_save_error error;
 #ifdef RESTART_TESTING
@@ -198,19 +207,31 @@ aborted:
 static bool read_handoff(FILE *fp, struct handoff *h)
 {
     char line[1024];
-    if (!fgets(line,sizeof(line),fp) || strcmp(line,HANDOFF_MAGIC)) return FALSE;
+    bool legacy;
+    if (!fgets(line,sizeof(line),fp)) return FALSE;
+    legacy=!strcmp(line,HANDOFF_LEGACY_MAGIC);
+    if (!legacy && strcmp(line,HANDOFF_MAGIC)) return FALSE;
     while (fgets(line,sizeof(line),fp)) {
         if (!strchr(line,'\n')) return FALSE;
         if (!strcmp(line,"-1\n")) return getc(fp)==EOF && !ferror(fp);
-        char token[32], name[256], host[256], extra;
-        long fd;
+        char token[32], name[256], host[256], state_token[32], verb_token[32], extra;
+        long fd, state=TELNET_DATA, verb=0;
+        int fields=legacy ?
+            sscanf(line,"%31s %255s %255s %c",token,name,host,&extra) :
+            sscanf(line,"%31s %255s %255s %31s %31s %c",
+                   token,name,host,state_token,verb_token,&extra);
         if (h->count>=FD_SETSIZE ||
-            sscanf(line,"%31s %255s %255s %c",token,name,host,&extra)!=3 ||
+            fields!=(legacy ? 3 : 5) ||
+            (!legacy && (!number(state_token,TELNET_DATA,
+                                TELNET_SUBNEGOTIATION_COMMAND,&state) ||
+                         !number(verb_token,0,255,&verb))) ||
+            !telnet_state_valid((unsigned int)state,(unsigned int)verb) ||
             !number(token,3,FD_SETSIZE-1,&fd) || fd==control ||
             !atomic_save_name_valid(name) || !host_valid(host) ||
             !connected_socket((int)fd) || !row_unique(h,(int)fd,name)) return FALSE;
         struct handoff_row *row=&h->rows[h->count++];
         row->fd=(int)fd; strcpy(row->name,name); strcpy(row->host,host);
+        row->telnet_state=(unsigned int)state; row->telnet_verb=(unsigned int)verb;
     }
     return FALSE; /* Missing sentinel or I/O error, never loop on stale input. */
 }
@@ -247,6 +268,8 @@ bool copyover_recover(void)
         struct handoff_row *row=&h->rows[i];
         DESCRIPTOR_DATA *d=recovered_descriptor();
         d->descriptor=row->fd; d->host=str_dup(row->host);
+        d->telnet_state=(unsigned char)row->telnet_state;
+        d->telnet_verb=(unsigned char)row->telnet_verb;
         d->next=descriptor_list; descriptor_list=d;
         if (!load_char_obj(d,row->name) || IS_NPC(d->character) ||
             d->character->pcdata==NULL || d->character->level<LEV_AWA ||

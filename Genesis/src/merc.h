@@ -255,6 +255,8 @@ struct	descriptor_data
     long		connected;
     bool		fcommand;
     bool                password_save_pending;
+    unsigned char       telnet_state;
+    unsigned char       telnet_verb;
     char		inbuf		[4 * MAX_INPUT_LENGTH];
     char		incomm		[MAX_INPUT_LENGTH];
     char		inlast		[MAX_INPUT_LENGTH];
