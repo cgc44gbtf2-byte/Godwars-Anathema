@@ -242,6 +242,11 @@ interface and can terminate the process without saving.
 
 ## 6. Saves, stops, copyover and upgrades
 
+For existing default-layout installations, the
+[updater guide](UPDATING.md) provides a CI-gated command with restart and
+manual-copyover staging modes, backups, verification and binary rollback.
+The fresh installer is not an updater.
+
 * TERM/INT request shutdown through a signal flag; eligible loaded players
   are saved in normal-loop context before normal exit. This requires the
   patched graceful-shutdown implementation, not the archive executable.

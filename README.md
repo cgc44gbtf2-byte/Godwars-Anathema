@@ -35,6 +35,11 @@ There is no offline account creation, Yami promotion or bootstrap secret.
 This intentionally trusts control of the Luto account, not real-world identity.
 See [installation details and upgrades](deploy/INSTALL.md).
 
+For existing installations, use the [CI-gated updater](deploy/UPDATING.md).
+It supports maintenance restarts, staging a compatible binary for your
+in-game `copyover`, verification and explicit binary rollback. Preview with
+`python3 deploy/update.py`; apply only after reviewing the guide.
+
 ## Player updates
 
 - **Vampires:** consent-based discipline teaching and five Path of Blood
@@ -83,13 +88,12 @@ shows health, mana and class resources without automating combat.
 
 Supported CI targets: Debian 12/13 and Ubuntu 22.04/24.04.
 Use an ordinary user to build; do not run the game as root.
-The repository is private, so cloning requires your existing authorized
-GitHub SSH access.
+The repository is public; HTTPS cloning does not require a GitHub SSH key.
 
 ```sh
 sudo apt-get update
 sudo apt-get install -y build-essential libcrypt-dev git ca-certificates python3 unzip luajit
-git clone --branch Godwars-Anathema git@github.com:cgc44gbtf2-byte/Godwars-Anathema.git
+git clone --branch Godwars-Anathema https://github.com/cgc44gbtf2-byte/Godwars-Anathema.git
 cd Godwars-Anathema
 make -j2
 make test

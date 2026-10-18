@@ -62,6 +62,7 @@ check-layout:
 	python3 tests/test_security_commands.py
 	python3 tests/test_setup.py
 	python3 tests/test_world_layout.py
+	python3 tests/test_updater.py
 
 test: check-layout $(TESTS)
 	@set -e; for t in $(TESTS); do ./$$t; done
