@@ -1,0 +1,46 @@
+name: C build and regression tests
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - debian:12
+          - debian:13
+          - ubuntu:22.04
+          - ubuntu:24.04
+    container: ${{ matrix.image }}
+    steps:
+      - name: Install distro toolchain
+        run: apt-get update && apt-get install -y --no-install-recommends ca-certificates git build-essential libcrypt-dev systemd python3
+      - uses: actions/checkout@v4
+      - name: Build
+        run: make -j2
+      - name: Validate systemd unit (does not start service)
+        run: |
+          install -D -m 0755 Genesis/src/merc /opt/anathema/src/merc
+          systemd-analyze verify deploy/anathema.service
+      - name: Regression tests
+        run: |
+          make test
+          python3 tests/test_catalog.py
+      - name: Isolated boot and graceful stop
+        run: |
+          python3 tests/smoke_shutdown.py
+          python3 tests/smoke_copyover.py
+      - name: Address and undefined-behavior sanitizers
+        env:
+          ASAN_OPTIONS: detect_leaks=0:halt_on_error=1
+          UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+        run: |
+          make sanitize
+          make -C Genesis/src clean
+          make -j2 CFLAGS="-std=gnu17 -DMERC -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer" LDFLAGS="-fsanitize=address,undefined"
+          python3 tests/smoke_shutdown.py
+          python3 tests/smoke_copyover.py
