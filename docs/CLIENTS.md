@@ -96,3 +96,10 @@ real exec and verifies a subsequent save on the same TCP connection.
 These are transport-level regression checks. They are **not** recorded GUI
 sessions in real Mudlet or MudForge releases, a live hosted-bridge test, a TLS
 deployment test, a UTF-8 upgrade, or certification of enhanced client features.
+
+Smoke-test greetings use a bounded 25-second receive deadline, rather than
+inheriting the short TCP-connect timeout. EOF still fails immediately and
+missing output still fails at the deadline; the test never reconnects or
+restarts a failing server to hide an error. Deterministic Python checks cover
+delayed/partial replies, EOF, deadline expiry and oversized output. Failures
+include the tail of the synthetic server log for diagnosis.

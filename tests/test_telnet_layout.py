@@ -1,4 +1,5 @@
-"""Transport ownership and build coverage; wire behavior is tested in C."""
+"""Transport ownership, build coverage and deterministic smoke-wait regressions."""
+import ast
 import collections
 import re
 import unittest
@@ -41,6 +42,57 @@ class TelnetLayoutChecks(unittest.TestCase):
         self.assertIn('HANDOFF_MAGIC "ANATHEMA_COPYOVER 2\\n"', restart)
         self.assertIn('HANDOFF_LEGACY_MAGIC "ANATHEMA_COPYOVER 1\\n"', restart)
         self.assertIn("telnet_state_valid", restart)
+
+
+class SmokeWaitChecks(unittest.TestCase):
+    def wait(self, chunks, needle=None, timeout=25):
+        class FakeSocketModule:
+            class timeout(Exception):
+                pass
+
+        class Client:
+            def settimeout(self, value):
+                self.timeout = value
+
+            def recv(self, count):
+                value = chunks.pop(0)
+                if value is None:
+                    raise FakeSocketModule.timeout()
+                return value
+
+        class Clock:
+            value = 0
+
+            def monotonic(self):
+                self.value += 1
+                return self.value
+
+        tree = ast.parse((ROOT / "tests/smoke_copyover.py").read_text())
+        function = next(n for n in tree.body if isinstance(n, ast.FunctionDef)
+                        and n.name == "until")
+        namespace = {"time": Clock(), "socket": FakeSocketModule}
+        exec(compile(ast.Module(body=[function], type_ignores=[]), "<smoke-wait>", "exec"),
+             namespace)
+        return namespace["until"](Client(), needle, timeout)
+
+    def test_delayed_greeting_retries_read_not_connection(self):
+        self.assertEqual(self.wait([None, None, b"greeting"]), b"greeting")
+
+    def test_greeting_eof_fails_immediately(self):
+        with self.assertRaisesRegex(AssertionError, "Connection closed"):
+            self.wait([b""])
+
+    def test_unresponsive_server_has_deadline(self):
+        with self.assertRaisesRegex(AssertionError, "did not arrive"):
+            self.wait([None] * 10, timeout=2)
+
+    def test_partial_expected_response_waits(self):
+        self.assertEqual(self.wait([None, b"Sa", None, b"ved."], b"Saved."),
+                         b"Saved.")
+
+    def test_unbounded_output_still_fails(self):
+        with self.assertRaisesRegex(AssertionError, "unbounded"):
+            self.wait([b"x" * 2_000_000], b"never")
 
 
 if __name__ == "__main__":

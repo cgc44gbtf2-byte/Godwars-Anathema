@@ -3,6 +3,7 @@ import pathlib
 import signal
 import socket
 import subprocess
+import sys
 import tempfile
 import time
 import zipfile
@@ -14,7 +15,7 @@ def until(client, needle, timeout=25):
     deadline = time.monotonic() + timeout
     received = b""
     client.settimeout(0.5)
-    while needle.lower() not in received.lower():
+    while not received or (needle is not None and needle.lower() not in received.lower()):
         if time.monotonic() > deadline:
             raise AssertionError("Expected server response did not arrive")
         try:
@@ -59,7 +60,7 @@ with tempfile.TemporaryDirectory(prefix="anathema-copyover-") as directory:
                     if time.monotonic() > deadline:
                         raise AssertionError("Server did not start")
                     time.sleep(0.1)
-            assert staff.recv(65536), "Empty TCP greeting"
+            until(staff, None)
             staff.sendall(b"Restarter\n")
             until(staff, b"Password")
             staff.sendall(b"test-only-passphrase\n")
@@ -69,7 +70,7 @@ with tempfile.TemporaryDirectory(prefix="anathema-copyover-") as directory:
             staff.sendall(b"save\n")
             until(staff, b"Saved.")
             pending = socket.create_connection(("127.0.0.1", port), timeout=3)
-            assert pending.recv(65536), "Empty pending-login greeting"
+            until(pending, None)
 
             # Both manual restart paths must refuse failed authoritative writes.
             (runtime / "player").rename(runtime / "unavailable")
@@ -98,9 +99,15 @@ with tempfile.TemporaryDirectory(prefix="anathema-copyover-") as directory:
             except ConnectionResetError:
                 pass
             newcomer = socket.create_connection(("127.0.0.1", port), timeout=3)
-            assert newcomer.recv(65536), "Inherited listener did not greet"
+            until(newcomer, None)
             staff.sendall(b"shutdown\n")
             assert process.wait(timeout=15) == 0, "Checked shutdown did not exit cleanly"
+        except Exception:
+            log.flush()
+            diagnostic = (runtime / "server.log").read_text(errors="replace")
+            print("Synthetic copyover server log (last 120 lines):", file=sys.stderr)
+            print("\n".join(diagnostic.splitlines()[-120:]), file=sys.stderr)
+            raise
         finally:
             for client in (staff, pending, newcomer):
                 if client is not None:
