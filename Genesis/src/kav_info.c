@@ -368,32 +368,35 @@ long get_totalscore( CHAR_DATA *ch )
 void do_level( CHAR_DATA *ch, char *argument )
 {
     char arg[MIL];
-    char skill[50];
+    char skill[MAX_STRING_LENGTH];
+
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL)
+        return;
 
     one_argument(argument, arg);
 
     stc("#l---------------------------------------------#n\n\r", ch);
     stc("Stances       #l|#n Styles        #l|#n Weapons\n\r", ch);
     stc("#l---------------------------------------------#n\n\r", ch);
-    sprintf(skill, "Viper   : %3li #l|#n Unarmed : %3li #l|#n Unarmed: %4li\n\r", ch->stance[1], ch->style[1], ch->weapon[1]);
+    snprintf(skill, sizeof(skill), "Viper   : %3li #l|#n Unarmed : %3li #l|#n Unarmed: %4li\n\r", ch->stance[1], ch->style[1], ch->weapon[1]);
     stc(skill, ch);
-    sprintf(skill, "Crane   : %3li #l|#n Natural : %3li #l|#n Slash  : %4li\n\r", ch->stance[2], ch->style[2], ch->weapon[2]);
+    snprintf(skill, sizeof(skill), "Crane   : %3li #l|#n Natural : %3li #l|#n Slash  : %4li\n\r", ch->stance[2], ch->style[2], ch->weapon[2]);
     stc(skill, ch);
-    sprintf(skill, "Crab    : %3li #l|#n One Hand: %3li #l|#n Pierce : %4li\n\r", ch->stance[3], ch->style[3], ch->weapon[3]);
+    snprintf(skill, sizeof(skill), "Crab    : %3li #l|#n One Hand: %3li #l|#n Pierce : %4li\n\r", ch->stance[3], ch->style[3], ch->weapon[3]);
     stc(skill, ch);
-    sprintf(skill, "Mongoose: %3li #l|#n Shield  : %3li #l|#n Blunt  : %4li\n\r", ch->stance[4], ch->style[4], ch->weapon[4]);
+    snprintf(skill, sizeof(skill), "Mongoose: %3li #l|#n Shield  : %3li #l|#n Blunt  : %4li\n\r", ch->stance[4], ch->style[4], ch->weapon[4]);
     stc(skill, ch);
-    sprintf(skill, "Bull    : %3li #l|#n Two Hand: %3li #l|#n\n\r", ch->stance[5], ch->style[5]);
+    snprintf(skill, sizeof(skill), "Bull    : %3li #l|#n Two Hand: %3li #l|#n\n\r", ch->stance[5], ch->style[5]);
     stc(skill, ch);
-    sprintf(skill, "Mantis  : %3li #l|#n Two Weap: %3li #l|#n\n\r", ch->stance[6], ch->style[6]);
+    snprintf(skill, sizeof(skill), "Mantis  : %3li #l|#n Two Weap: %3li #l|#n\n\r", ch->stance[6], ch->style[6]);
     stc(skill, ch);
-    sprintf(skill, "Dragon  : %3li #l|#n               #l|#n\n\r", ch->stance[7]);
+    snprintf(skill, sizeof(skill), "Dragon  : %3li #l|#n               #l|#n\n\r", ch->stance[7]);
     stc(skill, ch);
-    sprintf(skill, "Tiger   : %3li #l|#n               #l|#n\n\r", ch->stance[8]);
+    snprintf(skill, sizeof(skill), "Tiger   : %3li #l|#n               #l|#n\n\r", ch->stance[8]);
     stc(skill, ch);
-    sprintf(skill, "Monkey  : %3li #l|#n               #l|#n\n\r", ch->stance[9]);
+    snprintf(skill, sizeof(skill), "Monkey  : %3li #l|#n               #l|#n\n\r", ch->stance[9]);
     stc(skill, ch);
-    sprintf(skill, "Swallow : %3li #l|#n               #l|#n\n\r", ch->stance[10]);
+    snprintf(skill, sizeof(skill), "Swallow : %3li #l|#n               #l|#n\n\r", ch->stance[10]);
     stc(skill, ch);
     stc("#l---------------------------------------------#n\n\r", ch);
     switch(ch->stance[11])
@@ -449,8 +452,8 @@ void do_level( CHAR_DATA *ch, char *argument )
     if (IS_ELEM(ch)) stc("You are an Elementalist.\n\r", ch);
     if (IS_MAGE(ch)) stc("You are a Mage.\n\r", ch);
 
-    if (!IS_WEREWOLF(ch)) sprintf(skill, "Generation: %li\n\r", ch->vampgen);
-    else sprintf(skill, "Rank: %li\n\r", ch->pcdata->rank);
+    if (!IS_WEREWOLF(ch)) snprintf(skill, sizeof(skill), "Generation: %li\n\r", ch->vampgen);
+    else snprintf(skill, sizeof(skill), "Rank: %li\n\r", ch->pcdata->rank);
     stc(skill, ch);
 
     return;

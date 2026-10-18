@@ -1,6 +1,7 @@
 /* Real engine, synthetic characters and save fragments only. */
 #include <assert.h>
 #include <fcntl.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -65,6 +66,45 @@ static void save_fragment(const char *fragment)
     rewind(fp);
     fread_char(&a, fp);
     fclose(fp);
+}
+
+static void training_display(void)
+{
+    fixture();
+    do_level(&a, "");
+    assert(strstr(output, "Stances") && strstr(output, "Unarmed"));
+    assert(strstr(output, "Generation:"));
+    assert(descriptor.connected == CON_PLAYING);
+
+    fixture();
+    a.level = LEV_ST;
+    a.stance[1] = LONG_MAX;
+    a.style[1] = LONG_MIN;
+    a.weapon[1] = LONG_MAX;
+    a.weapon[2] = LONG_MIN;
+    do_level(&a, "");
+    char number[64];
+    snprintf(number, sizeof(number), "%li", LONG_MAX);
+    assert(strstr(output, number));
+    snprintf(number, sizeof(number), "%li", LONG_MIN);
+    assert(strstr(output, number));
+    assert(a.level == LEV_ST && a.stance[1] == LONG_MAX);
+    assert(a.style[1] == LONG_MIN && a.weapon[1] == LONG_MAX);
+    assert(descriptor.connected == CON_PLAYING);
+
+    fixture();
+    a.class = CLASS_WEREWOLF;
+    pa.rank = LONG_MAX;
+    do_level(&a, "");
+    assert(strstr(output, "Rank:"));
+
+    fixture();
+    SET_BIT(a.act, ACT_IS_NPC);
+    a.class = CLASS_WEREWOLF;
+    a.pcdata = NULL;
+    do_level(&a, "");
+    assert(descriptor.connected == CON_PLAYING);
+    do_level(NULL, "");
 }
 
 static void persisted_ranges(void)
@@ -308,6 +348,7 @@ static void complete_player_load(void)
 
 int main(void)
 {
+    training_display();
     persisted_ranges();
     invalid_live_indexes();
     defender_stance_without_attacker_stance();

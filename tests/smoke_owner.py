@@ -64,9 +64,18 @@ with tempfile.TemporaryDirectory(prefix="anathema-owner-wire-") as directory:
                     if time.monotonic() > deadline:
                         raise AssertionError("Server did not start")
                     time.sleep(0.1)
+            # Mudlet-style GMCP negotiation must not affect command safety.
+            owner.sendall(b"\xff\xfd\xc9")
             signup(owner, "Luto")
+            # Both aliases used to overflow even on fresh player stats.
+            owner.sendall(b"level\n")
+            until(owner, b"Generation:")
+            owner.sendall(b"exp\n")
+            until(owner, b"Generation:")
             owner.sendall(b"authorize\n")
             until(owner, b"highest staff level (7)")
+            owner.sendall(b"level\n")
+            until(owner, b"Generation:")
             for name in ("player/Luto", "backup/Luto"):
                 data = (runtime / name).read_bytes()
                 assert re.search(rb"(?m)^Level\s+7\s*$", data)
@@ -76,6 +85,8 @@ with tempfile.TemporaryDirectory(prefix="anathema-owner-wire-") as directory:
             until(owner, b"already have the highest staff level")
             other = socket.create_connection(("127.0.0.1", port), timeout=1)
             signup(other, "Yami")
+            other.sendall(b"level\n")
+            until(other, b"Generation:")
             other.sendall(b"authorize\n")
             until(other, b"only available to Luto")
             assert not (runtime / "player/Yami").exists()
