@@ -362,7 +362,7 @@ void do_write( CHAR_DATA *ch, char *argument )
 	obj->chpoweruse = str_dup(arg3);
 	stc("Ok.\n\r", ch);
 	act("$n writes something on $p.", ch, obj, NULL, TO_ROOM);
-	if (!IS_SORCERER(ch) && !IS_IMM(ch))
+	if (!hybrid_power_parent(ch, CLASS_SORCERER) && !IS_IMM(ch))
 	    SET_BIT(obj->spectype, ADV_FAILED);
 	else if (!str_cmp(arg3, "start.damage.spell") && obj->spectype == 0)
 	    {SET_BIT(obj->spectype, ADV_STARTED); SET_BIT(obj->spectype, ADV_DAMAGE);}
@@ -391,7 +391,7 @@ void do_write( CHAR_DATA *ch, char *argument )
 	    argument = one_argument(argument, arg1);
 	    strcpy(arg2, argument);
 
-	    if (!IS_SORCERER(ch) && !IS_IMM(ch) && !IS_SET(obj->spectype, ADV_FINISHED))
+	    if (!hybrid_power_parent(ch, CLASS_SORCERER) && !IS_IMM(ch) && !IS_SET(obj->spectype, ADV_FINISHED))
 		SET_BIT(obj->spectype, ADV_FAILED);
 	    else if (!str_cmp(arg1, "start.damage.spell") && obj->spectype == 0)
 		{SET_BIT(obj->spectype, ADV_STARTED); SET_BIT(obj->spectype, ADV_DAMAGE);}

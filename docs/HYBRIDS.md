@@ -39,7 +39,7 @@ configured; only the approved book-chain budget is reduced.
 Native color getters and interpreter level gates are unchanged. `chant` already
 accepts all classes at its native tier; no new casting-permission route is needed.
 Dedicated color-training and material-creation routes are described below;
-enchantment, writing, vision and player conversion still need integration.
+enchantment, vision and player conversion still need integration.
 Native actors without a hybrid record keep the original10-page
 limit. No schema or handoff changes. Full secondary Sorcerer command integration
 remains pending; no PvP balance claim follows from page-prefix replays.
@@ -66,8 +66,44 @@ or cross-player trade guarantee. Actual full/short player-file reloads verify
 saved materials, owner, zero prices, primal and hybrid records; they do not
 prove crash/powercut behavior. Native `chant` was already available at its
 command tier to all classes: this stage does not add casting permission.
-Writing/finishing pages, enchantment, vision ownership and other class crafting
-still need their own adapters. No playable hybrid conversion is enabled.
+Writing/finishing pages use the scoped adapter below; enchantment, vision
+ownership and other class crafting still need their own adapters.
+No playable hybrid conversion is enabled.
+
+### Secondary Sorcerer page writing and finishing (existing records only)
+
+Valid secondary Sorcerers can author magical pages through the native `write`
+command. Hold a pen and carry the page or book:
+
+```text
+hold pen
+write book title My spellbook
+write page title Red embers
+write page line start.damage.spell
+write page line end.red
+```
+
+The two magical-author checks recognize the owned Sorcerer parent; the native
+page compiler, color terminators, optional messages, affect/action syntax,
+duplicate/invalid-line failure flags and size limit are unchanged. Native
+Sorcerers keep their full writing access. Staff override, NPC rejection,
+RESTING/LEV_SLE interpreter gates, ordinary titles and existing finished-page
+annotations retain their previous behavior. Invalid/unrelated secondary
+records do not gain magical-author permission: ordinary writing can still
+mark a page failed, exactly as for native non-Sorcerers.
+
+Authoring does not grant color ranks, change permanent focus or charge primal,
+mana, quest points or gold. Native authors can finish pages of untrained colors;
+that still does not supply learned casting strength. Existing learned-color
+adapters and the approved6/4/3 hybrid book-chain budgets remain enforced at
+casting, with standalone Sorcerers retaining10. Titles and page changes use
+ordinary player-save timing, not an atomic inventory/trade transaction or a
+crash/powercut guarantee. Full and short player-file reload tests cover completed
+pages, hybrid records and resources; only full loads restore inventory.
+
+This does not enable hybrid conversion, enchantment and vision, teacher/social
+roles, other class trainers or live transformation/fusion handlers. No file-based
+world help is replaced: existing custom helps still take priority.
 
 The recipe audit also reproduced a native item-factory ownership defect:
 objects directly borrowed mutable OLC template strings. Crafting renamed
@@ -103,7 +139,7 @@ uncertainty keeps the visible saved candidate/payment and blocks another lesson
 until recovery: the UI never refunds or repeats an uncertain transaction.
 
 Listing/focus previews, `selfbrid list` and `selfbrid info` remain read-only.
-Conversion, page finishing/enchanting, other class trainers and full live forms
+Conversion, enchantment, other class trainers and full live forms
 remain disabled or pending; this UI is not a conversion eligibility check.
 Material creation is a separate, scoped adapter described above.
 

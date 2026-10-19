@@ -3,10 +3,12 @@ import hashlib
 import re
 import unittest
 from test_class_layout import ROOT, SRC, make_values
+from test_hybrid_writing_catalog import without_sorcerer_writing_adapter
 
 
 def without_sorcerer_creation_adapter(text):
     """Reverse exactly the scoped entry gate, not arbitrary class predicates."""
+    text=without_sorcerer_writing_adapter(text)
     include='#include "classes/hybrid/access.h"\n'
     assert text.count(include)==1
     start=text.index("void do_sorccreate(")

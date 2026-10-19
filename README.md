@@ -91,7 +91,10 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   Failed or uncertain saves block repeat purchases until primary save recovery.
   Existing secondary Sorcerers can also use `sorccreate book`, `sorccreate page`
   and `sorccreate pen` at native prices:10 primal for book/pen, free blank pages.
-  This creates materials only, not finished spells, and uses normal player saves.
+  With a held pen, secondary Sorcerers can also use the native `write` syntax
+  to title books and write/finish spell pages. Writing costs no extra resources,
+  grants no color ranks, and uses normal player saves; casting keeps its
+  existing learned-color requirements and hybrid book-chain limits.
   A separate object-factory fix prevents crafted items from freeing mutable
   names, descriptions and spell messages still owned by staff-edited templates.
   The info page also shows a read-only numeric checklist: 50,000 max HP/mana,

@@ -86,8 +86,10 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
                      "Confirm one permanent full color before paid rank training; "
                      "this does not create a hybrid.\n\r",ch);
         send_to_char("Existing secondary Sorcerers can sorccreate book/page/pen: "
-                     "book or pen: 10 primal; page: free. Writing/enchanting/vision "
-                     "are not enabled by this adapter.\n\r",ch);
+                     "book or pen: 10 primal; page: free. With a held pen, write "
+                     "titles and spell-page lines, then the native end.<color>. "
+                     "Writing grants no color ranks. Enchanting/vision remain "
+                     "unavailable through this adapter.\n\r",ch);
         return 1;
     }
     const HYBRID_DEFINITION *h = hybrid_by_name(argument);
