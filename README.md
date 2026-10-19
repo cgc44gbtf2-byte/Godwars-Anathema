@@ -89,6 +89,11 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   `selfbrid colors focus blue confirm` to save it, and `selfbrid colors blue`
   to buy one rank at native primal prices. Original Sorcerers still use `colors`.
   Failed or uncertain saves block repeat purchases until primary save recovery.
+  Existing secondary Sorcerers can also use `sorccreate book`, `sorccreate page`
+  and `sorccreate pen` at native prices:10 primal for book/pen, free blank pages.
+  This creates materials only, not finished spells, and uses normal player saves.
+  A separate object-factory fix prevents crafted items from freeing mutable
+  names, descriptions and spell messages still owned by staff-edited templates.
   The info page also shows a read-only numeric checklist: 50,000 max HP/mana,
   max base stats, all ten stances, four weapon proficiencies and trainable
   styles at their original-class caps. Natural style is exempt for classes
@@ -110,7 +115,8 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   updates are also implemented internally; other activation upkeep is pending.
   Normal players still cannot create hybrids: conversion, other secondary
   trainers and live forms remain unavailable. Only color training for an
-  existing secondary Sorcerer record is exposed. Updates use save epoch3 and reject older
+  existing secondary Sorcerer record, plus its book/page/pen creation, is exposed.
+  Updates use save epoch3 and reject older
   binary-only rollbacks.
   See [hybrid implementation status](docs/HYBRIDS.md).
 - **Vampire upkeep:** Obfuscate no longer takes empty blood below zero.

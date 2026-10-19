@@ -36,13 +36,49 @@ class/array projection, combining ranks or altering training. Original Sorcerers
 retain their full native color ranks, even when the secondary build is not yet
 configured; only the approved book-chain budget is reduced.
 
-Native color getters and interpreter level gates are unchanged. This does not
-open crafting, enchantment, writing, vision, color-training commands or player
-conversion. Native actors without a hybrid record keep the original10-page
+Native color getters and interpreter level gates are unchanged. `chant` already
+accepts all classes at its native tier; no new casting-permission route is needed.
+Dedicated color-training and material-creation routes are described below;
+enchantment, writing, vision and player conversion still need integration.
+Native actors without a hybrid record keep the original10-page
 limit. No schema or handoff changes. Full secondary Sorcerer command integration
 remains pending; no PvP balance claim follows from page-prefix replays.
 
 ## Available in this stage
+
+### Secondary Sorcerer materials (existing records only)
+
+`sorccreate book`, `sorccreate page` and `sorccreate pen` now recognize a
+validated secondary Sorcerer parent through a single scoped creation-entry
+adapter. No class macro, primary field, color rank, training choice or
+interpreter permission is changed. Native Sorcerers, including original
+Sorcerers in both parent orders, retain the same recipes and access.
+The native Sorcerer-tier/RESTING command-table gates remain in effect.
+
+Books and pens cost10 primal each; blank pages are free. There is no extra
+quest, gold or mana fee. Materials retain their existing item types, hold flags,
+maker ownership and zero cost/points (no resale/refund value). A missing
+protoplasm template is rejected before any payment. Having the secondary
+parent's unranked material-creation utility does not grant learned colors.
+
+This uses ordinary player-save timing and is not an atomic inventory/currency transaction
+or cross-player trade guarantee. Actual full/short player-file reloads verify
+saved materials, owner, zero prices, primal and hybrid records; they do not
+prove crash/powercut behavior. Native `chant` was already available at its
+command tier to all classes: this stage does not add casting permission.
+Writing/finishing pages, enchantment, vision ownership and other class crafting
+still need their own adapters. No playable hybrid conversion is enabled.
+
+The recipe audit also reproduced a native item-factory ownership defect:
+objects directly borrowed mutable OLC template strings. Crafting renamed
+instances, later template edits or object extraction could free/invalidate
+strings still referenced elsewhere. A separate prerequisite safety fix gives
+instances their own copies of all nine mutable text fields, while continuing to
+share immutable boot-loaded strings. Missing names/descriptions become empty
+strings; absent secondary messages use the existing `(null)` marker.
+The real factory/extractor regression runs128 mutable/shared/partial-template
+cycles, including edits while instances are alive. Native item recipes, spell
+page behavior and RNG snapshots are otherwise unchanged.
 
 ### Secondary Sorcerer training UI (existing records only)
 
@@ -67,8 +103,9 @@ uncertainty keeps the visible saved candidate/payment and blocks another lesson
 until recovery: the UI never refunds or repeats an uncertain transaction.
 
 Listing/focus previews, `selfbrid list` and `selfbrid info` remain read-only.
-Conversion, crafting, other class trainers and full live forms remain disabled
-or pending; this UI is not a conversion eligibility check.
+Conversion, page finishing/enchanting, other class trainers and full live forms
+remain disabled or pending; this UI is not a conversion eligibility check.
+Material creation is a separate, scoped adapter described above.
 
 The original Anathema implementation contains the 45 named pairs supplied for
 this server, with stable hybrid IDs 1–45. These are **not base-class IDs**.
@@ -122,8 +159,8 @@ on older records; loading never guesses clan identity or silently resets ranks.
 is still not a complete secondary class: forms, remaining buffs/timers,
 absorption/familiar lifecycle, social clan membership and remaining live ability adapters
 remain pending. Native build selection and paid learning now have backend APIs
-described below. Only secondary Sorcerer focus/color ranks now have a
-player-facing UI for existing records; other trainers and secondary teaching
+described below. Secondary Sorcerer focus/color ranks and material creation now
+have player-facing routes for existing records; other trainers and secondary teaching
 remain unwired.
 Validation does not certify every combination of
 prerequisites, resource defaults or effective abilities. Independent Ninja

@@ -3,6 +3,7 @@ import hashlib
 import re
 import unittest
 from test_class_layout import ROOT, SRC, make_values
+from test_hybrid_creation_catalog import without_sorcerer_creation_adapter
 
 
 def blob(data):
@@ -12,6 +13,7 @@ def blob(data):
 class HybridBooksCatalog(unittest.TestCase):
     def test_native_page_bodies_unchanged_after_guards_removed(self):
         text = (SRC / "classes/sorcerer/sorcerer.c").read_text()
+        text = without_sorcerer_creation_adapter(text)
         self.assertEqual(text.count("if (!book_page_begin(ch, book, page, argument)) return;"), 3)
         self.assertNotIn("++chainspell > 10", text)
         text = text.replace('#include "classes/hybrid/books.h"\n', "")

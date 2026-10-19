@@ -2,6 +2,7 @@
 import hashlib
 import unittest
 from test_class_layout import ROOT, SRC, make_values
+from test_hybrid_creation_catalog import without_sorcerer_creation_adapter
 
 
 class HybridColorsCatalog(unittest.TestCase):
@@ -42,6 +43,8 @@ class HybridColorsCatalog(unittest.TestCase):
             "interp.c":"ccb0125d4264a8a5447618c29a9240ec674d2eb4",
         }.items():
             data=(SRC/path).read_bytes()
+            if path=="classes/sorcerer/sorcerer.c":
+                data=without_sorcerer_creation_adapter(data.decode()).encode()
             self.assertEqual(hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest(),sha)
 
     def test_real_engine_files_reload_and_failure_coverage(self):

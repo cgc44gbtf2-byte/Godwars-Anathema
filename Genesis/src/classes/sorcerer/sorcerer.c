@@ -9,6 +9,7 @@
 #include <time.h>
 #include "merc.h"
 #include "classes/hybrid/books.h"
+#include "classes/hybrid/access.h"
 
 /*
  * Local Functions.
@@ -132,7 +133,7 @@ void do_sorccreate( CHAR_DATA *ch, char *argument )
 
     one_argument(argument, arg);
 
-    if (!IS_SORCERER(ch))
+    if (!hybrid_power_parent(ch, CLASS_SORCERER))
     {
 	stc("Huh?\n\r", ch);
 	return;

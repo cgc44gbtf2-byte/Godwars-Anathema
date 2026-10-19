@@ -35,6 +35,7 @@ TESTS += tests/test_hybrid_healing
 TESTS += tests/test_hybrid_readiness
 TESTS += tests/test_hybrid_books
 TESTS += tests/test_hybrid_colors
+TESTS += tests/test_hybrid_creation
 TESTS += tests/test_object_strings
 # Real validators/effective access for older isolated native fixtures too.
 # Never replace hybrid access with permissive stubs just to satisfy linking.
@@ -95,6 +96,7 @@ check-layout:
 	python3 tests/test_hybrid_readiness_catalog.py
 	python3 tests/test_hybrid_books_catalog.py
 	python3 tests/test_hybrid_colors_catalog.py
+	python3 tests/test_hybrid_creation_catalog.py
 	python3 tests/test_combat_layout.py
 	python3 tests/test_telnet_layout.py
 	python3 tests/test_gmcp_layout.py
@@ -156,6 +158,9 @@ tests/test_hybrid_books: tests/test_hybrid_books.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_hybrid_colors: tests/test_hybrid_colors.c $(ENGINE_OBJECTS)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
+tests/test_hybrid_creation: tests/test_hybrid_creation.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_object_strings: tests/test_object_strings.c $(ENGINE_OBJECTS)
