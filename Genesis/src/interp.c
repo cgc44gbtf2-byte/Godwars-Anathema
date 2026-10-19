@@ -3247,7 +3247,10 @@ long number_argument(char *argument, char *arg)
     long number;
 
     if (*argument == '\0')
-	return 0;
+    {
+        arg[0]='\0';
+        return 0;
+    }
     for (pdot = argument; *pdot != '\0'; pdot++)
     {
 	if (*pdot == '.')

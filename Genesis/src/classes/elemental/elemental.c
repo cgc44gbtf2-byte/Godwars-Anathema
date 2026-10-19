@@ -20,6 +20,7 @@
 #include <sys/types.h>
 #endif 
 #include <stdio.h> 
+#include <limits.h>
 #include <stdlib.h> 
 #include <string.h> 
 #include <time.h> 
@@ -1044,18 +1045,16 @@ void do_sunbath(CHAR_DATA *ch, char *argument) {
     	}
 	if ( arg[0] == '\0' )
 	   victim = ch;
-    	if ( ( victim = get_char_room( ch, arg ) ) == NULL )
+    else if ( ( victim = get_char_room( ch, arg ) ) == NULL )
     	{
     	   send_to_char( "They aren't here.\n\r", ch );
      	   return;
     	}
-	i = victim->max_hit / 10;
-	if ( ch->fighting != NULL ) i /= (11 - ch->pcdata->powers[ELEM_SUN]);
 	i = number_range(1001,1500);
-   	victim->hit += i;
+    /* Add before clamping only when the sum is representable. */
+    victim->hit = victim->hit > LONG_MAX-i ? victim->max_hit
+                                         : UMIN(victim->hit+i,victim->max_hit);
     	ch->mana -= 800;
-    	if (victim->hit > victim->max_hit)
-	   victim->hit = victim->max_hit;
     	update_pos( victim );
     	if ((ch == victim) )
     	{
