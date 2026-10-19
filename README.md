@@ -65,6 +65,11 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   or Friction Curse incapacitates the attacker.
   Punch and Black Furies' charge also stop follow-up effects against removed
   targets.
+- **Hybrid preview:** `selfbrid list` shows all 45 planned hybrids;
+  `selfbrid info Bloodmoon Revenant` shows its two parents. Conversion is not
+  enabled yet: the planned price is 50,000 quest points, but no training,
+  currency or character data is changed.
+  See [hybrid implementation status](docs/HYBRIDS.md).
 - **Kills and rewards:** Highest-level and highest-XP kill records track the
   single best kill rather than adding later kills to the record. Players
   editing in-game still count toward the online XP bonus.

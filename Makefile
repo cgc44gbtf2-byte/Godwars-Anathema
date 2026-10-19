@@ -22,6 +22,7 @@ TESTS += tests/test_telnet
 TESTS += tests/test_gmcp
 TESTS += tests/test_world_integrity
 TESTS += tests/test_combat_attack
+TESTS += tests/test_hybrids
 
 all:
 	$(MAKE) -C Genesis/src
@@ -78,6 +79,9 @@ tests/test_world_integrity: tests/test_world_integrity.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_combat_attack: tests/test_combat_attack.c $(ENGINE_OBJECTS)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
+tests/test_hybrids: tests/test_hybrids.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 # Separate test objects keep sanitizer flags out of the production executable.

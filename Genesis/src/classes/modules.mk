@@ -21,4 +21,6 @@ CLASS_MODULE_SOURCES = \
   classes/dragon/dragon.c \
   classes/ninja/ninja.c \
   classes/monk/monk.c \
-  classes/elemental/elemental.c
+  classes/elemental/elemental.c \
+  classes/hybrid/registry.c \
+  classes/hybrid/selfbrid.c

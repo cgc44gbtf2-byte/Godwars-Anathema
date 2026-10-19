@@ -2474,6 +2474,7 @@ DECLARE_DO_FUN( do_mindflex     );
 DECLARE_DO_FUN( do_mindshield   );
 DECLARE_DO_FUN( do_mirageslice  );
 DECLARE_DO_FUN(	do_mirrorimage	);
+DECLARE_DO_FUN( do_selfbrid     );
 DECLARE_DO_FUN( do_monkarmor    );
 DECLARE_DO_FUN( do_mutate_ephemera );
 DECLARE_DO_FUN(	do_mload	);

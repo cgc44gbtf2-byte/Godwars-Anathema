@@ -405,6 +405,7 @@
    { "destroy",		do_destroy,	POS_STANDING,	LEV_AWA,  LOG_ALWAYS	},
    { "diagnostics",	do_diagnostics,	POS_STANDING,	 LEV_AWA,  LOG_NORMAL 	},
    { "discipline",	do_discipline,  POS_DEAD,        LEV_AWA,  LOG_NORMAL 	},
+   { "selfbrid",	do_selfbrid,    POS_DEAD,        LEV_AWA,  LOG_NORMAL 	},
    { "dominator",	do_dominator,	POS_FIGHTING,	 LEV_AWA,  LOG_NORMAL	},
    { "doppleganger",	do_doppleganger,POS_STANDING,	 LEV_AWA,  LOG_NORMAL	},
    { "humble",		do_humble,      POS_STANDING,    LEV_AWA,  LOG_NORMAL 	},
