@@ -65,10 +65,23 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   or Friction Curse incapacitates the attacker.
   Punch and Black Furies' charge also stop follow-up effects against removed
   targets.
-- **Hybrid preview:** `selfbrid list` shows all 45 planned hybrids;
-  `selfbrid info Bloodmoon Revenant` shows its two parents. Conversion is not
+- **Hybrid preview:** `selfbrid list` shows only the nine planned combinations
+  containing your current base class (the full internal roster remains45);
+  `selfbrid info <listed hybrid name>` shows its two parents. Conversion is not
   enabled yet: the planned price is 50,000 quest points, but no training,
   currency or character data is changed.
+  Other-parent info requests are rejected; characters without a supported
+  base class have no choices.
+  `help hybrid` and `help selfbrid` show all45 pairs under both possible
+  original parents; each parent class help links its nine hybrid help topics.
+  Hybrid names use stable mixed colors from `help class`, without combat RNG.
+  Generated help is a binary feature: it does not replace your live help files,
+  and existing custom file-backed topics take priority.
+  The info page also shows a read-only numeric checklist: 50,000 max HP/mana,
+  max base stats, all ten stances, four weapon proficiencies and trainable
+  styles at their original-class caps. Natural style is exempt for classes
+  that cannot normally enter it; retracting claws does not bypass it for
+  Dragon, Vampire or Werewolf. This is not full conversion eligibility.
   Optional hybrid saving, untrained secondary initialization, native build
   choices and paid parent-aware training are implemented internally.
   Learned combat passives and the safe `bflash`, `bash`, and `judge`

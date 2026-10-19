@@ -63,6 +63,7 @@ tests/test_hybrid_training
 tests/test_hybrid_access
 tests/test_hybrid_resources
 tests/test_hybrid_healing
+tests/test_hybrid_readiness
 bootstrap-backups/
 __pycache__/
 *.py[cod]

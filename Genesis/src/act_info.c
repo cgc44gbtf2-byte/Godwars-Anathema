@@ -35,6 +35,7 @@
 #include <time.h>
 #include "merc.h"
 #include "classes/hybrid/passives.h"
+#include "classes/hybrid/hybrid.h"
 
 
 
@@ -1993,9 +1994,11 @@ void do_help( CHAR_DATA *ch, char *argument )
 	 */
 	if (pHelp->text[0] == '.') stc(pHelp->text+1, ch);
 	else stc(pHelp->text  , ch);
+hybrid_help_parent_links(ch, pHelp->keyword);
 	return;
     }
 
+    if (hybrid_help_topic(ch, argall)) return;
     stc("No help on that word.\n\r", ch);
     return;
 }

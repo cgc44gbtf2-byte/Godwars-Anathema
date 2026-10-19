@@ -1,5 +1,7 @@
 /* Original Anathema registry. This does not activate multi-class permissions. */
 #include <ctype.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 #include "../class_ids.h"
 #include "hybrid.h"
@@ -86,10 +88,57 @@ const char *hybrid_parent_name(long parent)
     }
 }
 
+const char *hybrid_parent_color(long parent)
+{
+    switch (parent) {
+    case CLASS_DRAGON: return "#n";
+    case CLASS_DROW: return "#P";
+    case CLASS_ELEM: return "#c";
+    case CLASS_HIGHLANDER: return "#C";
+    case CLASS_MAGE: return "#p";
+    case CLASS_MONK: return "#7";
+    case CLASS_NINJA: return "#0";
+    case CLASS_SORCERER: return "#L";
+    case CLASS_VAMPIRE: return "#r";
+    case CLASS_WEREWOLF: return "#o";
+    default: return NULL;
+    }
+}
+
+int hybrid_display_name(const HYBRID_DEFINITION *hybrid, char *out, size_t size)
+{
+    if (!out || !size) return 0;
+    out[0] = '\0';
+    if (!hybrid || hybrid_by_id(hybrid->id) != hybrid) return 0;
+    size_t length = strlen(hybrid->name);
+    if (length < 2) return 0;
+    uint32_t hash = UINT32_C(2166136261) ^ (uint32_t)hybrid->id;
+    for (size_t i = 0; i < length; i++)
+        hash = (hash ^ (unsigned char)hybrid->name[i]) * UINT32_C(16777619);
+    size_t split = 1 + hash % (length - 1);
+    const char *first = hybrid_parent_color(hybrid->parents[hash & 1]);
+    const char *second = hybrid_parent_color(hybrid->parents[(hash & 1) ^ 1]);
+    int n = snprintf(out, size, "%s%.*s%s%s#n", first, (int)split,
+                     hybrid->name, second, hybrid->name + split);
+    if (n < 0 || (size_t)n >= size) { out[0] = '\0'; return 0; }
+    return 1;
+}
+
 int hybrid_has_parent(const HYBRID_DEFINITION *hybrid, long parent)
 {
     return hybrid && hybrid_parent_name(parent) &&
         (hybrid->parents[0] == parent || hybrid->parents[1] == parent);
+}
+
+long hybrid_book_chain_policy(const HYBRID_DEFINITION *hybrid)
+{
+    if (!hybrid || hybrid_by_id(hybrid->id) != hybrid ||
+        !hybrid_has_parent(hybrid, CLASS_SORCERER)) return 0;
+    if (hybrid_has_parent(hybrid, CLASS_MAGE)) return 6;
+    if (hybrid_has_parent(hybrid, CLASS_DROW) ||
+        hybrid_has_parent(hybrid, CLASS_ELEM) ||
+        hybrid_has_parent(hybrid, CLASS_VAMPIRE)) return 4;
+    return 3;
 }
 
 const HYBRID_DEFINITION *hybrid_by_parents(long first, long second)

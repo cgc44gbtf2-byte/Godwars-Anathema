@@ -32,6 +32,7 @@ TESTS += tests/test_hybrid_training
 TESTS += tests/test_hybrid_access
 TESTS += tests/test_hybrid_resources
 TESTS += tests/test_hybrid_healing
+TESTS += tests/test_hybrid_readiness
 # Real validators/effective access for older isolated native fixtures too.
 # Never replace hybrid access with permissive stubs just to satisfy linking.
 HYBRID_ACCESS_SOURCES = $(addprefix Genesis/src/classes/hybrid/,registry.c state.c player.c build.c progression.c specialization.c access.c passives.c)
@@ -88,6 +89,7 @@ check-layout:
 	python3 tests/test_hybrid_resources_catalog.py
 	python3 tests/test_hybrid_drow_catalog.py
 	python3 tests/test_hybrid_healing_catalog.py
+	python3 tests/test_hybrid_readiness_catalog.py
 	python3 tests/test_combat_layout.py
 	python3 tests/test_telnet_layout.py
 	python3 tests/test_gmcp_layout.py
@@ -140,6 +142,9 @@ tests/test_hybrid_resources: tests/test_hybrid_resources.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_hybrid_healing: tests/test_hybrid_healing.c $(ENGINE_OBJECTS)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
+tests/test_hybrid_readiness: tests/test_hybrid_readiness.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 # Separate test objects keep sanitizer flags out of the production executable.

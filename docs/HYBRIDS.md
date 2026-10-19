@@ -1,5 +1,30 @@
 # Hybrid conversion: staged implementation
 
+## Colors, help and approved book policy
+
+Class labels follow **HELP CLASS**, not a separate autoclass palette. Dragon
+retains its default color. Hybrid names combine two color segments, with the
+split/order selected by a stable hash of canonical name and ID, never gameplay
+RNG. Names/IDs used by commands and saved records are unchanged.
+
+`help hybrid` / `help selfbrid` provide the full45-pair catalog, grouped into
+ten original-parent sections of nine. Each hybrid appears under both eligible
+original parents. The command list remains restricted to the player's nine
+choices. Each parent class help gets corresponding links; each full hybrid name
+has a generated fallback help topic. Existing file-backed custom topics win.
+The help module neither edits loaded HELP_DATA nor writes world files, so a
+binary update/copyover delivers these additions without overwriting live OLC
+help. Full legacy help reorganization remains deferred.
+
+**Approved, not yet enforced:** Sorcerer/Mage chains6 pages; Sorcerer with Drow,
+Elementalist or Vampire4; with Dragon, Highlander, Monk, Ninja or Werewolf3.
+These fixed limits apply in both parent orders, including Sorcerer as the
+original class: an explicit exception to full-original-power access.
+Standalone Sorcerers keep10. The higher-melee/lower-book tradeoff motivated
+this policy; no measured balance or fight results are claimed. This stage
+contains only the display policy; casting handlers are unchanged pending their
+separate adapter and tests.
+
 ## Available in this stage
 
 The original Anathema implementation contains the 45 named pairs supplied for
@@ -7,9 +32,10 @@ this server, with stable hybrid IDs 1–45. These are **not base-class IDs**.
 The two parent orders resolve to the same definition. Unknown parents, combined
 base-class masks, duplicate parents and invalid IDs do not resolve.
 
-`selfbrid`, `selfbrid list` and `selfbrid info Bloodmoon Revenant` are read-only.
-The command shows whether the current class is one of the required parents.
-This is only a parent check, **not complete conversion eligibility**.
+`selfbrid`, `selfbrid list` and `selfbrid info <listed hybrid name>` are read-only.
+The list/info command permits only combinations containing the current base
+class. It shows planned quest price/balance and numeric readiness, **not
+complete conversion eligibility**.
 It cannot create a hybrid, deduct currency, strip gear or grant powers.
 The command does not change player files or existing single-class checks.
 
@@ -582,3 +608,44 @@ rank retention, with owned banks unchanged.
 
 This remains backend access for audited existing powers, not playable
 hybrid conversion. Save epoch3, record4 and copyover handoff2 are unchanged.
+
+## Numeric readiness preview — no conversion
+
+The player list is filtered to the nine hybrids containing the current
+original base class. `selfbrid info` also rejects unrelated combinations,
+including guessed names. Unsupported/unclassed characters get no choices.
+This is parent compatibility, not permission to convert before mastery/quest/
+safe-state requirements are complete. All45 internal definitions and permanent
+IDs remain unchanged for validation, documentation and future saves.
+
+`selfbrid info <full hybrid name>` now reports the numeric part of the agreed
+prerequisites without changing any player data. A complete numeric report is
+**not** eligibility to convert: parent/quest checks, original class/build
+power mastery, existing hybrid/actor-state validation and the safe conversion
+transaction are separate requirements. No automatic conversion, payment,
+training, normalization, form switching or item creation is added.
+
+The report checks max HP and max mana **at least50,000**, not current health or
+remaining mana. It checks the five stored base stats against the real native
+`stat_max` for the original class and current level, including the existing
+staff adjustment; temporary gear/form bonuses cannot substitute for training.
+All ten named stances require200. All four weapon proficiencies and existing
+styles use the native original-class improvement caps, not a universal200.
+Every class/slot is regression-tested against actual native improvement at
+an over-cap value; cap-policy drift must fail CI, not change combat silently.
+
+Natural style is unavailable to the seven original classes excluded by native
+equipment-style selection, so they are exempt even if an obsolete value is
+stored. Dragon, Vampire and Werewolf must master it: readiness does not depend
+on whether claws happen to be extended when viewing the report. Their natural
+style may require activating the relevant learned power/form to train.
+All other five equipment styles are required at their existing class caps.
+No new styles, disciplines, class restrictions or training opportunities were
+introduced; `style.c` and `stance.c` remain byte-identical.
+
+Negative values or stored ranks/stats **above** their native cap are flagged
+for review, not credited or silently reduced. Vitals above50,000 are valid.
+The original character and bank data remain intact. No report claims that
+other powers/forms/trainers are fully wired or that conversion is enabled.
+Record4/save epoch3/handoff2 remain unchanged. Help reorganization stays
+deferred, using werewolf help as a layout reference with a safe live-data import.
