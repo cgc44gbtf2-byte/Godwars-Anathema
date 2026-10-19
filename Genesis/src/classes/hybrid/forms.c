@@ -15,24 +15,62 @@ static int known_features(unsigned int mask)
     return (mask & ~HYBRID_FEATURE_ALL) == 0;
 }
 
+static int valid_profile(unsigned int grants, unsigned int compatible)
+{
+    return known_features(grants) && known_features(compatible) &&
+           !(grants & ~compatible);
+}
+
+static unsigned int component_count(const HYBRID_FORM_STATE *state)
+{
+    return !!state->components[0].token + !!state->components[1].token;
+}
+
+static HYBRID_FORM_COMPONENT empty_component(void)
+{
+    HYBRID_FORM_COMPONENT result = {0, 0, HYBRID_FEATURE_ALL};
+    return result;
+}
+
+static HYBRID_FUSION_PROFILE empty_fusion(void)
+{
+    HYBRID_FUSION_PROFILE result = {0, 0, HYBRID_FEATURE_ALL};
+    return result;
+}
+
 int hybrid_forms_valid(const HYBRID_FORM_STATE *state)
 {
     const HYBRID_DEFINITION *definition;
+    unsigned int count;
     if (!state) return 0;
     definition = hybrid_by_id(state->hybrid_id);
     if (!definition || state->parents[0] == state->parents[1] ||
         !hybrid_has_parent(definition, state->parents[0]) ||
         !hybrid_has_parent(definition, state->parents[1]) ||
         !known_features(state->requested[0]) ||
-        !known_features(state->requested[1]) ||
-        !known_features(state->form_grants) ||
-        !known_features(state->compatible) ||
-        (state->form_grants & ~state->compatible)) return 0;
-    if (!state->form_token)
-        return state->form_parent == 0 && state->form_grants == 0 &&
-               state->compatible == HYBRID_FEATURE_ALL;
-    return state->activation_serial != 0 &&
-           parent_slot(state, state->form_parent) >= 0;
+        !known_features(state->requested[1])) return 0;
+    for (int slot = 0; slot < 2; ++slot) {
+        const HYBRID_FORM_COMPONENT *c = &state->components[slot];
+        if (!valid_profile(c->grants, c->compatible)) return 0;
+        if (!c->token && (c->grants || c->compatible != HYBRID_FEATURE_ALL))
+            return 0;
+    }
+    count = component_count(state);
+    if (!valid_profile(state->fusion.grants, state->fusion.compatible))
+        return 0;
+    if (count == 2) {
+        if (state->fusion.hybrid_id != state->hybrid_id) return 0;
+    } else if (state->fusion.hybrid_id || state->fusion.grants ||
+               state->fusion.compatible != HYBRID_FEATURE_ALL) return 0;
+    /* Leave one serial available for every component that can still end. */
+    return !count || (state->activation_serial != 0 &&
+                     state->activation_serial <= ULONG_MAX - count);
+}
+
+enum hybrid_body_mode hybrid_forms_mode(const HYBRID_FORM_STATE *state)
+{
+    if (!hybrid_forms_valid(state)) return HYBRID_BODY_INVALID;
+    return (enum hybrid_body_mode)component_count(state);
 }
 
 int hybrid_forms_prepare(const HYBRID_DEFINITION *definition, long primary,
@@ -46,7 +84,9 @@ int hybrid_forms_prepare(const HYBRID_DEFINITION *definition, long primary,
     candidate.parents[0] = primary;
     candidate.parents[1] = definition->parents[
         definition->parents[0] == primary ? 1 : 0];
-    candidate.compatible = HYBRID_FEATURE_ALL;
+    candidate.components[0] = empty_component();
+    candidate.components[1] = empty_component();
+    candidate.fusion = empty_fusion();
     if (!hybrid_forms_valid(&candidate)) return 0;
     *destination = candidate;
     return 1;
@@ -56,30 +96,47 @@ unsigned long hybrid_form_begin(HYBRID_FORM_STATE *state, long parent,
                                 unsigned int logical_token,
                                 unsigned int grants, unsigned int compatible)
 {
-    if (!hybrid_forms_valid(state) || parent_slot(state, parent) < 0 ||
-        state->form_token || !logical_token || !known_features(grants) ||
-        !known_features(compatible) || (grants & ~compatible) ||
-        state->activation_serial == ULONG_MAX) return 0;
-    /* Refuse replacement, including same-parent replacement. The eventual
-     * handler must finish its old-form teardown before starting another. */
-    state->form_parent = parent;
-    state->form_token = logical_token;
-    state->form_grants = grants;
-    state->compatible = compatible;
+    int slot;
+    if (hybrid_forms_mode(state) != HYBRID_BODY_NORMAL ||
+        (slot = parent_slot(state, parent)) < 0 || !logical_token ||
+        !valid_profile(grants, compatible) ||
+        state->activation_serial > ULONG_MAX - 2) return 0;
+    state->components[slot] =
+        (HYBRID_FORM_COMPONENT){logical_token, grants, compatible};
+    return ++state->activation_serial;
+}
+
+unsigned long hybrid_form_fuse(HYBRID_FORM_STATE *state, long parent,
+                               unsigned int logical_token,
+                               unsigned int grants, unsigned int compatible,
+                               const HYBRID_FUSION_PROFILE *profile)
+{
+    int slot;
+    if (hybrid_forms_mode(state) != HYBRID_BODY_SINGLE || !profile ||
+        (slot = parent_slot(state, parent)) < 0 ||
+        state->components[slot].token || !logical_token ||
+        !valid_profile(grants, compatible) ||
+        profile->hybrid_id != state->hybrid_id ||
+        !valid_profile(profile->grants, profile->compatible) ||
+        state->activation_serial > ULONG_MAX - 3) return 0;
+    state->components[slot] =
+        (HYBRID_FORM_COMPONENT){logical_token, grants, compatible};
+    state->fusion = *profile;
     return ++state->activation_serial;
 }
 
 int hybrid_form_end(HYBRID_FORM_STATE *state, long parent,
                     unsigned int logical_token, unsigned long activation)
 {
+    int slot;
     if (!hybrid_forms_valid(state) || !logical_token ||
-        state->form_parent != parent || state->form_token != logical_token ||
+        (slot = parent_slot(state, parent)) < 0 ||
+        state->components[slot].token != logical_token ||
         state->activation_serial != activation)
         return 0;
-    state->form_parent = 0;
-    state->form_token = 0;
-    state->form_grants = 0;
-    state->compatible = HYBRID_FEATURE_ALL;
+    state->components[slot] = empty_component();
+    state->fusion = empty_fusion();
+    ++state->activation_serial;
     return 1;
 }
 
@@ -96,19 +153,34 @@ int hybrid_feature_request(HYBRID_FORM_STATE *state, long parent,
 
 int hybrid_forms_release_parent(HYBRID_FORM_STATE *state, long parent)
 {
+    HYBRID_FORM_STATE candidate;
     int slot;
     if (!hybrid_forms_valid(state) ||
         (slot = parent_slot(state, parent)) < 0) return 0;
-    state->requested[slot] = 0;
-    if (state->form_parent == parent)
-        return hybrid_form_end(state, parent, state->form_token,
-                               state->activation_serial);
+    candidate = *state;
+    candidate.requested[slot] = 0;
+    if (candidate.components[slot].token &&
+        !hybrid_form_end(&candidate, parent, candidate.components[slot].token,
+                         candidate.activation_serial)) return 0;
+    *state = candidate;
     return 1;
 }
 
 unsigned int hybrid_features_effective(const HYBRID_FORM_STATE *state)
 {
+    unsigned int grants = 0, compatible = HYBRID_FEATURE_ALL;
     if (!hybrid_forms_valid(state)) return 0;
-    return (state->requested[0] | state->requested[1] | state->form_grants)
-           & state->compatible;
+    if (component_count(state) == 2) {
+        /* Fusion is one explicit profile, NOT the union of parent grants. */
+        grants = state->fusion.grants;
+        compatible = state->fusion.compatible;
+    } else {
+        for (int slot = 0; slot < 2; ++slot) {
+            if (state->components[slot].token) {
+                grants = state->components[slot].grants;
+                compatible = state->components[slot].compatible;
+            }
+        }
+    }
+    return (state->requested[0] | state->requested[1] | grants) & compatible;
 }

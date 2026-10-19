@@ -38,16 +38,25 @@ copyover schemas remain unchanged in this stage.
 
 ## Transformation policy foundation
 
-Agreed policy: one full-body transformation at a time; compatible features
-such as claws and fangs may coexist. `classes/hybrid/forms.c` models one logical
-form rather than counting legacy flags (werebat, for example, sets two).
-Each parent owns its feature requests separately from the full form's grants.
-Ending a form or releasing one parent preserves requests owned by the other.
+The approved policy is one logical body: normal, either parent form alone,
+or a distinct hybrid-only fused form when the other parent transforms.
+Ending either component of fusion leaves the other parent's form active;
+ending the remaining component returns to normal. Replacing a form owned by
+the same parent or adding a third component is rejected.
 
-An incoming form must be rejected until the old form has explicitly ended;
-there is no automatic replacement that skips teardown. Per-activation serials
-reject delayed cleanup from an earlier activation of the same form in the
-same still-live policy object. Serial exhaustion fails closed, without wrap.
+`classes/hybrid/forms.c` models these transitions without counting legacy flags
+(werebat, for example, sets two). A fusion requires an explicit feature profile
+with this exact hybrid identity; it uses that one profile, not the union of
+the parent form grants. Parent profiles are retained only for a later split.
+Each parent independently owns requested claws/fangs. Compatibility may suspend
+these requests without erasing them, and releasing one parent preserves the
+other's feature ownership and remaining form.
+
+Every body transition, including a split or final exit, changes the activation
+serial. This rejects callbacks from before fusion or before the split. Future
+adapters must rebind remaining-form callbacks to the new serial. Serial space
+is reserved for all remaining exits, so exhaustion rejects new activations
+without preventing a valid active body from ending.
 Do not reinitialize/recycle a policy object while callbacks retain references;
 this module does not solve character-address reuse or actor liveness.
 
@@ -68,9 +77,15 @@ must aggregate those sources before changing that parent's request.
 ## Agreed conversion behavior
 
 - Exactly two distinct parents, using the names in the roster.
-- Keep earned training from the original parent.
+- Keep the original parent's full normal power/ability access, earned training
+  and native caps. Secondary specialization does not restrict the original.
 - Start the second parent's progression untrained; do not copy ranks or grant
   free mastery from similarly numbered legacy fields.
+- A branchless secondary parent exposes its normal full ability roster, with
+  normal prerequisites and training costs, not free mastered ranks.
+- For a secondary Werewolf, select one family (Breed, Auspice or Tribe) for
+  normal cap 5; the other two cap at 3, without exceeding lower native caps.
+  These training restrictions and choices are not implemented yet.
 - Conversion price: **50,000 quest points**, selected for Anathema. The preview
   reports the planned price and whether the current balance meets it, but
   performs no deduction. Runtime price configuration is not implemented yet.
