@@ -24,6 +24,7 @@ class HybridBooksCatalog(unittest.TestCase):
                 end = len(text)
             body = text[start:end].replace(
                 "    if (!book_page_begin(ch, book, page, argument)) return;\n", "")
+            body = body.replace("hybrid_book_color_rank(", "get_color(")
             anchor = ("    if (ch->mana < cost)" if kind == "action"
                       else "    one_argument(argument, arg);")
             body = body.replace(anchor, "    extern long chainspell;\n\n"
@@ -56,6 +57,23 @@ class HybridBooksCatalog(unittest.TestCase):
             "interp.c": "ccb0125d4264a8a5447618c29a9240ec674d2eb4",
         }.items():
             self.assertEqual(blob((SRC / path).read_bytes()), expected)
+
+    def test_color_adapter_is_page_scoped_and_uses_valid_earned_bank(self):
+        adapter = (SRC / "classes/hybrid/books.c").read_text().split(
+            "long hybrid_book_color_rank(", 1)[1]
+        self.assertIn("color < 0 || color > 5", adapter)
+        self.assertIn("hybrid_player_save_valid(ch)", adapter)
+        self.assertIn("hybrid_power_rank(ch, CLASS_SORCERER, HYBRID_TRAIN_COLOR", adapter)
+        self.assertNotIn("pcdata->colors", adapter)
+        self.assertNotIn("ch->class =", adapter)
+        text = (SRC / "classes/sorcerer/sorcerer.c").read_text()
+        self.assertEqual(text.count("hybrid_book_color_rank("), 7)
+        self.assertNotIn("hybrid_book_color_rank(", text.split("void adv_spell_damage(", 1)[0])
+        test = (ROOT / "tests/test_hybrid_books.c").read_text()
+        for part in ("trained_replays", "const int ranks[]={0,1,3,5}",
+                     "for(int primary=0;primary<2;primary++)",
+                     "HYBRID_TRAIN_COLOR,RED_MAGIC,4", "Cannot borrow the original raw array"):
+            self.assertIn(part, test)
 
     def test_actual_engine_baselines_and_boundary_replays(self):
         self.assertIn("Genesis/src/classes/hybrid/books.c", make_values(ROOT, "ENGINE_SOURCES"))

@@ -650,17 +650,17 @@ void adv_spell_damage( CHAR_DATA *ch, OBJ_DATA *book, OBJ_DATA *page, char *argu
 	return;
     }
 
-    dam *= get_color(ch, color);
+    dam *= hybrid_book_color_rank(ch, color);
 
     if (lastcolor == color)
-	dam += 10 * get_color(ch, color);
+	dam += 10 * hybrid_book_color_rank(ch, color);
     else if (lastcolor == PURPLE_MAGIC)
 	area = TRUE;
     else if (lastcolor == RED_MAGIC)
-	dam += 20 * get_color(ch, RED_MAGIC);
+	dam += 20 * hybrid_book_color_rank(ch, RED_MAGIC);
     else if (lastcolor == BLUE_MAGIC)
     {
-	if (heal) dam += 30 * get_color(ch, BLUE_MAGIC);
+	if (heal) dam += 30 * hybrid_book_color_rank(ch, BLUE_MAGIC);
 	else heal = TRUE;
     }
     else if (lastcolor == GREEN_MAGIC)
@@ -668,12 +668,12 @@ void adv_spell_damage( CHAR_DATA *ch, OBJ_DATA *book, OBJ_DATA *page, char *argu
     else if (lastcolor == YELLOW_MAGIC)
     {
 	cost -= 200;
-	dam += number_range(10, -10) * get_color(ch, YELLOW_MAGIC);
+	dam += number_range(10, -10) * hybrid_book_color_rank(ch, YELLOW_MAGIC);
     }
     else if (lastcolor == BLACK_MAGIC)
     {
 	aggy = TRUE;
-	dam -= 20 * get_color(ch, BLACK_MAGIC);
+	dam -= 20 * hybrid_book_color_rank(ch, BLACK_MAGIC);
     }
 
     if ((strlen(page->victpoweron) < 1 || !str_cmp(page->victpoweron, "(null)"))
@@ -894,7 +894,7 @@ void adv_spell_affect( CHAR_DATA *ch, OBJ_DATA *book, OBJ_DATA *page, char *argu
 	return;
     }
 
-    bonuses = get_color(ch, color);
+    bonuses = hybrid_book_color_rank(ch, color);
 
     if (ch->mana < cost)
     {

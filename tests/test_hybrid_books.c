@@ -107,6 +107,18 @@ static long expected(long first,long second)
     return 3;
 }
 
+static void learned_colors(int focus,int rank,int secondary)
+{
+    if(secondary) {
+        assert(hybrid_secondary_specialize(&pc.hybrid,CLASS_SORCERER,focus));
+        for(int i=0;i<6;i++)
+            assert(hybrid_secondary_rank_write(&pc.hybrid,CLASS_SORCERER,
+                    HYBRID_TRAIN_COLOR,i,i==focus?rank:(rank>3?3:rank)));
+    } else {
+        for(int i=0;i<6;i++)pc.colors[i]=rank;
+    }
+}
+
 static void paired(void)
 {
     int cases=0;
@@ -124,6 +136,94 @@ static void paired(void)
             ++cases;
         }
     printf("hybrid books: %d real mixed damage/affect/action prefix replays passed\n",cases);
+}
+
+static void trained_replays(void)
+{
+    const int ranks[]={0,1,3,5};
+    int cases=0;
+    for(size_t p=0;p<10;p++)if(parents[p]!=CLASS_SORCERER)
+        for(int primary=0;primary<2;primary++)for(int focus=0;focus<6;focus++)
+        for(size_t r=0;r<4;r++)for(int start=0;start<3;start++)
+        for(int n=1;n<=12;n++) {
+            long cap=expected(CLASS_SORCERER,parents[p]),native[7],hybrid[7];
+            fixture(CLASS_SORCERER,0,n<cap?n:(int)cap,start,0);
+            learned_colors(focus,ranks[r],0);
+            if(!primary)for(int i=0;i<6;i++)
+                if(i!=focus&&pc.colors[i]>3)pc.colors[i]=3;
+            cast(native);
+            char text[sizeof(output)];memcpy(text,output,sizeof(text));
+            fixture(primary?CLASS_SORCERER:parents[p],
+                    primary?parents[p]:CLASS_SORCERER,n,start,0);
+            learned_colors(focus,ranks[r],!primary);
+            for(int i=0;i<6;i++) {
+                long want=!primary&&i!=focus&&ranks[r]>3?3:ranks[r];
+                assert(hybrid_book_color_rank(&actor,i)==want);
+                if(!primary)assert(get_color(&actor,i)==0);
+            }
+            cast(hybrid);
+            if(memcmp(native,hybrid,sizeof(native))||strcmp(text,output)) {
+                fprintf(stderr,"Trained replay mismatch parent%ld primary%d focus%d rank%d start%d n%d\n",
+                        parents[p],primary,focus,ranks[r],start,n);
+                assert(0);
+            }
+            assert(chainspell==(n<cap?n:cap));
+            ++cases;
+        }
+    printf("hybrid book colors: %d learned-bank/native-prefix replays passed\n",cases);
+}
+
+static void color_boundaries(void)
+{
+    long v[7];
+    fixture(CLASS_DROW,CLASS_SORCERER,1,0,1);
+    learned_colors(BLUE_MAGIC,5,1);
+    assert(hybrid_book_color_rank(&actor,BLUE_MAGIC)==5);
+    assert(hybrid_book_color_rank(&actor,RED_MAGIC)==3);
+    assert(!hybrid_secondary_rank_write(&pc.hybrid,CLASS_SORCERER,
+                                       HYBRID_TRAIN_COLOR,RED_MAGIC,4));
+    pc.hybrid.secondary_progression.colors[RED_MAGIC]=4;
+    /* Structurally valid legacy training is capped on read, never rewritten. */
+    assert(hybrid_player_save_valid(&actor));
+    assert(!hybrid_secondary_ranks_valid(&pc.hybrid));
+    assert(hybrid_book_color_rank(&actor,RED_MAGIC)==3);
+    assert(hybrid_book_color_rank(&actor,BLUE_MAGIC)==5);
+    assert(pc.hybrid.secondary_progression.colors[RED_MAGIC]==4);
+    pc.hybrid.secondary_progression.colors[RED_MAGIC]=6;
+    assert(!hybrid_player_save_valid(&actor));
+    assert(!hybrid_book_color_rank(&actor,BLUE_MAGIC));
+    cast(v);assert(actor.hit==1&&actor.mana==1000000&&chainspell==0);
+    fixture(CLASS_DROW,CLASS_SORCERER,1,0,1);
+    for(int i=0;i<6;i++)pc.colors[i]=5; /* Cannot borrow the original raw array. */
+    assert(!hybrid_book_color_rank(&actor,BLUE_MAGIC));
+    cast(v);assert(actor.hit==1&&actor.mana==999600);
+    fixture(CLASS_DROW,CLASS_SORCERER,1,0,1);
+    learned_colors(BLUE_MAGIC,5,1);
+    pc.hybrid_present=0;assert(!hybrid_book_color_rank(&actor,BLUE_MAGIC));
+    pc.hybrid_present=2;assert(!hybrid_book_color_rank(&actor,BLUE_MAGIC));
+    fixture(CLASS_DROW,CLASS_SORCERER,1,0,1);
+    learned_colors(BLUE_MAGIC,5,1);
+    actor.class=CLASS_MAGE;assert(!hybrid_book_color_rank(&actor,BLUE_MAGIC));
+    fixture(CLASS_SORCERER,0,1,0,1);
+    pc.player_load_failed=1;assert(!hybrid_book_color_rank(&actor,BLUE_MAGIC));
+    fixture(CLASS_SORCERER,0,1,0,1);
+    const long bad[]={-1,LONG_MIN,6,LONG_MAX};
+    unsigned char before[sizeof(actor)],bank[sizeof(pc)];
+    memcpy(before,&actor,sizeof(actor));memcpy(bank,&pc,sizeof(pc));
+    init_mm();long next=number_range(1,1000000);init_mm();
+    for(size_t i=0;i<4;i++)assert(!hybrid_book_color_rank(&actor,bad[i]));
+    assert(number_range(1,1000000)==next);
+    assert(!memcmp(before,&actor,sizeof(actor))&&!memcmp(bank,&pc,sizeof(pc)));
+    assert(!hybrid_book_color_rank(NULL,BLUE_MAGIC));
+    actor.pcdata=NULL;assert(!hybrid_book_color_rank(&actor,BLUE_MAGIC));
+    SET_BIT(actor.act,ACT_IS_NPC);assert(!hybrid_book_color_rank(&actor,BLUE_MAGIC));
+    actor.pcdata=&pc;REMOVE_BIT(actor.act,ACT_IS_NPC);
+    fixture(CLASS_SORCERER,CLASS_MAGE,1,0,1);
+    learned_colors(BLUE_MAGIC,5,0);
+    assert(!hybrid_live_secondary(&actor)); /* Original access is not gated by this. */
+    for(int i=0;i<6;i++)assert(hybrid_book_color_rank(&actor,i)==5);
+    actor.level=LEV_AWA;chainspell=0;cast(v);
+    assert(actor.mana==1000000&&chainspell==0);
 }
 
 static void resets_and_invalid(void)
@@ -197,10 +297,21 @@ int main(int argc,char **argv)
         assert(actor.mana==1000000-3*400);
         return 0;
     }
+    if(argc==2&&!strcmp(argv[1],"--secondary-probe")) {
+        fixture(CLASS_DROW,CLASS_SORCERER,1,0,1);
+        learned_colors(BLUE_MAGIC,5,1);
+        assert(hybrid_power_rank(&actor,CLASS_SORCERER,HYBRID_TRAIN_COLOR,BLUE_MAGIC)==5);
+        assert(get_color(&actor,BLUE_MAGIC)==0);
+        long v[7];cast(v);
+        fprintf(stderr,"Learned secondary blue5: HP %ld; mana spent %ld\n",
+                actor.hit,1000000-actor.mana);
+        assert(actor.hit>1&&actor.mana==999600);
+        return 0;
+    }
     /* Captured from the unmodified native Sorcerer on9b3885e:210 executed
      * interpreter/page/cost/effect/RNG snapshots, not a new-code oracle. */
     assert(native_dump(0)==UINT64_C(0x85c64faa8bc58818));
-    paired();resets_and_invalid();
+    paired();trained_replays();color_boundaries();resets_and_invalid();
     while(actor.affected)affect_remove(&actor,actor.affected);
     puts("hybrid book limits: fixed3/4/6 both orders, native10, reset/invalid/RNG checks passed");
     return 0;

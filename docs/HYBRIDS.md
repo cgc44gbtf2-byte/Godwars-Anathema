@@ -28,10 +28,19 @@ configured; malformed player records fail closed. Changing equipment or stance
 does not increase the budget. The legacy counter is saturated instead of
 overshooting the cap and rejects invalid negative/overflowed values.
 
-This guard **does not grant casting permissions**, color ranks or training.
-Native color getters and interpreter level gates are unchanged; full secondary
-Sorcerer color integration is still pending. Native actors without a hybrid
-record keep the original10-page limit. No schema or handoff changes.
+Existing book damage/affect pages now resolve **earned secondary Sorcerer color
+ranks** through a page-scoped adapter. One chosen color may reach5; the other
+five reach3. Zero/untrained ranks confer no color strength, and unrelated raw
+primary color fields cannot be borrowed. Invalid records fail closed without
+class/array projection, combining ranks or altering training. Original Sorcerers
+retain their full native color ranks, even when the secondary build is not yet
+configured; only the approved book-chain budget is reduced.
+
+Native color getters and interpreter level gates are unchanged. This does not
+open crafting, enchantment, writing, vision, color-training commands or player
+conversion. Native actors without a hybrid record keep the original10-page
+limit. No schema or handoff changes. Full secondary Sorcerer command integration
+remains pending; no PvP balance claim follows from page-prefix replays.
 
 ## Available in this stage
 

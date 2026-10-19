@@ -102,7 +102,7 @@ class HybridReadinessCatalog(unittest.TestCase):
 
     def test_book_policy_does_not_enable_readonly_conversion(self):
         text = (SRC / "classes/hybrid/help.c").read_text()
-        self.assertIn("no new casting permissions or playable conversion", text)
+        self.assertIn("native command gates remain. Conversion is disabled.", text)
         tests = (ROOT / "tests/test_hybrids.c").read_text()
         for fragment in ("cap == 6", "cap == 4", "cap == 3", "rows == 90",
                          "CUSTOM HYBRID HELP TAKES PRIORITY", "cosmetics();", "help_topics();"):

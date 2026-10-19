@@ -79,8 +79,11 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   and existing custom file-backed topics take priority.
   Configured Sorcerer hybrids now share a fixed book-chain limit across damage,
   affect and action pages: Mage6, Drow/Elementalist/Vampire4, other pairings3,
-  in either parent order. Standalone Sorcerers keep10. This adds no casting
-  permissions and does not enable conversion.
+  in either parent order. Standalone Sorcerers keep10. Existing book damage
+  and affect pages now use learned secondary Sorcerer color ranks from their
+  isolated bank: one full5, others3. Original Sorcerer color access stays native.
+  Native command gates, training/crafting commands and mana costs are unchanged;
+  conversion remains disabled.
   The info page also shows a read-only numeric checklist: 50,000 max HP/mana,
   max base stats, all ten stances, four weapon proficiencies and trainable
   styles at their original-class caps. Natural style is exempt for classes
