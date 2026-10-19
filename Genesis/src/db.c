@@ -1783,18 +1783,21 @@ OBJ_DATA *create_object( OBJ_INDEX_DATA *pObjIndex, long level )
     obj->level		= level;
     obj->wear_loc	= -1;
 
-    obj->name		= pObjIndex->name;
-    obj->short_descr	= pObjIndex->short_descr;
-    obj->description	= pObjIndex->description;
+    /* Boot-loaded strings are immutable and str_dup shares them. Live OLC
+     * strings are mutable: each instance must own its copy before a crafter,
+     * editor or extraction frees/replaces it. Never transfer index ownership. */
+    obj->name		= str_dup(pObjIndex->name ? pObjIndex->name : "");
+    obj->short_descr	= str_dup(pObjIndex->short_descr ? pObjIndex->short_descr : "");
+    obj->description	= str_dup(pObjIndex->description ? pObjIndex->description : "");
 
     if (pObjIndex->chpoweron != NULL)
     {
-	obj->chpoweron    = pObjIndex->chpoweron;
-	obj->chpoweroff   = pObjIndex->chpoweroff;
-	obj->chpoweruse   = pObjIndex->chpoweruse;
-	obj->victpoweron  = pObjIndex->victpoweron;
-	obj->victpoweroff = pObjIndex->victpoweroff;
-	obj->victpoweruse = pObjIndex->victpoweruse;
+	obj->chpoweron    = str_dup(pObjIndex->chpoweron);
+	obj->chpoweroff   = str_dup(pObjIndex->chpoweroff ? pObjIndex->chpoweroff : "(null)");
+	obj->chpoweruse   = str_dup(pObjIndex->chpoweruse ? pObjIndex->chpoweruse : "(null)");
+	obj->victpoweron  = str_dup(pObjIndex->victpoweron ? pObjIndex->victpoweron : "(null)");
+	obj->victpoweroff = str_dup(pObjIndex->victpoweroff ? pObjIndex->victpoweroff : "(null)");
+	obj->victpoweruse = str_dup(pObjIndex->victpoweruse ? pObjIndex->victpoweruse : "(null)");
 	obj->spectype     = pObjIndex->spectype;
 	obj->specpower    = pObjIndex->specpower;
     }
