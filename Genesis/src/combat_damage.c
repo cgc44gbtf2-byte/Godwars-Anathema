@@ -46,9 +46,15 @@ void damage( CHAR_DATA *ch, CHAR_DATA *victim, long dam, long dt, char *message 
 
 	if (victim->position > POS_STUNNED)
 	{
-	    if (victim->fighting == NULL) set_fighting(victim, ch);
+	    if (victim->fighting == NULL) {
+                set_fighting(victim, ch);
+                if (!combat_pair_in_room(combat_room, ch, victim)) return;
+            }
 	    victim->position = POS_FIGHTING;
-	    if (ch->fighting == NULL) set_fighting(ch, victim);
+	    if (ch->fighting == NULL) {
+                set_fighting(ch, victim);
+                if (!combat_pair_in_room(combat_room, ch, victim)) return;
+            }
 	}
 
 	/*
@@ -132,6 +138,7 @@ void damage( CHAR_DATA *ch, CHAR_DATA *victim, long dam, long dt, char *message 
 	act("$N's burning form singes you!", ch, NULL, victim, TO_CHAR);
 	act("$N's burning form singes $n!", ch, NULL, victim, TO_NOTVICT);
 	hurt_person(victim, ch, number_range(200, 250));
+        if (!combat_pair_in_room(combat_room, ch, victim)) return;
     }
     if (IS_VAMPIRE(victim) && IS_CRAFT(victim, CRAFT_BONEQUILLS) && victim != ch && number_range(1, 6) == 1)
     {
@@ -145,6 +152,7 @@ void damage( CHAR_DATA *ch, CHAR_DATA *victim, long dam, long dt, char *message 
 bool hurt_fighting( CHAR_DATA *ch, CHAR_DATA *victim )
 {
     if (ch == NULL || victim == NULL || victim->position == POS_DEAD) return FALSE;
+    ROOM_INDEX_DATA *combat_room = ch->in_room;
 
     if (victim != ch)
     {
@@ -152,9 +160,15 @@ bool hurt_fighting( CHAR_DATA *ch, CHAR_DATA *victim )
 
 	if (victim->position > POS_STUNNED)
 	{
-	    if (victim->fighting == NULL) set_fighting(victim, ch);
+	    if (victim->fighting == NULL) {
+                set_fighting(victim, ch);
+                if (!combat_pair_in_room(combat_room, ch, victim)) return FALSE;
+            }
 	    victim->position = POS_FIGHTING;
-	    if (ch->fighting == NULL) set_fighting(ch, victim);
+	    if (ch->fighting == NULL) {
+                set_fighting(ch, victim);
+                if (!combat_pair_in_room(combat_room, ch, victim)) return FALSE;
+            }
 
 	    /*
 	     * If victim is charmed, ch might attack victim's master.
@@ -174,6 +188,7 @@ bool hurt_fighting( CHAR_DATA *ch, CHAR_DATA *victim )
 
 void hurt_person( CHAR_DATA *ch, CHAR_DATA *victim, long dam )
 {
+    ROOM_INDEX_DATA *actor_room = ch != NULL ? ch->in_room : NULL;
     if (ch == NULL || victim == NULL) return;
     /* Preserve legacy signed healing without overflowing the HP subtraction. */
     if (dam > 0 && victim->hit < LONG_MIN + dam) victim->hit = LONG_MIN;
@@ -244,9 +259,19 @@ void hurt_person( CHAR_DATA *ch, CHAR_DATA *victim, long dam )
 	}
         dp_gain(ch, victim);
     	if (!IS_NPC(victim) && IS_NPC(ch)) victim->mdeath++;
+#ifdef COMBAT_CALLBACK_TESTING
+    {
+        extern void combat_test_raw_kill(CHAR_DATA *, CHAR_DATA *);
+        combat_test_raw_kill(victim, ch);
+    }
+#else
 	raw_kill(victim, ch);
+#endif
 
-	if (IS_SET(ch->act, PLR_AUTOSEARCH)) do_look(ch, "in corpse");
+/* Death can remove the attacker too (notably NPC self-damage or linked
+ * body teardown). A non-NULL pooled pointer is not a live character. */
+if (combat_character_in_room(actor_room, ch) && IS_SET(ch->act, PLR_AUTOSEARCH))
+    do_look(ch, "in corpse");
 	return;
     }
 

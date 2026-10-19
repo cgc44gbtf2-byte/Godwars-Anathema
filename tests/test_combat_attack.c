@@ -119,6 +119,31 @@ static void label_lifetime(void)
     }
 }
 
+static void friction_incapacitation(void)
+{
+    fixture(STYLE_UNARMED);
+    DESCRIPTOR_DATA da = {0}, db = {0};
+    char output_a[32768] = {0}, output_b[32768] = {0};
+    da.character = &a; db.character = &b;
+    da.connected = db.connected = CON_PLAYING;
+    da.outbuf = output_a; db.outbuf = output_b;
+    da.outsize = sizeof(output_a); db.outsize = sizeof(output_b);
+    a.desc = &da; b.desc = &db;
+    AFFECT_DATA af = {0};
+    af.type = gsn_friction_curse; af.duration = 1;
+    affect_to_char(&a, &af);
+    a.hit = 50;
+    b.position = POS_STANDING; /* Standing defenders do not auto-parry. */
+    assert(is_affected(&a, gsn_friction_curse));
+    a.beginners_luck = 1;
+    long hp = b.hit;
+    one_hit(&a, &b, TYPE_UNARMED, "1");
+    assert(a.hit <= 0 && a.position < POS_FIGHTING);
+    assert(b.hit == hp);
+    while (a.affected) affect_remove(&a, a.affected);
+    a.desc = b.desc = NULL;
+}
+
 static void bad_procs(void)
 {
     const long invalid[] = {MAX_SKILL, 999, MAX_SKILL + 1000, LONG_MAX};
@@ -177,9 +202,11 @@ int main(int argc, char **argv)
     if (argc > 1 && !strcmp(argv[1], "--baseline")) { baseline(); return 0; }
     if (argc > 1 && !strcmp(argv[1], "--bad-proc")) { bad_procs(); return 0; }
     if (argc > 1 && !strcmp(argv[1], "--leak")) { label_lifetime(); return 0; }
+    if (argc > 1 && !strcmp(argv[1], "--friction")) { friction_incapacitation(); return 0; }
     baseline();
     bad_procs();
     label_lifetime();
+    friction_incapacitation();
     puts("native attack pulse/styles/NPC thresholds, proc validation and label reuse passed");
     return 0;
 }

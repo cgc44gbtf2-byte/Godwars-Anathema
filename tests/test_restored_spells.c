@@ -42,6 +42,26 @@ void combat_test_hurt_person(CHAR_DATA *ch, CHAR_DATA *victim, long dam)
     hurt_person(ch, victim, dam);
 }
 
+static void reset(void);
+static void add_mobile(void);
+
+void combat_test_raw_kill(CHAR_DATA *victim, CHAR_DATA *killer)
+{
+    if (inject_death && victim == mobile) {
+        remove_mobile();
+        return;
+    }
+    raw_kill(victim, killer);
+}
+
+static void test_self_death(void)
+{
+    reset(); add_mobile(); inject_death = TRUE;
+    mobile->hit = 50;
+    hurt_person(mobile, mobile, 100);
+    assert(mobile == NULL);
+}
+
 static void reset(void)
 {
     assert(!mobile);
@@ -205,7 +225,34 @@ static void test_extraction(void)
     assert(extracted);
 }
 
-int main(void)
+static void test_melee_extraction(bool npc_attacker, bool pulse)
+{
+    bool extracted = FALSE;
+    for (int i = 0; i < 256 && !extracted; ++i)
+    {
+        reset(); add_mobile(); inject_death = TRUE;
+        mobile->hit = mobile->max_hit = 1000000;
+        mobile->level = 501;
+        chars[0].hit = chars[1].hit = 1000000;
+        if (npc_attacker) {
+            chars[1].class = CLASS_WEREWOLF;
+            players[1].tribes[TRIBE_STARGAZERS] = 5;
+            if (pulse) {
+                mobile->position = POS_FIGHTING;
+                mobile->fighting = &chars[1];
+                first_fight = last_fight = mobile;
+                violence_update();
+            } else multi_hit(mobile, &chars[1]);
+        } else {
+            multi_hit(chars, mobile);
+        }
+        extracted = !mobile;
+        if (mobile) remove_mobile();
+    }
+    assert(extracted);
+}
+
+int main(int argc, char **argv)
 {
     string_space = calloc(1, 1024 * 1024);
     assert(string_space); top_string = string_space;
@@ -213,7 +260,22 @@ int main(void)
     energy = skill_lookup("energy drain"); weather = skill_lookup("control weather");
     assert(energy > 0 && weather > 0);
     assert(slot_lookup(11) == weather && slot_lookup(25) == energy);
+    if (argc > 1 && !strcmp(argv[1], "--melee-player")) {
+        test_melee_extraction(FALSE, FALSE); return 0;
+    }
+    if (argc > 1 && !strcmp(argv[1], "--melee-npc")) {
+        test_melee_extraction(TRUE, FALSE); return 0;
+    }
+    if (argc > 1 && !strcmp(argv[1], "--violence-npc")) {
+        test_melee_extraction(TRUE, TRUE); return 0;
+    }
+    if (argc > 1 && !strcmp(argv[1], "--self-death")) {
+        test_self_death(); return 0;
+    }
     test_weather(); test_energy(); test_extraction();
+    test_melee_extraction(FALSE, FALSE); test_melee_extraction(TRUE, FALSE);
+    test_melee_extraction(TRUE, TRUE);
+    test_self_death();
     puts("restored spell engine regressions passed");
     return 0;
 }

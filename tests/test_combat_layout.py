@@ -14,7 +14,7 @@ OWNERS = {
                  "autostance", "dambonus"),
     "combat_state.c": ("set_fighting", "stop_fighting"),
     "combat_rules.c": ("is_safe", "auto_safe"),
-    "combat_status.c": ("combat_pair_in_room", "combat_target_live",
+    "combat_status.c": ("combat_character_in_room", "combat_pair_in_room", "combat_target_live",
                         "combat_status_update"),
     "combat_initiative.c": ("get_speed",),
     "combat_defense.c": ("get_soak", "check_avoid", "avoidblow", "breakavoid"),

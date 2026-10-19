@@ -28,6 +28,22 @@ in the shared engine.
 Both production and full-engine tests link the new owners exactly once.
 `tests/test_combat_layout.py` enforces ownership, build and cleanup boundaries.
 
+## Strike callback safety
+
+`one_hit` stops after counter and self-damage callbacks if its original room
+no longer contains two live combatants. `multi_hit` checks both combatants
+after each strike and spell proc, before reading weapon or character state.
+The pulse checks that its actor is still present after `multi_hit`, and
+validates cached fight/room-list entries before dereferencing them. If a
+cached fighter is removed, the interrupted traversal resumes at the next
+pulse. The damage and fighting-start paths revalidate after Mage
+contingencies; auto-search never dereferences an NPC removed by its own death.
+No per-hit RNG, valid-target damage formulas or persistent player fields
+change. The full-engine extraction test deliberately frees a synthetic NPC at
+the damage/death callback, including reflected NPC attacks; the production
+engine normally recycles NPC structs instead. Pointer-address reuse during a
+callback and every class-specific command remain separate audit work.
+
 ## Confirmed repairs in this batch
 
 1. The loader preserves the legacy inactive stance marker `-1`, repairs

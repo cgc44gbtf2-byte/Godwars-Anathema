@@ -48,6 +48,8 @@ void one_hit( CHAR_DATA *ch, CHAR_DATA *victim, long dt, char *message )
     long dam, max_dam;
     bool weap = TRUE;
     char *owned_message = NULL;
+    ROOM_INDEX_DATA *combat_room;
+    long weapon_slot = WEAR_NONE;
 
     if (ch == NULL || IS_COMBAT_PAUSED(ch)) return;
 
@@ -55,17 +57,19 @@ void one_hit( CHAR_DATA *ch, CHAR_DATA *victim, long dt, char *message )
      * Can't beat a dead char!
      * Guard against weird room-leavings.
      */
-    if (victim == NULL || victim->position == POS_DEAD || ch->in_room != victim->in_room) return;
+    combat_room = ch->in_room;
+    if (message == NULL || combat_room == NULL || victim == NULL ||
+        victim->position == POS_DEAD || combat_room != victim->in_room) return;
 
     bool melee = highlander_melee_attack(dt, message);
 
     /*
      * Check if it is a weapon attack.
      */
-    if (IS_NPC(ch)) wield = get_eq_char(ch, WEAR_WEAPON);
+    if (IS_NPC(ch)) wield = get_eq_char(ch, weapon_slot = WEAR_WEAPON);
     else if (message[0] == '1')
     {
-	wield = get_eq_char(ch, WEAR_WEAPON);
+	wield = get_eq_char(ch, weapon_slot = WEAR_WEAPON);
 	if (wield == NULL || wield->item_type != ITEM_WEAPON)
 	{
 	    wield = NULL;
@@ -75,7 +79,7 @@ void one_hit( CHAR_DATA *ch, CHAR_DATA *victim, long dt, char *message )
     }
     else if (message[0] == '2')
     {
-	wield = get_eq_char(ch, WEAR_HOLD);
+	wield = get_eq_char(ch, weapon_slot = WEAR_HOLD);
 	if (wield == NULL || wield->item_type != ITEM_WEAPON)
 	{
 	    wield = NULL;
@@ -106,11 +110,17 @@ void one_hit( CHAR_DATA *ch, CHAR_DATA *victim, long dt, char *message )
      * below still apply. Natural/contact attacks qualify; magic and ranged
      * attacks are excluded by the original-label classifier above. */
     bool riposte = highlander_counter_strike(ch, victim, wield, dt);
+    if (!combat_pair_in_room(combat_room, ch, victim)) goto strike_done;
     if (melee && !riposte && highlander_counter_parry(ch, victim, wield, dt))
     {
 	free_string(owned_message);
 	return;
     }
+    if (!combat_pair_in_room(combat_room, ch, victim) || IS_COMBAT_PAUSED(ch))
+        goto strike_done;
+    /* Combat entry can run a Mage contingency. Do not use a weapon that a
+     * callback removed or replaced, even if both combatants remain present. */
+    if (wield != NULL && get_eq_char(ch, weapon_slot) != wield) goto strike_done;
     if (!riposte && check_avoid(ch, victim, weap))
     {
 	if (IS_NPC(ch) || !IS_SET(ch->act, PLR_BRIEF)) act("$N avoids your blow.", ch, NULL, victim, TO_CHAR);
@@ -182,11 +192,16 @@ void one_hit( CHAR_DATA *ch, CHAR_DATA *victim, long dt, char *message )
 
     if (dt >= TYPE_UNARMED && dt <= TYPE_BLUNT && IS_AFFECTED(victim, AFF_SANCTUARY)) dam *= .7;
 
-    if (is_affected(ch, gsn_friction_curse)) //friction curse turns some of your movement into damage
- 	hurt_person(ch, ch, 100);
+    if (is_affected(ch, gsn_friction_curse))
+    {
+        hurt_person(ch, ch, 100);
+        if (!combat_pair_in_room(combat_room, ch, victim) || IS_COMBAT_PAUSED(ch))
+            goto strike_done;
+    }
 
 
     damage(ch, victim, dam, dt, message);
+strike_done:
     free_string(owned_message);
     tail_chain();
     return;

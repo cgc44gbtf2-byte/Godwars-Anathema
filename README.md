@@ -61,7 +61,8 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   cleaned up without a general damage rebalance. Brittle Bones now expires
   without walking into the recycled-effect list. Invalid weapon spell values
   are safely ignored, and ordinary melee no longer retains temporary attack
-  label allocations after each hit.
+  label allocations after each hit. Strikes now stop if a combatant is removed
+  or Friction Curse incapacitates the attacker.
 - **Kills and rewards:** Highest-level and highest-XP kill records track the
   single best kill rather than adding later kills to the record. Players
   editing in-game still count toward the online XP bonus.

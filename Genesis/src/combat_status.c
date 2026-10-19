@@ -6,9 +6,17 @@
 #include <time.h>
 #include "merc.h"
 
-/* A damage callback may extract its target. Compare against live room members
- * before dereferencing the old pointer; checking victim != NULL is not enough.
- * Class attackers are players and remain allocated through death handling. */
+/* Callback arguments are untrusted pointers until found in a live room list. */
+bool combat_character_in_room(ROOM_INDEX_DATA *room, CHAR_DATA *ch)
+{
+    CHAR_DATA *member;
+    if (room == NULL || ch == NULL) return FALSE;
+    for (member = room->people; member != NULL; member = member->next_in_room)
+        if (member == ch) return member->in_room == room;
+    return FALSE;
+}
+
+/* Neither pointer may be dereferenced before membership is established. */
 bool combat_pair_in_room(ROOM_INDEX_DATA *room, CHAR_DATA *ch, CHAR_DATA *victim)
 {
     CHAR_DATA *member, *actor = NULL, *target = NULL;
@@ -19,7 +27,8 @@ bool combat_pair_in_room(ROOM_INDEX_DATA *room, CHAR_DATA *ch, CHAR_DATA *victim
         if (member == ch) actor = member;
         if (member == victim) target = member;
     }
-    return actor != NULL && target != NULL && actor->hit > 0
+    return actor != NULL && target != NULL && actor->in_room == room
+        && target->in_room == room && actor->hit > 0
         && actor->position >= POS_FIGHTING && target->hit > 0
         && target->position != POS_DEAD;
 }
