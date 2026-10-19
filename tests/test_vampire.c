@@ -17,6 +17,7 @@ extern void init_mm(void);
 void fwrite_char(CHAR_DATA *, FILE *);
 void fread_char(CHAR_DATA *, FILE *);
 void char_update(void);
+void mobile_update(void);
 extern char *string_space, *top_string;
 
 static CHAR_DATA chars[4];
@@ -716,6 +717,36 @@ static void test_object_form_returns(void)
     }
 }
 
+static void test_native_upkeep_boundaries(void)
+{
+    const long values[]={0,1,4,5,6,11,-1,LONG_MIN,LONG_MAX};
+    for(int mask=1;mask<8;++mask)for(size_t i=0;i<sizeof(values)/sizeof(values[0]);++i) {
+        reset();
+        CHAR_DATA *ch=&chars[0];
+        ch->next=ch->next_in_room=NULL;
+        ch->blood[BLOOD_CURRENT]=values[i];
+        if(mask&1)SET_BIT(ch->vampaff,VAM_OBFUSCATE);
+        if(mask&2) {
+            SET_BIT(ch->polyaff,POLY_SHADOW);
+            SET_BIT(ch->affected_by,AFF_ETHEREAL|AFF_POLYMORPH);
+        }
+        if(mask&4)SET_BIT(ch->itemaffect,ITEMA_PEACE);
+        long expected=values[i];int obfuscate=0,shadow=0,peace=0;
+        if(mask&1) {expected=expected>0?expected-1:0;obfuscate=expected>0;}
+        if(mask&2) {expected=expected>5?expected-5:0;shadow=expected>0;}
+        if(mask&4) {expected=expected>5?expected-5:0;peace=expected>0;}
+        mobile_update();
+        assert(ch->blood[BLOOD_CURRENT]==expected);
+        assert(!!IS_VAMPAFF(ch,VAM_OBFUSCATE)==obfuscate);
+        assert(!!IS_POLYAFF(ch,POLY_SHADOW)==shadow);
+        assert(!!IS_ITEMAFF(ch,ITEMA_PEACE)==peace);
+        if((mask&2)&&!shadow) {
+            assert(!IS_AFFECTED(ch,AFF_ETHEREAL));
+            assert(!IS_AFFECTED(ch,AFF_POLYMORPH));
+        }
+    }
+}
+
 int main(void)
 {
     char directory[] = "/tmp/anathema-vampire-XXXXXX";
@@ -728,6 +759,7 @@ int main(void)
     top_string = string_space;
     current_time = 123456; /* Reproducible, initialized engine RNG, not all-zero state. */
     init_mm();
+    test_native_upkeep_boundaries();
     test_random_drain_bounds();
     test_cauldron_class_and_hp_envelopes();
     test_recovery_cannot_be_bypassed();

@@ -347,7 +347,8 @@ void mobile_update( void )
             {
 		if (IS_VAMPAFF(ch, VAM_OBFUSCATE))
 		{
-		    ch->blood[BLOOD_CURRENT]--;
+    ch->blood[BLOOD_CURRENT] = ch->blood[BLOOD_CURRENT] > 0 ?
+        ch->blood[BLOOD_CURRENT] - 1 : 0;
 		    if (ch->blood[BLOOD_CURRENT] <= 0)
 		    {
 			REMOVE_BIT(ch->vampaff, VAM_OBFUSCATE);
@@ -356,7 +357,8 @@ void mobile_update( void )
 		}
 		if (IS_POLYAFF(ch, POLY_SHADOW))
 		{
-		    ch->blood[BLOOD_CURRENT] -= 5;
+    ch->blood[BLOOD_CURRENT] = ch->blood[BLOOD_CURRENT] > 5 ?
+        ch->blood[BLOOD_CURRENT] - 5 : 0;
 		    if (ch->blood[BLOOD_CURRENT] <= 0)
 		    {
 			ch->blood[BLOOD_CURRENT] = 0;
@@ -368,7 +370,8 @@ void mobile_update( void )
 		}
 		if (IS_ITEMAFF(ch, ITEMA_PEACE))
 		{
-		    ch->blood[BLOOD_CURRENT] -= 5;
+    ch->blood[BLOOD_CURRENT] = ch->blood[BLOOD_CURRENT] > 5 ?
+        ch->blood[BLOOD_CURRENT] - 5 : 0;
 		    if (ch->blood[BLOOD_CURRENT] <= 0)
 		    {
 			ch->blood[BLOOD_CURRENT] = 0;
