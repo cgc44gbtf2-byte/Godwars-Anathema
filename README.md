@@ -59,7 +59,9 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
 - **Combat:** Gathering-style damage messages keep Genesis's existing damage
   thresholds. Stance/style handling and class-ability error checks are being
   cleaned up without a general damage rebalance. Brittle Bones now expires
-  without walking into the recycled-effect list.
+  without walking into the recycled-effect list. Invalid weapon spell values
+  are safely ignored, and ordinary melee no longer retains temporary attack
+  label allocations after each hit.
 - **Kills and rewards:** Highest-level and highest-XP kill records track the
   single best kill rather than adding later kills to the record. Players
   editing in-game still count toward the online XP bonus.

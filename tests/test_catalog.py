@@ -185,7 +185,8 @@ class CatalogChecks(unittest.TestCase):
         comm = (SRC / "comm.c").read_text()
         self.assertEqual(comm.count("combat_status_update();"), 2)
         self.assertEqual(comm.count("IS_COMBAT_PAUSED(d->character)"), 2)
-        fight = (SRC / "fight.c").read_text()
+        fight = "\n".join((SRC / owner).read_text()
+                          for owner in ("fight.c", "combat_attack.c"))
         for name in ("violence_update", "multi_hit", "one_hit"):
             body = fight.split("void " + name + "(", 1)[1].split("\n}", 1)[0]
             self.assertIn("IS_COMBAT_PAUSED(ch)", body)

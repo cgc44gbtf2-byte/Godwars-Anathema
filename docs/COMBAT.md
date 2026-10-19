@@ -12,7 +12,7 @@ in the shared engine.
 | `stance.c` | Stance commands, autostance, stance training, combined skill display and stance raw-damage modifiers |
 | `style.c` | Equipment-driven styles, `grip`, bounded proficiency getter, style and weapon training |
 | `combat_state.c` | Starting/stopping fights and linked fight-list membership |
-| `combat_attack.c` | Room-scoped NPC assist target selection; the rest of the attack loop is still in `fight.c` |
+| `combat_attack.c` | Fight pulse (`violence_update`), grouped attacks (`multi_hit`) and room-scoped NPC assist targeting |
 | `combat_rules.c` | Explicit-command and automatic safety policies |
 | `combat_status.c` | Target liveness, action pauses and immunity/reuse timers |
 | `combat_initiative.c` | Pulse spacing from stats, class powers, stances and status effects |
@@ -20,7 +20,7 @@ in the shared engine.
 | `combat_damage.c` | Shared damage, hit points, damage caps and safety/reaction boundaries |
 | `combat_death.c` | Wound positions, corpse/head lifecycle, player/NPC death and announcements |
 | `combat_rewards.c` | XP, group rewards and class points |
-| `fight.c` | Remaining attack loop, damage wording and combat action commands |
+| `fight.c` | Single-strike resolution (`one_hit`), damage wording and combat action commands |
 | `core.c` | General formatted output and legacy item/output helpers; no fight-list management |
 | `handler.c` | Equipment-derived flags and effects; styles call its existing refresh helper after hand promotion |
 | `save.c` | Save format and load-time normalization, not combat decisions |
@@ -88,12 +88,12 @@ orchestration; it does not execute root installation on a production host.
 
 The request covers the shared combat system, not just these initial owners.
 Initiative, defense, damage, death and rewards now have explicit owners.
-Next extract and characterize the attack loop, damage wording and generic
+Next extract and characterize single-strike resolution, damage wording and generic
 combat commands from `fight.c`. Keep legacy public entry points compatible. Spell dispatch remains
 in `magic.c` and class abilities remain in their class modules; audit their
 engine boundaries instead of moving unrelated code wholesale.
 
-The next bounded attack-loop step isolates NPC assist target selection.
+The first bounded attack-loop step isolated NPC assist target selection.
 Its legacy room scan incorrectly followed `CHAR_DATA.next` (the global
 character chain), not `next_in_room`. A real-engine regression reproduced a
 foreign-room group member being selected and missed local candidates.
@@ -102,8 +102,38 @@ entries, with null/missing-room guards. Existing visibility/group checks and
 the historical random-selection formula are preserved; this is not a class
 balance or reservoir-sampling change. `tests/test_combat_calculations.c`
 covers deliberately different global/room ordering, eligible local candidates,
-foreign entries and invalid inputs. The rest of the attack loop and generic
-commands are still pending, not claimed complete.
+foreign entries and invalid inputs.
+
+The next step moves `violence_update()` and `multi_hit()` into `combat_attack.c`.
+Both function bodies are byte-identical to a separately repaired baseline.
+Public prototypes, initiative timings, attack order, style probabilities, class
+bonus attacks and RNG consumption are unchanged by that move. `one_hit()`,
+damage wording and generic commands remain in `fight.c`; this is not a claim
+that the entire combat refactor is finished.
+
+The separate repair addresses two reproduced defects:
+
+- A weapon's `value[0] % 1000` was used as a skill-table index without an upper
+  bound or callback check. The native sanitizer test fails on index 132.
+  Procs now require `0 < sn < MAX_SKILL`, a spell callback and a non-object
+  target type. Legacy `TAR_DEATH` spells still take character targets and
+  remain allowed; ordinary and thousand-prefixed character spells still work.
+- `one_hit()` duplicated weapon/unarmed labels without releasing them after
+  a strike or early avoidance/counter return. It now tracks only its own
+  duplicates and releases them on every post-allocation exit. Caller-owned
+  labels are not freed, and shared world strings retain the allocator's
+  existing non-owning behavior. The native test warms allocator pools then
+  asserts that hundreds more weapon/unarmed strikes require no new permanent
+  allocations. This proves bounded label reuse, not overall server leak freedom
+  or a measured runtime speedup.
+
+`tests/test_combat_attack.c` runs as the 35th native suite in normal and
+ASan/UBSan builds. Fixed-seed HP/RNG snapshots were captured on `49c3511`
+before repairs: six styles, five NPC attack thresholds and a fight pulse.
+They pass before and after extraction. The suite also checks pause/missing-room
+guards, malformed/empty/object-only procs, real Armor and `TAR_DEATH` procs,
+and repeated label reuse. Broader callback-driven actor/target invalidation
+and fight-list mutation during attack groups remain separate audit work.
 
 Before each extraction, retain exact function-body comparisons and native
 characterization tests. Keep callback instrumentation used by restored-spell

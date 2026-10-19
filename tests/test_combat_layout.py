@@ -7,7 +7,7 @@ import unittest
 from test_class_layout import ROOT, SRC, make_values
 
 OWNERS = {
-    "combat_attack.c": ("combat_assist_target",),
+    "combat_attack.c": ("combat_assist_target", "violence_update", "multi_hit"),
     "style.c": ("get_style", "update_style", "do_grip", "improve_style",
                 "improve_weapon"),
     "stance.c": ("do_skill", "improve_stance", "do_stance", "do_autostance",
@@ -64,6 +64,7 @@ class CombatLayoutChecks(unittest.TestCase):
         self.assertEqual(selected.count("tests/test_stance_style"), 1)
         self.assertEqual(selected.count("tests/test_combat_calculations"), 1)
         self.assertEqual(selected.count("tests/test_combat_damage_death"), 1)
+        self.assertEqual(selected.count("tests/test_combat_attack"), 1)
         makefile = (ROOT / "Makefile").read_text()
         self.assertRegex(makefile, r"(?s)sanitize:.*?\$\(MAKE\) test")
 

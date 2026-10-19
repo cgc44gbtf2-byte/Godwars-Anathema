@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include "merc.h"
 
-/* Attack-loop targeting lives here; public combat entry points stay stable. */
+/* Attack pulse, attack groups and targeting; public entry points stay stable. */
 CHAR_DATA *combat_assist_target(CHAR_DATA *helper, CHAR_DATA *victim)
 {
     CHAR_DATA *vch, *target = NULL;
@@ -40,4 +40,229 @@ CHAR_DATA *combat_assist_target(CHAR_DATA *helper, CHAR_DATA *victim)
         }
     }
     return target;
+}
+
+/*
+ * Control the fights going on.
+ * Called periodically by update_handler.
+ */
+void violence_update( void )
+{
+    CHAR_DATA *ch;
+    CHAR_DATA *ch_next;
+    CHAR_DATA *victim;
+    CHAR_DATA *rch;
+    CHAR_DATA *rch_next;
+
+    for (ch = first_fight; ch != NULL; ch = ch_next)
+    {
+	ch_next	= ch->next_fight;
+
+        if (IS_COMBAT_PAUSED(ch)) continue;
+
+	if ((victim = ch->fighting) == NULL || victim->in_room != ch->in_room)
+	{
+	    stop_fighting(ch, FALSE);
+	    continue;
+	}
+
+	if (IS_AWAKE(ch) && IS_AWAKE(victim) && ch->in_room == victim->in_room)
+	{
+	    if (--ch->init <= 0)
+	    {
+		multi_hit(ch, victim);
+		ch->init = get_speed(ch);
+	    }
+	    else continue;
+	}
+	else stop_fighting(ch, FALSE);
+
+	if ((victim = ch->fighting) == NULL)
+	{
+	    stop_fighting(ch, FALSE);
+	    continue;
+	}
+	if (!IS_NPC(ch) && !IS_NPC(victim)) ch->fight_timer = 30;
+
+	/*
+	 * Fun for the whole family!
+	 */
+	for (rch = ch->in_room->people; rch != NULL; rch = rch_next)
+	{
+	    rch_next = rch->next_in_room;
+
+	    if (IS_AWAKE(rch) && rch->fighting == NULL)
+	    {
+		/* Auto-assist others in group. */
+		if (is_same_group(ch, rch) && !is_same_group(rch, victim))
+		    multi_hit(rch, victim);
+		else if (IS_NPC(ch) && IS_NPC(rch))
+		{
+		    /* NPC's assist NPC's of same type or 1/16 chance regardless. */
+		    if (rch->pIndexData == ch->pIndexData || number_bits(4) == 0)
+		    {
+			CHAR_DATA *target = combat_assist_target(rch, victim);
+
+			if (target != NULL) multi_hit(rch, target);
+		    }
+		}
+	    }
+	}
+    }
+
+    return;
+}
+
+
+
+/*
+ * Do one group of attacks.
+ */
+void multi_hit( CHAR_DATA *ch, CHAR_DATA *victim )
+{
+    OBJ_DATA *wield;
+    long sn, dt, style;
+
+    if (ch == NULL || victim == NULL || IS_COMBAT_PAUSED(ch)) return;
+    if (ch->position < POS_SLEEPING || is_safe(ch, victim)) return;
+
+    if (IS_NPC(ch)) /* Temporary I swear */
+    {
+	if ((wield = get_eq_char(ch, WEAR_WEAPON)) && wield->item_type == ITEM_WEAPON) dt = wield->value[3];
+	else dt = TYPE_UNARMED;
+	one_hit(ch, victim, dt, "attack");
+	if (number_range(251, 500) <= ch->level) one_hit(ch, victim, dt, "attack");
+	if (number_range(501, 1000) <= ch->level) one_hit(ch, victim, dt, "attack");
+	if (number_range(1001, 2500) <= ch->level) one_hit(ch, victim, dt, "attack");
+	if (number_range(2501, 5000) <= ch->level) one_hit(ch, victim, dt, "attack");
+	return;
+    }
+
+    style = ch->style[0];
+    if ((wield = get_eq_char(ch, WEAR_WEAPON)) != NULL)
+    {
+	if (style == STYLE_UNARMED || style == STYLE_NATURAL)
+	{
+	    stc("Erm...'Oh Shit(weapon)' bug alert.  Inform Akuma.\n\r", ch);
+	    return;
+	}
+	dt = wield->value[3];
+    }
+    else
+    {
+	if (style == STYLE_UNARMED || style == STYLE_SHIELD) dt = TYPE_UNARMED;
+	else if (style == STYLE_NATURAL) dt = TYPE_SLASH;
+	else
+	{
+	    stc("Erm...'Oh Shit(unarmed)' bug alert.  Inform Akuma.\n\r", ch);
+	    return;
+	}
+    }
+
+    improve_stance(ch);
+    improve_style(ch);
+    improve_weapon(ch, dt);
+
+    one_hit(ch, victim, dt, "1");
+    switch(style)
+    {
+	default:
+	    stc("Erm...'Oh Shit(style)' bug alert.  Inform Akuma.\n\r", ch);
+	    return;
+	case STYLE_UNARMED:
+	    if (number_range(101, 200) <= get_style(ch, style)) one_hit(ch, victim, dt, "1");
+	    break;
+	case STYLE_NATURAL:
+	    break;
+	case STYLE_ONEHAND:
+	    if (number_range(1, 100) <= get_style(ch, style)) one_hit(ch, victim, dt, "1");
+	    if (number_range(101, 200) <= get_style(ch, style)) one_hit(ch, victim, dt, "1");
+	    break;
+	case STYLE_SHIELD:
+	    break;
+	case STYLE_TWOHAND:
+	    break;
+	case STYLE_TWOWEAPON:
+	    if (number_range(51, 150) <= get_style(ch, style)) one_hit(ch, victim, dt, "1");
+	    if (number_range(151, 250) <= get_style(ch, style)) one_hit(ch, victim, dt, "1");
+
+	    if ((wield = get_eq_char(ch, WEAR_HOLD)) == NULL || wield->item_type != ITEM_WEAPON)
+	    {
+		stc("Erm...'Oh Shit(two weapon)' bug alert.  Inform Akuma.\n\r", ch);
+		return;
+	    }
+	    dt = wield->value[3];
+	    improve_weapon(ch, dt);
+
+	    if (number_range(1, 100) <= get_style(ch, style)) one_hit(ch, victim, dt, "2");
+	    if (number_range(101, 200) <= get_style(ch, style)) one_hit(ch, victim, dt, "2");
+	    break;
+    }
+
+    if (victim == NULL || victim->position != POS_FIGHTING) return;
+    if (wield != NULL && wield->value[0] >= 1)
+    {
+	sn = wield->value[0] % 1000;
+	/* Saved/OLC weapon values are not trusted skill-table indexes.
+	 * Item-only callbacks cannot consume a character target. TAR_DEATH
+	 * remains valid here: those legacy damage spells take CHAR_DATA. */
+	if (sn > 0 && sn < MAX_SKILL && skill_table[sn].spell_fun != NULL
+	    && skill_table[sn].target != TAR_OBJ_INV && victim->position == POS_FIGHTING)
+	    (*skill_table[sn].spell_fun) (sn, wield->level, ch, victim);
+    }
+    else if (style == STYLE_NATURAL && IS_WEREWOLF(ch) && get_tribe(ch, TRIBE_BLACK_FURIES) >= 3)
+	spell_poison(gsn_poison, 25, ch, victim);
+
+    if (!IS_NPC(ch) && IS_VAMPAFF(ch, VAM_FANGS) && number_range(1, 3) <= 2) one_hit(ch, victim, TYPE_PIERCE, "fangs");
+    if (IS_DRAGON(ch))
+    {
+	if (IS_DRAGAFF(ch, DRAG_HORNSOUT) && number_range(1, 3) == 1) one_hit(ch, victim, TYPE_PIERCE, "horns");
+	if (IS_DRAGAFF(ch, DRAG_WINGSOUT) && number_range(1, 3) == 1) one_hit(ch, victim, TYPE_BLUNT, "wing buffet");
+    }
+    if (IS_MONK(ch) && get_monk(ch, MONK_ART) >= 8 && number_range(1, 3) == 1) one_hit(ch, victim, TYPE_HIT, "wave fist");
+    if (IS_MAGE(ch) && IS_XTRA(ch, XTRA_HOLY_SMOTE) && number_range(1, 2) == 1) one_hit(ch, victim, TYPE_HIT, "holy sword");
+    if (IS_WEREWOLF(ch) && get_tribe(ch, TRIBE_WENDIGOS) >= 5 && IS_SET(world_affects, WORLD_RAIN) && IS_OUTSIDE(ch))
+    {
+	CHAR_DATA *vch;
+	CHAR_DATA *vch_next;
+	for (vch = ch->in_room->people; vch != NULL; vch = vch_next)
+	{
+	    vch_next = vch->next_in_room;
+	    if (is_safe(ch, vch)) continue;
+	    if (vch->fighting != ch) continue;
+	    if (number_range(1, 2) == 1) continue;
+	    one_hit(ch, vch, TYPE_HIT, "lightning blast");
+	}
+    }
+
+    if (IS_NINJA(ch))
+    {
+	if (IS_VAMPAFF(ch, VAM_CLAWS) && number_range(1, 3) == 1) one_hit(ch, victim, TYPE_SLASH, "tsume");
+	if (get_ninja(ch, NINJA_NINGENNO) >= 6 && number_range(1, 3) == 1)
+	{
+	    one_hit(ch, victim, TYPE_PIERCE, "shuriken");
+	    if (victim == NULL || victim->position != POS_FIGHTING) return;
+	    spell_poison(gsn_poison, 25, ch, victim);
+	}
+    }
+    
+    if (IS_POLYAFF(ch, POLY_SERPENT))
+    {
+	one_hit(ch, victim, TYPE_SLASH, "forked tongue");
+	one_hit(ch, victim, TYPE_SLASH, "forked tongue");
+    }
+
+    if (IS_VAMPIRE(ch) && IS_XTRA(ch, XTRA_TENEBROUS))
+    {
+	one_hit(ch, victim, TYPE_SLASH, "tendril of shadow");
+	one_hit(ch, victim, TYPE_BLUNT, "shadow arm");
+    }
+
+    if (IS_VAMPIRE(ch) && get_disc(ch, DISC_CHIMERSTRY) >= 2)
+	one_hit(ch, victim, TYPE_SLASH, "chimerstral dagger");
+
+    if (IS_DROW(ch) && get_drow(ch, DROW_BITE) && number_range(1, 4) == 1)
+	one_hit(ch, victim, TYPE_PIERCE, "spider fangs");
+
+    return;
 }
