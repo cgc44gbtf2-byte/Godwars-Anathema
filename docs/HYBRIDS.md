@@ -501,3 +501,46 @@ only the include and four permission checks introduced for these two handlers.
 Other Drow attacks, forms, gear creation, summon/teleport, upkeep and social
 commands remain native-only; no `IS_*` macro or interpreter table was widened.
 Record v4, save epoch 3 and handoff v2 are unchanged. Conversion stays disabled.
+
+## Sunbath — trained secondary Elementalist, shared mana
+
+`sunbath [target]` now uses earned, parent-owned Sun training (minimum 3).
+Original Elementalists retain their native ranks. Secondary ranks must come
+from a ready owned record and follow the existing full/half-cap and native
+focus rules; stale original-class `powers[]` entries are never borrowed.
+Full Sun focus follows the existing initialization/training/focus backend,
+not a free rank grant from invoking a power.
+
+Activation still costs exactly **800 of the caster's shared mana**, heals
+1001–1500 HP with the native RNG, clamps to the target's max HP and imposes
+18 pulses of caster lag. Missing targets and mana below 800 do not charge or
+roll healing. Already-full targets still incur the native cost and lag.
+No parent-owned Ki, blood, DP or quint is charged: mana is one existing shared
+character stat, not a class bank. No new caster/target activation flag, form,
+rank write, class swap, item, social role or synchronous player save is added.
+The explicit local-target rule is unchanged; an omitted target reliably means
+self, as the native command intended.
+
+Before adapting permission checks, UBSan reproduced signed overflow at
+`LONG_MAX-1` HP and division by zero when a malformed native Sun rank was 11
+and the caster was fighting. Healing now saturates safely before adding past
+`LONG_MAX`; the divided expression was immediately discarded by the RNG
+assignment and was removed, without changing normal healing or its RNG.
+The full normal suite also reproduced unreliable default targeting: Sunbath
+overwrote its self-target with an empty lookup, while `number_argument()`
+returned zero without initializing its output. The parser now outputs an
+empty string while retaining ordinal zero, and Sunbath only looks up explicit
+targets. A sentinel-buffer regression fails on the original parser object.
+No other parser, alias, ordinal or interpreter command rule was redesigned.
+Separate native-fix and hybrid-adapter commits preserve that distinction.
+
+A new real-engine suite retains eight original HP/mana/lag/position/RNG
+snapshots captured before either change. It runs 81 paired native/secondary
+replays across all nine original parents, including nine legitimately fully
+focused Sun-10 records, plus near-limit healing, below-threshold training,
+invalid ownership/load/NPC records and the 799/800-mana boundary. The class
+file matches its fixed native baseline after removing only the include and
+two permission/rank replacements; all other Elementalist handlers are intact.
+Other healing commands, stateful class powers, forms, gear, secondary trainers
+and player conversion remain outside this stage. Record4/epoch3/handoff2 stay
+unchanged. No conversion, fighting-style expansion, merge or deployment.

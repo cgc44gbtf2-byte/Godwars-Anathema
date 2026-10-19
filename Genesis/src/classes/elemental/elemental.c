@@ -25,6 +25,7 @@
 #include <string.h> 
 #include <time.h> 
 #include "merc.h" 
+#include "classes/hybrid/access.h"
 
 
 void do_element( CHAR_DATA *ch, char *argument )
@@ -1031,11 +1032,11 @@ void do_sunbath(CHAR_DATA *ch, char *argument) {
 	long i;
     	argument = one_argument( argument, arg );
     	if (IS_NPC(ch) ) return;
-    	if (!IS_ELEM(ch) ){
+    	if (!hybrid_power_parent(ch,CLASS_ELEM) ){
 	   send_to_char("Huh?\n\r",ch);
 	   return;
 	}
-	if (ch->pcdata->powers[ELEM_SUN] < 3){
+	if (hybrid_power_rank(ch,CLASS_ELEM,HYBRID_TRAIN_ELEMENT,ELEM_SUN) < 3){
    	   stc("You lack the training in light control to use this technique.\n\r",ch);
    	   return;
    	}

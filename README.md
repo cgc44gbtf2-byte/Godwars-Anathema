@@ -75,6 +75,9 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   Highlander adapters now use parent-owned training in internal tests.
   Drow Attunement and Faerie Fire also have learned, parent-owned adapters,
   retaining their native ownership/protection rules and zero activation cost.
+  Sunbath now has a trained secondary-Elementalist adapter at Sun 3, preserving
+  its 800-mana cost; native overflow, a discarded divide and unreliable
+  empty-target handling were fixed.
   Checked secondary resource accounting and independent Ninja Ki/rage/cooldown
   updates are also implemented internally; other activation upkeep is pending.
   These adapters are not player-accessible yet: conversion, secondary trainers
