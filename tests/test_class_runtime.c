@@ -38,6 +38,13 @@ void send_to_char(const char *s, CHAR_DATA *ch) { (void)s; (void)ch; }
 void act(const char *s, CHAR_DATA *ch, const void *a, const void *b, long t)
 { (void)s; (void)ch; (void)a; (void)b; (void)t; }
 long get_trust(CHAR_DATA *ch) { return ch->level; }
+/* The real access backend links the remaining native getters. An unexpected
+ * native range diagnostic is a test failure, never a permissive hybrid stub. */
+void bug(const char *message,long value)
+{
+    fprintf(stderr,"unexpected native bug: %s (%ld)\n",message,value);
+    abort();
+}
 long get_monk(CHAR_DATA *ch, long p) { (void)ch; (void)p; return 8; }
 long get_ninja(CHAR_DATA *ch, long p) { (void)ch; (void)p; return 10; }
 long get_highland(CHAR_DATA *ch, long p) { (void)ch; (void)p; return 6; }

@@ -29,6 +29,10 @@ TESTS += tests/test_hybrid_progression
 TESTS += tests/test_hybrid_specialization
 TESTS += tests/test_hybrid_player
 TESTS += tests/test_hybrid_training
+TESTS += tests/test_hybrid_access
+# Real validators/effective access for older isolated native fixtures too.
+# Never replace hybrid access with permissive stubs just to satisfy linking.
+HYBRID_ACCESS_SOURCES = $(addprefix Genesis/src/classes/hybrid/,registry.c state.c player.c build.c progression.c specialization.c access.c passives.c)
 
 all:
 	$(MAKE) -C Genesis/src
@@ -43,7 +47,7 @@ tests/test_comm: tests/test_comm.c $(ENGINE_SOURCES) $(ENGINE_HEADERS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< Genesis/src/telnet_input.c Genesis/src/gmcp.c $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_gameplay: tests/test_gameplay.c $(ENGINE_SOURCES) $(ENGINE_HEADERS)
-	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< Genesis/src/act_info.c Genesis/src/classes/werewolf/wwauspice.c Genesis/src/classes/mage/mage.c $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< Genesis/src/act_info.c Genesis/src/classes/werewolf/wwauspice.c Genesis/src/classes/mage/mage.c $(HYBRID_ACCESS_SOURCES) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_buffers: tests/test_buffers.c $(ENGINE_SOURCES) $(ENGINE_HEADERS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) --param=asan-globals=0 -c Genesis/src/interp.c -o tests/buffers_interp.o
@@ -63,12 +67,18 @@ tests/test_classes tests/test_wall tests/test_mage_powers: tests/%: tests/%.c $(
 tests/test_powers: tests/test_powers.c $(ENGINE_SOURCES) $(ENGINE_HEADERS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< Genesis/src/classes/ninja/ninja.c Genesis/src/classes/monk/monk.c Genesis/src/classes/elemental/elemental.c Genesis/src/classes/sorcerer/sorcerer.c Genesis/src/classes/drow/drow.c Genesis/src/combat_status.c $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
-tests/test_class_runtime: tests/test_class_runtime.c $(ENGINE_SOURCES) $(ENGINE_HEADERS)
-	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< Genesis/src/classes/elemental/elemental.c Genesis/src/classes/monk/monk.c Genesis/src/classes/ninja/ninja.c Genesis/src/classes/dragon/dragon.c Genesis/src/classes/drow/drow.c Genesis/src/classes/highlander/highland.c Genesis/src/classes/werewolf/wwtribe.c Genesis/src/combat_status.c $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+# Preserve this legacy fixture's existing native mocks, while obtaining any
+# other native getters from the real implementation for the hybrid backend.
+tests/runtime_info.o: Genesis/src/act_info.c $(ENGINE_HEADERS)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) -Dchar_stat=runtime_real_char_stat -Dchar_damroll=runtime_real_char_damroll -Dget_breed=runtime_real_get_breed -Dget_drow=runtime_real_get_drow -Dget_highland=runtime_real_get_highland -Dget_monk=runtime_real_get_monk -Dget_ninja=runtime_real_get_ninja -Dget_tribe=runtime_real_get_tribe -c $< -o $@
+
+tests/test_class_runtime: tests/test_class_runtime.c $(ENGINE_SOURCES) $(ENGINE_HEADERS) tests/runtime_info.o
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< Genesis/src/classes/elemental/elemental.c Genesis/src/classes/monk/monk.c Genesis/src/classes/ninja/ninja.c Genesis/src/classes/dragon/dragon.c Genesis/src/classes/drow/drow.c Genesis/src/classes/highlander/highland.c Genesis/src/classes/werewolf/wwtribe.c Genesis/src/combat_status.c tests/runtime_info.o $(HYBRID_ACCESS_SOURCES) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 check-layout:
 	python3 tests/test_class_layout.py
 	python3 tests/test_hybrid_training_catalog.py
+	python3 tests/test_hybrid_access_catalog.py
 	python3 tests/test_combat_layout.py
 	python3 tests/test_telnet_layout.py
 	python3 tests/test_gmcp_layout.py
@@ -114,6 +124,9 @@ tests/test_hybrid_player: tests/test_hybrid_player.c $(ENGINE_OBJECTS)
 tests/test_hybrid_training: tests/test_hybrid_training.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
+tests/test_hybrid_access: tests/test_hybrid_access.c $(ENGINE_OBJECTS)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
 # Separate test objects keep sanitizer flags out of the production executable.
 tests/test_restored_spells: tests/test_restored_spells.c $(filter-out tests/stun_engine/fight.o tests/stun_engine/combat_damage.o,$(ENGINE_OBJECTS)) tests/restored_fight.o tests/restored_damage.o
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(filter-out tests/stun_engine/fight.o tests/stun_engine/combat_damage.o,$(ENGINE_OBJECTS)) tests/restored_fight.o tests/restored_damage.o $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
@@ -147,6 +160,6 @@ sanitize:
 	$(MAKE) test CFLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer" LDFLAGS="-fsanitize=address,undefined"
 
 clean:
-	rm -f tests/restart_engine.o
+	rm -f tests/restart_engine.o tests/runtime_info.o
 	$(MAKE) -C Genesis/src clean
 	rm -f $(TESTS) tests/buffers_interp.o $(ENGINE_OBJECTS) $(LEGACY_CLASS_OBJECTS) tests/stun_comm.o tests/restored_fight.o tests/restored_damage.o

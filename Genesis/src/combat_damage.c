@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "merc.h"
+#include "classes/hybrid/passives.h"
 
 void dam_message( CHAR_DATA *ch, CHAR_DATA *victim, long dam, long type, char *message );
 
@@ -395,6 +396,7 @@ long get_damcap( CHAR_DATA *ch )
 		if (ch->pcdata->powers[ELEM_INFIN] >= 8) max_dam += ch->pcdata->powers[ELEM_INFIN] * 30;
 		break;
 	}
+        max_dam = hybrid_secondary_passive(ch, HYBRID_PASSIVE_DAMCAP, max_dam);
     }
 
     return max_dam;

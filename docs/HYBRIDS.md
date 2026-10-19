@@ -178,8 +178,8 @@ social clan membership still requires a separate live integration.
 
 This is **not playable conversion**: checked attachment is a backend operation,
 not a staff/player command and not itself a durable conversion transaction.
-No new player-facing activation, trainer, passive or conversion-mastery
-checks are enabled.
+No conversion or player-facing secondary trainer is enabled. The limited
+checked combat/Highlander adapters below are the first live access integration.
 The 50,000QP conversion remains preview-only. One active parent/hybrid form
 policy still needs live adapters and safe restart reconciliation.
 
@@ -335,3 +335,63 @@ separately approved; its balance still needs testing.
 
 The read-only command was written for Anathema. No donor `clearclass`/staff
 command dispatch, random trainer aggression or destructive preflight was copied.
+
+## Checked combat access — first live integration
+
+`access.c` recognizes a secondary only when the attached record matches the
+original actor and is structurally valid. Vampire/Mage/Dragon require an
+explicit native build; their initialized core and Werewolf rank must be
+present. Older unconfigured records remain inactive. Positive effective ranks
+are capped by the agreed secondary policy; retained raw ranks above a half-cap
+do not bypass that cap. First-learning/unavailable Vampire markers grant nothing.
+Primary getters and all ten `IS_*` class predicates remain native-only.
+No handler temporarily changes the character's class or swaps its primary banks.
+
+`passives.c` supplies learned secondary contributions to initiative, soak,
+avoidance, avoidance-breaking, damage cap, hitroll, damroll and armor. These
+add once to the original class's contribution. Armor/hitroll enter the existing
+calculations before their divisions; injury penalties and speed/soak conditions
+are applied at their native stage, not separately for each parent. Secondary
+Philodox's learned injury protection applies to the three raw combat stats.
+Integer additions saturate at long limits, and Drow speed retains native
+compound truncation even for negative avoidance.
+This is not every class passive: class-specific contact, immunity and damage
+callbacks outside these paths remain native-only until separately adapted.
+
+| Secondary parent | Learned contributions in this stage | Still excluded |
+|---|---|---|
+| Vampire | Fortitude armor/soak; Potence damroll/damage cap | Celerity activation, blood/rage, form/bodycraft flags, damage multipliers and advanced damage callbacks |
+| Werewolf | Learned Breed/Auspice/Tribe combat bonuses and injury protection | Rank-based class baseline, rage, forms and activated gifts |
+| Mage | Time speed/avoidance; Entropy avoidance-breaking/damage cap | Spellcasting, quint/paradox and physical damage multiplier |
+| Highlander | Weapon/Attack/Defense combat bonuses | Speed timer/DEX boost, forge/gear ownership and Lunge |
+| Ninja | Ningenno speed/avoidance-breaking; Chikyu avoidance/damage cap | Ki, Harakiri, weapon multipliers and toggles |
+| Monk | Learned Arts speed, armor, soak, accuracy, damroll, avoidance and damage cap | Chimera flags, weapon multipliers and activated techniques |
+| Drow | Trained speed and learned Skip/Tough/Eyes/Might/Bite bonuses | Spells, active shields, flight and shape ownership |
+| Elementalist | Learned Wind/Time/Earth/Moon/Fire/Infinity combat bonuses | Aura/shield ownership, forms, weapon multipliers and active powers |
+| Sorcerer | Checked color-rank API; no learned-only bonus in these eight native paths | Color spellcasting and resources |
+| Dragon | Checked learned-skill query; no form-free bonus in these paths | All form-dependent effects and lifecycle/resource handlers |
+
+There are no free Vampire/Werewolf class baseline bonuses, inferred shared
+activation flags, copied primary resources or compounded weapon multipliers.
+The primary retains its full existing behavior, including its own active forms.
+No NPC receives a secondary bonus.
+
+Three existing Highlander commands now use owned, effective ranks:
+`bflash` needs Powers 2, `bash` Powers 3, and `judge` Powers 5. Their native
+costs/waits, safe-target checks and effect implementations remain intact.
+Powers 5 requires choosing that full secondary path. Counter retains BOTH
+Defense 4 and Powers 4: under one-full-tree/other-paths 3 it is deliberately
+unavailable to a secondary Highlander, including when a migrated raw bank has
+both ranks 4. Original Highlanders retain Counter normally. Htwist and Lunge
+are not broadened, and secondary forge/class gear is not enabled.
+
+The real-engine regression captures 20 original profiles before the combat
+hooks, checks 180 untrained pair orientations and compares 90 learned secondary
+pairs with independent native-class counterparts. It also exercises inherited
+flag isolation, raw over-cap masking, corrupt/unconfigured records, odd-speed
+truncation, integer limits, brittle soak, final speed floor, injury protection,
+unchanged RNG, interpreter-routed Highlander powers and Counter refusal.
+These are mechanics checks, not proof of PvP balance or multiplayer stability.
+`selfbrid` is still read-only: no normal player can convert or reach these
+secondary paths until the conversion/eligibility transaction is implemented.
+Save record v4/epoch 3 and socket handoff v2 are unchanged by this stage.

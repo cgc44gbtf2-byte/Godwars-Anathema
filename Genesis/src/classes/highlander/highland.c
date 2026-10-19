@@ -8,6 +8,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "../hybrid/access.h"
 
 /* Counter is original Anathema code. Its reply modifies the next ordinary
  * melee strike: it never recursively invokes damage/one_hit or keeps a target
@@ -23,9 +24,10 @@ static bool counter_katana(CHAR_DATA *ch, OBJ_DATA *weapon)
 
 static bool counter_ready(CHAR_DATA *ch)
 {
-    return ch != NULL && !IS_NPC(ch) && IS_HIGHLANDER(ch)
-        && get_highland(ch, HIGH_DEFENSE) >= 4
-        && get_highland(ch, HIGH_ABILITY) >= 4;
+    return hybrid_power_rank(ch, CLASS_HIGHLANDER, HYBRID_TRAIN_HIGHLAND,
+                             HIGH_DEFENSE) >= 4
+        && hybrid_power_rank(ch, CLASS_HIGHLANDER, HYBRID_TRAIN_HIGHLAND,
+                             HIGH_ABILITY) >= 4;
 }
 
 static bool counter_equipped(CHAR_DATA *ch)
@@ -125,7 +127,8 @@ bool highlander_counter_parry(CHAR_DATA *ch, CHAR_DATA *victim,
         || is_safe(ch, victim) || !hurt_fighting(ch, victim))
         return FALSE;
     victim->highland_guard = 0; /* One eligible swing, even when the roll fails. */
-    if (number_percent() > UMIN(6, get_highland(victim, HIGH_DEFENSE)) * 5)
+    if (number_percent() > UMIN(6, hybrid_power_rank(victim, CLASS_HIGHLANDER,
+                                  HYBRID_TRAIN_HIGHLAND, HIGH_DEFENSE)) * 5)
     {
         stc("Your katana counter guard fails to catch the strike.\n\r", victim);
         return FALSE;
@@ -223,12 +226,12 @@ void do_bladeflash(CHAR_DATA *ch, char *argument)
 
     argument = one_argument(argument, arg);
 
-    if (!IS_HIGHLANDER(ch))
+    if (!hybrid_power_parent(ch,CLASS_HIGHLANDER))
     {
 	stc("Huh?\n\r", ch);
 	return;
     }
-    if (get_highland(ch, HIGH_ABILITY) < 2)
+    if (hybrid_power_rank(ch,CLASS_HIGHLANDER,HYBRID_TRAIN_HIGHLAND,HIGH_ABILITY) < 2)
     {
 	stc("You have not learned the Powers ability to level 2 yet.\n\r", ch);
 	return;
@@ -290,12 +293,12 @@ void do_bash(CHAR_DATA *ch, char *argument)
     long damage = (850 + number_range(1,100));
     argument = one_argument(argument, arg);
 
-    if (!IS_HIGHLANDER(ch))
+    if (!hybrid_power_parent(ch,CLASS_HIGHLANDER))
     {
 	stc("Huh?\n\r",ch);
 	return;
     }
-    if (get_highland(ch, HIGH_ABILITY) < 3)
+    if (hybrid_power_rank(ch,CLASS_HIGHLANDER,HYBRID_TRAIN_HIGHLAND,HIGH_ABILITY) < 3)
     {
 	stc("You have not learned the Powers ability to level 3 yet.\n\r", ch);
 	return;
@@ -373,12 +376,12 @@ void do_judgement(CHAR_DATA *ch, char *argument )
 
     if (IS_NPC(ch)) return;
 
-    if (!IS_HIGHLANDER(ch))
+    if (!hybrid_power_parent(ch,CLASS_HIGHLANDER))
     {
 	stc("Huh?\n\r",ch);
 	return;
     }
-    if (get_highland(ch, HIGH_ABILITY) < 5)
+    if (hybrid_power_rank(ch,CLASS_HIGHLANDER,HYBRID_TRAIN_HIGHLAND,HIGH_ABILITY) < 5)
     {
 	stc("You have not learned the Powers ability to level 5 yet.\n\r",ch);
 	return;

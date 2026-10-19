@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <time.h>
 #include "merc.h"
+#include "classes/hybrid/passives.h"
 
 long get_soak( CHAR_DATA *victim )
 {
@@ -66,6 +67,7 @@ long get_soak( CHAR_DATA *victim )
 		if (get_monk(victim, MONK_ART) >= 5) soak += 200;
 		break;
 	}
+	soak = hybrid_secondary_passive(victim, HYBRID_PASSIVE_SOAK, soak);
 	if (IS_MORE(victim, MORE_FAVOUR)) soak += 100;
 	if ((ch = victim->fighting) == NULL || !IS_STANCE(ch, STANCE_MANTIS))
 	{
@@ -190,7 +192,7 @@ long avoidblow( CHAR_DATA *ch )
 	    if (IS_ITEMAFF(ch, ITEMA_AQUABARRIER)) chance += (ch->pcdata->powers[ELEM_WATER]);
 	    break;
     }
-    return chance;
+    return hybrid_secondary_passive(ch, HYBRID_PASSIVE_AVOID, chance);
 }
 
 long breakavoid( CHAR_DATA *ch )
@@ -262,5 +264,5 @@ long breakavoid( CHAR_DATA *ch )
 	    if (IS_ITEMAFF(ch, ITEMA_AURA)) chance += (ch->pcdata->powers[ELEM_SUN]);
 	    break;
     }
-    return chance;
+    return hybrid_secondary_passive(ch, HYBRID_PASSIVE_BREAK, chance);
 }

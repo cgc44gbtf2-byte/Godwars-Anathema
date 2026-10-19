@@ -11,7 +11,8 @@ struct char_data;
  * The original parent's live legacy fields remain authoritative and are
  * never copied, cleared or modified by this component. player.c supplies an
  * optional player-file adapter and an untrained initialization template.
- * No game command attaches these records to a player or enables their powers.
+ * No game command attaches these records to a player. Only explicit checked
+ * access/passive adapters may use their learned powers; conversion is disabled.
  * Clan identities, live forms, remaining fields and ability integration remain
  * pending; raw structural validity is not complete class readiness. */
 typedef struct hybrid_state {

@@ -34,6 +34,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "classes/hybrid/passives.h"
 
 
 
@@ -386,6 +387,7 @@ long char_hitroll( CHAR_DATA *ch )
 	}
 	if (IS_WEREWOLF(ch) && get_tribe(ch, TRIBE_STARGAZERS) >= 2)
 	    hr += get_tribe(ch, TRIBE_STARGAZERS) * 10;
+	hr = hybrid_secondary_passive(ch,HYBRID_PASSIVE_HITROLL,hr);
 	if (IS_POLYAFF(ch, POLY_WOLF)) hr += 200;
 	else if (IS_POLYAFF(ch, POLY_SERPENT)) hr += 150;
 	else if (IS_POLYAFF(ch, POLY_ZULO)) hr += 200;
@@ -397,7 +399,8 @@ long char_hitroll( CHAR_DATA *ch )
 
     if (ch->hit < ch->max_hit)
     {
-	if (!IS_NPC(ch) && IS_WEREWOLF(ch) && get_auspice(ch, AUSPICE_PHILODOX) > 0)
+	if ((!IS_NPC(ch) && IS_WEREWOLF(ch) && get_auspice(ch, AUSPICE_PHILODOX) > 0)
+            || hybrid_secondary_unwounded(ch))
 	    return hr;
 	min = hr * 0.75;
 	if (ch->hit < 1 || ch->max_hit < 1)
@@ -440,6 +443,7 @@ long char_damroll( CHAR_DATA *ch )
 	    dr += get_tribe(ch, TRIBE_STARGAZERS) * 10;
         if (IS_DROW(ch))
             dr += ch->pcdata->drow[DROW_SPEED] * 50;
+	dr = hybrid_secondary_passive(ch,HYBRID_PASSIVE_DAMROLL,dr);
 	if (IS_ITEMAFF(ch, ITEMA_AURA)) dr += (ch->pcdata->powers[ELEM_SUN]*ch->pcdata->powers[ELEM_SUN]*2.5);
 	if (IS_POLYAFF(ch, POLY_WOLF)) dr += 200;
 	else if (IS_POLYAFF(ch, POLY_SERPENT)) dr += 150;
@@ -452,7 +456,8 @@ long char_damroll( CHAR_DATA *ch )
 
     if (ch->hit < ch->max_hit)
     {
-	if (!IS_NPC(ch) && IS_WEREWOLF(ch) && get_auspice(ch, AUSPICE_PHILODOX) > 0)
+	if ((!IS_NPC(ch) && IS_WEREWOLF(ch) && get_auspice(ch, AUSPICE_PHILODOX) > 0)
+            || hybrid_secondary_unwounded(ch))
 	    return dr;
 	min = dr * 0.75;
 	if (ch->hit < 1 || ch->max_hit < 1)
@@ -482,6 +487,7 @@ long char_ac( CHAR_DATA *ch )
 	    if (get_monk(ch, MONK_ART) >= 4) a_c += 375;
 	    if (IS_POLYAFF(ch, POLY_CHIMERA)) a_c += 375;
 	}
+	a_c = hybrid_secondary_passive(ch,HYBRID_PASSIVE_ARMOR,a_c);
 	if (IS_POLYAFF(ch, POLY_WOLF)) a_c += 100;
 	else if (IS_POLYAFF(ch, POLY_SERPENT)) a_c += 200;
 	else if (IS_POLYAFF(ch, POLY_BAT)) a_c += 300;
@@ -494,7 +500,8 @@ long char_ac( CHAR_DATA *ch )
 
     if (ch->hit < ch->max_hit)
     {
-	if (!IS_NPC(ch) && IS_WEREWOLF(ch) && get_auspice(ch, AUSPICE_PHILODOX) >= 1)
+	if ((!IS_NPC(ch) && IS_WEREWOLF(ch) && get_auspice(ch, AUSPICE_PHILODOX) >= 1)
+            || hybrid_secondary_unwounded(ch))
 	    return a_c;
 	min = a_c * 0.75;
 	if (ch->hit < 1 || ch->max_hit < 1)

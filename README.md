@@ -71,6 +71,9 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   currency or character data is changed.
   Optional hybrid saving, untrained secondary initialization, native build
   choices and paid parent-aware training are implemented internally.
+  Learned combat passives and the safe `bflash`, `bash`, and `judge`
+  Highlander adapters now use parent-owned training in internal tests.
+  Conversion, secondary trainers and forms remain unavailable to players.
   These are not player-accessible yet; conversion and secondary powers remain
   disabled. Updates use save epoch3 and reject older binary-only rollbacks.
   See [hybrid implementation status](docs/HYBRIDS.md).

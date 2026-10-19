@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <time.h>
 #include "merc.h"
+#include "classes/hybrid/passives.h"
 
 /*
  * Determines number of pulses between Attacks.
@@ -85,6 +86,7 @@ long get_speed( CHAR_DATA *ch )
 		if (ch->pcdata->powers[ELEM_EARTH] >= 5) count += ch->pcdata->powers[ELEM_EARTH] - 5;
 		break;
 	}
+	count = hybrid_secondary_passive(ch, HYBRID_PASSIVE_SPEED, count);
 	if (ch->pcdata->pain > 0) count += 3;
     }
 
