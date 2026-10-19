@@ -51,12 +51,13 @@ on older records; loading never guesses clan identity or silently resets ranks.
 
 **The codec is now connected to optional player saving/loading.** The record
 is still not a complete secondary class: forms, remaining buffs/timers,
-absorption/familiar lifecycle, social clan membership and live ability adapters
+absorption/familiar lifecycle, social clan membership and remaining live ability adapters
 remain pending. Native build selection and paid learning now have backend APIs
 described below; player-facing trainers and secondary teaching remain unwired.
 Validation does not certify every combination of
-prerequisites, resource defaults or effective abilities. Timers are stored, not
-ticked; no blood renewal or upkeep is enabled. Persistence failure must abort
+prerequisites, resource defaults or effective abilities. Independent Ninja
+scalars now tick as described below; other timers, blood renewal and
+form-dependent upkeep remain unwired. Persistence failure must abort
 the load/transaction; the codec alone does not provide atomicity or
 durability. Player files now support an optional record; socket handoff remains v2.
 
@@ -395,3 +396,72 @@ These are mechanics checks, not proof of PvP balance or multiplayer stability.
 `selfbrid` is still read-only: no normal player can convert or reach these
 secondary paths until the conversion/eligibility transaction is implemented.
 Save record v4/epoch 3 and socket handoff v2 are unchanged by this stage.
+
+## Owned resources and independent Ninja clocks
+
+`resources.c` provides checked runtime reads/spending/gains for Vampire current
+blood, Drow DP, Dragon DP, Ninja Ki and Mage BODY quintessence. The caller names
+both parent and pool; the two DP pools cannot alias each other or the original
+class's `CP_CURRENT`. Reads may inspect the original parent without any hybrid
+record, but the mutation APIs can ONLY change a valid, ready secondary bank.
+Wrong owners/pools, NPCs, corrupt/unconfigured state, negative amounts,
+insufficient balances, capacity overflow and lifetime-counter overflow fail
+without partially changing the actor or output. Zero is an accepted no-op.
+No writable pointer is returned.
+
+Spending reduces only the owned current balance. Earned DP gains increase
+both owned current points and lifetime earnings, matching native reward
+semantics; this is not a refund operation. Blood gains cannot exceed the
+owned pool, Ki cannot exceed 300, and BODY quint gains cannot exceed owned
+Arete. Migrated excess BODY quint is retained and spendable, not silently
+discarded, but cannot grow further. Other Mage fields are deliberately outside
+this API. Native spells can also require mana or health-backed Heart's Blood;
+their complete costs, prerequisites and safe health fallback need a separate
+payment adapter, not just a BODY-quint debit.
+No resource-consuming spell, secondary feeding/reward route or trainer is
+enabled merely by adding this accounting layer.
+
+The existing online-PC mobile loop calls the new secondary updater once after
+its original-class branch. Only a ready secondary Ninja is affected:
+Ki regenerates by 2 per mobile update, or 5 when meditating, capped at 300;
+the owned Harakiri counter decreases toward zero; an existing positive Ki/rage
+boost decays outside combat or rises toward effective Sora rank times 25 in
+combat. A zero boost never activates itself. Native over-cap boosts are not
+silently reset. Other parents, offline/not-playing actors and invalid records
+are unchanged. This uses the existing mobile-update cadence, not seconds.
+
+Kakusu regeneration is conservatively suspended while the shared flag is set.
+The secondary updater never clears that flag, even in combat: the separate
+secondary activation/flag owner is not implemented. It does not infer primary
+Vampire Celerity, rage, Deep Umbra or form flags; spend original resources;
+invoke transformations; renew blood powers; change stat bonuses; or consume
+RNG. Secondary Ki activation and Harakiri's combat effects remain unwired.
+
+These are ordinary runtime balances, persisted by the existing atomic player
+saves at normal save timing. They are NOT an immediate durable multi-currency
+payment, conversion transaction or crash journal. Paid training retains its
+separate checked candidate/atomic-save transaction. No schema or compatibility
+epoch changed: record v4, save epoch 3, socket handoff v2.
+
+The real-engine resource suite covers all 45 funded parent orientations,
+22,500 deterministic modeled gains/spends, current/lifetime overflow, caps,
+negative/mismatched inputs and codec round trips. Paired real mobile updates
+across all 90 orientations preserve the original actor/PC fields and RNG
+sequence while ticking only the intended bank. Ninja boundary tests cover
+meditation, effective Sora half-caps, zero and LONG_MAX counters, hidden flags,
+and disconnected/invalid actors. A source-hash check proves the native update
+file is byte-identical to the previous release after removing its one include,
+one secondary call and the separate checked native blood-debit fix below.
+This is not PvP balance or live-host validation.
+
+### Separately characterized native Vampire fix
+
+The real engine reproduced Obfuscate taking zero blood to -1 before clearing
+the flag. Native Obfuscate/Shadow/Peace upkeep now subtracts its normal 1/5/5
+costs without allowing negative balances or signed underflow from invalid
+legacy LONG_MIN values. The existing expiry order/messages/flag cleanup are
+unchanged; combined powers still expire at their own point in the native order.
+The existing Vampire suite checks all seven flag combinations at nine blood
+boundaries (63 cases, including zero, negative, LONG_MIN and LONG_MAX).
+That new regression failed on the old debit before the fix. This does not
+enable secondary Vampire upkeep or infer ownership of a primary activation.

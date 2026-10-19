@@ -30,6 +30,7 @@ CLASS_MODULE_SOURCES = \
   classes/hybrid/training.c \
    classes/hybrid/access.c \
    classes/hybrid/passives.c \
+  classes/hybrid/resources.c \
   classes/hybrid/progression.c \
   classes/hybrid/specialization.c \
   classes/hybrid/forms.c

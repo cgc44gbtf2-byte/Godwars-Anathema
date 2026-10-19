@@ -32,6 +32,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "classes/hybrid/resources.h"
 
 
 
@@ -429,6 +430,7 @@ void mobile_update( void )
 		}
 	    }
 
+	    hybrid_secondary_mobile_update(ch);
 	    continue;
  	}
 
