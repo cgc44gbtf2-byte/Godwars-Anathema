@@ -69,6 +69,7 @@ tests/test_hybrid_colors
 tests/test_hybrid_creation
 tests/test_object_strings
 tests/test_hybrid_writing
+tests/test_hybrid_enchant
 bootstrap-backups/
 __pycache__/
 *.py[cod]

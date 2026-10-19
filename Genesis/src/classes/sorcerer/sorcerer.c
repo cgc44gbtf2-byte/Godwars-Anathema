@@ -233,7 +233,7 @@ void do_enchant( CHAR_DATA *ch, char *argument )
 
     one_argument(argument, arg);
 
-    if (!IS_SORCERER(ch))
+    if (!hybrid_power_parent(ch, CLASS_SORCERER))
     {
 	stc("Huh?\n\r", ch);
 	return;
@@ -255,6 +255,16 @@ void do_enchant( CHAR_DATA *ch, char *argument )
     {
 	act("$p is not a weapon or armor.", ch, obj, NULL, TO_CHAR);
 	return;
+    }
+
+    /* The creator and current carrier are not proof of ownership. Use the
+     * existing claim/grant owner, with exact case-insensitive player matching.
+     * No automatic claim, metadata rewrite or staff bypass. */
+    if (obj->questowner == NULL || str_cmp(obj->questowner, ch->name))
+    {
+        stc("You can only enchant gear claimed in your own name.\n\r", ch);
+        stc("Claim unowned gear first with: claim <item>.\n\r", ch);
+        return;
     }
 
     if (IS_SET(obj->quest, QUEST_SORCENCHANT) || IS_SET(obj->quest, QUEST_ARTIFACT))

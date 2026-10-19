@@ -95,6 +95,13 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   to title books and write/finish spell pages. Writing costs no extra resources,
   grants no color ranks, and uses normal player saves; casting keeps its
   existing learned-color requirements and hybrid book-chain limits.
+  Original and secondary Sorcerers may `enchant <item>` only when its claimed
+  owner matches their name (not merely its crafter or current carrier). Use
+  `claim <item>` first for unowned gear; someone else's claim cannot be replaced.
+  Native enchantment adds permanent +5 hitroll/+5 damroll, once per weapon/armor,
+  with no new fee. Artifacts stay excluded, and worn gear must be unequipped.
+  The shared `cast 'enchant weapon'` spell also requires the caster's own claim;
+  its native spell costs, bonuses and exclusions are otherwise unchanged.
   A separate object-factory fix prevents crafted items from freeing mutable
   names, descriptions and spell messages still owned by staff-edited templates.
   The info page also shows a read-only numeric checklist: 50,000 max HP/mana,

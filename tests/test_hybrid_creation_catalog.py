@@ -4,6 +4,7 @@ import re
 import unittest
 from test_class_layout import ROOT, SRC, make_values
 from test_hybrid_writing_catalog import without_sorcerer_writing_adapter
+from test_hybrid_enchant_catalog import without_sorcerer_enchant_adapter
 
 
 def without_sorcerer_creation_adapter(text):
@@ -41,7 +42,7 @@ class HybridCreationCatalog(unittest.TestCase):
         table=(SRC/"interp.c").read_text()
         self.assertRegex(table,r'"sorccreate",\s*do_sorccreate,\s*POS_RESTING,\s*LEV_SOR')
         self.assertRegex(table,r'"chant",\s*do_chant,\s*POS_FIGHTING,\s*LEV_SOR')
-        text=(SRC/"classes/sorcerer/sorcerer.c").read_text()
+        text=without_sorcerer_enchant_adapter((SRC/"classes/sorcerer/sorcerer.c").read_text())
         for name in ("colors","vision","enchant"):
             self.assertIn("if (!IS_SORCERER(ch))",
                           text.split("void do_"+name+"(",1)[1].split("\nvoid ",1)[0])

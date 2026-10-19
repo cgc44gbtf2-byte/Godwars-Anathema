@@ -1184,6 +1184,14 @@ void spell_enchant_weapon( long sn, long level, CHAR_DATA *ch, void *vo )
     OBJ_DATA *obj = (OBJ_DATA *) vo;
     AFFECT_DATA *paf;
 
+    /* The shared cast route must not bypass the enchant command's owner rule. */
+    if (obj->questowner == NULL || str_cmp(obj->questowner, ch->name))
+    {
+        stc("You can only enchant gear claimed in your own name.\n\r", ch);
+        stc("Claim unowned gear first with: claim <item>.\n\r", ch);
+        return;
+    }
+
     if (obj->item_type != ITEM_WEAPON || IS_SET(obj->quest, QUEST_ENCHANTED)
      || IS_SET(obj->quest, QUEST_ARTIFACT) || IS_SET(obj->quest, QUEST_RELIC) || obj->chobj != NULL)
     {

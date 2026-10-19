@@ -39,7 +39,7 @@ configured; only the approved book-chain budget is reduced.
 Native color getters and interpreter level gates are unchanged. `chant` already
 accepts all classes at its native tier; no new casting-permission route is needed.
 Dedicated color-training and material-creation routes are described below;
-enchantment, vision and player conversion still need integration.
+vision and player conversion still need integration.
 Native actors without a hybrid record keep the original10-page
 limit. No schema or handoff changes. Full secondary Sorcerer command integration
 remains pending; no PvP balance claim follows from page-prefix replays.
@@ -66,7 +66,7 @@ or cross-player trade guarantee. Actual full/short player-file reloads verify
 saved materials, owner, zero prices, primal and hybrid records; they do not
 prove crash/powercut behavior. Native `chant` was already available at its
 command tier to all classes: this stage does not add casting permission.
-Writing/finishing pages use the scoped adapter below; enchantment, vision
+Writing/finishing pages and enchantment use the scoped adapters below; vision
 ownership and other class crafting still need their own adapters.
 No playable hybrid conversion is enabled.
 
@@ -101,9 +101,47 @@ ordinary player-save timing, not an atomic inventory/trade transaction or a
 crash/powercut guarantee. Full and short player-file reload tests cover completed
 pages, hybrid records and resources; only full loads restore inventory.
 
-This does not enable hybrid conversion, enchantment and vision, teacher/social
+This does not enable hybrid conversion or vision, teacher/social
 roles, other class trainers or live transformation/fusion handlers. No file-based
 world help is replaced: existing custom helps still take priority.
+
+### Sorcerer enchantment: claimed-owner gear only
+
+`enchant <item>` recognizes a validated secondary Sorcerer as well as an
+original Sorcerer. **All Sorcerer enchanters must own the target's claim.**
+`questowner` must match the caster's complete player name, case-insensitively:
+the `questmaker`, present carrier, partial names and name lists are not ownership.
+There is no staff bypass. Null/empty claims and someone else's gear are rejected
+before allocating affects or setting any enchantment flag.
+
+Use the existing `claim <item>` command on unowned eligible gear, then
+`enchant <item>`. Claiming cannot replace another player's claim; use the
+existing owner-authorized transfer system instead. Enchant never claims items
+automatically or rewrites owner/maker fields. This is an explicit new ownership
+restriction on native Sorcerers too, not just a hybrid limitation.
+
+Native enchantment is otherwise unchanged: an unequipped carried weapon or
+armor receives permanent +5 hitroll and +5 damroll once. Existing artifact and
+already-Sorcerer-enchanted exclusions remain. There is no new primal, mana,
+quest-point or gold fee, no color-rank grant and no item price rewrite.
+Original-class access, native command-tier/position gates and NPC rejection
+remain in effect. Unrelated or malformed secondary records gain no access.
+
+The same owner check applies to the shared `cast 'enchant weapon'` spell for
+all casters, so switching command routes cannot bypass it. Its separate native
+bonuses, casting costs, quest marker and artifact/relic exclusions are unchanged.
+This is not a new Sorcerer casting permission: the shared spell retains its
+existing class/skill access. Failed casting attempts keep normal casting-cost
+semantics; the Sorcerer `enchant` command itself remains free.
+
+Existing enchantments are not removed, and this does not add permanent binding
+or change ownership transfers after enchanting. Item/claim changes use ordinary
+player-save timing, not an atomic transfer or powercut guarantee. Full/short
+reload tests preserve owner, record, resources, enchantment marker and the
+permanent bonuses. The native object-affect file format stores duration,
+modifier and location, restoring type=-1 and bitvector=0; this stage preserves
+that format rather than adding a migration. Vision ownership and full live
+hybrid conversion/forms remain pending; no PvP balance claim is made.
 
 The recipe audit also reproduced a native item-factory ownership defect:
 objects directly borrowed mutable OLC template strings. Crafting renamed
@@ -139,7 +177,7 @@ uncertainty keeps the visible saved candidate/payment and blocks another lesson
 until recovery: the UI never refunds or repeats an uncertain transaction.
 
 Listing/focus previews, `selfbrid list` and `selfbrid info` remain read-only.
-Conversion, enchantment, other class trainers and full live forms
+Conversion, other class trainers and full live forms
 remain disabled or pending; this UI is not a conversion eligibility check.
 Material creation is a separate, scoped adapter described above.
 

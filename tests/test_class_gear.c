@@ -211,6 +211,14 @@ static void sorcerer(void)
     OBJ_DATA *obj = create_object(index_for(72001, ITEM_WEAPON), 0);
     obj_to_char(obj, &actor);
     invoke(do_enchant, "gear");
+    assert(!obj->affected && !IS_SET(obj->quest, QUEST_SORCENCHANT));
+    free_string(obj->questowner);
+    obj->questowner = str_dup("Someoneelse");
+    invoke(do_enchant, "gear");
+    assert(!obj->affected && !IS_SET(obj->quest, QUEST_SORCENCHANT));
+    free_string(obj->questowner);
+    obj->questowner = str_dup(actor.name);
+    invoke(do_enchant, "gear");
     int n = 0;
     for (AFFECT_DATA *a = obj->affected; a; a = a->next) {
         assert(a->modifier == 5); ++n;
@@ -218,7 +226,7 @@ static void sorcerer(void)
     assert(n == 2 && IS_SET(obj->quest, QUEST_SORCENCHANT));
     invoke(do_enchant, "gear");
     n = 0; for (AFFECT_DATA *a = obj->affected; a; a = a->next) ++n;
-    assert(n == 2); /* Existing zero-cost, once-only +5/+5 enchant preserved. */
+    assert(n == 2); /* Claimed-owner gear keeps zero-cost, once-only +5/+5. */
 }
 
 static void market(long type)

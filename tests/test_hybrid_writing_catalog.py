@@ -3,9 +3,11 @@ import hashlib
 import re
 import unittest
 from test_class_layout import ROOT, SRC, make_values
+from test_hybrid_enchant_catalog import without_sorcerer_enchant_adapter
 
 
 def without_sorcerer_writing_adapter(text):
+    text=without_sorcerer_enchant_adapter(text)
     start=text.index("void do_write(")
     end=text.index("\n\n/* Shared across mixed page kinds.",start)
     body=text[start:end]
@@ -33,7 +35,7 @@ class HybridWritingCatalog(unittest.TestCase):
         self.assertNotRegex(body,r"ch->(?:class|primal|mana|exp|pcdata->\w+)\s*[-+]?=(?!=)")
 
     def test_native_flags_colors_and_length_guard(self):
-        text=(SRC/"classes/sorcerer/sorcerer.c").read_text()
+        text=without_sorcerer_enchant_adapter((SRC/"classes/sorcerer/sorcerer.c").read_text())
         body=text.split("void do_write(",1)[1].split("\n\n/* Shared across mixed page kinds.",1)[0]
         for part in ("ADV_FAILED","ADV_STARTED","ADV_FINISHED","ADV_DAMAGE","ADV_AFFECT","ADV_ACTION",
                      "ADV_NEXT_PAGE","ADV_REVERSED","MAX_STRING_LENGTH - 4"):
@@ -67,7 +69,7 @@ class HybridWritingCatalog(unittest.TestCase):
         text=(ROOT/"docs/HYBRIDS.md").read_text()
         for part in ("write page line start.damage.spell","write page line end.red",
                      "Authoring does not grant color ranks","ordinary player-save timing",
-                     "enchantment and vision"):
+                     "Vision ownership"):
             self.assertIn(part,text)
 
 if __name__=="__main__":

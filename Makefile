@@ -38,6 +38,7 @@ TESTS += tests/test_hybrid_colors
 TESTS += tests/test_hybrid_creation
 TESTS += tests/test_object_strings
 TESTS += tests/test_hybrid_writing
+TESTS += tests/test_hybrid_enchant
 # Real validators/effective access for older isolated native fixtures too.
 # Never replace hybrid access with permissive stubs just to satisfy linking.
 HYBRID_ACCESS_SOURCES = $(addprefix Genesis/src/classes/hybrid/,registry.c state.c player.c build.c progression.c specialization.c access.c passives.c books.c)
@@ -99,6 +100,7 @@ check-layout:
 	python3 tests/test_hybrid_colors_catalog.py
 	python3 tests/test_hybrid_creation_catalog.py
 	python3 tests/test_hybrid_writing_catalog.py
+	python3 tests/test_hybrid_enchant_catalog.py
 	python3 tests/test_combat_layout.py
 	python3 tests/test_telnet_layout.py
 	python3 tests/test_gmcp_layout.py
@@ -169,6 +171,9 @@ tests/test_object_strings: tests/test_object_strings.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_hybrid_writing: tests/test_hybrid_writing.c $(ENGINE_OBJECTS)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
+tests/test_hybrid_enchant: tests/test_hybrid_enchant.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 # Separate test objects keep sanitizer flags out of the production executable.
