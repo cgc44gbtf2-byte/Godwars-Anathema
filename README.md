@@ -40,6 +40,9 @@ It supports maintenance restarts, staging a compatible binary for your
 in-game `copyover`, verification and explicit binary rollback. Preview with
 `python3 deploy/update.py`; apply only after reviewing the guide.
 
+Optional [Discord crash/recovery and low-disk alerts](deploy/MONITORING.md)
+use a separate host timer and a private webhook; setup does not restart the MUD.
+
 ## Player updates
 
 - **Vampires:** consent-based discipline teaching and five Path of Blood
