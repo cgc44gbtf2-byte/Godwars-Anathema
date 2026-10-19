@@ -12,6 +12,51 @@ static PC_DATA pa, pb;
 static ROOM_INDEX_DATA room;
 static AREA_DATA area;
 
+static void assist_room_chain(void)
+{
+    static CHAR_DATA helper, victim, local, foreign;
+    static PC_DATA ph, pv, pl, pf;
+    static ROOM_INDEX_DATA here, elsewhere;
+    static AREA_DATA zone;
+    int saw_local = 0;
+    clear_char(&helper); clear_char(&victim);
+    clear_char(&local); clear_char(&foreign);
+    memset(&ph, 0, sizeof(ph)); memset(&pv, 0, sizeof(pv));
+    memset(&pl, 0, sizeof(pl)); memset(&pf, 0, sizeof(pf));
+    memset(&here, 0, sizeof(here)); memset(&elsewhere, 0, sizeof(elsewhere));
+    memset(&zone, 0, sizeof(zone));
+    helper.pcdata = &ph; victim.pcdata = &pv;
+    local.pcdata = &pl; foreign.pcdata = &pf;
+    helper.name = "Helper"; victim.name = "Victim";
+    local.name = "Local"; foreign.name = "Foreign";
+    helper.in_room = victim.in_room = local.in_room = &here;
+    foreign.in_room = &elsewhere;
+    here.area = elsewhere.area = &zone;
+    here.light = elsewhere.light = 2;
+    helper.level = victim.level = local.level = foreign.level = LEV_AWA;
+    local.leader = foreign.leader = &victim;
+    here.people = &victim;
+    victim.next_in_room = &local;
+    victim.next = &foreign; /* Deliberately different global/room ordering. */
+    for (int n = 0; n < 256; ++n) {
+        CHAR_DATA *target = combat_assist_target(&helper, &victim);
+        assert(target == &victim || target == &local);
+        if (target == &local) saw_local = 1;
+    }
+    assert(saw_local);
+    local.next_in_room = &foreign; /* Reject a stale foreign-room list member too. */
+    for (int n = 0; n < 32; ++n) {
+        CHAR_DATA *target = combat_assist_target(&helper, &victim);
+        assert(target == &victim || target == &local);
+    }
+    assert(combat_assist_target(NULL, &victim) == NULL);
+    assert(combat_assist_target(&helper, NULL) == NULL);
+    helper.in_room = NULL;
+    assert(combat_assist_target(&helper, &victim) == NULL);
+    helper.in_room = &elsewhere;
+    assert(combat_assist_target(&helper, &victim) == NULL);
+}
+
 static void fixture(void)
 {
     clear_char(&a);
@@ -269,6 +314,7 @@ static void philodox_not_tribe(void)
 
 int main(int argc, char **argv)
 {
+    assist_room_chain();
     gsn_brittle_bones = skill_lookup("brittle bones");
     gsn_friction_curse = skill_lookup("friction curse");
     gsn_alter_weight = skill_lookup("alter weight");

@@ -97,20 +97,7 @@ void violence_update( void )
 		    /* NPC's assist NPC's of same type or 1/16 chance regardless. */
 		    if (rch->pIndexData == ch->pIndexData || number_bits(4) == 0)
 		    {
-			CHAR_DATA *vch;
-			CHAR_DATA *target;
-			long number;
-
-			target = NULL;
-			number = 0;
-			for (vch = ch->in_room->people; vch; vch = vch->next)
-			{
-			    if (can_see(rch, vch) && is_same_group(vch, victim) && number_range(0, number) == 0)
-			    {
-				target = vch;
-				number++;
-			    }
-			}
+			CHAR_DATA *target = combat_assist_target(rch, victim);
 
 			if (target != NULL) multi_hit(rch, target);
 		    }

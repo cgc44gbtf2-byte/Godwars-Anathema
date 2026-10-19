@@ -7,6 +7,7 @@ import unittest
 from test_class_layout import ROOT, SRC, make_values
 
 OWNERS = {
+    "combat_attack.c": ("combat_assist_target",),
     "style.c": ("get_style", "update_style", "do_grip", "improve_style",
                 "improve_weapon"),
     "stance.c": ("do_skill", "improve_stance", "do_stance", "do_autostance",
@@ -31,7 +32,7 @@ class CombatLayoutChecks(unittest.TestCase):
         for path in SRC.rglob("*.c"):
             source = re.sub(r"/\*.*?\*/|//[^\n]*", "", path.read_text(), flags=re.S)
             for fn in re.findall(
-                r"(?m)^(?:void|bool|long)\s+(\w+)\s*\([^;{}]*\)\s*\{", source
+                r"(?m)^(?:(?:void|bool|long)\s+|CHAR_DATA\s*\*\s*)(\w+)\s*\([^;{}]*\)\s*\{", source
             ):
                 owners[fn].append(str(path.relative_to(SRC)))
         for owner, functions in OWNERS.items():
@@ -69,7 +70,8 @@ class CombatLayoutChecks(unittest.TestCase):
     def test_extracted_licensed_code_keeps_notices(self):
         for owner in ("style.c", "combat_state.c", "combat_rules.c",
                       "combat_initiative.c", "combat_defense.c",
-                      "combat_damage.c", "combat_death.c", "combat_rewards.c"):
+                      "combat_damage.c", "combat_death.c", "combat_rewards.c",
+                      "combat_attack.c"):
             source = (SRC / owner).read_text()
             self.assertIn("Original Diku Mud copyright", source)
             self.assertIn("Merc Diku Mud improvments copyright", source)

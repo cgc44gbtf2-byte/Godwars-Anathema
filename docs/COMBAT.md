@@ -12,6 +12,7 @@ in the shared engine.
 | `stance.c` | Stance commands, autostance, stance training, combined skill display and stance raw-damage modifiers |
 | `style.c` | Equipment-driven styles, `grip`, bounded proficiency getter, style and weapon training |
 | `combat_state.c` | Starting/stopping fights and linked fight-list membership |
+| `combat_attack.c` | Room-scoped NPC assist target selection; the rest of the attack loop is still in `fight.c` |
 | `combat_rules.c` | Explicit-command and automatic safety policies |
 | `combat_status.c` | Target liveness, action pauses and immunity/reuse timers |
 | `combat_initiative.c` | Pulse spacing from stats, class powers, stances and status effects |
@@ -91,6 +92,18 @@ Next extract and characterize the attack loop, damage wording and generic
 combat commands from `fight.c`. Keep legacy public entry points compatible. Spell dispatch remains
 in `magic.c` and class abilities remain in their class modules; audit their
 engine boundaries instead of moving unrelated code wholesale.
+
+The next bounded attack-loop step isolates NPC assist target selection.
+Its legacy room scan incorrectly followed `CHAR_DATA.next` (the global
+character chain), not `next_in_room`. A real-engine regression reproduced a
+foreign-room group member being selected and missed local candidates.
+The owned helper now follows the room chain and excludes stale foreign-room
+entries, with null/missing-room guards. Existing visibility/group checks and
+the historical random-selection formula are preserved; this is not a class
+balance or reservoir-sampling change. `tests/test_combat_calculations.c`
+covers deliberately different global/room ordering, eligible local candidates,
+foreign entries and invalid inputs. The rest of the attack loop and generic
+commands are still pending, not claimed complete.
 
 Before each extraction, retain exact function-body comparisons and native
 characterization tests. Keep callback instrumentation used by restored-spell

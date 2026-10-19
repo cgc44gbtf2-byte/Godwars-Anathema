@@ -3199,6 +3199,7 @@ bool    combat_pair_in_room args( ( ROOM_INDEX_DATA *room, CHAR_DATA *ch, CHAR_D
 bool    highlander_counter_parry args( ( CHAR_DATA *ch, CHAR_DATA *victim, OBJ_DATA *weapon, long dt ) );
 bool    highlander_counter_strike args( ( CHAR_DATA *ch, CHAR_DATA *victim, OBJ_DATA *weapon, long dt ) );
 bool    highlander_melee_attack args( ( long dt, const char *message ) );
+CHAR_DATA *combat_assist_target(CHAR_DATA *helper, CHAR_DATA *victim);
 void	violence_update	args( ( void ) );
 void	multi_hit	args( ( CHAR_DATA *ch, CHAR_DATA *victim ) );
 long	get_speed	args( ( CHAR_DATA *ch ) );
