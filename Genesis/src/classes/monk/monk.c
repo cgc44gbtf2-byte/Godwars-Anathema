@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <limits.h>
 #include "merc.h"
 
 
@@ -748,8 +749,8 @@ void do_touch(CHAR_DATA *ch, char *argument)
         stc("You don't have enough mana for Healing Touch.\n\r", ch);
         return;
     }
-    victim->hit += heal;
-    if (victim->hit > victim->max_hit) victim->hit = victim->max_hit;
+    victim->hit = victim->hit > LONG_MAX-heal ? victim->max_hit
+                                            : UMIN(victim->hit+heal,victim->max_hit);
 
     if ((ch == victim))
     {
