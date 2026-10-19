@@ -44,6 +44,14 @@ the damage/death callback, including reflected NPC attacks; the production
 engine normally recycles NPC structs instead. Pointer-address reuse during a
 callback and every class-specific command remain separate audit work.
 
+The generic `punch` and Black Furies' two-part `kill` charge also revalidate
+their original combatants after callbacks. Punch does not apply its stun to
+an extracted or relocated target; a charge does not start its second attack
+after the first removes a fighter. The callback regression deliberately
+heap-frees the synthetic NPC, reproducing invalid reads on the exact previous
+source. Normal punch/charge HP, recovery and next-RNG snapshots are locked to
+that baseline. The wider death/reward and other command audit is not complete.
+
 ## Confirmed repairs in this batch
 
 1. The loader preserves the legacy inactive stance marker `-1`, repairs

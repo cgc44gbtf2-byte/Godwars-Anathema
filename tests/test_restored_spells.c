@@ -9,6 +9,7 @@
 #include "../Genesis/src/merc.h"
 
 extern void init_mm(void);
+extern int number_mm(void);
 extern void weather_update(void);
 extern char *string_space, *top_string;
 static CHAR_DATA chars[3], *mobile;
@@ -252,6 +253,44 @@ static void test_melee_extraction(bool npc_attacker, bool pulse)
     assert(extracted);
 }
 
+static void test_command_extraction(bool charge)
+{
+    reset(); add_mobile(); inject_death = TRUE;
+    chars[0].position = POS_STANDING;
+    if (charge) {
+        chars[0].class = CLASS_WEREWOLF;
+        players[0].tribes[TRIBE_BLACK_FURIES] = 4;
+        do_kill(chars, "mobile");
+    } else {
+        do_punch(chars, "mobile");
+    }
+    assert(mobile == NULL);
+}
+
+static void test_command_normal(bool charge)
+{
+    reset(); current_time = 123456; init_mm();
+    chars[0].fighting = chars[1].fighting = NULL;
+    if (charge) {
+        chars[0].class = CLASS_WEREWOLF;
+        players[0].tribes[TRIBE_BLACK_FURIES] = 4;
+        do_kill(chars, "target");
+        assert(chars[0].wait == PULSE_VIOLENCE);
+    } else {
+        do_punch(chars, "target");
+        assert(chars[0].wait == 12 && chars[1].position == POS_STUNNED);
+        assert(chars[0].fighting == NULL && chars[1].fighting == NULL);
+    }
+    assert(chars[1].hit > 0 && chars[1].hit < chars[1].max_hit);
+    int rng = number_mm();
+    /* Recorded against the exact f77cf492 source before these two repairs. */
+    assert(chars[1].hit == (charge ? 965 : 999));
+    assert(rng == (charge ? 3135177 : 7711061));
+    printf("command=%s hp=%ld wait=%ld position=%ld rng=%d\n",
+        charge ? "charge" : "punch", chars[1].hit, chars[0].wait,
+        chars[1].position, rng);
+}
+
 int main(int argc, char **argv)
 {
     string_space = calloc(1, 1024 * 1024);
@@ -272,10 +311,21 @@ int main(int argc, char **argv)
     if (argc > 1 && !strcmp(argv[1], "--self-death")) {
         test_self_death(); return 0;
     }
+    if (argc > 1 && !strcmp(argv[1], "--punch-extraction")) {
+        test_command_extraction(FALSE); return 0;
+    }
+    if (argc > 1 && !strcmp(argv[1], "--charge-extraction")) {
+        test_command_extraction(TRUE); return 0;
+    }
+    if (argc > 1 && !strcmp(argv[1], "--command-normal")) {
+        test_command_normal(FALSE); test_command_normal(TRUE); return 0;
+    }
     test_weather(); test_energy(); test_extraction();
     test_melee_extraction(FALSE, FALSE); test_melee_extraction(TRUE, FALSE);
     test_melee_extraction(TRUE, TRUE);
     test_self_death();
+    test_command_extraction(FALSE); test_command_extraction(TRUE);
+    test_command_normal(FALSE); test_command_normal(TRUE);
     puts("restored spell engine regressions passed");
     return 0;
 }

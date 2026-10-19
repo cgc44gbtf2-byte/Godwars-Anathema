@@ -63,6 +63,8 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   are safely ignored, and ordinary melee no longer retains temporary attack
   label allocations after each hit. Strikes now stop if a combatant is removed
   or Friction Curse incapacitates the attacker.
+  Punch and Black Furies' charge also stop follow-up effects against removed
+  targets.
 - **Kills and rewards:** Highest-level and highest-XP kill records track the
   single best kill rather than adding later kills to the record. Players
   editing in-game still count toward the online XP bonus.

@@ -330,6 +330,7 @@ void do_kill( CHAR_DATA *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     CHAR_DATA *victim;
+    ROOM_INDEX_DATA *combat_room;
 
     one_argument( argument, arg );
 
@@ -360,6 +361,7 @@ void do_kill( CHAR_DATA *ch, char *argument )
 
     if ( is_safe( ch, victim ) )
 	return;
+    combat_room = ch->in_room;
 
     if ( IS_AFFECTED(ch, AFF_CHARM) && ch->master == victim )
     {
@@ -384,6 +386,10 @@ void do_kill( CHAR_DATA *ch, char *argument )
 	act("$n charge into $N, knocking $M from $S feet.",ch,NULL,victim,TO_NOTVICT);
 	act("$n charge into you, knocking you from your feet.",ch,NULL,victim,TO_VICT);
 	multi_hit(ch, victim);
+        /* A lethal opening charge can extract the target (or move the
+         * attacker). Never hand either stale pointer to the second hit. */
+        if (!combat_pair_in_room(combat_room, ch, victim) || IS_COMBAT_PAUSED(ch))
+            return;
 	multi_hit(ch, victim);
 	return;
     }
@@ -656,6 +662,7 @@ void do_punch( CHAR_DATA *ch, char *argument )
 {
     char arg [MAX_INPUT_LENGTH];
     CHAR_DATA *victim;
+    ROOM_INDEX_DATA *combat_room;
     long dam;
 
     one_argument(argument,arg);
@@ -691,6 +698,7 @@ void do_punch( CHAR_DATA *ch, char *argument )
     if (IS_ITEMAFF(ch, ITEMA_PEACE)) do_majesty(ch,"");
 
     if (is_safe(ch, victim)) return;
+    combat_room = ch->in_room;
 
     act("You draw your fist back and aim a punch at $N.",ch,NULL,victim,TO_CHAR);
     act("$n draws $s fist back and aims a punch at you.",ch,NULL,victim,TO_VICT);
@@ -707,8 +715,10 @@ void do_punch( CHAR_DATA *ch, char *argument )
 	dam = 0;
 
     if (highlander_counter_parry(ch, victim, NULL, TYPE_BLUNT)) return;
+    if (!combat_pair_in_room(combat_room, ch, victim) || IS_COMBAT_PAUSED(ch))
+        return;
     damage(ch, victim, dam, TYPE_BLUNT, "punch");
-    if (victim == NULL || victim->position == POS_DEAD || dam < 1) return;
+    if (!combat_pair_in_room(combat_room, ch, victim) || dam < 1) return;
     if (victim->position == POS_FIGHTING) stop_fighting(victim, TRUE);
     act("You fall to the ground stunned!", victim, NULL, NULL, TO_CHAR);
     act("$n falls to the ground stunned!", victim, NULL, NULL, TO_ROOM);
