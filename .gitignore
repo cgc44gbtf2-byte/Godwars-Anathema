@@ -6,6 +6,7 @@
 /tests/test_telnet
 /tests/test_gmcp
 /tests/test_world_integrity
+/tests/test_combat_attack
 *.o
 *.d
 Genesis/src/merc

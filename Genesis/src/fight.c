@@ -199,7 +199,12 @@ void multi_hit( CHAR_DATA *ch, CHAR_DATA *victim )
     if (wield != NULL && wield->value[0] >= 1)
     {
 	sn = wield->value[0] % 1000;
-	if (sn != 0 && victim->position == POS_FIGHTING) (*skill_table[sn].spell_fun) (sn, wield->level, ch, victim);
+	/* Saved/OLC weapon values are not trusted skill-table indexes.
+	 * Item-only callbacks cannot consume a character target. TAR_DEATH
+	 * remains valid here: those legacy damage spells take CHAR_DATA. */
+	if (sn > 0 && sn < MAX_SKILL && skill_table[sn].spell_fun != NULL
+	    && skill_table[sn].target != TAR_OBJ_INV && victim->position == POS_FIGHTING)
+	    (*skill_table[sn].spell_fun) (sn, wield->level, ch, victim);
     }
     else if (style == STYLE_NATURAL && IS_WEREWOLF(ch) && get_tribe(ch, TRIBE_BLACK_FURIES) >= 3)
 	spell_poison(gsn_poison, 25, ch, victim);
@@ -269,6 +274,7 @@ void one_hit( CHAR_DATA *ch, CHAR_DATA *victim, long dt, char *message )
     OBJ_DATA *wield;
     long dam, max_dam;
     bool weap = TRUE;
+    char *owned_message = NULL;
 
     if (ch == NULL || IS_COMBAT_PAUSED(ch)) return;
 
@@ -290,9 +296,9 @@ void one_hit( CHAR_DATA *ch, CHAR_DATA *victim, long dt, char *message )
 	if (wield == NULL || wield->item_type != ITEM_WEAPON)
 	{
 	    wield = NULL;
-	    message = str_dup("");
+	    message = owned_message = str_dup("");
 	}
-	else message = str_dup(wield->short_descr);
+	else message = owned_message = str_dup(wield->short_descr);
     }
     else if (message[0] == '2')
     {
@@ -300,9 +306,9 @@ void one_hit( CHAR_DATA *ch, CHAR_DATA *victim, long dt, char *message )
 	if (wield == NULL || wield->item_type != ITEM_WEAPON)
 	{
 	    wield = NULL;
-	    message = str_dup("");
+	    message = owned_message = str_dup("");
 	}
-	else message = str_dup(wield->short_descr);
+	else message = owned_message = str_dup(wield->short_descr);
     }
     else
     {
@@ -312,13 +318,13 @@ void one_hit( CHAR_DATA *ch, CHAR_DATA *victim, long dt, char *message )
 
     if (message[0] == '\0')
     {
-	if (IS_NPC(ch)) message = str_dup("fist");
-	else if (IS_VAMPAFF(ch, VAM_CLAWS) && IS_MORE(ch, MORE_HELIOS)) message = str_dup("flaming claws");
-	else if (IS_CRAFT(ch, CRAFT_BONETALONS)) message = str_dup("bone talons");
-	else if (IS_VAMPAFF(ch, VAM_CLAWS)) message = str_dup("claws");
-	else if (IS_MORE(ch, MORE_HELIOS)) message = str_dup("flaming fist");
-	else if (IS_MONK(ch) && get_monk(ch, MONK_ART) >= 6) message = str_dup("adamantium fist");
-	else  message = str_dup("fist");
+	if (IS_NPC(ch)) message = owned_message = str_dup("fist");
+	else if (IS_VAMPAFF(ch, VAM_CLAWS) && IS_MORE(ch, MORE_HELIOS)) message = owned_message = str_dup("flaming claws");
+	else if (IS_CRAFT(ch, CRAFT_BONETALONS)) message = owned_message = str_dup("bone talons");
+	else if (IS_VAMPAFF(ch, VAM_CLAWS)) message = owned_message = str_dup("claws");
+	else if (IS_MORE(ch, MORE_HELIOS)) message = owned_message = str_dup("flaming fist");
+	else if (IS_MONK(ch) && get_monk(ch, MONK_ART) >= 6) message = owned_message = str_dup("adamantium fist");
+	else  message = owned_message = str_dup("fist");
     }
     if (!str_cmp(message, "backstab") || !str_cmp(message, "circle")) weap = TRUE;
 
@@ -327,12 +333,17 @@ void one_hit( CHAR_DATA *ch, CHAR_DATA *victim, long dt, char *message )
      * below still apply. Natural/contact attacks qualify; magic and ranged
      * attacks are excluded by the original-label classifier above. */
     bool riposte = highlander_counter_strike(ch, victim, wield, dt);
-    if (melee && !riposte && highlander_counter_parry(ch, victim, wield, dt)) return;
+    if (melee && !riposte && highlander_counter_parry(ch, victim, wield, dt))
+    {
+	free_string(owned_message);
+	return;
+    }
     if (!riposte && check_avoid(ch, victim, weap))
     {
 	if (IS_NPC(ch) || !IS_SET(ch->act, PLR_BRIEF)) act("$N avoids your blow.", ch, NULL, victim, TO_CHAR);
 	if (IS_NPC(victim) || !IS_SET(victim->act, PLR_BRIEF)) act("You avoid $n's blow.", ch, NULL, victim, TO_VICT);
 	hurt_fighting(ch, victim);
+	free_string(owned_message);
 	return;
     }
 
@@ -403,6 +414,7 @@ void one_hit( CHAR_DATA *ch, CHAR_DATA *victim, long dt, char *message )
 
 
     damage(ch, victim, dam, dt, message);
+    free_string(owned_message);
     tail_chain();
     return;
 }
