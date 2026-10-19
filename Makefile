@@ -24,6 +24,7 @@ TESTS += tests/test_world_integrity
 TESTS += tests/test_combat_attack
 TESTS += tests/test_hybrids
 TESTS += tests/test_hybrid_state
+TESTS += tests/test_hybrid_forms
 
 all:
 	$(MAKE) -C Genesis/src
@@ -86,6 +87,9 @@ tests/test_hybrids: tests/test_hybrids.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_hybrid_state: tests/test_hybrid_state.c $(ENGINE_OBJECTS)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
+tests/test_hybrid_forms: tests/test_hybrid_forms.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 # Separate test objects keep sanitizer flags out of the production executable.

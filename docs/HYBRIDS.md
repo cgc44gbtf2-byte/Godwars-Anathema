@@ -36,6 +36,35 @@ eligibility. Persistence failure must abort the eventual load/transaction;
 the codec alone does not provide atomicity or durability. Player-file and
 copyover schemas remain unchanged in this stage.
 
+## Transformation policy foundation
+
+Agreed policy: one full-body transformation at a time; compatible features
+such as claws and fangs may coexist. `classes/hybrid/forms.c` models one logical
+form rather than counting legacy flags (werebat, for example, sets two).
+Each parent owns its feature requests separately from the full form's grants.
+Ending a form or releasing one parent preserves requests owned by the other.
+
+An incoming form must be rejected until the old form has explicitly ended;
+there is no automatic replacement that skips teardown. Per-activation serials
+reject delayed cleanup from an earlier activation of the same form in the
+same still-live policy object. Serial exhaustion fails closed, without wrap.
+Do not reinitialize/recycle a policy object while callbacks retain references;
+this module does not solve character-address reuse or actor liveness.
+
+Compatible-feature masks are supplied by future reviewed form adapters.
+For example, a noncorporeal profile can suppress claws/fangs while retaining
+the requests so they resume on reverting. Removing a request while suppressed
+still removes it; shared features are combined, not numerically stacked.
+
+**No legacy form handler uses this policy yet.** Logical tokens and compatible
+features are not a form catalog or permission checks. Class ownership, trained
+power requirements, individual form compatibility, stats, equipment, flight,
+nightsight, teardown, and save/copyover reconciliation must be reviewed and
+connected before activation. The current policy only arbitrates claws/fangs;
+it grants no live ability, changes no existing form and is not serialized.
+If multiple abilities of one parent supply the same feature, their adapter
+must aggregate those sources before changing that parent's request.
+
 ## Agreed conversion behavior
 
 - Exactly two distinct parents, using the names in the roster.

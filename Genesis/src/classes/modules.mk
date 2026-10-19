@@ -24,4 +24,5 @@ CLASS_MODULE_SOURCES = \
   classes/elemental/elemental.c \
   classes/hybrid/registry.c \
   classes/hybrid/selfbrid.c \
-  classes/hybrid/state.c
+  classes/hybrid/state.c \
+  classes/hybrid/forms.c
