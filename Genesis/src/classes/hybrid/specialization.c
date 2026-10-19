@@ -175,7 +175,7 @@ int hybrid_secondary_vampire_profile(HYBRID_STATE *state,long parent,
         return state->secondary_progression.vampire_profile == (long)profile;
     /* Initial setup only. Nonempty legacy banks require an explicit migration,
      * not a silent reclassification or destruction of their stored training. */
-    for(size_t i=0;i<20;++i) if(state->secondary_powers[i]) return 0;
+    for(size_t i=0;i<20;++i) if(state->secondary_powers[i] > 0) return 0;
     memcpy(&candidate,state,sizeof(candidate));
     candidate.secondary_progression.vampire_profile=profile;
     if(!hybrid_state_valid(&candidate))return 0;
@@ -227,7 +227,7 @@ int hybrid_parent_rank_read(const CHAR_DATA *ch,const HYBRID_STATE *state,
         if(t->powers) rank=state->secondary_powers[index];
         else if(!hybrid_parent_progression_read(ch,state,parent,t->progression,index,&rank))
             return 0;
-        rank=UMIN(rank,cap);
+        rank=URANGE(0,rank,cap);
     }
     *destination=rank;
     return 1;
@@ -257,7 +257,8 @@ int hybrid_secondary_ranks_valid(const HYBRID_STATE *state)
             if(t->powers)rank=state->secondary_powers[i];
             else if(!hybrid_progression_record_read(state->secondary_class,
                 &state->secondary_progression,t->progression,i,&rank))return 0;
-            if(rank < 0 || rank > cap)return 0;
+            if(rank < (state->secondary_class == CLASS_VAMPIRE ? -1 : 0) ||
+               rank > cap)return 0;
         }
     }
     return 1;

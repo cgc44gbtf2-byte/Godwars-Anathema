@@ -9,9 +9,11 @@ struct char_data;
 
 /* Staged storage for confirmed shared-field collisions and Vampire resources.
  * The original parent's live legacy fields remain authoritative and are
- * never copied, cleared or modified by this component. This is not a complete
- * secondary class: native initialization, forms and other fields remain pending.
- * No game command attaches these records to a player or enables their powers. */
+ * never copied, cleared or modified by this component. player.c supplies an
+ * optional player-file adapter and an untrained initialization template.
+ * No game command attaches these records to a player or enables their powers.
+ * Clan identities, live forms, remaining fields and ability integration remain
+ * pending; raw structural validity is not complete class readiness. */
 typedef struct hybrid_state {
     long hybrid_id;
     long primary_class;
@@ -65,7 +67,7 @@ int hybrid_secondary_value_write(HYBRID_STATE *state, long parent,
                                  enum hybrid_value_kind kind, size_t index,
                                  long value);
 
-/* Standalone, single-record v3 writer, v1/v2/v3 reader. Not in player files.
+/* Single-record v3 writer, v1/v2/v3 reader, also used by the player adapter.
  * Older records load missing banks as untrained/uninitialized; selections
  * belonging to the secondary use -1 rather than selecting a free branch.
  * Read failure leaves the destination unchanged. The caller must abort its
@@ -74,5 +76,8 @@ int hybrid_secondary_value_write(HYBRID_STATE *state, long parent,
  * existing atomic-save transaction and check flush/fsync/rename outcomes. */
 int hybrid_state_write(FILE *stream, const HYBRID_STATE *state);
 int hybrid_state_read(FILE *stream, HYBRID_STATE *destination);
+/* Player parser has consumed only the literal AnathemaHybrid keyword.
+ * Requires its remaining data on the SAME bounded line. */
+int hybrid_state_read_tail(FILE *stream, HYBRID_STATE *destination);
 
 #endif

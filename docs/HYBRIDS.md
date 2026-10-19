@@ -48,15 +48,15 @@ trailing data before replacing its destination. Malformed, unsupported,
 truncated and overlong records are rejected without partially replacing state.
 Older v1/v2-only readers cannot read a new v3 record.
 
-**This codec is not connected to live player saving/loading yet.** The record
+**The codec is now connected to optional player saving/loading.** The record
 is still not a complete secondary class: forms, remaining buffs/timers,
-absorption/familiar lifecycle, class-owned initialization and live adapters
-remain pending. Vampire learned/unknown rank states also need initialization
-and learning routes. Validation does not certify every combination of
+absorption/familiar lifecycle, complete clan/build initialization and live
+adapters remain pending. Vampire learned/unknown markers are initialized, but
+teaching/learning routes remain pending. Validation does not certify every combination of
 prerequisites, resource defaults or effective abilities. Timers are stored, not
 ticked; no blood renewal or upkeep is enabled. Persistence failure must abort
-the eventual load/transaction; the codec alone does not provide atomicity or
-durability. Player-file and copyover schemas remain unchanged in this stage.
+the load/transaction; the codec alone does not provide atomicity or
+durability. Player files now support an optional record; socket handoff remains v2.
 
 ## Native progression and secondary specialization limits
 
@@ -141,9 +141,52 @@ secondary unfocus/reset/respec route has been introduced.
 
 **Legacy trainers, teaching and combat do not call these APIs yet.** The
 read-only `selfbrid` command still cannot create, train or charge a hybrid.
-All these APIs are standalone policy/storage, not live trainers or permissions.
+These APIs are policy/storage, not live trainers or permissions.
 Branchless secondary parents retain their normal roster with normal learning
 and costs, not free mastery. No primary class has a new specialization penalty.
+
+## Optional player-file integration and initialization
+
+`classes/hybrid/player.c` adds an inline, zero-initialized optional record to
+`PC_DATA`. No command attaches one yet. Ordinary players still save without
+an `AnathemaHybrid` line, and old player files load with no secondary parent.
+The player's `class` field and original trained arrays remain authoritative;
+no bitwise ancestry mask or primary-array copying is introduced.
+
+Full and authentication-only loaders preserve the bounded v3 record (including
+old v1/v2 migrations). Ownership is checked at explicit `End`, allowing `Class`
+to occur later in a file. Duplicate, malformed, unsupported, overlong, truncated
+or wrong-primary records fail closed: login/recovery/staff loading rejects the
+shell and atomic saves refuse to overwrite the file. Full loads validate before
+equipment/style repair. Player and backup writes use their existing independent
+atomic transactions, retries and durability reporting. Invalid in-memory hybrid
+state also blocks saving; it is not silently stripped. Recycled PC_DATA is
+zeroed, with no heap ownership or new teardown callbacks.
+
+`hybrid_secondary_initialize` builds a candidate without touching the actor:
+Vampire generation9 with capacity300/current0 and unknown disciplines (`-1`);
+Dragon hatchling age12 with color unselected; Werewolf rank1 with gifts
+unselected; Mage Arete1 with spheres unselected; other banks remain untrained.
+This follows native creation metadata without invoking `autoclass`, changing
+primary stats/clan/equipment, or granting trained ranks or currency. Vampire
+unknown markers are preserved separately from learned-but-untrained rank0;
+effective secondary rank access never exposes negative ranks. Vampire clan
+profile, clan membership, Dragon color and other build choices still require
+explicit future selection, validation and normal learning routes.
+
+This is **not playable conversion**: checked attachment is a backend operation,
+not a staff/player command and not itself a durable conversion transaction.
+No new activation, trainer, passive, cost or mastery checks are enabled.
+The 50,000QP conversion remains preview-only. One active parent/hybrid form
+policy still needs live adapters and safe restart reconciliation.
+
+The supported save epoch is now2; socket handoff stays2. Forward updates read
+epoch1 player files. The reviewed updater blocks downgrade/rollback to epoch1
+because old binaries can silently discard the optional record. Cross-epoch
+startup failures stop for operator repair instead of auto-starting the old
+binary. Adopted unknown binaries are conservatively recorded as epoch2.
+Use an epoch2-compatible corrective release; do not manually replace it with an
+older binary once hybrid records may have been saved.
 
 ## Transformation policy foundation
 
@@ -225,8 +268,8 @@ and training still use the original fields. Transformations, clan affiliations,
 remaining native fields and rank-dependent calculations still need explicit
 class ownership and migration, not global bitwise-OR class checks.
 
-The next stages must complete native initialization and remaining state;
-connect backward-compatible player save/load and crash recovery; parent-aware training,
+The next stages must complete clan/build initialization and remaining state;
+connect live form recovery, parent-aware training,
 ability, equipment, ranking and teardown rules; and tested interactions for
 every pair. The mastery/stat prerequisites above must be implemented and tested.
 

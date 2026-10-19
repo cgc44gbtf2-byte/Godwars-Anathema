@@ -23,6 +23,7 @@
  ***************************************************************************/
 
 #include "classes/mage/mage.h"
+#include "classes/hybrid/state.h"
 #include "memwatch.h"
 
 /*
@@ -1575,6 +1576,11 @@ struct	char_data
  */
 struct	pc_data
 {
+    /* Optional durable secondary-class state; never an alternate class mask.
+     * Inline storage is zeroed with recycled PC_DATA, with no owned pointers. */
+    int                 hybrid_present;
+    int                 player_load_failed;
+    HYBRID_STATE        hybrid;
     /* Transient named lesson consent; never serialized or kept as pointers. */
     char                teach_from[32];
     long                teach_disc;

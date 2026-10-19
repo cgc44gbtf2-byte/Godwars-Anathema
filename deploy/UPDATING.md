@@ -100,7 +100,7 @@ special files and file-to-symlink/FIFO swaps. Snapshot directories/files
 are restricted to root (0700/0600); original ownership and timestamps are
 not a filesystem-image restoration contract.
 
-To restore a previously backed-up binary:
+To restore a previously backed-up binary from the same supported save epoch:
 
 ```sh
 python3 deploy/update.py --rollback BACKUP_ID --apply
@@ -137,7 +137,15 @@ staging path promises to leave the current process untouched.
   This is privilege separation, not a complete sandbox for hostile code.
 - Archives are size-limited and source entries are selected explicitly;
   traversal, links and unexpected source artifacts are rejected.
-- The supported declaration is `save_epoch: 1`, `handoff: 2`. Future
+- The supported declaration is `save_epoch: 2`, `handoff: 2`. This release
+  reads existing epoch1 player files and adds optional hybrid records.
+  Installed epoch1 metadata can advance to2, but binary-only downgrade to1
+  is refused because old loaders may discard those records. Same-epoch
+  rollback remains available. If an epoch1→2 restart fails after replacement,
+  the helper stops rather than automatically launching an old binary against
+  possibly updated data; repair with an epoch2-compatible release. An
+  operator-adopted unknown binary is conservatively recorded as epoch2.
+  Future
   save-format, copyover-format, dependency or service changes need a reviewed
   migration, not blindly changing these numbers. The declaration cannot
   prove all future source changes are compatible.

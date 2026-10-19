@@ -17,6 +17,7 @@
 #include <crypt.h>
 #include "merc.h"
 #include "atomic_save.h"
+#include "classes/hybrid/player.h"
 #include "restart.h"
 #include "telnet_input.h"
 #include "gmcp.h"
@@ -288,6 +289,16 @@ int main(int argc,char **argv)
     if(argc==3 && !strcmp(argv[1],"--seed")) {
         assert(chdir(argv[2])==0); globals();
         CHAR_DATA *ch=player("Restarter",FALSE);
+        ch->class = CLASS_NINJA;
+        const HYBRID_DEFINITION *hybrid = NULL;
+        for (size_t i = 0; i < hybrid_count(); ++i)
+            if (hybrid_has_parent(hybrid_at(i), CLASS_NINJA) &&
+                hybrid_has_parent(hybrid_at(i), CLASS_WEREWOLF)) {
+                hybrid = hybrid_at(i); break;
+            }
+        HYBRID_STATE secondary;
+        assert(hybrid && hybrid_secondary_initialize(ch, hybrid, &secondary) &&
+               hybrid_player_attach(ch, &secondary));
         char *hash=crypt("test-only-passphrase","$6$fixture$");
         assert(hash && hash[0]!='*');
         free_string(ch->pcdata->pwd); ch->pcdata->pwd=str_dup(hash);

@@ -41,6 +41,12 @@ with tempfile.TemporaryDirectory(prefix="anathema-copyover-") as directory:
     stage_world(repo, runtime)
     subprocess.run([str(repo / "tests/test_restart"), "--seed",
                     str(runtime / "area")], check=True)
+    original_player = (runtime / "player/Restarter").read_bytes()
+    hybrid_line = next(line for line in original_player.splitlines()
+                       if line.startswith(b"AnathemaHybrid "))
+    assert hybrid_line.startswith(b"AnathemaHybrid 3 ")
+    rejected_player = b"#PLAYER\nName Rejected~\nAnathemaHybrid 99 1\nEnd\n#END\n"
+    (runtime / "player/Rejected").write_bytes(rejected_player)
     with socket.socket() as reservation:
         reservation.bind(("127.0.0.1", 0))
         port = reservation.getsockname()[1]
@@ -122,6 +128,11 @@ with tempfile.TemporaryDirectory(prefix="anathema-copyover-") as directory:
                 pass
             newcomer = socket.create_connection(("127.0.0.1", port), timeout=3)
             until(newcomer, None)
+            newcomer.sendall(b"Rejected\n")
+            until(newcomer, b"Player data could not be loaded safely")
+            assert (runtime / "player/Rejected").read_bytes() == rejected_player
+            updated_player = (runtime / "player/Restarter").read_bytes()
+            assert hybrid_line in updated_player.splitlines(), "Copyover lost hybrid storage"
             staff.sendall(b"shutdown\n")
             assert process.wait(timeout=15) == 0, "Checked shutdown did not exit cleanly"
         except Exception:

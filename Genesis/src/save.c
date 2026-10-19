@@ -34,6 +34,7 @@
 #include <malloc.h>
 #include "merc.h"
 #include "atomic_save.h"
+#include "classes/hybrid/player.h"
 
 #if !defined(macintosh)
 extern	long	_filbuf		args( (FILE *) );
@@ -94,6 +95,7 @@ void	fread_tiny_obj	args( ( CHAR_DATA *ch,  FILE *fp ) );
 static int write_player_save(FILE *fp, void *context)
 {
     CHAR_DATA *ch = context;
+    if (!hybrid_player_save_valid(ch)) return -1;
     fwrite_char(ch, fp);
     if (ch->carrying != NULL)
         fwrite_obj(ch, ch->carrying, fp, 0);
@@ -401,6 +403,8 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
 	    );
     }
 
+    if (ch->pcdata->hybrid_present)
+        hybrid_state_write(fp, &ch->pcdata->hybrid);
     fprintf( fp, "End\n\n" );
     return;
 }
@@ -837,7 +841,17 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
 	    char letter;
 	    char *word;
 
-	    letter = fread_letter( fp );
+    /* Avoid legacy fread_letter's process exit on whitespace followed by EOF.
+     * A truncated hybrid file remains found and is never new-name signup. */
+    int next;
+    do { next = getc(fp); } while (next != EOF && isspace((unsigned char)next));
+    if (next == EOF) {
+        if (ch->pcdata->hybrid_present || ferror(fp))
+            ch->pcdata->player_load_failed = 1;
+        break;
+    }
+    ungetc(next, fp);
+    letter = fread_letter( fp );
 	    if ( letter == '*' )
 	    {
 		fread_to_eol( fp );
@@ -851,7 +865,10 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
 	    }
 
 	    word = fread_word( fp );
-	    if      ( !str_cmp( word, "PLAYER" ) ) fread_char( ch, fp );
+    if      ( !str_cmp( word, "PLAYER" ) ) {
+        fread_char(ch, fp);
+        if (ch->pcdata->player_load_failed) break;
+    }
 	    else if ( !str_cmp( word, "OBJECT" ) ) fread_obj( ch, fp );
 	    else if ( !str_cmp( word, "O"      ) ) fread_tiny_obj( ch, fp );
 	    else if ( !str_cmp( word, "END"    ) ) break;
@@ -866,7 +883,7 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
     }
 
     fpReserve = fopen( NULL_FILE, "r" );
-    if (found) {
+    if (found && !ch->pcdata->player_load_failed) {
         clan_sync_player(ch);
         refresh_equipment_state(ch);
         /* Objects are restored after #PLAYER.  Only now can the selected
@@ -1138,7 +1155,15 @@ bool load_char_short( DESCRIPTOR_DATA *d, char *name )
 	    char letter;
 	    char *word;
 
-	    letter = fread_letter( fp );
+    int next;
+    do { next = getc(fp); } while (next != EOF && isspace((unsigned char)next));
+    if (next == EOF) {
+        if (ch->pcdata->hybrid_present || ferror(fp))
+            ch->pcdata->player_load_failed = 1;
+        break;
+    }
+    ungetc(next, fp);
+    letter = fread_letter( fp );
 	    if ( letter == '*' )
 	    {
 		fread_to_eol( fp );
@@ -1152,7 +1177,10 @@ bool load_char_short( DESCRIPTOR_DATA *d, char *name )
 	    }
 
 	    word = fread_word( fp );
-	    if      ( !str_cmp( word, "PLAYER" ) ) fread_char ( ch, fp );
+    if      ( !str_cmp( word, "PLAYER" ) ) {
+        fread_char(ch, fp);
+        if (ch->pcdata->player_load_failed) break;
+    }
 	    else if ( !str_cmp( word, "OBJECT" ) ) break;
 	    else if ( !str_cmp( word, "O"      ) ) break;
 	    else if ( !str_cmp( word, "END"    ) ) break;
@@ -1214,6 +1242,10 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
     char *word;
     bool fMatch;
 
+    if (ch->pcdata->hybrid_present || ch->pcdata->player_load_failed) {
+        ch->pcdata->player_load_failed = 1;
+        return;
+    }
     for ( ; ; )
     {
 	word   = feof( fp ) ? "End" : fread_word( fp );
@@ -1227,6 +1259,11 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
 	    break;
 
 	case 'A':
+    if (!str_cmp(word, "AnathemaHybrid")) {
+        if (!hybrid_player_read_tail(ch, fp)) return;
+        fMatch = TRUE;
+        break;
+    }
 	    if ( !str_cmp( word, "Absorb" ) )
 	    {
 		ch->pcdata->absorb[0] = fread_number( fp );
@@ -1430,6 +1467,12 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
 	    KEY( "Email",	ch->pcdata->email,	fread_string( fp ) );
 	    if ( !str_cmp( word, "End" ) )
             {
+                /* EOF must not synthesize success for a partial hybrid file. */
+                if ((feof(fp) && ch->pcdata->hybrid_present) ||
+                    !hybrid_player_load_finish(ch)) {
+                    ch->pcdata->player_load_failed = 1;
+                    return;
+                }
                 /* Older saves may contain this runtime-only marker. */
                 REMOVE_BIT(ch->extra,EXTRA_SWITCH);
                 normalize_combat_training(ch);

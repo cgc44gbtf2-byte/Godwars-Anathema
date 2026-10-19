@@ -1,4 +1,4 @@
-/* Original Anathema isolated-bank foundation; no live save-schema change. */
+/* Original Anathema isolated-bank foundation and bounded player-file codec. */
 #include <sys/types.h>
 #include <ctype.h>
 #include <errno.h>
@@ -57,7 +57,8 @@ int hybrid_state_valid(const HYBRID_STATE *state)
         !hybrid_has_parent(definition, state->primary_class) ||
         !hybrid_has_parent(definition, state->secondary_class)) return 0;
     for (size_t i = 0; i < 20; ++i)
-        if (state->secondary_powers[i] < 0 ||
+        if (state->secondary_powers[i] <
+                (state->secondary_class == CLASS_VAMPIRE ? -1 : 0) ||
             (!owns_powers(state->secondary_class) &&
              state->secondary_powers[i] != 0)) return 0;
     for (size_t i = 0; i < 2; ++i)
@@ -266,19 +267,23 @@ static int next_number(const char **cursor, long *value)
     return 1;
 }
 
-int hybrid_state_read(FILE *stream, HYBRID_STATE *destination)
+static int read_record(FILE *stream, HYBRID_STATE *destination, int tail)
 {
     char line[4096];
     const char header[] = "AnathemaHybrid";
     const char *cursor;
     long version;
     HYBRID_STATE candidate = {0};
-    if (!stream || !destination || !fgets(line, sizeof(line), stream) ||
+    if (!stream || !destination) return 0;
+    size_t prefix = tail ? sizeof(header) - 1 : 0;
+    if (tail) memcpy(line, header, prefix);
+    if (!fgets(line + prefix, sizeof(line) - prefix, stream) ||
         ferror(stream)) return 0;
     size_t length = strlen(line);
     if (!length || line[length - 1] != '\n' ||
         strncmp(line, header, sizeof(header) - 1) ||
-        !isspace((unsigned char)line[sizeof(header) - 1])) return 0;
+        (line[sizeof(header) - 1] != ' ' &&
+         line[sizeof(header) - 1] != '\t')) return 0;
     cursor = line + sizeof(header) - 1;
     if (!next_number(&cursor, &version) || (version < 1 || version > 3) ||
         !next_number(&cursor, &candidate.hybrid_id) ||
@@ -312,4 +317,14 @@ int hybrid_state_read(FILE *stream, HYBRID_STATE *destination)
     if (*cursor || !hybrid_state_valid(&candidate)) return 0;
     *destination = candidate;
     return 1;
+}
+
+int hybrid_state_read(FILE *stream, HYBRID_STATE *destination)
+{
+    return read_record(stream, destination, 0);
+}
+
+int hybrid_state_read_tail(FILE *stream, HYBRID_STATE *destination)
+{
+    return read_record(stream, destination, 1);
 }

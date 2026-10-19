@@ -25,6 +25,7 @@ CLASS_MODULE_SOURCES = \
   classes/hybrid/registry.c \
   classes/hybrid/selfbrid.c \
   classes/hybrid/state.c \
+  classes/hybrid/player.c \
   classes/hybrid/progression.c \
   classes/hybrid/specialization.c \
   classes/hybrid/forms.c

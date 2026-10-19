@@ -280,7 +280,9 @@ bool copyover_recover(void)
         d->telnet_verb=(unsigned char)row->telnet_verb;
         d->next=descriptor_list; descriptor_list=d;
         if (!load_char_obj(d,row->name) || IS_NPC(d->character) ||
-            d->character->pcdata==NULL || d->character->level<LEV_AWA ||
+            d->character->pcdata==NULL ||
+            d->character->pcdata->player_load_failed ||
+            d->character->level<LEV_AWA ||
             str_cmp(d->character->name,row->name)) {
             close_socket(d); continue;
         }

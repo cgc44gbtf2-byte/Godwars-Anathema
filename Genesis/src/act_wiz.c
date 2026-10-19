@@ -1673,6 +1673,15 @@ void do_pload( CHAR_DATA *ch, char *argument )
     d->character = NULL;
     fOld = load_char_obj( d, argument );
     ch   = d->character;
+    if (ch->pcdata->player_load_failed)
+    {
+        write_to_buffer(d, "Player data could not be loaded safely; contact staff.\n\r", 0);
+        /* This newly loaded shell has not been linked into char_list. */
+        free_char(ch);
+        d->character = NULL;
+        close_socket(d);
+        return;
+    }
     ch->next = char_list;
     char_list = ch;
     char_to_room(ch,in_room);

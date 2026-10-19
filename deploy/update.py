@@ -151,7 +151,7 @@ def archive_source(data, destination):
             "Genesis/src/classes/modules.mk" in entries and
             "deploy/update_compat.json" in entries, "Release is missing required source")
     compat = json.loads(entries.pop("deploy/update_compat.json"))
-    require(compat == {"schema": 1, "save_epoch": 1, "handoff": 2},
+    require(compat == {"schema": 1, "save_epoch": 2, "handoff": 2},
             "Unsupported save/handoff compatibility; use a reviewed migration")
     for name, value in entries.items():
         path = destination.joinpath(*PurePosixPath(name).parts[2:])
@@ -215,13 +215,13 @@ def read_binary(path, owner):
 
 def binary_record(value, commit=None, adopted=False):
     return {"schema": 1, "commit": commit, "binary_sha256": hashlib.sha256(value).hexdigest(),
-            "save_epoch": 1, "handoff": 2, "status": "active",
+            "save_epoch": 2, "handoff": 2, "status": "active",
             "provenance": "operator-adopted" if adopted else "CI-checked"}
 
 
 def validate_record(record):
     require(isinstance(record, dict) and record.get("schema") == 1 and
-            record.get("save_epoch") == 1 and record.get("handoff") == 2 and
+            record.get("save_epoch") in (1, 2) and record.get("handoff") == 2 and
             record.get("status") in ("active", "staged") and
             isinstance(record.get("binary_sha256"), str) and
             HEX256.fullmatch(record["binary_sha256"]) and
@@ -487,6 +487,10 @@ def backup_binary(identifier):
 def deploy(value, next_record, mode, adopt=False, recovering=False):
     old = read_binary(BINARY, 0)
     previous = load_record(old, adopt, recovering)
+    validate_record(next_record)
+    require(next_record["save_epoch"] >= previous["save_epoch"],
+            "Unsafe save-epoch downgrade: older binaries may discard hybrid data. "
+            "Use a reviewed data migration, not binary-only rollback.")
     info = service_info()
     online = info.get("ActiveState") == "active"
     if not recovering:
@@ -512,6 +516,16 @@ def deploy(value, next_record, mode, adopt=False, recovering=False):
         return backup
     except Exception as error:
         if replaced:
+            if next_record["save_epoch"] > previous["save_epoch"]:
+                # The new process may have written optional hybrid records even
+                # if its greeting failed. Never let an old executable discard
+                # them. Leave the new executable and require operator repair.
+                stop()
+                raise UpdateError("Update failed across a save-epoch upgrade; "
+                                  "service stopped, no old binary started. "
+                                  "Backup ID: " + str(backup) +
+                                  ". Repair with an epoch-compatible release; "
+                                  "data were not restored.") from error
             try:
                 stop()
                 atomic_bytes(BINARY, old, 0o755)

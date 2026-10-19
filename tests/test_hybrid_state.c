@@ -195,7 +195,7 @@ static void invalid_states(void)
     state = base; state.secondary_classpoints[0] = 1; bad_state(state);
     fresh(CLASS_ELEM);
     assert(hybrid_state_prepare(&actor, hybrid_by_id(23), &state));
-    state.secondary_powers[0] = -1; bad_state(state);
+    state.secondary_powers[0] = -2; bad_state(state);
     fresh(CLASS_DROW);
     assert(hybrid_state_prepare(&actor, hybrid_by_id(1), &state));
     state.secondary_classpoints[1] = -1; bad_state(state);
@@ -429,9 +429,9 @@ static void codec_errors(void)
     /* Same pair, wrong bank owner: Werewolf cannot own Vampire power slots. */
     snprintf(changed, sizeof(changed), "AnathemaHybrid 3 45 1 2%s", banks);
     rejects(changed, strlen(changed));
-    /* Replace the first zero rank with -1 while retaining the full field set. */
+    /* -1 is native Vampire "unknown"; values below that are malformed. */
     assert(banks[0] == ' ' && banks[1] == '0');
-    snprintf(changed, sizeof(changed), "AnathemaHybrid 3 45 2 1 -1%s", banks + 2);
+    snprintf(changed, sizeof(changed), "AnathemaHybrid 3 45 2 1 -2%s", banks + 2);
     rejects(changed, strlen(changed));
     strcpy(changed, good);
     changed[strlen("AnathemaHybrid ")] = '4';
@@ -517,7 +517,7 @@ static void legacy_records(void)
         }
     }
     const char *bad[] = {
-        "AnathemaHybrid 1 45 2 1 -1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n",
+        "AnathemaHybrid 1 45 2 1 -2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n",
         "AnathemaHybrid 1 45 2 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n",
         "AnathemaHybrid 2 45 2 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n"
     };
