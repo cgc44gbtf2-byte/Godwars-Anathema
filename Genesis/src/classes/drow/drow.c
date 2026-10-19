@@ -10,6 +10,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "classes/hybrid/access.h"
 
 void do_dinduct( CHAR_DATA *ch, char *argument )
 {
@@ -36,12 +37,12 @@ void do_attune( CHAR_DATA *ch, char *argument )
 
     one_argument(argument, arg);
 
-    if (!IS_DROW(ch))
+    if (!hybrid_power_parent(ch,CLASS_DROW))
     {
 	stc("Huh?\n\r",ch);
 	return;
     }
-    if (!get_drow(ch, DROW_ATTUNE))
+    if (!hybrid_power_drow(ch,DROW_ATTUNE))
     {
 	stc("You need to obtain attune first.\n\r",ch);
 	return;
@@ -126,13 +127,13 @@ void do_faeriefire( CHAR_DATA *ch, char *argument )
 
     one_argument(argument, arg);
 
-    if (!IS_DROW(ch))
+    if (!hybrid_power_parent(ch,CLASS_DROW))
     {
 	stc("Huh?\n\r", ch);
 	return;
     }
 
-    if (!get_drow(ch, DROW_FIRE))
+    if (!hybrid_power_drow(ch,DROW_FIRE))
     {
 	stc("You need to obtain faerie fire first.\n\r",ch);
 	return;

@@ -322,6 +322,146 @@ static void highlander_powers(void)
         assert(!actors[0].highland_guard&&actors[0].mana==10000&&!actors[0].wait);
     }
 }
+static void drow_utility_fixture(long parent,int secondary)
+{
+    for(int i=0;i<2;++i)
+        while(actors[i].affected)affect_remove(&actors[i],actors[i].affected);
+    current_time=123;fixture(parent,0);
+    if(secondary)attach(CLASS_DROW);
+}
+
+static void drow_learn(long flags)
+{
+    if(actors[0].class==CLASS_DROW)pcs[0].drow[DROW_POWERS]=flags;
+    else pcs[0].hybrid.secondary_progression.drow[DROW_POWERS]=flags;
+}
+
+static int affect_count(void)
+{
+    int count=0;
+    for(AFFECT_DATA *af=actors[1].affected;af;af=af->next)++count;
+    return count;
+}
+
+static void drow_utilities(void)
+{
+    /* Native baseline plus all nine secondary orientations. Affects use the
+     * existing target spell record, never a borrowed caster activation flag. */
+    int faerie=(int)skill_lookup("faerie fire");assert(faerie>0);
+    unsigned cases=0;
+    int native_rng=0;
+    for(size_t order=0;order<11;++order) {
+        long parent=order==0?CLASS_DROW:parents[order-1];
+        if(order&&parent==CLASS_DROW)continue;
+        drow_utility_fixture(parent,order!=0);drow_learn(DROW_FIRE);
+        CHAR_DATA *ch=actors,*victim=&actors[1];
+        HYBRID_STATE bank=pcs[0].hybrid;
+        long original_powers=pcs[0].drow[DROW_POWERS];
+        long hr=victim->hitroll,dr=victim->damroll,ac=victim->armor;
+        current_time=123;init_mm();
+        interpret(ch,"faeriefire beta");
+        int next_rng=number_range(1,100000);
+        if(!order)native_rng=next_rng;else assert(next_rng==native_rng);
+        assert(ch->class==parent&&ch->wait==12);
+        assert(IS_AFFECTED(victim,AFF_FAERIE_FIRE)&&affect_count()==3);
+        assert(victim->hitroll==hr-50&&victim->damroll==dr-50&&victim->armor==ac-50);
+        for(AFFECT_DATA *af=victim->affected;af;af=af->next)
+            assert(af->type==faerie&&af->duration==10&&af->modifier==-50);
+        assert(pcs[0].drow[DROW_POWERS]==original_powers);
+        assert(!memcmp(&bank,&pcs[0].hybrid,sizeof(bank)));
+        ch->wait=0;
+        interpret(ch,"faeriefire beta");
+        assert(!ch->wait&&affect_count()==3); /* No duplicate/refresh stacking. */
+        affect_strip(victim,faerie);
+        assert(!victim->affected&&!IS_AFFECTED(victim,AFF_FAERIE_FIRE));
+        assert(victim->hitroll==hr&&victim->damroll==dr&&victim->armor==ac);
+        SET_BIT(victim->itemaffect,ITEMA_PEACE);
+        interpret(ch,"faeriefire beta");assert(!victim->affected&&!ch->wait);
+        REMOVE_BIT(victim->itemaffect,ITEMA_PEACE);
+        SET_BIT(room.room_flags,ROOM_SAFE);ch->status=victim->status=0;
+        interpret(ch,"faeriefire beta");assert(!victim->affected&&!ch->wait);
+        REMOVE_BIT(room.room_flags,ROOM_SAFE);ch->status=victim->status=100;
+        SET_BIT(pcs[1].flag,FLAG_AFK);
+        interpret(ch,"faeriefire beta");assert(!victim->affected&&!ch->wait);
+        REMOVE_BIT(pcs[1].flag,FLAG_AFK);
+        victim->desc=NULL;
+        interpret(ch,"faeriefire beta");assert(!victim->affected&&!ch->wait);
+        victim->desc=&descs[1];
+        pcs[1].atm=100;
+        interpret(ch,"faeriefire beta");assert(!victim->affected&&!ch->wait);
+        pcs[1].atm=0;
+        interpret(ch,"faeriefire missing");assert(!victim->affected&&!ch->wait);
+
+        OBJ_DATA item={0};OBJ_INDEX_DATA index={0};
+        item.pIndexData=&index;item.name="token";item.short_descr="a token";
+        item.questowner="alpha";item.item_type=ITEM_ARMOR;item.wear_loc=WEAR_NONE;
+        item.carried_by=ch;ch->carrying=&item;
+        long mana=ch->mana,primal=ch->primal,dp=pcs[0].classpoints[CP_CURRENT];
+        interpret(ch,"attunement token");assert(!item.extra_flags); /* FIRE is not ATTUNE. */
+        drow_learn(DROW_ATTUNE);bank=pcs[0].hybrid;
+        current_time=123;init_mm();int rejected_rng=number_range(1,100000);init_mm();
+        interpret(ch,"faeriefire beta");assert(!victim->affected&&!ch->wait);
+        assert(number_range(1,100000)==rejected_rng); /* ATTUNE is not FIRE. */
+        interpret(ch,"attunement token");assert(IS_SET(item.extra_flags,ITEM_LOYAL));
+        long flags=item.extra_flags;
+        interpret(ch,"attunement token");assert(item.extra_flags==flags);
+        item.extra_flags=0;item.questowner="beta";
+        interpret(ch,"attunement token");assert(!item.extra_flags);
+        item.questowner="alpha";
+        const int denied[]={ITEM_QUEST,ITEM_AMMO,ITEM_EGG,ITEM_VOODOO,
+                            ITEM_MONEY,ITEM_TREASURE,ITEM_PAGE};
+        for(size_t i=0;i<sizeof(denied)/sizeof(denied[0]);++i) {
+            item.item_type=denied[i];
+            interpret(ch,"attunement token");assert(!item.extra_flags);
+        }
+        item.item_type=ITEM_ARMOR;item.quest=QUEST_ARTIFACT;
+        interpret(ch,"attunement token");assert(!item.extra_flags);
+        item.quest=0;interpret(ch,"attunement missing");assert(!item.extra_flags);
+        assert(ch->mana==mana&&ch->primal==primal&&pcs[0].classpoints[CP_CURRENT]==dp);
+        assert(!memcmp(&bank,&pcs[0].hybrid,sizeof(bank)));
+        ch->carrying=NULL;
+        ++cases;
+    }
+    assert(cases==10);
+    for(size_t p=0;p<10;++p) {
+        drow_utility_fixture(parents[p],parents[p]!=CLASS_DROW);
+        interpret(actors,"faeriefire beta");assert(!actors[1].affected&&!actors[0].wait);
+        OBJ_DATA item={0};OBJ_INDEX_DATA index={0};
+        item.pIndexData=&index;item.name="token";item.short_descr="a token";
+        item.questowner="alpha";item.item_type=ITEM_ARMOR;item.wear_loc=WEAR_NONE;
+        item.carried_by=actors;actors[0].carrying=&item;
+        interpret(actors,"attunement token");assert(!item.extra_flags);
+        actors[0].carrying=NULL;
+    }
+    /* No record, wrong secondary parent, corrupt ownership and failed load
+     * never turn unrelated original/stale Drow fields into permissions. */
+    for(int bad=0;bad<8;++bad) {
+        drow_utility_fixture(CLASS_NINJA,0);
+        if(bad==1)attach(CLASS_MONK);
+        else if(bad>1)attach(CLASS_DROW);
+        pcs[0].drow[DROW_POWERS]=DROW_FIRE|DROW_ATTUNE;
+        if(bad>1)pcs[0].hybrid.secondary_progression.drow[DROW_POWERS]=
+            bad==6?0:bad==7?DROW_EYES:DROW_FIRE|DROW_ATTUNE;
+        if(bad==2)pcs[0].hybrid.primary_class=CLASS_MAGE;
+        if(bad==3)pcs[0].player_load_failed=1;
+        if(bad==4)pcs[0].hybrid.hybrid_id=999;
+        if(bad==5) {SET_BIT(actors[0].act,ACT_IS_NPC);actors[0].pcdata=NULL;}
+        if(bad==5)do_faeriefire(actors,"beta");
+        else interpret(actors,"faeriefire beta");
+        assert(!actors[1].affected&&!actors[0].wait);
+        OBJ_DATA item={0};OBJ_INDEX_DATA index={0};
+        item.pIndexData=&index;item.name="token";item.short_descr="a token";
+        item.questowner="alpha";item.item_type=ITEM_ARMOR;item.wear_loc=WEAR_NONE;
+        item.carried_by=actors;actors[0].carrying=&item;
+        if(bad==5)do_attune(actors,"token");
+        else interpret(actors,"attunement token");
+        assert(!item.extra_flags);
+        actors[0].carrying=NULL;
+    }
+    drow_utility_fixture(CLASS_DROW,0);
+    puts("hybrid Drow utilities: native+9 secondary orientations; learned gates,affects,RNG,protection,duplicates,ownership and exclusions passed");
+}
+
 int main(int argc,char **argv)
 {
     string_space=malloc(1024*1024);assert(string_space);
@@ -329,6 +469,7 @@ int main(int argc,char **argv)
     if(argc==2&&!strcmp(argv[1],"--baseline")) {baseline_dump();return 0;}
     unchanged_native();learned_contributions();
     rejection_and_conditions();highlander_powers();
+    drow_utilities();
     puts("hybrid access: 20 native snapshots/180 untrained pairs,90 trained pairs;"
          " owned ranks,passives,conditions,RNG and live Highlander powers passed");
     return 0;

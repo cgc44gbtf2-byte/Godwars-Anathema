@@ -81,6 +81,7 @@ check-layout:
 	python3 tests/test_hybrid_training_catalog.py
 	python3 tests/test_hybrid_access_catalog.py
 	python3 tests/test_hybrid_resources_catalog.py
+	python3 tests/test_hybrid_drow_catalog.py
 	python3 tests/test_combat_layout.py
 	python3 tests/test_telnet_layout.py
 	python3 tests/test_gmcp_layout.py

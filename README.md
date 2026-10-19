@@ -73,6 +73,8 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   choices and paid parent-aware training are implemented internally.
   Learned combat passives and the safe `bflash`, `bash`, and `judge`
   Highlander adapters now use parent-owned training in internal tests.
+  Drow Attunement and Faerie Fire also have learned, parent-owned adapters,
+  retaining their native ownership/protection rules and zero activation cost.
   Checked secondary resource accounting and independent Ninja Ki/rage/cooldown
   updates are also implemented internally; other activation upkeep is pending.
   These adapters are not player-accessible yet: conversion, secondary trainers

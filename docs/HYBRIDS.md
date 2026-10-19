@@ -465,3 +465,39 @@ The existing Vampire suite checks all seven flag combinations at nine blood
 boundaries (63 cases, including zero, negative, LONG_MIN and LONG_MAX).
 That new regression failed on the old debit before the fix. This does not
 enable secondary Vampire upkeep or infer ownership of a primary activation.
+
+## Drow utility adapters — no new conversion or activation flags
+
+Two existing commands now check the appropriate parent's earned Drow flags:
+`attunement <item>` (`DROW_ATTUNE`) and `faeriefire <target>` (`DROW_FIRE`).
+The original Drow uses its unchanged native getter. A secondary Drow must
+have a valid owned record and have learned that exact flag: neither the other
+utility flag nor stale original-class Drow fields substitutes for training.
+Drow remains branchless: this adds no half-cap or specialization requirement.
+The initialization/paid-training/conversion policies are unchanged.
+
+Both native utilities cost zero to activate. These adapters do not invent a
+DP, mana or primal charge, grant a learned flag, change a class, borrow a form
+flag or alter either parent's training/resource banks. Learning still has its
+normal backend costs; no player-facing secondary trainer is enabled.
+
+Attunement keeps the existing exact item-owner check and all excluded item
+types/artifact restrictions. Already-loyal items do not change again. This
+does not allow equipping another class's gear or change item provenance.
+Faerie Fire uses the same three timed target affects (-50 damroll/hitroll/AC,
+duration 10), native resistance roll, safety checks and 12-pulse caster lag.
+Existing Faerie Fire blocks duplicates rather than stacking or refreshing,
+regardless of which class originally applied it. This is a target spell
+effect with an existing expiry/save lifecycle, not a new caster form.
+
+Real interpreter tests cover native Drow and all nine secondary orientations:
+individual earned flags, normal RNG parity, unchanged original training and
+owned banks, effect removal, duplicate prevention, protected/AFK/link-dead
+targets, resistance, missing targets, item ownership and excluded types.
+Untrained actors and eight invalid/unauthorized cases fail closed, including
+wrong parent, absent/corrupt record, failed load, NPC, stale original flags and
+an unrelated learned flag. The native-file hash is unchanged after removing
+only the include and four permission checks introduced for these two handlers.
+Other Drow attacks, forms, gear creation, summon/teleport, upkeep and social
+commands remain native-only; no `IS_*` macro or interpreter table was widened.
+Record v4, save epoch 3 and handoff v2 are unchanged. Conversion stays disabled.
