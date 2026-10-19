@@ -23,4 +23,5 @@ CLASS_MODULE_SOURCES = \
   classes/monk/monk.c \
   classes/elemental/elemental.c \
   classes/hybrid/registry.c \
-  classes/hybrid/selfbrid.c
+  classes/hybrid/selfbrid.c \
+  classes/hybrid/state.c

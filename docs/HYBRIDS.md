@@ -13,6 +13,29 @@ This is only a parent check, **not complete conversion eligibility**.
 It cannot create a hybrid, deduct currency, strip gear or grant powers.
 No player-file fields or existing single-class checks changed.
 
+## Parent-bank storage foundation
+
+`classes/hybrid/state.c` provides an isolated secondary-parent bank for the
+two confirmed shared-field collisions: Vampire/Elementalist `powers[20]`
+and Drow/Dragon `classpoints[2]`. The original parent's existing fields remain
+authoritative and are not copied or modified. Preparing a candidate record
+starts these secondary banks at zero, preserves the primary identity, and
+does not charge quest points or grant any class.
+
+Bank access requires the exact secondary-parent identity and an owned bank.
+The version-1 `AnathemaHybrid` codec stores one bounded record; loading checks
+IDs, pair membership, numeric range, field count, bank ownership and trailing
+data before replacing its destination. Malformed, unsupported, truncated and
+overlong records are rejected without partially replacing state.
+
+**This codec is not connected to live player saving/loading yet.** It is not
+a complete secondary class: generation/age, rage, forms and remaining
+class-owned fields still need mapping and valid class-specific initialization.
+Structural bank validation is not power-rank validation or conversion
+eligibility. Persistence failure must abort the eventual load/transaction;
+the codec alone does not provide atomicity or durability. Player-file and
+copyover schemas remain unchanged in this stage.
+
 ## Agreed conversion behavior
 
 - Exactly two distinct parents, using the names in the roster.

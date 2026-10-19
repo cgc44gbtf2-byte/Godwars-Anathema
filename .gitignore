@@ -54,6 +54,7 @@ Genesis/clans/*
 !Genesis/clans/.gitkeep
 memwatch.log
 tests/test_hybrids
+tests/test_hybrid_state
 bootstrap-backups/
 __pycache__/
 *.py[cod]
