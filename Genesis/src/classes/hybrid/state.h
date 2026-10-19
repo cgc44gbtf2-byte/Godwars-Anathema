@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include "hybrid.h"
+#include "progression.h"
 
 struct char_data;
 
@@ -25,6 +26,7 @@ typedef struct hybrid_state {
     long secondary_blood[2];
     long secondary_beast;
     long secondary_truebeast;
+    HYBRID_PROGRESSION secondary_progression;
 } HYBRID_STATE;
 
 enum hybrid_bank_kind {
@@ -63,8 +65,9 @@ int hybrid_secondary_value_write(HYBRID_STATE *state, long parent,
                                  enum hybrid_value_kind kind, size_t index,
                                  long value);
 
-/* Standalone, single-record v2 writer, v1/v2 reader. Not in player files.
- * v1 loads the new fields as uninitialized/empty; owned branch slots use -1.
+/* Standalone, single-record v3 writer, v1/v2/v3 reader. Not in player files.
+ * Older records load missing banks as untrained/uninitialized; selections
+ * belonging to the secondary use -1 rather than selecting a free branch.
  * Read failure leaves the destination unchanged. The caller must abort its
  * load after failure; do not continue scanning a malformed/overlong record.
  * Write failure is not a durable commit: the eventual caller must use the

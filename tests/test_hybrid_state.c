@@ -72,6 +72,12 @@ static void roundtrip(const HYBRID_STATE *state)
                    sizeof(loaded.secondary_blood)));
     assert(loaded.secondary_beast == state->secondary_beast);
     assert(loaded.secondary_truebeast == state->secondary_truebeast);
+    long loaded_values[HYBRID_PROGRESSION_WORDS], expected_values[HYBRID_PROGRESSION_WORDS];
+    assert(hybrid_progression_export(&loaded.secondary_progression, loaded_values,
+                                     HYBRID_PROGRESSION_WORDS));
+    assert(hybrid_progression_export(&state->secondary_progression, expected_values,
+                                     HYBRID_PROGRESSION_WORDS));
+    assert(!memcmp(loaded_values, expected_values, sizeof(loaded_values)));
     char next[16];
     assert(fgets(next, sizeof(next), fp) && !strcmp(next, "NEXT\n"));
     assert(fclose(fp) == 0);
@@ -415,20 +421,20 @@ static void codec_errors(void)
         changed[i] = (char)((unsigned char)changed[i] ^ 0x80);
         rejects(changed, length);
     }
-    const char *banks = good + strlen("AnathemaHybrid 2 45 2 1");
-    snprintf(changed, sizeof(changed), "AnathemaHybrid 2 46 2 1%s", banks);
+    const char *banks = good + strlen("AnathemaHybrid 3 45 2 1");
+    snprintf(changed, sizeof(changed), "AnathemaHybrid 3 46 2 1%s", banks);
     rejects(changed, strlen(changed));
-    snprintf(changed, sizeof(changed), "AnathemaHybrid 2 45 1 1%s", banks);
+    snprintf(changed, sizeof(changed), "AnathemaHybrid 3 45 1 1%s", banks);
     rejects(changed, strlen(changed));
     /* Same pair, wrong bank owner: Werewolf cannot own Vampire power slots. */
-    snprintf(changed, sizeof(changed), "AnathemaHybrid 2 45 1 2%s", banks);
+    snprintf(changed, sizeof(changed), "AnathemaHybrid 3 45 1 2%s", banks);
     rejects(changed, strlen(changed));
     /* Replace the first zero rank with -1 while retaining the full field set. */
     assert(banks[0] == ' ' && banks[1] == '0');
-    snprintf(changed, sizeof(changed), "AnathemaHybrid 2 45 2 1 -1%s", banks + 2);
+    snprintf(changed, sizeof(changed), "AnathemaHybrid 3 45 2 1 -1%s", banks + 2);
     rejects(changed, strlen(changed));
     strcpy(changed, good);
-    changed[strlen("AnathemaHybrid ")] = '3';
+    changed[strlen("AnathemaHybrid ")] = '4';
     rejects(changed, length);
     snprintf(changed, sizeof(changed), "%.*s 99\n", (int)length - 1, good);
     rejects(changed, strlen(changed));
@@ -529,6 +535,6 @@ int main(void)
     codec_errors();
     legacy_records();
     puts("hybrid isolated values: 45 pairs/both orders, primary preservation, "
-         "resource/timer ownership, atomic rejects and v1/v2 codecs passed");
+         "resource/timer ownership, atomic rejects and v1/v2/v3 codecs passed");
     return 0;
 }

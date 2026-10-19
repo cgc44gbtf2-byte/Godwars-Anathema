@@ -40,24 +40,110 @@ This is raw storage access, not effective rank/ability authorization.
 The older secondary-bank pointer API remains available for existing callers;
 it is not a validated assignment API and can invalidate a record if misused.
 
-The standalone `AnathemaHybrid` codec now writes version 2 and reads versions
-1 and 2. Loading v1 preserves its banks and supplies the new empty/uninitialized
-fields, including -1 for owned branch choices. Loading checks IDs, pair
-membership, ranges, field count, ownership, blood consistency and trailing
-data before replacing its destination. Malformed, unsupported, truncated and
-overlong records are rejected without partially replacing state. An older
-v1-only reader cannot read a new v2 record.
+The standalone `AnathemaHybrid` codec now writes version 3 and reads versions
+1, 2 and 3. Older records preserve their existing banks/core and receive empty
+new progression, including -1 for owned unselected choices. Loading checks
+IDs, pair membership, ranges, field count, ownership, blood consistency and
+trailing data before replacing its destination. Malformed, unsupported,
+truncated and overlong records are rejected without partially replacing state.
+Older v1/v2-only readers cannot read a new v3 record.
 
 **This codec is not connected to live player saving/loading yet.** The record
-is still not a complete secondary class: Werewolf gifts/selections/rank, Mage
-spheres/quintessence/paradox, other class-specific banks, forms and remaining
-timers need ownership and adapters. Valid native class initialization and
-Vampire learned/unknown rank states also remain pending. Raw bank validation
-does not certify legal power ranks, meaningful branch combinations, trained
-abilities or conversion eligibility. Timers are stored, not ticked; no blood
-renewal or upkeep is enabled. Persistence failure must abort the eventual
-load/transaction; the codec alone does not provide atomicity or durability.
-Player-file and copyover schemas remain unchanged in this stage.
+is still not a complete secondary class: forms, remaining buffs/timers,
+absorption/familiar lifecycle, class-owned initialization and live adapters
+remain pending. Vampire learned/unknown rank states also need initialization
+and learning routes. Validation does not certify every combination of
+prerequisites, resource defaults or effective abilities. Timers are stored, not
+ticked; no blood renewal or upkeep is enabled. Persistence failure must abort
+the eventual load/transaction; the codec alone does not provide atomicity or
+durability. Player-file and copyover schemas remain unchanged in this stage.
+
+## Native progression and secondary specialization limits
+
+`classes/hybrid/progression.c` gives the remaining native banks explicit
+secondary ownership, without copying the original character:
+
+- Werewolf Breed, Auspice, Tribe, selected gifts and rank.
+- Sorcerer colors, Highlander training, Ninja skills/Ki/Harakiri, Monk training,
+  Drow powers/speed and Dragon color/skill bits.
+- Mage spheres, quintessence, Arete, signed paradox and paradox ward.
+
+Together with the original banks this covers the main progression arrays for
+all ten classes. It is not an inventory of every live activation or timer.
+Native Ninja/Dragon/Drow arrays mix progression with transient values/flags;
+storing them does not reconcile a live form or activate their effects.
+Paradox remains signed because native backlash can leave it negative.
+
+The raw progression reader requires the matching primary actor and an exact
+owned parent. The raw secondary writer validates a candidate record, rejecting
+wrong owners, indexes, known rank-ceiling violations, unknown Drow/Dragon bits
+and nonzero reserved slots without changing the record. Primary reads retain
+the original stored values; there is no primary write API. Neither raw writes
+nor specialization selection train a live character or pay training costs.
+
+`classes/hybrid/specialization.c` applies the agreed rule to **all eight
+secondary classes with ranked power trees**, not just the Werewolf example:
+one chosen specialization at its normal native cap; the others at half
+rounded up. No choice means all branches use their secondary half caps.
+
+| Secondary parent | Full specialization | Other branches |
+| --- | --- | --- |
+| Werewolf | Breed OR Auspice OR Tribe family, up to 5 | Other families 3 |
+| Vampire | One discipline at its clan-sensitive native cap | 7 → 4, 6 → 3, 5 → 3 |
+| Mage | One sphere at native 5 or 4 | Selected spheres 5 → 3, others 4 → 2 |
+| Elementalist | One element: 8 before focus, 10 after focus | 4 normally; focused opposite 3 |
+| Sorcerer | One color at 5 | Other colors 3 |
+| Highlander | One training path at 6 | Other paths 3 |
+| Ninja | One principle at 10 | Other principles 5 |
+| Monk | One path at 8 | Other paths 4 |
+
+Werewolf uses a family ceiling of five: selected gifts normally train to five
+and nonselected gifts to four, so the chosen family does not automatically
+raise every path to five. Other families cap at three, still respecting any
+lower native limit. Drow/Dragon boolean unlocks and fixed choices are not
+multiple ranked trees and are not halved. Stats, pools, timers, Ki, Arete and
+Werewolf rank are not specialization branches and receive no half-cap rule.
+
+`hybrid_secondary_specialize` records an initial branch choice and accepts the
+same choice idempotently; it does not provide respecialization. The old
+Werewolf choice/cap/rank APIs delegate to this general implementation.
+`hybrid_parent_training_cap` calculates the normal original cap or the
+secondary cap. `hybrid_parent_rank_read` preserves native effective getters
+for the original, but clips secondary effective ranks to the allowed cap.
+`hybrid_secondary_rank_write` rejects above-cap assignments atomically.
+`hybrid_secondary_ranks_valid` identifies stored ranked progression requiring
+review; it does not certify complete class initialization or ability eligibility.
+
+**Raw storage is deliberately separate from effective permission.** Legacy
+records may preserve raw ranks above the new secondary cap. Roundtripping
+them must not silently destroy data, but the effective accessor cannot expose
+above-cap secondary power, including after reload or a cap-lowering selection.
+Raw getters, raw writers and direct bank pointers are never authorization.
+Future teaching/training/ability adapters must use the checked rank API,
+validate normal prerequisites and learning, and handle payment/save atomically.
+
+Vampire cap profile begins uninitialized: the backend refuses effective
+secondary discipline access until a legitimate native initializer supplies
+standard-clan or Caitiff/Panders caps. The initializer is restricted to empty
+banks and cannot silently reclassify existing training. This profile is **not
+clan affiliation**, which remains pending. Thaumaturgy's native cap stays five.
+Original-class caps use the original actor's actual clan/selections.
+
+The native Elementalist focus gate requires rank eight in every element,
+which would be impossible under secondary caps. The standalone
+`hybrid_secondary_element_focus` instead requires every element at its allowed
+pre-focus cap (chosen eight, others four). It then applies the normal focus
+analogue: chosen ten, opposite three, others four, in one validated candidate.
+It grants nothing from an untrained/undertrained state and cannot be repeated.
+Affinities inconsistent with the selected specialization have no effective
+secondary rank access. This does not activate native auras/forms, and no
+secondary unfocus/reset/respec route has been introduced.
+
+**Legacy trainers, teaching and combat do not call these APIs yet.** The
+read-only `selfbrid` command still cannot create, train or charge a hybrid.
+All these APIs are standalone policy/storage, not live trainers or permissions.
+Branchless secondary parents retain their normal roster with normal learning
+and costs, not free mastery. No primary class has a new specialization penalty.
 
 ## Transformation policy foundation
 
@@ -108,7 +194,11 @@ must aggregate those sources before changing that parent's request.
   normal prerequisites and training costs, not free mastered ranks.
 - For a secondary Werewolf, select one family (Breed, Auspice or Tribe) for
   normal cap 5; the other two cap at 3, without exceeding lower native caps.
-  These training restrictions and choices are not implemented yet.
+  The standalone specialization backend models this; live trainers, commands
+  and teaching have not been connected.
+- The restriction covers every ranked secondary power tree, including Ninja,
+  Monk, Sorcerer and Highlander. Only the secondary is restricted; the original
+  class retains its full normal progression and access.
 - Conversion price: **50,000 quest points**, selected for Anathema. The preview
   reports the planned price and whether the current balance meets it, but
   performs no deduction. Runtime price configuration is not implemented yet.
@@ -135,8 +225,8 @@ and training still use the original fields. Transformations, clan affiliations,
 remaining native fields and rank-dependent calculations still need explicit
 class ownership and migration, not global bitwise-OR class checks.
 
-The next stages must provide parent-owned progression/resource records;
-backward-compatible save/load and crash recovery; parent-aware training,
+The next stages must complete native initialization and remaining state;
+connect backward-compatible player save/load and crash recovery; parent-aware training,
 ability, equipment, ranking and teardown rules; and tested interactions for
 every pair. The mastery/stat prerequisites above must be implemented and tested.
 
