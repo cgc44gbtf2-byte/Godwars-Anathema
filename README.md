@@ -77,6 +77,10 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   Hybrid names use stable mixed colors from `help class`, without combat RNG.
   Generated help is a binary feature: it does not replace your live help files,
   and existing custom file-backed topics take priority.
+  Configured Sorcerer hybrids now share a fixed book-chain limit across damage,
+  affect and action pages: Mage6, Drow/Elementalist/Vampire4, other pairings3,
+  in either parent order. Standalone Sorcerers keep10. This adds no casting
+  permissions and does not enable conversion.
   The info page also shows a read-only numeric checklist: 50,000 max HP/mana,
   max base stats, all ten stances, four weapon proficiencies and trainable
   styles at their original-class caps. Natural style is exempt for classes

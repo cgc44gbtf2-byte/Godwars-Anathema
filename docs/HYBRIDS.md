@@ -16,14 +16,22 @@ The help module neither edits loaded HELP_DATA nor writes world files, so a
 binary update/copyover delivers these additions without overwriting live OLC
 help. Full legacy help reorganization remains deferred.
 
-**Approved, not yet enforced:** Sorcerer/Mage chains6 pages; Sorcerer with Drow,
+**Enforced for valid hybrid records:** Sorcerer/Mage chains6 pages; Sorcerer with Drow,
 Elementalist or Vampire4; with Dragon, Highlander, Monk, Ninja or Werewolf3.
 These fixed limits apply in both parent orders, including Sorcerer as the
 original class: an explicit exception to full-original-power access.
 Standalone Sorcerers keep10. The higher-melee/lower-book tradeoff motivated
-this policy; no measured balance or fight results are claimed. This stage
-contains only the display policy; casting handlers are unchanged pending their
-separate adapter and tests.
+this policy; no measured balance or fight results are claimed. Damage, affect
+and action pages share one chain budget, checked before their page effects,
+costs, messages or RNG. Limits apply even before secondary build/training is
+configured; malformed player records fail closed. Changing equipment or stance
+does not increase the budget. The legacy counter is saturated instead of
+overshooting the cap and rejects invalid negative/overflowed values.
+
+This guard **does not grant casting permissions**, color ranks or training.
+Native color getters and interpreter level gates are unchanged; full secondary
+Sorcerer color integration is still pending. Native actors without a hybrid
+record keep the original10-page limit. No schema or handoff changes.
 
 ## Available in this stage
 

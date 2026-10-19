@@ -27,7 +27,7 @@ const char *hybrid_parent_color(long parent);
 /* Stable cosmetic mix of both canonical parents. Never consumes game RNG.
  * Canonical names/IDs stay plain for command/save/help lookup. */
 int hybrid_display_name(const HYBRID_DEFINITION *hybrid, char *out, size_t size);
-/* Approved balance policy, display-only until the book adapter is validated.
+/* Approved fixed book-chain budget for valid player records.
  * Zero means this is not a Sorcerer pairing, not a casting permission. */
 long hybrid_book_chain_policy(const HYBRID_DEFINITION *hybrid);
 int hybrid_help_topic(struct char_data *ch, const char *argument);

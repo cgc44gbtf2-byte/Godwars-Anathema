@@ -77,9 +77,10 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
                      "pending. Secondary ranked trees: one full branch, others rounded-up "
                      "half, within native caps. Branchless parents keep normal ability "
                      "rosters, not free learning.\n\r"
-                     "Planned Sorcerer chains: Mage6; Drow/Elementalist/Vampire4; "
+                     "Sorcerer chain limits: Mage6; Drow/Elementalist/Vampire4; "
                      "Dragon/Highlander/Monk/Ninja/Werewolf3. Both parent orders; "
-                     "standalone Sorcerer10. This book override is NOT active yet.\n\r", ch);
+                     "standalone Sorcerer10. Enforced for valid hybrid records; "
+                     "no new casting permissions or playable conversion.\n\r", ch);
         return 1;
     }
     const HYBRID_DEFINITION *h = hybrid_by_name(argument);
@@ -96,7 +97,8 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
     long pages = hybrid_book_chain_policy(h);
     if (pages) {
         snprintf(line, sizeof(line), "Approved book-chain policy: %ld pages in either "
-                 "parent order. Planned override, not active yet.\n\r", pages);
+                 "parent order. Enforced for valid hybrid records; "
+                 "does not grant casting permissions.\n\r", pages);
         send_to_char(line, ch);
     }
     snprintf(line, sizeof(line), "Related help: %s, %s, HYBRID, SELFBRID.\n\r",

@@ -26,6 +26,7 @@ CLASS_MODULE_SOURCES = \
   classes/hybrid/selfbrid.c \
   classes/hybrid/readiness.c \
   classes/hybrid/help.c \
+  classes/hybrid/books.c \
   classes/hybrid/state.c \
   classes/hybrid/player.c \
   classes/hybrid/build.c \

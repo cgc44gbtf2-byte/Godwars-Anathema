@@ -100,13 +100,9 @@ class HybridReadinessCatalog(unittest.TestCase):
                          "d1b17698c68bc2ddeec1f14232c0dbf8a56a2352")
         self.assertIn("Genesis/src/classes/hybrid/help.c", make_values(ROOT, "ENGINE_SOURCES"))
 
-    def test_book_policy_is_metadata_not_active_casting_change(self):
-        data = (SRC / "classes/sorcerer/sorcerer.c").read_bytes()
-        self.assertEqual(hashlib.sha1(b"blob " + str(len(data)).encode() +
-                                     b"\0" + data).hexdigest(),
-                         "6e3d479485fdcaa9e8c19e8f5bc67f90eb391c31")
+    def test_book_policy_does_not_enable_readonly_conversion(self):
         text = (SRC / "classes/hybrid/help.c").read_text()
-        self.assertIn("NOT active yet", text)
+        self.assertIn("no new casting permissions or playable conversion", text)
         tests = (ROOT / "tests/test_hybrids.c").read_text()
         for fragment in ("cap == 6", "cap == 4", "cap == 3", "rows == 90",
                          "CUSTOM HYBRID HELP TAKES PRIORITY", "cosmetics();", "help_topics();"):

@@ -8,6 +8,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "classes/hybrid/books.h"
 
 /*
  * Local Functions.
@@ -528,6 +529,20 @@ void do_write( CHAR_DATA *ch, char *argument )
 }
 
 
+/* Shared across mixed page kinds. This restricts an existing cast; it does
+ * not grant class access, color ranks or ownership of a spellbook. Keep the
+ * legacy counter bounded, including malformed direct-handler calls. */
+static int book_page_begin(CHAR_DATA *ch, OBJ_DATA *book, OBJ_DATA *page,
+                           const char *argument)
+{
+    extern long chainspell;
+    long limit = hybrid_book_chain_limit(ch);
+    if (!ch || !ch->in_room || !book || !page || !argument ||
+        limit < 1 || chainspell < 0 || chainspell >= limit) return 0;
+    ++chainspell;
+    return 1;
+}
+
 void do_chant( CHAR_DATA *ch, char *argument )
 {
     OBJ_DATA *book;
@@ -584,15 +599,12 @@ void do_chant( CHAR_DATA *ch, char *argument )
 
 void adv_spell_damage( CHAR_DATA *ch, OBJ_DATA *book, OBJ_DATA *page, char *argument, int lastcolor)
 {
+    if (!book_page_begin(ch, book, page, argument)) return;
     OBJ_DATA *page_next;
     char arg[MIL];
     char buf[MSL];
     int cost, dam, color = page->toughness;
     bool aggy = FALSE, area = FALSE, heal = FALSE, spec = FALSE;
-    extern long chainspell;
-
-    if (++chainspell > 10) return;
-
     one_argument(argument, arg);
 
     if (color == RANDOM_MAGIC) color = number_range(0, 5);
@@ -799,16 +811,13 @@ void adv_spell_damage( CHAR_DATA *ch, OBJ_DATA *book, OBJ_DATA *page, char *argu
 
 void adv_spell_affect( CHAR_DATA *ch, OBJ_DATA *book, OBJ_DATA *page, char *argument, int lastcolor)
 {
+    if (!book_page_begin(ch, book, page, argument)) return;
     CHAR_DATA *victim = ch;
     OBJ_DATA *page_next;
     char arg[MSL];
     long bonuses, sn, color = page->toughness, duration = page->level, cost = 1500 + 30*duration;
     long affect_bit = page->value[3], apply_bit = page->value[1];
     bool any_affects = FALSE;
-    extern long chainspell;
-
-    if (++chainspell > 10) return;
-
     one_argument(argument, arg);
 
     if ((strlen(page->victpoweron) < 1 || !str_cmp(page->victpoweron, "(null)"))
@@ -986,6 +995,7 @@ void adv_spell_affect( CHAR_DATA *ch, OBJ_DATA *book, OBJ_DATA *page, char *argu
 
 void adv_spell_action( CHAR_DATA *ch, OBJ_DATA *book, OBJ_DATA *page, char *argument, int lastcolor)
 {
+    if (!book_page_begin(ch, book, page, argument)) return;
     ROOM_INDEX_DATA *old_room = ch->in_room;
     CHAR_DATA *victim = NULL;
     OBJ_DATA *obj = NULL;
@@ -993,10 +1003,6 @@ void adv_spell_action( CHAR_DATA *ch, OBJ_DATA *book, OBJ_DATA *page, char *argu
     char arg[MSL];
     char buf[MSL];
     long color = page->toughness, cost = 3000;
-    extern long chainspell;
-
-    if (++chainspell > 10) return;
-
     if (ch->mana < cost)
     {
 	stc("You have insufficient mana to chant this spell.\n\r", ch);
