@@ -13,8 +13,8 @@ int hybrid_secondary_initialize(const CHAR_DATA *ch,
     if (!destination || !hybrid_state_prepare(ch, definition, &candidate)) return 0;
     switch (candidate.secondary_class) {
     case CLASS_VAMPIRE:
-        /* Native autoclass: generation nine, all basic disciplines unknown.
-         * -1 is UNKNOWN, zero is learned but untrained; do not conflate them.
+        /* Native autoclass: generation nine, basic disciplines start at -1.
+         * -1 permits first learning; zero is unavailable until teaching.
          * Clan/profile/selections remain unchosen, so no effective access. */
         candidate.secondary_generation = 9;
         for (size_t i = 0; i < 20; ++i) candidate.secondary_powers[i] = -1;

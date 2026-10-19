@@ -69,10 +69,10 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   `selfbrid info Bloodmoon Revenant` shows its two parents. Conversion is not
   enabled yet: the planned price is 50,000 quest points, but no training,
   currency or character data is changed.
-  Optional hybrid player-save storage and untrained secondary initialization
-  are now implemented internally; actual conversion and secondary powers remain
-  disabled. Updates use save epoch2 and reject older binary-only rollbacks
-  that could discard hybrid data.
+  Optional hybrid saving, untrained secondary initialization, native build
+  choices and paid parent-aware training are implemented internally.
+  These are not player-accessible yet; conversion and secondary powers remain
+  disabled. Updates use save epoch3 and reject older binary-only rollbacks.
   See [hybrid implementation status](docs/HYBRIDS.md).
 - **Kills and rewards:** Highest-level and highest-XP kill records track the
   single best kill rather than adding later kills to the record. Players

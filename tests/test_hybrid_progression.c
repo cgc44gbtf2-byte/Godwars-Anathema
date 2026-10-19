@@ -76,7 +76,7 @@ static void roundtrip(const HYBRID_STATE *state)
     rewind(fp);
     char header[32];
     assert(fgets(header, sizeof(header), fp));
-    assert(!strncmp(header, "AnathemaHybrid 3 ", strlen("AnathemaHybrid 3 ")));
+    assert(!strncmp(header, "AnathemaHybrid 4 ", strlen("AnathemaHybrid 4 ")));
     rewind(fp);
     memset(&loaded, 0xa5, sizeof(loaded));
     assert(hybrid_state_read(fp, &loaded) && hybrid_state_valid(&loaded));
@@ -336,7 +336,7 @@ static void migrations_and_codec(void)
     snprintf(changed,sizeof(changed),"%.*s 0\n",(int)length-1,good);
     reject_record(changed,strlen(changed));
     memcpy(changed,good,length);
-    changed[strlen("AnathemaHybrid ")]='4';
+    changed[strlen("AnathemaHybrid ")]='5';
     reject_record(changed,length);
     strcpy(changed,"AnathemaHybrid 3 ");
     memset(changed+strlen(changed),' ',5000);

@@ -137,14 +137,14 @@ staging path promises to leave the current process untouched.
   This is privilege separation, not a complete sandbox for hostile code.
 - Archives are size-limited and source entries are selected explicitly;
   traversal, links and unexpected source artifacts are rejected.
-- The supported declaration is `save_epoch: 2`, `handoff: 2`. This release
-  reads existing epoch1 player files and adds optional hybrid records.
-  Installed epoch1 metadata can advance to2, but binary-only downgrade to1
+- The supported declaration is `save_epoch: 3`, `handoff: 2`. This release
+  reads older player files and writes optional v4 hybrid records with build IDs.
+  Installed epoch1/2 metadata can advance to3, but binary-only downgrade to1/2
   is refused because old loaders may discard those records. Same-epoch
-  rollback remains available. If an epoch1→2 restart fails after replacement,
+  rollback remains available. If an epoch1/2→3 restart fails after replacement,
   the helper stops rather than automatically launching an old binary against
-  possibly updated data; repair with an epoch2-compatible release. An
-  operator-adopted unknown binary is conservatively recorded as epoch2.
+  possibly updated data; repair with an epoch3-compatible release. An
+  operator-adopted unknown binary is conservatively recorded as epoch3.
   Future
   save-format, copyover-format, dependency or service changes need a reviewed
   migration, not blindly changing these numbers. The declaration cannot

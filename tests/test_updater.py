@@ -30,7 +30,7 @@ def make_archive(extra=(), compat=None, makefile=None):
         ("root/Genesis/src/classes/modules.mk", b"CLASS_MODULE_SOURCES =\n"),
         ("root/Genesis/src/comm.c", b"/* fixture */\n"),
         ("root/deploy/update_compat.json", json.dumps(
-            compat or {"schema": 1, "save_epoch": 2, "handoff": 2}).encode()),
+            compat or {"schema": 1, "save_epoch": 3, "handoff": 2}).encode()),
         ("root/Genesis/player/Oldaccount", b"NOT TO BE EXTRACTED"),
     ]
     data = io.BytesIO()
@@ -56,7 +56,7 @@ class ArchiveTests(unittest.TestCase):
 
     def test_only_source_is_written(self):
         compat, names = self.extract(make_archive())
-        self.assertEqual(compat["save_epoch"], 2)
+        self.assertEqual(compat["save_epoch"], 3)
         self.assertIn("classes/modules.mk", names)
         self.assertIn("comm.c", names)
         self.assertFalse(any("player" in p or "Oldaccount" in p for p in names))
@@ -85,11 +85,15 @@ class ArchiveTests(unittest.TestCase):
 
     def test_future_epoch_rejected(self):
         with self.assertRaises(u.UpdateError):
-            self.extract(make_archive(compat={"schema": 1, "save_epoch": 3, "handoff": 2}))
+            self.extract(make_archive(compat={"schema": 1, "save_epoch": 4, "handoff": 2}))
 
     def test_legacy_target_rejected(self):
         with self.assertRaises(u.UpdateError):
             self.extract(make_archive(compat={"schema": 1, "save_epoch": 1, "handoff": 2}))
+
+    def test_pre_build_epoch_target_rejected(self):
+        with self.assertRaises(u.UpdateError):
+            self.extract(make_archive(compat={"schema": 1, "save_epoch": 2, "handoff": 2}))
 
     def test_future_handoff_rejected(self):
         with self.assertRaises(u.UpdateError):
@@ -520,8 +524,29 @@ class DeployTests(unittest.TestCase):
     def test_forward_epoch_upgrade(self):
         u.write_record(dict(u.binary_record(OLD), save_epoch=1))
         self.install()
-        self.assertEqual(json.loads(self.record.read_text())["save_epoch"], 2)
+        self.assertEqual(json.loads(self.record.read_text())["save_epoch"], 3)
         self.assertEqual(self.binary.read_bytes(), NEW)
+
+    def test_forward_build_epoch_upgrade(self):
+        u.write_record(dict(u.binary_record(OLD), save_epoch=2))
+        self.install()
+        self.assertEqual(json.loads(self.record.read_text())["save_epoch"], 3)
+        self.assertEqual(self.binary.read_bytes(), NEW)
+
+    def test_build_epoch_downgrade_rejected(self):
+        u.write_record(u.binary_record(OLD))
+        with self.assertRaisesRegex(u.UpdateError, "Unsafe save-epoch downgrade"):
+            u.deploy(NEW, dict(u.binary_record(NEW), save_epoch=2), "restart")
+        self.assertEqual(self.binary.read_bytes(), OLD)
+        self.assertEqual(self.run_mock.call_count, 0)
+
+    def test_failed_build_epoch_upgrade_does_not_restart_old_binary(self):
+        u.write_record(dict(u.binary_record(OLD), save_epoch=2))
+        self.fail_new = True
+        with self.assertRaisesRegex(u.UpdateError, "save-epoch upgrade"):
+            self.install()
+        self.assertEqual(self.binary.read_bytes(), NEW)
+        self.assertFalse(self.online)
 
     def test_epoch_downgrade_rejected_before_changes(self):
         u.write_record(u.binary_record(OLD))

@@ -7,6 +7,7 @@
 #include <string.h>
 #include "../../merc.h"
 #include "state.h"
+#include "build.h"
 
 static int owns_powers(long parent)
 {
@@ -94,7 +95,8 @@ int hybrid_state_valid(const HYBRID_STATE *state)
         (state->secondary_blood[0] != 0 || state->secondary_blood[1] != 0 ||
          state->secondary_beast != 0 || state->secondary_truebeast != 0)) return 0;
     return hybrid_progression_valid(state->secondary_class,
-                                      &state->secondary_progression);
+                                      &state->secondary_progression) &&
+           hybrid_build_record_valid(state);
 }
 
 int hybrid_state_prepare(const CHAR_DATA *ch,
@@ -227,7 +229,7 @@ int hybrid_secondary_value_write(HYBRID_STATE *state, long parent,
 int hybrid_state_write(FILE *stream, const HYBRID_STATE *state)
 {
     if (!stream || !hybrid_state_valid(state)) return 0;
-    if (fprintf(stream, "AnathemaHybrid 3 %ld %ld %ld",
+    if (fprintf(stream, "AnathemaHybrid 4 %ld %ld %ld",
                 state->hybrid_id, state->primary_class,
                 state->secondary_class) < 0) return 0;
     for (size_t i = 0; i < 20; ++i)
@@ -249,7 +251,7 @@ int hybrid_state_write(FILE *stream, const HYBRID_STATE *state)
                                    HYBRID_PROGRESSION_WORDS)) return 0;
     for (size_t i = 0; i < HYBRID_PROGRESSION_WORDS; ++i)
         if (fprintf(stream, " %ld", progression[i]) < 0) return 0;
-    return fputc('\n', stream) != EOF && !ferror(stream);
+    return fprintf(stream, " %ld\n", state->secondary_build) >= 0 && !ferror(stream);
 }
 
 static int next_number(const char **cursor, long *value)
@@ -285,7 +287,7 @@ static int read_record(FILE *stream, HYBRID_STATE *destination, int tail)
         (line[sizeof(header) - 1] != ' ' &&
          line[sizeof(header) - 1] != '\t')) return 0;
     cursor = line + sizeof(header) - 1;
-    if (!next_number(&cursor, &version) || (version < 1 || version > 3) ||
+    if (!next_number(&cursor, &version) || (version < 1 || version > 4) ||
         !next_number(&cursor, &candidate.hybrid_id) ||
         !next_number(&cursor, &candidate.primary_class) ||
         !next_number(&cursor, &candidate.secondary_class)) return 0;
@@ -305,7 +307,7 @@ static int read_record(FILE *stream, HYBRID_STATE *destination, int tail)
         for (size_t i = 0; i < sizeof(core) / sizeof(core[0]); ++i)
             if (!next_number(&cursor, core[i])) return 0;
     }
-    if (version == 3) {
+    if (version >= 3) {
         long progression[HYBRID_PROGRESSION_WORDS];
         for (size_t i = 0; i < HYBRID_PROGRESSION_WORDS; ++i)
             if (!next_number(&cursor, &progression[i])) return 0;
@@ -313,6 +315,7 @@ static int read_record(FILE *stream, HYBRID_STATE *destination, int tail)
                                        HYBRID_PROGRESSION_WORDS,
                                        &candidate.secondary_progression)) return 0;
     }
+    if (version == 4 && !next_number(&cursor, &candidate.secondary_build)) return 0;
     while (isspace((unsigned char)*cursor)) ++cursor;
     if (*cursor || !hybrid_state_valid(&candidate)) return 0;
     *destination = candidate;

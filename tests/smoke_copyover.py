@@ -44,7 +44,7 @@ with tempfile.TemporaryDirectory(prefix="anathema-copyover-") as directory:
     original_player = (runtime / "player/Restarter").read_bytes()
     hybrid_line = next(line for line in original_player.splitlines()
                        if line.startswith(b"AnathemaHybrid "))
-    assert hybrid_line.startswith(b"AnathemaHybrid 3 ")
+    assert hybrid_line.startswith(b"AnathemaHybrid 4 ")
     rejected_player = b"#PLAYER\nName Rejected~\nAnathemaHybrid 99 1\nEnd\n#END\n"
     (runtime / "player/Rejected").write_bytes(rejected_player)
     with socket.socket() as reservation:

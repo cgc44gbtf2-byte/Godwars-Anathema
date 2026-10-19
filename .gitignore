@@ -59,6 +59,7 @@ tests/test_hybrid_forms
 tests/test_hybrid_progression
 tests/test_hybrid_specialization
 tests/test_hybrid_player
+tests/test_hybrid_training
 bootstrap-backups/
 __pycache__/
 *.py[cod]

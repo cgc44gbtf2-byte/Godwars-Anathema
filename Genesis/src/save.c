@@ -102,7 +102,8 @@ static int write_player_save(FILE *fp, void *context)
     return fprintf(fp, "#END\n") < 0 || ferror(fp) ? -1 : 0;
 }
 
-static bool save_player_atomic(CHAR_DATA *ch, const char *directory)
+static enum atomic_save_result save_player_atomic_record(CHAR_DATA *ch,
+    const char *directory, CHAR_DATA *record)
 {
     struct atomic_save_error error;
     enum atomic_save_result result;
@@ -111,23 +112,23 @@ static bool save_player_atomic(CHAR_DATA *ch, const char *directory)
     size_t i;
 
     if ( ch == NULL )
-        return FALSE;
+        return ATOMIC_SAVE_FAILED;
 
     if ( ch->desc != NULL && !descriptor_is_in_game(ch->desc) )
-        return FALSE;
+        return ATOMIC_SAVE_FAILED;
 
     if ( ch->desc != NULL && ch->desc->original != NULL )
         ch = ch->desc->original;
 
     if ( IS_NPC(ch) || ch->pcdata == NULL || ch->level < 2 )
-        return FALSE;
+        return ATOMIC_SAVE_FAILED;
 
     /* Validate before capitalization or construction of any filesystem path.
      * Match capitalize()'s ASCII spelling without its shared static buffer. */
     if (!atomic_save_name_valid(ch->name))
     {
         bug("Player save rejected: invalid player filename", 0);
-        return FALSE;
+        return ATOMIC_SAVE_FAILED;
     }
     for (i = 0; ch->name[i] != '\0'; ++i)
     {
@@ -140,7 +141,8 @@ static bool save_player_atomic(CHAR_DATA *ch, const char *directory)
         fclose(fpReserve);
         fpReserve = NULL;
     }
-    result = atomic_save(directory, name, write_player_save, ch, &error);
+    result = atomic_save(directory, name, write_player_save,
+                         record ? record : ch, &error);
     /* Queue each destination independently. Failed or backup writes must not
      * masquerade as a durable primary save or hide its retry deadline. */
     unsigned int slot = strcmp(directory,BACKUP_DIR) == 0 ? 1u : 0u;
@@ -174,7 +176,46 @@ static bool save_player_atomic(CHAR_DATA *ch, const char *directory)
             bug(message, 0);
         }
     }
-    return result == ATOMIC_SAVE_OK;
+    return result;
+}
+
+static bool save_player_atomic(CHAR_DATA *ch, const char *directory)
+{
+    return save_player_atomic_record(ch, directory, NULL) == ATOMIC_SAVE_OK;
+}
+
+enum atomic_save_result hybrid_player_commit(CHAR_DATA *ch,
+    const HYBRID_STATE *state, long primal, long experience, long quest)
+{
+    if (!hybrid_player_save_valid(ch) || !ch->pcdata->hybrid_present ||
+        !hybrid_state_valid(state) ||
+        state->hybrid_id != ch->pcdata->hybrid.hybrid_id ||
+        state->primary_class != ch->class ||
+        state->secondary_class != ch->pcdata->hybrid.secondary_class ||
+        primal < 0 || primal > ch->primal || experience < 0 ||
+        experience > ch->exp || quest < 0 || quest > ch->pcdata->quest ||
+        (ch->desc && ch->desc->original)) return ATOMIC_SAVE_FAILED;
+    /* Serialize a shadow, not a temporary mutation of the live actor. This
+     * keeps callbacks/retry bookkeeping from observing unpaid progression. */
+    CHAR_DATA shadow = *ch;
+    PC_DATA player = *ch->pcdata;
+    shadow.pcdata = &player;
+    player.hybrid = *state;
+    player.quest = quest;
+    shadow.primal = primal;
+    shadow.exp = experience;
+    enum atomic_save_result result =
+        save_player_atomic_record(ch, PLAYER_DIR, &shadow);
+    if (result != ATOMIC_SAVE_FAILED) {
+        ch->pcdata->hybrid = *state;
+        ch->pcdata->quest = quest;
+        ch->primal = primal;
+        ch->exp = experience;
+        /* The normal per-destination retry loop will checkpoint this new
+         * state to backup; it never refunds a visible primary rename. */
+        ch->save_pending |= PLAYER_SAVE_BACKUP;
+    }
+    return result;
 }
 
 /* FALSE includes skipped saves and uncertain durability after rename. */

@@ -121,7 +121,7 @@ static void all_pairs(void)
             assert(save_char_obj_checked(ch));
             assert(save_char_obj_backup_checked(ch));
             char *disk = read_file("../player/Newfixture");
-            assert(strstr(disk, "AnathemaHybrid 3 ") &&
+            assert(strstr(disk, "AnathemaHybrid 4 ") &&
                    !strstr(strstr(disk, "AnathemaHybrid") + 14, "AnathemaHybrid"));
             char *backup = read_file("../backup/Newfixture");
             assert(!strcmp(disk, backup));

@@ -421,20 +421,20 @@ static void codec_errors(void)
         changed[i] = (char)((unsigned char)changed[i] ^ 0x80);
         rejects(changed, length);
     }
-    const char *banks = good + strlen("AnathemaHybrid 3 45 2 1");
-    snprintf(changed, sizeof(changed), "AnathemaHybrid 3 46 2 1%s", banks);
+    const char *banks = good + strlen("AnathemaHybrid 4 45 2 1");
+    snprintf(changed, sizeof(changed), "AnathemaHybrid 4 46 2 1%s", banks);
     rejects(changed, strlen(changed));
-    snprintf(changed, sizeof(changed), "AnathemaHybrid 3 45 1 1%s", banks);
+    snprintf(changed, sizeof(changed), "AnathemaHybrid 4 45 1 1%s", banks);
     rejects(changed, strlen(changed));
     /* Same pair, wrong bank owner: Werewolf cannot own Vampire power slots. */
-    snprintf(changed, sizeof(changed), "AnathemaHybrid 3 45 1 2%s", banks);
+    snprintf(changed, sizeof(changed), "AnathemaHybrid 4 45 1 2%s", banks);
     rejects(changed, strlen(changed));
     /* -1 is native Vampire "unknown"; values below that are malformed. */
     assert(banks[0] == ' ' && banks[1] == '0');
-    snprintf(changed, sizeof(changed), "AnathemaHybrid 3 45 2 1 -2%s", banks + 2);
+    snprintf(changed, sizeof(changed), "AnathemaHybrid 4 45 2 1 -2%s", banks + 2);
     rejects(changed, strlen(changed));
     strcpy(changed, good);
-    changed[strlen("AnathemaHybrid ")] = '4';
+    changed[strlen("AnathemaHybrid ")] = '5';
     rejects(changed, length);
     snprintf(changed, sizeof(changed), "%.*s 99\n", (int)length - 1, good);
     rejects(changed, strlen(changed));

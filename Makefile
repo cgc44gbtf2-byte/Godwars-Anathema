@@ -28,6 +28,7 @@ TESTS += tests/test_hybrid_forms
 TESTS += tests/test_hybrid_progression
 TESTS += tests/test_hybrid_specialization
 TESTS += tests/test_hybrid_player
+TESTS += tests/test_hybrid_training
 
 all:
 	$(MAKE) -C Genesis/src
@@ -54,7 +55,7 @@ tests/test_signals: tests/test_signals.c $(ENGINE_SOURCES) $(ENGINE_HEADERS)
 # test_save embeds save.c; retain its isolated atomic fault injection while
 # linking the real optional record validator/codec, not permissive test stubs.
 tests/test_save: tests/test_save.c $(ENGINE_SOURCES) $(ENGINE_HEADERS)
-	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< Genesis/src/classes/hybrid/state.c Genesis/src/classes/hybrid/player.c Genesis/src/classes/hybrid/progression.c Genesis/src/classes/hybrid/specialization.c Genesis/src/classes/hybrid/registry.c $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< Genesis/src/classes/hybrid/state.c Genesis/src/classes/hybrid/player.c Genesis/src/classes/hybrid/build.c Genesis/src/classes/hybrid/progression.c Genesis/src/classes/hybrid/specialization.c Genesis/src/classes/hybrid/registry.c $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_classes tests/test_wall tests/test_mage_powers: tests/%: tests/%.c $(ENGINE_SOURCES) $(ENGINE_HEADERS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) -O0 $< $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
@@ -67,6 +68,7 @@ tests/test_class_runtime: tests/test_class_runtime.c $(ENGINE_SOURCES) $(ENGINE_
 
 check-layout:
 	python3 tests/test_class_layout.py
+	python3 tests/test_hybrid_training_catalog.py
 	python3 tests/test_combat_layout.py
 	python3 tests/test_telnet_layout.py
 	python3 tests/test_gmcp_layout.py
@@ -107,6 +109,9 @@ tests/test_hybrid_specialization: tests/test_hybrid_specialization.c $(ENGINE_OB
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_hybrid_player: tests/test_hybrid_player.c $(ENGINE_OBJECTS)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
+tests/test_hybrid_training: tests/test_hybrid_training.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 # Separate test objects keep sanitizer flags out of the production executable.

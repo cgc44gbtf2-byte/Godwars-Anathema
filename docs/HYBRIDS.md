@@ -11,7 +11,7 @@ base-class masks, duplicate parents and invalid IDs do not resolve.
 The command shows whether the current class is one of the required parents.
 This is only a parent check, **not complete conversion eligibility**.
 It cannot create a hybrid, deduct currency, strip gear or grant powers.
-No player-file fields or existing single-class checks changed.
+The command does not change player files or existing single-class checks.
 
 ## Parent-owned storage foundation
 
@@ -40,19 +40,21 @@ This is raw storage access, not effective rank/ability authorization.
 The older secondary-bank pointer API remains available for existing callers;
 it is not a validated assignment API and can invalidate a record if misused.
 
-The standalone `AnathemaHybrid` codec now writes version 3 and reads versions
-1, 2 and 3. Older records preserve their existing banks/core and receive empty
-new progression, including -1 for owned unselected choices. Loading checks
+The standalone `AnathemaHybrid` codec now writes version 4 and reads versions
+1, 2, 3 and 4. Older records preserve their existing banks/core; v1/v2 receive
+empty added progression, including -1 for owned unselected choices. Loading checks
 IDs, pair membership, ranges, field count, ownership, blood consistency and
 trailing data before replacing its destination. Malformed, unsupported,
 truncated and overlong records are rejected without partially replacing state.
-Older v1/v2-only readers cannot read a new v3 record.
+Older readers cannot read a new v4 record. The new stable build ID is zero
+on older records; loading never guesses clan identity or silently resets ranks.
 
 **The codec is now connected to optional player saving/loading.** The record
 is still not a complete secondary class: forms, remaining buffs/timers,
-absorption/familiar lifecycle, complete clan/build initialization and live
-adapters remain pending. Vampire learned/unknown markers are initialized, but
-teaching/learning routes remain pending. Validation does not certify every combination of
+absorption/familiar lifecycle, social clan membership and live ability adapters
+remain pending. Native build selection and paid learning now have backend APIs
+described below; player-facing trainers and secondary teaching remain unwired.
+Validation does not certify every combination of
 prerequisites, resource defaults or effective abilities. Timers are stored, not
 ticked; no blood renewal or upkeep is enabled. Persistence failure must abort
 the load/transaction; the codec alone does not provide atomicity or
@@ -153,8 +155,8 @@ an `AnathemaHybrid` line, and old player files load with no secondary parent.
 The player's `class` field and original trained arrays remain authoritative;
 no bitwise ancestry mask or primary-array copying is introduced.
 
-Full and authentication-only loaders preserve the bounded v3 record (including
-old v1/v2 migrations). Ownership is checked at explicit `End`, allowing `Class`
+Full and authentication-only loaders preserve the bounded v4 record (including
+old v1/v2/v3 migrations). Ownership is checked at explicit `End`, allowing `Class`
 to occur later in a file. Duplicate, malformed, unsupported, overlong, truncated
 or wrong-primary records fail closed: login/recovery/staff loading rejects the
 shell and atomic saves refuse to overwrite the file. Full loads validate before
@@ -169,24 +171,76 @@ Dragon hatchling age12 with color unselected; Werewolf rank1 with gifts
 unselected; Mage Arete1 with spheres unselected; other banks remain untrained.
 This follows native creation metadata without invoking `autoclass`, changing
 primary stats/clan/equipment, or granting trained ranks or currency. Vampire
-unknown markers are preserved separately from learned-but-untrained rank0;
+first-learning markers are preserved separately from locked rank0;
 effective secondary rank access never exposes negative ranks. Vampire clan
-profile, clan membership, Dragon color and other build choices still require
-explicit future selection, validation and normal learning routes.
+profile, Dragon color and Mage choices use the explicit build APIs below;
+social clan membership still requires a separate live integration.
 
 This is **not playable conversion**: checked attachment is a backend operation,
 not a staff/player command and not itself a durable conversion transaction.
-No new activation, trainer, passive, cost or mastery checks are enabled.
+No new player-facing activation, trainer, passive or conversion-mastery
+checks are enabled.
 The 50,000QP conversion remains preview-only. One active parent/hybrid form
 policy still needs live adapters and safe restart reconciliation.
 
-The supported save epoch is now2; socket handoff stays2. Forward updates read
-epoch1 player files. The reviewed updater blocks downgrade/rollback to epoch1
+The supported save epoch is now3; socket handoff stays2. Forward updates read
+older player files. The reviewed updater blocks downgrade/rollback to epoch1/2
 because old binaries can silently discard the optional record. Cross-epoch
 startup failures stop for operator repair instead of auto-starting the old
-binary. Adopted unknown binaries are conservatively recorded as epoch2.
-Use an epoch2-compatible corrective release; do not manually replace it with an
+binary. Adopted unknown binaries are conservatively recorded as epoch3.
+Use an epoch3-compatible corrective release; do not manually replace it with an
 older binary once hybrid records may have been saved.
+
+## Native build choices and parent-aware training backend
+
+`build.c` stores a stable class-build ID, not a social clan membership, rank
+or leader role. Its 25 choices exactly match native `autoclass`: nine Vampire
+clans, ten Mage traditions (including Hollow Ones), and six Dragon colors.
+Malkavian/Caitiff/Panders are not invented as new autoclass choices.
+Werewolf Breed/Auspice/Tribe selections and Mage avatar/personal spheres
+(plus Hollow Ones' clan sphere) are checked, unique where native rules require
+it, and one-time. Specialization remains an independent one-full-tree choice.
+No operation calls `autoclass` on a hybrid or swaps its primary class/arrays.
+Native Vampire basic/clan disciplines begin UNKNOWN (-1); unavailable
+non-clan disciplines remain zero and require a legitimate teacher. Build
+selection cannot reset taught/trained banks. Legacy unconfigured builds
+require explicit compatible initialization/migration; they are not guessed.
+
+`training.c` quotes a candidate without mutating the actor, then recomputes
+it at commit. Ranked lessons cover all eight branched classes using native
+prices and the agreed secondary caps. Werewolf gifts cost `(next rank)*10`
+for selected gifts or `*15` otherwise; Vampire disciplines cost `*5` in-clan
+or `*15` out-of-clan, with native first learning to rank1. Mage, Elementalist,
+Sorcerer, Ninja and Monk ranks cost `*10` primal; Highlander costs `*15`.
+An unavailable Vampire discipline returns NEEDS_TEACHER, never a free unlock.
+Reserved discipline slots, Ki/timers, and combat-only flags are not lessons.
+Elementalist focus uses the existing secondary pre-focus-cap policy, with
+no additional basic training after focus and no live aura/form activation.
+
+Branchless parents retain their native progression: Drow's 17 unlock prices
+and four speed increases use secondary DP; Dragon's 13 skills retain their
+required ages and prices, and age progression charges its normal DP/QP.
+Mage Arete costs `(next Arete)*500000` experience and caps at10. Werewolf
+self-advancement requires the normal completed quests and monster kills,
+stops at rank4, and does not grant the staff-controlled fifth rank.
+Secondary DP income, teacher consent/lessons and ability activation are
+separate future adapters; this backend never funds an empty bank.
+
+Commit requires the real connected original actor, standing/out of combat,
+and no pending primary save. A shadow player serializes the candidate and
+payment through the existing primary atomic transaction, including inventory.
+Pre-rename failure keeps both ranks and money unchanged. A successful rename
+with failed directory fsync keeps the visible rank/payment in memory, queues
+durability retry and blocks further lessons until primary retry succeeds.
+It must NOT be refunded/replayed: the new file may already survive a crash.
+Backup is queued independently; no multi-file or multi-player transaction
+is promised. No caller-supplied quote is trusted for payment.
+
+These are tested backend APIs, **not player-accessible trainers**. `selfbrid`
+remains read-only. Original-class requests return PRIMARY for the unchanged
+native trainer; original training/caps/access are not replaced. Conversion,
+secondary teaching and class powers/passives/forms/upkeep still need live
+adapters and balance testing before any player can convert.
 
 ## Transformation policy foundation
 
