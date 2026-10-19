@@ -1,5 +1,5 @@
 /* Parent-aware native training candidates and atomic single-player commits.
- * No ancestry masks, primary-field swapping, free learning or command route. */
+ * No ancestry masks, primary-field swapping or free rank learning. */
 #include <sys/types.h>
 #include <stdio.h>
 #include <string.h>

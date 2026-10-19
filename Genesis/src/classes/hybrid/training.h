@@ -51,7 +51,8 @@ typedef struct hybrid_lesson {
 enum hybrid_lesson_result hybrid_training_prepare(const struct char_data *ch,
     const HYBRID_LESSON_REQUEST *request, HYBRID_LESSON *destination);
 /* Backend only: requires the real connected original actor, out of combat.
- * Not called by selfbrid/native trainers yet. UNCERTAIN keeps the visible
+ * The explicit selfbrid colors UI uses only secondary Sorcerer focus/ranks.
+ * Other lessons remain backend-only. UNCERTAIN keeps the visible
  * rank/payment, blocks another lesson until primary save retry succeeds. */
 enum hybrid_lesson_result hybrid_training_commit(struct char_data *ch,
     const HYBRID_LESSON_REQUEST *request);

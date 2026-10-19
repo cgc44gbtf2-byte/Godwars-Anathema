@@ -84,6 +84,11 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   isolated bank: one full5, others3. Original Sorcerer color access stays native.
   Native command gates, training/crafting commands and mana costs are unchanged;
   conversion remains disabled.
+  Existing secondary Sorcerer records can use `selfbrid colors` to see ranks,
+  `selfbrid colors focus blue` to preview a permanent full-color choice,
+  `selfbrid colors focus blue confirm` to save it, and `selfbrid colors blue`
+  to buy one rank at native primal prices. Original Sorcerers still use `colors`.
+  Failed or uncertain saves block repeat purchases until primary save recovery.
   The info page also shows a read-only numeric checklist: 50,000 max HP/mana,
   max base stats, all ten stances, four weapon proficiencies and trainable
   styles at their original-class caps. Natural style is exempt for classes
@@ -103,8 +108,9 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   These adapters do not enable player hybrid conversion.
   Checked secondary resource accounting and independent Ninja Ki/rage/cooldown
   updates are also implemented internally; other activation upkeep is pending.
-  These adapters are not player-accessible yet: conversion, secondary trainers
-  and forms remain unavailable. Updates use save epoch3 and reject older
+  Normal players still cannot create hybrids: conversion, other secondary
+  trainers and live forms remain unavailable. Only color training for an
+  existing secondary Sorcerer record is exposed. Updates use save epoch3 and reject older
   binary-only rollbacks.
   See [hybrid implementation status](docs/HYBRIDS.md).
 - **Vampire upkeep:** Obfuscate no longer takes empty blood below zero.

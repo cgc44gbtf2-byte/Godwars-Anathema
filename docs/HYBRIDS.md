@@ -44,6 +44,32 @@ remains pending; no PvP balance claim follows from page-prefix replays.
 
 ## Available in this stage
 
+### Secondary Sorcerer training UI (existing records only)
+
+`selfbrid colors` shows isolated secondary ranks, stored values and effective
+caps. It does not attach a hybrid record. Original Sorcerers continue to use
+their unchanged native `colors` trainer; unrelated/invalid records cannot train.
+The new subcommand requires the same Sorcerer-tier access as native `colors`.
+
+- `selfbrid colors focus blue` previews the free, permanent full-color choice.
+- `selfbrid colors focus blue confirm` atomically saves that choice without
+  granting ranks. One color may reach5; the other five may reach3.
+- `selfbrid colors blue` buys exactly one rank for10 x next rank primal, using
+  the existing lesson transaction. Full training costs450 primal; quest points
+  and experience are not charged. No primary color array or class is swapped.
+
+Choose a focus before training. No respec or raw-rank normalization is offered.
+Legacy stored ranks above effective policy caps require staff review before
+new lessons, rather than silently reducing training. Real connected original
+actors must be standing and out of combat for writes. Failed saves retain no
+lesson/payment; primary save recovery must succeed before retry. Directory-fsync
+uncertainty keeps the visible saved candidate/payment and blocks another lesson
+until recovery: the UI never refunds or repeats an uncertain transaction.
+
+Listing/focus previews, `selfbrid list` and `selfbrid info` remain read-only.
+Conversion, crafting, other class trainers and full live forms remain disabled
+or pending; this UI is not a conversion eligibility check.
+
 The original Anathema implementation contains the 45 named pairs supplied for
 this server, with stable hybrid IDs 1–45. These are **not base-class IDs**.
 The two parent orders resolve to the same definition. Unknown parents, combined
@@ -96,7 +122,9 @@ on older records; loading never guesses clan identity or silently resets ranks.
 is still not a complete secondary class: forms, remaining buffs/timers,
 absorption/familiar lifecycle, social clan membership and remaining live ability adapters
 remain pending. Native build selection and paid learning now have backend APIs
-described below; player-facing trainers and secondary teaching remain unwired.
+described below. Only secondary Sorcerer focus/color ranks now have a
+player-facing UI for existing records; other trainers and secondary teaching
+remain unwired.
 Validation does not certify every combination of
 prerequisites, resource defaults or effective abilities. Independent Ninja
 scalars now tick as described below; other timers, blood renewal and
@@ -222,7 +250,8 @@ social clan membership still requires a separate live integration.
 
 This is **not playable conversion**: checked attachment is a backend operation,
 not a staff/player command and not itself a durable conversion transaction.
-No conversion or player-facing secondary trainer is enabled. The limited
+No conversion is enabled. The explicit secondary Sorcerer color UI described
+above is now available for existing records; other trainers remain pending. The limited
 checked combat/Highlander adapters below are the first live access integration.
 The 50,000QP conversion remains preview-only. One active parent/hybrid form
 policy still needs live adapters and safe restart reconciliation.
@@ -436,8 +465,10 @@ flag isolation, raw over-cap masking, corrupt/unconfigured records, odd-speed
 truncation, integer limits, brittle soak, final speed floor, injury protection,
 unchanged RNG, interpreter-routed Highlander powers and Counter refusal.
 These are mechanics checks, not proof of PvP balance or multiplayer stability.
-`selfbrid` is still read-only: no normal player can convert or reach these
-secondary paths until the conversion/eligibility transaction is implemented.
+Conversion previews remain read-only; normal players cannot create hybrids.
+Only the existing-record secondary Sorcerer color UI described above reaches
+paid lessons. Other secondary commands and the conversion/eligibility
+transaction remain pending.
 Save record v4/epoch 3 and socket handoff v2 are unchanged by this stage.
 
 ## Owned resources and independent Ninja clocks
@@ -522,7 +553,8 @@ The initialization/paid-training/conversion policies are unchanged.
 Both native utilities cost zero to activate. These adapters do not invent a
 DP, mana or primal charge, grant a learned flag, change a class, borrow a form
 flag or alter either parent's training/resource banks. Learning still has its
-normal backend costs; no player-facing secondary trainer is enabled.
+normal backend costs; Drow player-facing training remains unwired. The separate
+Sorcerer color UI does not grant Drow ranks or item permissions.
 
 Attunement keeps the existing exact item-owner check and all excluded item
 types/artifact restrictions. Already-loyal items do not change again. This

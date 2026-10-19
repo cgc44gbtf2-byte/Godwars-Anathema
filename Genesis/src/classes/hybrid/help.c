@@ -82,6 +82,9 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
                      "standalone Sorcerer10. Enforced for valid hybrid records; "
                      "Learned secondary colors affect book damage/affect pages; "
                      "native command gates remain. Conversion is disabled.\n\r", ch);
+        send_to_char("Existing secondary Sorcerers: selfbrid colors shows ranks/caps. "
+                     "Confirm one permanent full color before paid rank training; "
+                     "this does not create a hybrid.\n\r",ch);
         return 1;
     }
     const HYBRID_DEFINITION *h = hybrid_by_name(argument);

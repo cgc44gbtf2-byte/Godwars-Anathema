@@ -1,5 +1,5 @@
-/* Read-only registry/numeric readiness. No class assignment, currency charge,
- * staff dispatch or save mutation; full mastery/transaction checks pending. */
+/* List/info remain read-only. An explicit colors subcommand can train only an
+ * existing secondary record; class conversion/mastery transactions pending. */
 #include <sys/types.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -7,6 +7,7 @@
 #include "../../merc.h"
 #include "hybrid.h"
 #include "readiness.h"
+#include "colors.h"
 
 void do_selfbrid(CHAR_DATA *ch, char *argument)
 {
@@ -18,6 +19,7 @@ void do_selfbrid(CHAR_DATA *ch, char *argument)
     if (!ch || IS_NPC(ch) || !ch->pcdata) return;
     if (!argument) argument = "";
     while (isspace((unsigned char)*argument)) ++argument;
+    if (hybrid_colors_command(ch, argument)) return;
     if (!str_prefix("list", argument)) {
         name = argument + 4;
         while (isspace((unsigned char)*name)) ++name;
