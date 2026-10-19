@@ -66,8 +66,12 @@ tests/test_save: tests/test_save.c $(ENGINE_SOURCES) $(ENGINE_HEADERS)
 tests/test_classes tests/test_wall tests/test_mage_powers: tests/%: tests/%.c $(ENGINE_SOURCES) $(ENGINE_HEADERS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) -O0 $< $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
-tests/test_powers: tests/test_powers.c $(ENGINE_SOURCES) $(ENGINE_HEADERS)
-	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< Genesis/src/classes/ninja/ninja.c Genesis/src/classes/monk/monk.c Genesis/src/classes/elemental/elemental.c Genesis/src/classes/sorcerer/sorcerer.c Genesis/src/classes/drow/drow.c Genesis/src/combat_status.c $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+# Keep this native fixture's existing mocks; use actual access/record validation.
+tests/powers_info.o: Genesis/src/act_info.c $(ENGINE_HEADERS) Makefile
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) -Dchar_stat=powers_real_char_stat -Dchar_hitroll=powers_real_char_hitroll -Dchar_damroll=powers_real_char_damroll -Dchar_ac=powers_real_char_ac -Dget_drow=powers_real_get_drow -Dget_color=powers_real_get_color -Dget_monk=powers_real_get_monk -Dget_ninja=powers_real_get_ninja -Dget_tribe=powers_real_get_tribe -Ddo_look=powers_real_do_look -c $< -o $@
+
+tests/test_powers: tests/test_powers.c $(ENGINE_SOURCES) $(ENGINE_HEADERS) tests/powers_info.o
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< Genesis/src/classes/ninja/ninja.c Genesis/src/classes/monk/monk.c Genesis/src/classes/elemental/elemental.c Genesis/src/classes/sorcerer/sorcerer.c Genesis/src/classes/drow/drow.c Genesis/src/combat_status.c tests/powers_info.o $(HYBRID_ACCESS_SOURCES) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 # Preserve this legacy fixture's existing native mocks, while obtaining any
 # other native getters from the real implementation for the hybrid backend.
@@ -171,6 +175,6 @@ sanitize:
 	$(MAKE) test CFLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer" LDFLAGS="-fsanitize=address,undefined"
 
 clean:
-	rm -f tests/restart_engine.o tests/runtime_info.o
+	rm -f tests/restart_engine.o tests/runtime_info.o tests/powers_info.o
 	$(MAKE) -C Genesis/src clean
 	rm -f $(TESTS) tests/buffers_interp.o $(ENGINE_OBJECTS) $(LEGACY_CLASS_OBJECTS) tests/stun_comm.o tests/restored_fight.o tests/restored_damage.o

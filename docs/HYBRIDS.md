@@ -544,3 +544,41 @@ two permission/rank replacements; all other Elementalist handlers are intact.
 Other healing commands, stateful class powers, forms, gear, secondary trainers
 and player conversion remain outside this stage. Record4/epoch3/handoff2 stay
 unchanged. No conversion, fighting-style expansion, merge or deployment.
+
+## Healing Touch — trained secondary Monk, shared mana
+
+`touch [target]` requires ready owned Monk access and **Mantra4**. Original
+Monks retain their full native ranks (getter cap8); secondary Mantra follows
+the existing selected-full-branch policy:8 when selected,4 otherwise.
+Choosing Tech or Art as the full branch does not disable legitimately
+trained Mantra4. Neither original-class stale `monk[]` values nor invoking
+the command grants secondary training. Original Monk8 remains usable when
+an unrelated secondary parent has a different full branch selected.
+
+The native rules are preserved: **5,000 shared mana minimum to attempt**;
+healing is a400–600 roll times effective Mantra; actual charge is integer
+`heal*3/2`; caster delay is18 pulses. A Mantra8 caster with5,000 mana can
+fail the second affordability check after rolling healing, while spending
+no mana and receiving no lag. That RNG consumption is intentional legacy
+behavior, not silently standardized to Sunbath. Full-HP targets still cost
+mana/lag; an existing longer delay is not shortened. Targets are self or
+present in the caster's room, not world-wide. No Ki or other owned pool is
+charged; mana is shared.
+
+Native add-before-clamp signed overflow was reproduced under UBSan at
+`LONG_MAX-1` HP and fixed in a separate native-only commit. The native
+getter already caps Mantra8, keeping healing/cost multiplication bounded.
+No global Monk predicate/getter, other Monk handler, callback, class flag,
+form, trainer, social, command table or resource-bank rule was widened.
+
+The existing full-engine healing suite now checks22 captured native
+snapshots (Mantra4/8) and1,215 paired native/secondary replays across all9
+original parents, ranks4–8, self/local/missing/remote targets, combat,
+full/near-full HP, longer existing lag, low mana and exact/one-below costs.
+Eight fixed seeds include odd healing to test integer rounding. Additional
+cases cover36 low-rank refusals,6 unauthorized/invalid states,9
+near-LONG_MAX target heals, both other full branches and original-parent
+rank retention, with owned banks unchanged.
+
+This remains backend access for audited existing powers, not playable
+hybrid conversion. Save epoch3, record4 and copyover handoff2 are unchanged.

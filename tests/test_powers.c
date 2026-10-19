@@ -36,6 +36,13 @@ static bool protected_target, allow_fighting, group_members;
 static char last_message[MAX_STRING_LENGTH];
 long chainspell;
 
+/* Real native getters/access validation must fail visibly on invalid requests. */
+void bug(const char *message,long value)
+{
+    fprintf(stderr,"Unexpected native getter/access error: %s (%ld)\n",message,value);
+    assert(!"unexpected native getter/access error");
+}
+
 char *one_argument(char *argument, char *word)
 {
     while (isspace((unsigned char)*argument)) ++argument;

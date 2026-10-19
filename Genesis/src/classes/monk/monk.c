@@ -26,6 +26,7 @@
 #include <time.h>
 #include <limits.h>
 #include "merc.h"
+#include "classes/hybrid/access.h"
 
 
 void do_monklearn( CHAR_DATA *ch, char *argument )
@@ -717,13 +718,14 @@ void do_touch(CHAR_DATA *ch, char *argument)
 
     argument = one_argument(argument, arg);
 
-    if (!IS_MONK(ch))
+    if (!hybrid_power_parent(ch,CLASS_MONK))
     {
 	stc("Huh?\n\r", ch);
 	return;
     }
 
-    if (get_monk(ch, MONK_MANTRA) < 4)
+    const long mantra=hybrid_power_rank(ch,CLASS_MONK,HYBRID_TRAIN_MONK,MONK_MANTRA);
+    if (mantra < 4)
     {
 	stc("You need Mantra 4 for Healing Touch.\n\r", ch);
 	return;
@@ -742,7 +744,7 @@ void do_touch(CHAR_DATA *ch, char *argument)
      	return;
     }
 
-    heal = number_range(400, 600) * get_monk(ch, MONK_MANTRA);
+    heal = number_range(400, 600) * mantra;
     cost = heal * 3 / 2;
     if (ch->mana < cost)
     {

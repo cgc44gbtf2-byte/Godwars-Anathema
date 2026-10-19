@@ -78,6 +78,9 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   Sunbath now has a trained secondary-Elementalist adapter at Sun 3, preserving
   its 800-mana cost; native overflow, a discarded divide and unreliable
   empty-target handling were fixed.
+  Healing Touch also safely caps HP and uses owned secondary Mantra training:
+  Mantra 4 minimum, 5,000 mana to attempt, actual cost 1.5x rolled healing.
+  These adapters do not enable player hybrid conversion.
   Checked secondary resource accounting and independent Ninja Ki/rage/cooldown
   updates are also implemented internally; other activation upkeep is pending.
   These adapters are not player-accessible yet: conversion, secondary trainers

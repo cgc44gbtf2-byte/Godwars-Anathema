@@ -92,6 +92,54 @@ class HybridHealingCatalog(unittest.TestCase):
         tests=(ROOT/"tests/test_hybrid_healing.c").read_text()
         self.assertIn('assert(number_argument("",empty)==0&&empty[0]',tests)
 
+    def test_touch_permissions_only_restore_fixed_native_module(self):
+        text=(SRC/"classes/monk/monk.c").read_text()
+        self.assertEqual(text.count('#include "classes/hybrid/access.h"\n'),1)
+        self.assertEqual(text.count("hybrid_power_parent("),1)
+        self.assertEqual(text.count("hybrid_power_rank("),1)
+        native=text.replace('#include "classes/hybrid/access.h"\n',"").replace(
+            "hybrid_power_parent(ch,CLASS_MONK)","IS_MONK(ch)").replace(
+            "    const long mantra=hybrid_power_rank(ch,CLASS_MONK,HYBRID_TRAIN_MONK,MONK_MANTRA);\n","").replace(
+            "if (mantra < 4)","if (get_monk(ch, MONK_MANTRA) < 4)").replace(
+            "number_range(400, 600) * mantra","number_range(400, 600) * get_monk(ch, MONK_MANTRA)")
+        self.assertEqual(blob(native),"4d423dc19a5b06ca2897d980bc7ee07fe350ea1e")
+        fixed=("    victim->hit = victim->hit > LONG_MAX-heal ? victim->max_hit\n"
+               "                                            : UMIN(victim->hit+heal,victim->max_hit);")
+        original=("    victim->hit += heal;\n"
+                  "    if (victim->hit > victim->max_hit) victim->hit = victim->max_hit;")
+        self.assertEqual(native.count(fixed),1)
+        native=native.replace('#include <limits.h>\n',"").replace(fixed,original)
+        self.assertEqual(blob(native),"b20b414f5550719b9662d61c8805eb018ee97520")
+
+    def test_touch_native_cost_rng_order_targets_and_lag(self):
+        text=(SRC/"classes/monk/monk.c").read_text()
+        body=text.split("void do_touch",1)[1].split("void do_almighty",1)[0]
+        ordered=["if (mantra < 4)","ch->mana < 5000","get_char_room(ch, arg)",
+                 "number_range(400, 600) * mantra","cost = heal * 3 / 2",
+                 "ch->mana < cost","victim->hit =","ch->mana -= cost",
+                 "update_pos(victim)","WAIT_STATE(ch, 18)"]
+        positions=[body.index(s) for s in ordered]
+        self.assertEqual(positions,sorted(positions))
+        for token in ("hybrid_secondary_resource_","hybrid_player_commit",
+                      "SET_BIT","REMOVE_BIT","ch->class =","ch->class="):
+            self.assertNotIn(token,body)
+        self.assertIn("else if ((victim = get_char_room(ch, arg)) == NULL)",body)
+
+    def test_touch_replays_are_in_default_real_engine_suite(self):
+        text=(ROOT/"tests/test_hybrid_healing.c").read_text()
+        self.assertIn("static const long baseline[2][11][7]",text)
+        self.assertIn("touch_overflow();touch_native_snapshots();touch_secondary_cases();touch_cost_boundaries();",text)
+        self.assertIn("for(long rank=4;rank<=8;++rank)",text)
+        self.assertIn("assert(saw_odd_heal)",text)
+        self.assertIn("pcs[0].monk[MONK_MANTRA]=LONG_MAX",text)
+        self.assertIn("branch+=2",text)
+        make=(ROOT/"Makefile").read_text()
+        target=make.split("tests/test_powers: tests/test_powers.c",1)[1].split("\n\n",1)[0]
+        self.assertIn("tests/powers_info.o $(HYBRID_ACCESS_SOURCES)",target)
+        self.assertIn("tests/powers_info.o: Genesis/src/act_info.c",make)
+        cleanup=make.split("clean:",1)[1]
+        self.assertIn("tests/powers_info.o",cleanup)
+
 
 if __name__=="__main__":
     unittest.main()
