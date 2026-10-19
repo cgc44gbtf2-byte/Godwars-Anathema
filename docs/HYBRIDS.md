@@ -33,8 +33,9 @@ No player-file fields or existing single-class checks changed.
 The current preview does not check these mastery/stat prerequisites. Style
 and weapon caps depend on the original class (100/150/200); stance training
 caps at 200. Natural style currently requires a Dragon, Vampire or Werewolf
-with claws, so requiring that style for every other class needs an explicit
-training/exemption decision. No existing style rules were changed.
+with claws. Require every style the original class can legitimately train,
+at its existing cap; exempt unavailable styles. No cross-class training,
+existing style rules or caps were changed.
 
 ## Work required before conversion
 
@@ -46,8 +47,7 @@ explicit class ownership and migration, not global bitwise-OR class checks.
 The next stages must provide parent-owned progression/resource records;
 backward-compatible save/load and crash recovery; parent-aware training,
 ability, equipment, ranking and teardown rules; and tested interactions for
-every pair. The mastery/stat prerequisites above must be implemented and
-tested; the Natural-style accessibility decision is still pending.
+every pair. The mastery/stat prerequisites above must be implemented and tested.
 
 The eventual conversion must validate first, require explicit confirmation,
 and commit a durable save without leaving partially changed characters on
