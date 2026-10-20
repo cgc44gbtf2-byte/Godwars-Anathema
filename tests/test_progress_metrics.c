@@ -167,6 +167,7 @@ static void leaderboard_failures_and_reload(void)
         assert(!memcmp(&copy,&leader_board,sizeof copy)&&access("../area/leader.txt",F_OK)!=0);
     }
 }
+#ifndef PROGRESS_METRICS_FIXTURE_ONLY
 int main(int argc,char **argv)
 {
     sandbox_begin();
@@ -177,3 +178,4 @@ int main(int argc,char **argv)
         puts("Progress metrics:3200 native snapshots,196 PK/2744 timing oracles,14 boundaries,PK eligibility and leaderboard isolation/reloads passed.");}
     board_names(0);sandbox_end();return 0;
 }
+#endif

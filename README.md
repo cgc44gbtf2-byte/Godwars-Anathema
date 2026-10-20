@@ -149,6 +149,9 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   play time/PK score when their saved arithmetic cannot be evaluated safely.
   Login PK-age checks and derived leaderboard scores now reject invalid
   arithmetic; staff and covenant displays show unavailable metrics explicitly.
+  Numeric file loading now handles signed integer limits without overflowing.
+  Invalid numeric player records are refused without overwriting the file or
+  taking other players offline; staff should repair or restore the affected file.
   See [message-formatting limits](docs/MESSAGES.md).
   A separate object-factory fix prevents crafted items from freeing mutable
   names, descriptions and spell messages still owned by staff-edited templates.

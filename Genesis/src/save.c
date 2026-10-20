@@ -33,6 +33,7 @@
 #include <time.h>
 #include <malloc.h>
 #include "merc.h"
+#include "file_number.h"
 #include "atomic_save.h"
 #include "classes/hybrid/player.h"
 #include "classes/monk/favour.h"
@@ -883,6 +884,7 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
 	found = TRUE;
 	for ( ; ; )
 	{
+    if (ch->pcdata->player_load_failed) break;
 	    char letter;
 	    char *word;
 
@@ -1197,6 +1199,7 @@ bool load_char_short( DESCRIPTOR_DATA *d, char *name )
 	found = TRUE;
 	for ( ; ; )
 	{
+    if (ch->pcdata->player_load_failed) break;
 	    char letter;
 	    char *word;
 
@@ -1261,6 +1264,17 @@ bool load_char_short( DESCRIPTOR_DATA *d, char *name )
 				    break;				\
 				}
 
+/* Numeric player-reader scope: failures stay local to this record.
+ * A temporary zero is never accepted as a successful numeric field.
+ * Once failed, subsequent numeric reads do not consume more input. */
+static long saved_number(FILE *fp, bool *ok)
+{
+    long number=0;
+    if (*ok && fread_number_checked(fp,&number)!=FILE_NUMBER_OK) *ok=FALSE;
+    return number;
+}
+#define fread_number(fp) saved_number((fp),&numbers_ok)
+
 /* Keep the persisted format intact.  Older files may use -1 as the
  * inactive stance marker; only invalid indexes and impossible training
  * values are repaired before another command or combat tick sees them. */
@@ -1286,6 +1300,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
     char buf[MSL];
     char *word;
     bool fMatch;
+    bool numbers_ok=TRUE;
 
     if (ch->pcdata->hybrid_present || ch->pcdata->player_load_failed) {
         ch->pcdata->player_load_failed = 1;
@@ -1293,6 +1308,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
     }
     for ( ; ; )
     {
+if (!numbers_ok) { ch->pcdata->player_load_failed=1; return; }
 	word   = feof( fp ) ? "End" : fread_word( fp );
 	fMatch = FALSE;
 
@@ -1402,7 +1418,10 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
 		long i, num = fread_number(fp); /* number of boards saved */
 		char *boardname;
 
-		for ( ; num; num--) /* for each of the board saved */
+if (!numbers_ok || num<0 || num>1024) {
+    ch->pcdata->player_load_failed=1; return;
+}
+for ( ; num && numbers_ok; num--) /* for each of the board saved */
 		{
 		    boardname = fread_word(fp);
 		    i = board_lookup(boardname); /* find board number */
@@ -1713,7 +1732,9 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
 
 	    if ( !str_cmp( word, "Room" ) )
 	    {
-		ch->in_room = get_room_index( fread_number( fp ) );
+long vnum=fread_number(fp);
+if (!numbers_ok || vnum<0) { numbers_ok=FALSE; break; }
+ch->in_room = get_room_index(vnum);
 		if ( ch->in_room == NULL )
 		    ch->in_room = get_room_index( ROOM_VNUM_LIMBO );
 		fMatch = TRUE;
@@ -1862,7 +1883,9 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
 	    KEY( "Vampgen",        ch->vampgen,		fread_number( fp ) );
 	    if ( !str_cmp( word, "Vnum" ) )
 	    {
-		ch->pIndexData = get_mob_index( fread_number( fp ) );
+long vnum=fread_number(fp);
+if (!numbers_ok || vnum<0) { numbers_ok=FALSE; break; }
+ch->pIndexData = get_mob_index(vnum);
 		fMatch = TRUE;
 		break;
 	    }
@@ -1896,7 +1919,8 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
 	    break;
 	}
 
-	if ( !fMatch )
+if (!numbers_ok) continue;
+if ( !fMatch )
 	{
 	    sprintf(buf, "Fread_char: no match.  %s.", word);
 	    log_string(buf);
@@ -1909,6 +1933,26 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
 
 
 
+/* This object has not been published to object_list or counted yet. */
+static void discard_saved_object(OBJ_DATA *obj)
+{
+    char *strings[]={obj->name,obj->short_descr,obj->description,
+        obj->chpoweron,obj->chpoweroff,obj->chpoweruse,
+        obj->victpoweron,obj->victpoweroff,obj->victpoweruse,
+        obj->actcommands,obj->questmaker,obj->questowner};
+    for (unsigned n=0;n<sizeof strings/sizeof *strings;n++) free_string(strings[n]);
+    while (obj->affected) {
+        AFFECT_DATA *p=obj->affected;obj->affected=p->next;
+        p->next=affect_free;affect_free=p;
+    }
+    while (obj->extra_descr) {
+        EXTRA_DESCR_DATA *p=obj->extra_descr;obj->extra_descr=p->next;
+        free_string(p->keyword);free_string(p->description);
+        p->next=extra_descr_free;extra_descr_free=p;
+    }
+    for (unsigned n=0;n<MAX_NEST;n++) if(rgObjNest[n]==obj) rgObjNest[n]=NULL;
+    memset(obj,0,sizeof *obj);obj->next=obj_free;obj_free=obj;
+}
 void fread_obj( CHAR_DATA *ch, FILE *fp )
 {
     static OBJ_DATA obj_zero;
@@ -1920,6 +1964,7 @@ void fread_obj( CHAR_DATA *ch, FILE *fp )
     bool fMatch;
     bool fNest;
     bool fVnum;
+    bool numbers_ok=TRUE;
 
     if ( obj_free == NULL )
     {
@@ -1957,6 +2002,9 @@ void fread_obj( CHAR_DATA *ch, FILE *fp )
 
     for ( ; ; )
     {
+if (!numbers_ok) {
+    ch->pcdata->player_load_failed=1;discard_saved_object(obj);return;
+}
 	word   = feof( fp ) ? "End" : fread_word( fp );
 	fMatch = FALSE;
 
@@ -2030,14 +2078,10 @@ void fread_obj( CHAR_DATA *ch, FILE *fp )
 
 	    if ( !str_cmp( word, "End" ) )
 	    {
-		if ( !fNest || !fVnum )
+if ( !fNest || !fVnum || obj->pIndexData==NULL )
 		{
-		    bug( "Fread_obj: incomplete object.", 0 );
-		    free_string( obj->name        );
-		    free_string( obj->description );
-		    free_string( obj->short_descr );
-		    obj->next = obj_free;
-		    obj_free  = obj;
+    ch->pcdata->player_load_failed=1;
+    discard_saved_object(obj);
 		    return;
 		}
 		else
@@ -2070,7 +2114,7 @@ void fread_obj( CHAR_DATA *ch, FILE *fp )
 		iNest = fread_number( fp );
 		if ( iNest < 0 || iNest >= MAX_NEST )
 		{
-		    bug( "Fread_obj: bad nest %li.", iNest );
+    numbers_ok=FALSE;
 		}
 		else
 		{
@@ -2112,6 +2156,7 @@ void fread_obj( CHAR_DATA *ch, FILE *fp )
 		long sn;
 
 		iValue = fread_number( fp );
+if (!numbers_ok) break;
 		sn     = skill_lookup( fread_word( fp ) );
 		if ( iValue < 0 || iValue > 3 )
 		{
@@ -2152,11 +2197,12 @@ void fread_obj( CHAR_DATA *ch, FILE *fp )
 		long vnum;
 
 		vnum = fread_number( fp );
+if (!numbers_ok || vnum<0) { numbers_ok=FALSE; break; }
 		if ( ( obj->pIndexData = get_obj_index( vnum ) ) == NULL )
 		{
 		    vnum = 30041;
 		    if ( ( obj->pIndexData = get_obj_index( vnum ) ) == NULL )
-			bug( "Fread_obj: bad vnum %li.", vnum );
+numbers_ok=FALSE;
 		    else
 			fVnum = TRUE;
 		}
@@ -2181,7 +2227,8 @@ void fread_obj( CHAR_DATA *ch, FILE *fp )
 
 	}
 
-	if ( !fMatch )
+if (!numbers_ok) continue;
+if ( !fMatch )
 	{
 	    sprintf(log_buf, "Fread_obj: no match - %s.", word);
 	    log_string( log_buf );
@@ -2195,15 +2242,20 @@ void fread_obj( CHAR_DATA *ch, FILE *fp )
 void fread_tiny_obj( CHAR_DATA *ch, FILE *fp )
 {
     OBJ_DATA *obj;
+    OBJ_INDEX_DATA *prototype;
     long iNest, vnum, level;
     bool fNest = FALSE;
+    bool numbers_ok=TRUE;
 
     vnum		= fread_number( fp );
     level		= fread_number( fp );
 
-    if ( ( obj = create_object( get_obj_index( vnum ), level ) ) == NULL )
+    if (!numbers_ok || vnum<0 || (prototype=get_obj_index(vnum))==NULL) {
+        ch->pcdata->player_load_failed=1;return;
+    }
+    if ( ( obj = create_object( prototype, level ) ) == NULL )
     {
-	bug( "Fread_tiny_obj: bad vnum %li.", vnum );
+ch->pcdata->player_load_failed=1;
 	return;
     }
 
@@ -2211,7 +2263,7 @@ void fread_tiny_obj( CHAR_DATA *ch, FILE *fp )
 
     if ( iNest < 0 || iNest >= MAX_NEST )
     {
-	bug( "Fread_tiny_obj: bad nest %li.", iNest );
+ch->pcdata->player_load_failed=1;extract_obj(obj);return;
     }
     else
     {
@@ -2230,6 +2282,10 @@ void fread_tiny_obj( CHAR_DATA *ch, FILE *fp )
     obj->value[2] 	= fread_number( fp );
     obj->value[3] 	= fread_number( fp );
 
+    if (!numbers_ok) {
+        for (unsigned n=0;n<MAX_NEST;n++) if(rgObjNest[n]==obj) rgObjNest[n]=NULL;
+        ch->pcdata->player_load_failed=1;extract_obj(obj);return;
+    }
     if ( iNest == 0 || rgObjNest[iNest] == NULL )
 	obj_to_char( obj, ch );
     else
@@ -2248,22 +2304,23 @@ void do_finger( CHAR_DATA *ch, char *argument )
     char *word;
     bool fMatch;
     bool drop_out = FALSE;
+    bool numbers_ok=TRUE;
 
     char *f_name	= capitalize( argument );
-    char *f_title	= "";
-    char *f_lasthost	= "";
-    char *f_lasttime	= "";
+    char *f_title	= str_empty;
+    char *f_lasthost	= str_empty;
+    char *f_lasttime	= str_empty;
     long   f_extra	= 0;
     long   f_sex	= 0;
     char *f_createtime	= 0;
     long   f_level	= 0;
     long   f_status	= 0;
-    char *f_marriage	= "";
+    char *f_marriage	= str_empty;
     long   f_pkill	= 0;
     long   f_pdeath	= 0;
     long   f_mkill	= 0;
     long   f_mdeath	= 0;
-    char *f_email	= "";
+    char *f_email	= str_empty;
     long   f_played	= 0;
 
     if ( IS_NPC(ch) ) return;
@@ -2317,7 +2374,7 @@ void do_finger( CHAR_DATA *ch, char *argument )
 	    }
 	    fread_to_eol( fp );
 
-	    while ( !drop_out )
+    while ( !drop_out && numbers_ok )
 	    {
 		word   = feof( fp ) ? "End" : fread_word( fp );
 		fMatch = FALSE;
@@ -2395,6 +2452,12 @@ void do_finger( CHAR_DATA *ch, char *argument )
 	fflush( fp );
 	fclose( fp );
 	fpReserve = fopen( NULL_FILE, "r" );
+    }
+    if (!numbers_ok) {
+        free_string(f_title);free_string(f_lasthost);free_string(f_lasttime);
+        free_string(f_createtime);free_string(f_marriage);free_string(f_email);
+        send_to_char("Their playerfile has invalid numeric data.\n\r",ch);
+        return;
     }
     send_to_char("#l--------------------------------------------------------------------------------#n\n\r",ch);
     sprintf( buf, "%s%s%s.\n\r", f_name, drop_out ? " ": "", f_title );
@@ -2499,3 +2562,4 @@ void do_finger( CHAR_DATA *ch, char *argument )
     }
     return;
 }
+#undef fread_number

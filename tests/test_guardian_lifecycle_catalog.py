@@ -10,6 +10,8 @@ def once(text,old,new):
     return text.replace(old,new,1)
 
 def without_guardian_lifecycle_save(text):
+    from file_numbers_source import without_file_number_save
+    text=without_file_number_save(text)
     text=once(text,'#include "guardian.h"\n',"")
     text=once(text,'    fprintf( fp, "More         %li\\n",\n'
                    '        guardian_saved_more(ch, monk_favour_saved_more(ch, &time_info)));',

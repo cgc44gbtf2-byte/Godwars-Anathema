@@ -114,10 +114,44 @@ and leaderboard snapshots. Independent wide-integer checks cover 196 PK and
 eligibility checks, independent leaderboard updates and ordinary file reloads.
 All leaderboard test writes use private temporary directories.
 
-This is not a world-file parser or arbitrary corrupt-stat repair. The legacy
-numeric parser still needs a separate boundary audit; extreme integer file
-loads and leaderboard write/crash durability are not newly guaranteed here.
+The separate numeric-reader audit below covers file decoding, not arbitrary
+corrupt-stat repair or leaderboard write/crash durability.
 Other combat metrics still require valid in-range stats and class inputs.
+
+## Checked numeric file decoding
+
+`file_number.c` handles both signed `long` boundaries and checked decimal/pipe
+arithmetic without recursion. The legacy `|` syntax is **right-associative
+addition**, not bitwise OR: even its intermediate sums must fit. Ordinary signs,
+leading whitespace, numeric prefixes and stream positions remain unchanged.
+One ASCII space is consumed; other delimiters are pushed back, including every
+non-ASCII byte. EOF is never mistaken for a byte. A failed checked read leaves
+its output untouched and distinguishes format, range, work-limit and I/O errors.
+Each field is bounded to 1,024 terms and 65,536 read attempts.
+
+The existing boot/configuration wrapper still stops on an invalid number.
+Full/short player reads, full/tiny inventory reads and offline `finger` instead
+reject the affected record. Temporary fallback values are not accepted as a
+successful load. Numeric failure stops further word parsing and partially read
+inventory is released without publishing a half-built object. Negative lookup
+references, invalid nesting, missing tiny-object templates and impossible board
+counts are rejected before unsafe indexing or logging through a closed reserve.
+Normal missing full-object templates retain the existing 30041 fallback.
+
+The real-engine suite pins **3,042** ordinary parser/player snapshots and checks
+2,744 independent wide-integer pipe combinations, all 256 byte values in leading
+and trailing positions, I/O errors, work limits, leaderboard boundary reloads,
+full/short inventory failures, offline inspection and recovery. A separate
+isolated TCP smoke test rejects malformed records at both login stages without
+rewriting them, keeps an unrelated in-game player responsive, and verifies login
+after the fixture is repaired. No historical accounts or live host are used.
+
+No save format, compatibility epoch, game costs or training ranks changed.
+This is not complete semantic validation of every numeric field: representable
+values can still be inappropriate for downstream gameplay or save arithmetic.
+Legacy string/word readers, unrelated error/logging paths and permanent-disk
+failure recovery remain separate work. Startup still deliberately fails on bad
+boot data; it does not silently substitute numeric defaults.
 
 This is not a whole-codebase formatting audit. Other commands that build
 their own strings still require review. Callers must supply live,

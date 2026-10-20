@@ -34,6 +34,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "file_number.h"
 
 #if !defined(macintosh)
 extern	long	_filbuf		args( (FILE *) );
@@ -2177,48 +2178,12 @@ char fread_letter( FILE *fp )
 long fread_number( FILE *fp )
 {
     long number;
-    bool sign;
-    char c;
-
-    do
-    {
-	c = getc( fp );
+    /* Boot/configuration callers keep their existing fail-fast policy.
+     * Session-facing player readers use the checked API instead. */
+    if (fread_number_checked(fp,&number)!=FILE_NUMBER_OK) {
+        bug("Fread_number: invalid, out-of-range or unreadable number.",0);
+        exit(1);
     }
-    while ( isspace(c) );
-
-    number = 0;
-
-    sign   = FALSE;
-    if ( c == '+' )
-    {
-	c = getc( fp );
-    }
-    else if ( c == '-' )
-    {
-	sign = TRUE;
-	c = getc( fp );
-    }
-
-    if ( !isdigit(c) )
-    {
-	bug( "Fread_number: bad format.", 0 );
-	exit( 1 );
-    }
-
-    while ( isdigit(c) )
-    {
-	number = number * 10 + c - '0';
-	c      = getc( fp );
-    }
-
-    if ( sign )
-	number = 0 - number;
-
-    if ( c == '|' )
-	number += fread_number( fp );
-    else if ( c != ' ' )
-	ungetc( c, fp );
-
     return number;
 }
 

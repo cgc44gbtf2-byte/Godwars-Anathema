@@ -9,6 +9,8 @@ def once(text,old,new):
     return text.replace(old,new,1)
 
 def blob(text):
+    from file_numbers_source import without_file_number_save
+    text=without_file_number_save(text)
     data=text.encode()
     return hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest()
 

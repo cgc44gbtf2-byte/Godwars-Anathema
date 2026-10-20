@@ -7,6 +7,8 @@ from aura_source import without_aura_stage
 from item_info_source import without_item_info_stage
 
 def blob(text):
+    from file_numbers_source import without_file_number_save
+    text=without_file_number_save(text)
     if "void obj_score(" in text:text=without_item_info_stage(text)
     b=text.encode()
     return hashlib.sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest()
