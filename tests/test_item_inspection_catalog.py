@@ -8,7 +8,7 @@ class ItemInspectionCatalog(unittest.TestCase):
     def test_all_other_info_commands_and_getters_remain_pinned(self):
         data=without_item_info_stage((SRC/"act_info.c").read_text()).encode()
         self.assertEqual(hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest(),
-                         "35ad74c88203e8f2ea1ad53b09cab39fae4b74ea")
+                         "bcd53fad2731f9b30016c35eb50d16230280a489")
 
     def test_bounded_text_and_invalid_data(self):
         source=(SRC/"act_info.c").read_text()

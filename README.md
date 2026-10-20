@@ -143,6 +143,8 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   invalid spell references safely, without changing normal item statistics.
   The object-form score display has the same safeguards; weapon comparison
   now handles extreme damage values without overflow or rounding away ties.
+  Room titles and exit lists safely clip oversized labels. `look` also
+  handles missing item prototypes and invalid liquid references without crashing.
   See [message-formatting limits](docs/MESSAGES.md).
   A separate object-factory fix prevents crafted items from freeing mutable
   names, descriptions and spell messages still owned by staff-edited templates.

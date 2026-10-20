@@ -83,6 +83,7 @@ tests/test_hybrid_aura
 tests/test_message_format
 tests/test_identify
 tests/test_item_inspection
+tests/test_room_display
 bootstrap-backups/
 __pycache__/
 *.py[cod]

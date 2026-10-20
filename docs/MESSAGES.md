@@ -64,8 +64,24 @@ The real-engine suite pins **732** original output snapshots and exercises
 The old full-info pins now mask just these separately tested scopes; all other
 commands and class getters remain pinned.
 
-This is not a whole-codebase formatting audit. Room/exit displays, normal
-character scores and other commands that build
+## Room and exit displays
+
+Room titles and detailed exit lists now use bounded formatting and appending.
+Oversized labels are clipped with safe line endings; an unusually large
+detailed exit list may omit later entries at the existing MSL buffer limit.
+Missing room names show `Somewhere`. Looking at objects without a prototype
+still uses their available descriptions; inspecting a nonempty drink with an
+invalid liquid index reports that its colour cannot be determined. No room,
+object or liquid values are repaired or changed by displaying them.
+
+The real-engine suite pins **1,792** original output snapshots across normal,
+Umbra/deep-Umbra, blindness, blindfold, brief, builder, fog, darkness, auto-exit
+and ANSI settings. It also exercises 15 boundary cases, colour clipping, and
+portal room/temporary-shadow restoration. Existing visibility and navigation
+policy is retained; this is not a visibility-policy rewrite.
+
+This is not a whole-codebase formatting audit. Normal character scores
+and other commands that build
 their own strings still require review. Callers must supply live,
 correctly typed pointers and valid acyclic affect lists: arbitrary stale
 pointers and cyclic lists cannot be made safe by output bounds. The output

@@ -43,7 +43,7 @@ class AuraCatalog(unittest.TestCase):
     def test_native_macros_getters_interpreter_codecs_and_training_unchanged(self):
         for path,sha in (("merc.h","b843f157662ab181daabe913d74685f1c8bc75e6"),
                          ("interp.c","ccb0125d4264a8a5447618c29a9240ec674d2eb4"),
-                         ("act_info.c","35ad74c88203e8f2ea1ad53b09cab39fae4b74ea"),
+                         ("act_info.c","bcd53fad2731f9b30016c35eb50d16230280a489"),
                          ("save.c","3655e4f99b37b0d5165e58dc73d78c00b47564fc"),
                          ("classes/monk/monk.c","051fe16da87e9b7647c819512e833893c22762b0"),
                          ("classes/hybrid/training.c","4646c2494470f6427efbba6da69752b32590c2a2")):

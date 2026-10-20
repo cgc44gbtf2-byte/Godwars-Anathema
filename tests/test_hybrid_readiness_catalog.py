@@ -115,7 +115,7 @@ class HybridReadinessCatalog(unittest.TestCase):
         data = native.encode()
         self.assertEqual(hashlib.sha1(b"blob " + str(len(data)).encode() +
                                      b"\0" + data).hexdigest(),
-                         "88a763c1963755f79dfb618f347d275e0f5a40f3")
+                         "88ea3fd8dbee0e720f28111900943102b04f56dd")
         self.assertIn("Genesis/src/classes/hybrid/help.c", make_values(ROOT, "ENGINE_SOURCES"))
 
     def test_book_policy_does_not_enable_readonly_conversion(self):

@@ -1124,6 +1124,24 @@ bool check_blind( CHAR_DATA *ch )
 
 
 
+/* Room display scope: bounded individual reports and exit-list appends. */
+static void room_report(char *buf, size_t used, const char *format, ...)
+{
+    va_list args;
+    int length;
+    if (used >= MSL - 2) return;
+    va_start(args, format);
+    length = vsnprintf(buf + used, MSL - used, format, args);
+    va_end(args);
+    if (length < 0) { buf[used] = '\0'; return; }
+    if ((size_t)length >= MSL - used) {
+        size_t end = MSL - 3, hashes = 0;
+        while (hashes < end && buf[end - hashes - 1] == '#') hashes++;
+        if (hashes % 2 != 0) end--;
+        buf[end++] = '\n'; buf[end++] = '\r'; buf[end] = '\0';
+    }
+}
+
 void do_look( CHAR_DATA *ch, char *argument )
 {
     char buf  [MAX_STRING_LENGTH];
@@ -1142,10 +1160,14 @@ void do_look( CHAR_DATA *ch, char *argument )
     char *pdesc;
     long door;
     bool found;
+    const char *room_name;
 
+    if (ch == NULL || argument == NULL ||
+        (!IS_NPC(ch) && ch->pcdata == NULL)) return;
     if (ch->desc == NULL && (wizard = ch->wizard) == NULL) return;
 
     if (ch->in_room == NULL) return;
+    room_name = ch->in_room->name != NULL ? ch->in_room->name : "Somewhere";
 
     argument = one_argument( argument, arg1 );
     argument = one_argument( argument, arg2 );
@@ -1227,21 +1249,21 @@ void do_look( CHAR_DATA *ch, char *argument )
 	    send_to_char( "The Umbra\n\r", ch );
         else if ( IS_AFFECTED(ch, AFF_SHADOWPLANE) && !IS_AFFECTED(ch, AFF_DEEPUMBRA) && effective_shadowsight(ch))
 	{
-	    if (IS_BUI(ch)) sprintf(buf, "#g%s#n (Umbra) #l[#c%li#l]#n\n\r", ch->in_room->name, ch->in_room->vnum);
-	    else sprintf(buf, "#g%s#n (Umbra)\n\r", ch->in_room->name);
+    if (IS_BUI(ch)) room_report(buf, 0, "#g%s#n (Umbra) #l[#c%li#l]#n\n\r", room_name, ch->in_room->vnum);
+    else room_report(buf, 0, "#g%s#n (Umbra)\n\r", room_name);
 	    send_to_char( buf, ch );
 	}
 	else if ( IS_AFFECTED(ch, AFF_SHADOWPLANE) && IS_AFFECTED(ch, AFF_DEEPUMBRA) && effective_shadowsight(ch))
 	{
-            if (IS_BUI(ch)) sprintf(buf, "#g%s#n (Deep Umbra) #l[#c%li#l]#n\n\r", ch->in_room->name, ch->in_room->vnum);
-            else sprintf(buf, "#g%s#n (Deep Umbra)\n\r", ch->in_room->name);
+            if (IS_BUI(ch)) room_report(buf, 0, "#g%s#n (Deep Umbra) #l[#c%li#l]#n\n\r", room_name, ch->in_room->vnum);
+            else room_report(buf, 0, "#g%s#n (Deep Umbra)\n\r", room_name);
             send_to_char( buf, ch );
         }
 
 	else
 	{
-	    if (IS_BUI(ch)) sprintf(buf, "#g%s  #l[#c%li#l]#n\n\r", ch->in_room->name, ch->in_room->vnum);
-	    else sprintf(buf, "#g%s#n\n\r", ch->in_room->name);
+    if (IS_BUI(ch)) room_report(buf, 0, "#g%s  #l[#c%li#l]#n\n\r", room_name, ch->in_room->vnum);
+    else room_report(buf, 0, "#g%s#n\n\r", room_name);
 	    send_to_char( buf, ch );
 	}
 
@@ -1376,6 +1398,12 @@ void do_look( CHAR_DATA *ch, char *argument )
 		break;
 	    }
 
+    if (obj->value[2] < 0 || obj->value[2] >= LIQ_MAX)
+    {
+        send_to_char("The liquid's colour cannot be determined.\n\r", ch);
+        break;
+    }
+
 	    if (obj->value[1] < obj->value[0] / 5)
 	    	sprintf( buf, "There is a little %s liquid left in it.\n\r",liq_table[obj->value[2]].liq_color);
 	    else if (obj->value[1] < obj->value[0] / 4)
@@ -1455,7 +1483,8 @@ void do_look( CHAR_DATA *ch, char *argument )
 		return;
 	    }
 
-	    pdesc = get_extra_descr( arg1, obj->pIndexData->extra_descr );
+    pdesc = get_extra_descr( arg1, obj->pIndexData != NULL
+        ? obj->pIndexData->extra_descr : NULL );
 	    if ( pdesc != NULL )
 	    {
 		send_to_char( pdesc, ch );
@@ -1484,7 +1513,8 @@ void do_look( CHAR_DATA *ch, char *argument )
 		return;
 	    }
 
-	    pdesc = get_extra_descr( arg1, obj->pIndexData->extra_descr );
+    pdesc = get_extra_descr( arg1, obj->pIndexData != NULL
+        ? obj->pIndexData->extra_descr : NULL );
 	    if ( pdesc != NULL )
 	    {
 		send_to_char( pdesc, ch );
@@ -1622,6 +1652,7 @@ void do_examine( CHAR_DATA *ch, char *argument )
 /*
  * Thanks to Zrin for auto-exit part.
  */
+/* Exit display scope: keep visibility/selection policy; bound the report. */
 void do_exits( CHAR_DATA *ch, char *argument )
 {
     extern char * const dir_name[];
@@ -1631,12 +1662,14 @@ void do_exits( CHAR_DATA *ch, char *argument )
     bool fAuto;
     long door;
 
+    if (ch == NULL || argument == NULL || ch->in_room == NULL ||
+        (!IS_NPC(ch) && ch->pcdata == NULL)) return;
     buf[0] = '\0';
     fAuto  = !str_cmp(argument, "auto");
 
     if (IS_NPC(ch) || !check_blind(ch)) return;
 
-    strcpy( buf, fAuto ? "#r[#yExits#r:#y" : "#yObvious exits#r:#n\n\r" );
+    room_report(buf, 0, "%s", fAuto ? "#r[#yExits#r:#y" : "#yObvious exits#r:#n\n\r");
 
     found = FALSE;
     for ( door = 0; door <= 5; door++ )
@@ -1648,28 +1681,27 @@ void do_exits( CHAR_DATA *ch, char *argument )
 	    found = TRUE;
 	    if ( fAuto )
 	    {
-		strcat( buf, " " );
-		strcat( buf, dir_name[door] );
+room_report(buf, strlen(buf), " %s", dir_name[door]);
 	    }
 	    else
 	    {
 		if (IS_BUI(ch))
-		    sprintf(buf + strlen(buf), "#y%-5s #r-#n %s #0[#7%li#0]#n\n\r", capitalize(dir_name[door]), pexit->to_room->name, pexit->to_room->vnum);
+    room_report(buf, strlen(buf), "#y%-5s #r-#n %s #0[#7%li#0]#n\n\r", capitalize(dir_name[door]), pexit->to_room->name != NULL ? pexit->to_room->name : "Somewhere", pexit->to_room->vnum);
 		else if (IS_SET(world_affects, WORLD_FOG) && IS_OUTSIDE(ch))
-		    sprintf(buf + strlen(buf), "#y%-5s #r-#n Too foggy to tell\n\r", capitalize(dir_name[door]));
+    room_report(buf, strlen(buf), "#y%-5s #r-#n Too foggy to tell\n\r", capitalize(dir_name[door]));
 		else if (room_is_dark(pexit->to_room) && !effective_nightsight(ch))
-		    sprintf(buf + strlen(buf), "#y%-5s #r-#n Too dark to tell\n\r", capitalize(dir_name[door]));
+    room_report(buf, strlen(buf), "#y%-5s #r-#n Too dark to tell\n\r", capitalize(dir_name[door]));
 		else
-		    sprintf(buf + strlen(buf), "#y%-5s #r-#n %s\n\r", capitalize(dir_name[door]), pexit->to_room->name);
+    room_report(buf, strlen(buf), "#y%-5s #r-#n %s\n\r", capitalize(dir_name[door]), pexit->to_room->name != NULL ? pexit->to_room->name : "Somewhere");
 	    }
 	}
     }
 
     if ( !found )
-	strcat( buf, fAuto ? " #ynone" : "None.\n\r" );
+room_report(buf, strlen(buf), "%s", fAuto ? " #ynone" : "None.\n\r");
 
     if ( fAuto )
-	strcat( buf, "#r]#n\n\r" );
+room_report(buf, strlen(buf), "#r]#n\n\r");
 
     send_to_char( buf, ch );
     return;

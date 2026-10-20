@@ -1,5 +1,7 @@
 """Mask only the separately characterized comparison and object-score scopes."""
+from room_display_source import without_room_display_stage
 def without_item_info_stage(text):
+    text=without_room_display_stage(text)
     for marker, original, end, label in (
         ("/* Item comparison scope:", "void do_compare(", "void do_credits(",
          "item comparison"),
