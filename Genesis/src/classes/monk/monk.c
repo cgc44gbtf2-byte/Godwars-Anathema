@@ -926,9 +926,10 @@ void do_celestial( CHAR_DATA *ch, char *argument)
     CHAR_DATA *victim;
     char arg[MIL];
 
-    argument = one_argument(argument, arg);
+    if (ch == NULL) return;
+    argument = one_argument(argument ? argument : "", arg);
 
-    if (!IS_MONK(ch))
+    if (!IS_MONK(ch) || ch->pcdata == NULL || ch->in_room == NULL)
     {
 	stc("Huh?\n\r", ch);
 	return;
@@ -963,6 +964,12 @@ void do_celestial( CHAR_DATA *ch, char *argument)
 	    act("$n just failed to use Celestial Path on you.", ch, NULL, victim, TO_VICT);
 	}
 	return;
+    }
+
+    if (ch->mana < 1500)
+    {
+        stc("You need 1500 mana to open a Celestial path.\n\r", ch);
+        return;
     }
 
     act("$n opens a Celestial path and disappears in a bright flash.", ch, NULL, NULL, TO_ROOM);

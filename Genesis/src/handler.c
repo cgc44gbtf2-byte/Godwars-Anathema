@@ -2023,6 +2023,7 @@ bool can_see( CHAR_DATA *ch, CHAR_DATA *victim )
 {
     CHAR_DATA *vch;
 
+    if (ch == NULL || victim == NULL) return FALSE;
     if (ch == victim) return TRUE;
     if (IS_BUI(ch)) return TRUE;
     if (IS_IMM(victim) && (IS_SET(victim->act, PLR_WIZINVIS)
@@ -2051,6 +2052,9 @@ bool can_see( CHAR_DATA *ch, CHAR_DATA *victim )
 	}
     }
 
+    /* Preserve self/staff/item-vision shortcuts above.  Ordinary room sight
+     * cannot inspect an unplaced observer or target during world lookup. */
+    if (ch->in_room == NULL || victim->in_room == NULL) return FALSE;
    for (vch = victim->in_room->people; vch != NULL; vch = vch->next_in_room)
 	if ((IS_DROW(vch) && get_drow(vch, DROW_GLOBE))) return FALSE;
 
