@@ -3,11 +3,14 @@
 The catalogs still compare complete older modules to their original Git blobs.
 New functions are separately exercised by real-engine and pure parser tests.
 """
+from inventory_records_source import without_inventory_records_stage
+
 def once(text,new,old,count=1):
     assert text.count(new)==count,(repr(new[:100]),text.count(new),count)
     return text.replace(new,old)
 
 def without_string_readers_stage(text):
+    text=without_inventory_records_stage(text)
     if '#include "file_string.h"\n' not in text:return text
     text=once(text,'#include "file_string.h"\n','')
     if 'char *fread_string( FILE *fp )' in text:

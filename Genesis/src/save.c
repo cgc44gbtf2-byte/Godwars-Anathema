@@ -2041,7 +2041,7 @@ void fread_obj( CHAR_DATA *ch, FILE *fp )
     obj->points		= 0;
 
     fNest		= FALSE;
-    fVnum		= TRUE;
+    fVnum		= FALSE;
     iNest		= 0;
 
     for ( ; ; )
@@ -2123,7 +2123,8 @@ if (!numbers_ok) {
 
 	    if ( !str_cmp( word, "End" ) )
 	    {
-if ( !fNest || !fVnum || obj->pIndexData==NULL )
+if ( !fNest || !fVnum || obj->pIndexData==NULL ||
+     (iNest>0 && rgObjNest[iNest-1]==NULL) )
 		{
     ch->pcdata->player_load_failed=1;
     discard_saved_object(obj);
@@ -2131,10 +2132,14 @@ if ( !fNest || !fVnum || obj->pIndexData==NULL )
 		}
 		else
 		{
+		    /* Publish only a complete record. An ascending/root entry
+		     * invalidates every cached descendant of the previous path. */
+		    for (unsigned n=(unsigned)iNest+1;n<MAX_NEST;n++) rgObjNest[n]=NULL;
+		    rgObjNest[iNest]=obj;
 		    obj->next	= object_list;
 		    object_list	= obj;
 		    obj->pIndexData->count++;
-		    if ( iNest == 0 || rgObjNest[iNest] == NULL )
+		    if ( iNest == 0 )
 			obj_to_char( obj, ch );
 		    else
 			obj_to_obj( obj, rgObjNest[iNest-1] );
@@ -2157,13 +2162,12 @@ if ( !fNest || !fVnum || obj->pIndexData==NULL )
 	    if ( !str_cmp( word, "Nest" ) )
 	    {
 		iNest = fread_number( fp );
-		if ( iNest < 0 || iNest >= MAX_NEST )
+		if ( fNest || iNest < 0 || iNest >= MAX_NEST )
 		{
     numbers_ok=FALSE;
 		}
 		else
 		{
-		    rgObjNest[iNest] = obj;
 		    fNest = TRUE;
 		}
 		fMatch = TRUE;
@@ -2241,6 +2245,7 @@ if (!numbers_ok) break;
 	    {
 		long vnum;
 
+		if (fVnum) { numbers_ok=FALSE; break; }
 		vnum = fread_number( fp );
 if (!numbers_ok || vnum<0) { numbers_ok=FALSE; break; }
 		if ( ( obj->pIndexData = get_obj_index( vnum ) ) == NULL )
@@ -2306,13 +2311,13 @@ ch->pcdata->player_load_failed=1;
 
     iNest		= fread_number( fp );
 
-    if ( iNest < 0 || iNest >= MAX_NEST )
+    if ( !numbers_ok || iNest < 0 || iNest >= MAX_NEST ||
+         (iNest>0 && rgObjNest[iNest-1]==NULL) )
     {
 ch->pcdata->player_load_failed=1;extract_obj(obj);return;
     }
     else
     {
-	rgObjNest[iNest] = obj;
 	fNest = TRUE;
     }
 
@@ -2331,7 +2336,9 @@ ch->pcdata->player_load_failed=1;extract_obj(obj);return;
         for (unsigned n=0;n<MAX_NEST;n++) if(rgObjNest[n]==obj) rgObjNest[n]=NULL;
         ch->pcdata->player_load_failed=1;extract_obj(obj);return;
     }
-    if ( iNest == 0 || rgObjNest[iNest] == NULL )
+    for (unsigned n=(unsigned)iNest+1;n<MAX_NEST;n++) rgObjNest[n]=NULL;
+    rgObjNest[iNest]=obj;
+    if ( iNest == 0 )
 	obj_to_char( obj, ch );
     else
 	obj_to_obj( obj, rgObjNest[iNest-1] );

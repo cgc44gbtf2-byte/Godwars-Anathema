@@ -49,7 +49,7 @@ def signup(client, name, password):
     client.sendall(b"\n"); until(client, b"Welcome to Godwars")
 
 
-def run(word_failures=False, string_failures=False):
+def run(word_failures=False, string_failures=False, inventory_failures=False):
     with tempfile.TemporaryDirectory(prefix="anathema-number-wire-") as directory:
         runtime = pathlib.Path(directory)
         for name in ("area", "player", "backup", "notes", "log", "clans"):
@@ -113,7 +113,13 @@ def run(word_failures=False, string_failures=False):
                     # A full-login inventory word with no closing quote.
                     bad_full = original.replace(
                         b"#END\n", b"#OBJECT\n'unterminated\n")
-                if string_failures:
+                if inventory_failures:
+                    end = original.index(b"\nEnd\n", original.index(b"#PLAYER"))
+                    # Keep the authenticated PLAYER section, but start a fresh
+                    # inventory with an orphan child of stock object 30041.
+                    bad_full = original[:end + len(b"\nEnd\n")] + (
+                        b"#OBJECT\nVnum 30041\nNest 1\nEnd\n#END\n")
+                elif string_failures:
                     # Short loading skips inventory. This string is only read
                     # during full loading after the real password is checked;
                     # it fails before a prototype or world item is needed.
@@ -146,9 +152,10 @@ def run(word_failures=False, string_failures=False):
         text = (runtime / "server.log").read_text()
         assert "Normal termination of game." in text
         assert "AddressSanitizer" not in text and "runtime error:" not in text
-    print("Isolated " + ("string" if string_failures else
-                         "word" if word_failures else "numeric") +
-          " short/full-login rejection, unchanged files, "
+    print("Isolated " + ("numeric short/inventory full-login" if inventory_failures else
+                         ("string" if string_failures else
+                          "word" if word_failures else "numeric") + " short/full-login") +
+          " rejection, unchanged files, "
           "unrelated online player, repaired login and SIGTERM passed")
 
 
