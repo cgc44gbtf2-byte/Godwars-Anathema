@@ -50,11 +50,12 @@ class HybridEnchantCatalog(unittest.TestCase):
     }
 
 """
-        magic=(SRC/"magic.c").read_text()
+        from identify_source import without_identify_stage
+        magic=without_identify_stage((SRC/"magic.c").read_text())
         self.assertEqual(magic.count(guard),1)
         data=magic.replace(guard,"",1).encode()
         self.assertEqual(hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest(),
-                         "953e67d4bab0db915e21a75ccc48fa140d9e7de5")
+                         "52236b54f580d78b1f8163a1a14b97044fc80544")
 
     def test_native_costs_bonus_flags_tier_and_equipment_guard(self):
         body=(SRC/"classes/sorcerer/sorcerer.c").read_text().split(

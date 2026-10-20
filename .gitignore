@@ -81,6 +81,7 @@ tests/test_guardian_lifecycle
 tests/test_hybrid_monk_training
 tests/test_hybrid_aura
 tests/test_message_format
+tests/test_identify
 bootstrap-backups/
 __pycache__/
 *.py[cod]

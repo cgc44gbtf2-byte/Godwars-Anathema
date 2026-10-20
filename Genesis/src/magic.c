@@ -28,6 +28,7 @@
 #include <sys/types.h>
 #endif
 #include <stdio.h>
+#include <stdarg.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1534,6 +1535,32 @@ void spell_high_explosive( long sn, long level, CHAR_DATA *ch, void *vo )
 
 
 
+/* Identification helpers are deliberately local; other spell builders are
+ * not implicitly changed by this output-only repair. */
+static void identify_format(char *buf, size_t size, const char *format, ...)
+{
+    va_list args;
+    int length;
+    va_start(args, format);
+    length = vsnprintf(buf, size, format, args);
+    va_end(args);
+    if (length < 0) { buf[0] = '\0'; return; }
+    if ((size_t)length >= size) {
+        size_t used = size - 3, hashes = 0;
+        while (hashes < used && buf[used - hashes - 1] == '#') hashes++;
+        if (hashes % 2 != 0) used--;
+        buf[used++] = '\n'; buf[used++] = '\r'; buf[used] = '\0';
+    }
+}
+
+static long identify_average(long low, long high)
+{
+    /* Opposite signs cannot overflow their sum. Same-sign halves and
+     * remainders preserve C's truncation towards zero without summing first. */
+    if ((low < 0) != (high < 0)) return (low + high) / 2;
+    return low / 2 + high / 2 + (low % 2 + high % 2) / 2;
+}
+
 void spell_identify( long sn, long level, CHAR_DATA *ch, void *vo )
 {
     OBJ_DATA *obj = (OBJ_DATA *) vo;
@@ -1541,13 +1568,16 @@ void spell_identify( long sn, long level, CHAR_DATA *ch, void *vo )
     AFFECT_DATA *paf;
     long itemtype;
 
+    if (ch == NULL || obj == NULL ||
+        (!IS_NPC(ch) && ch->pcdata == NULL)) return;
+
     act("You examine $p carefully.",ch,obj,NULL,TO_CHAR);
     act("$n examines $p carefully.",ch,obj,NULL,TO_ROOM);
 
-    sprintf( buf,
+    identify_format( buf, sizeof(buf),
 	"Object '%s' is type %s, extra flags %s.\n\rWeight is %li, value is %li.\n\r",
 
-	obj->name,
+obj->name != NULL ? obj->name : "something",
 	item_type_name( obj->item_type ),	/* OLC */
 	extra_bit_name( obj->extra_flags ),
 	obj->weight,
@@ -1566,19 +1596,19 @@ void spell_identify( long sn, long level, CHAR_DATA *ch, void *vo )
 	obj->item_type != ITEM_CORPSE_NPC &&
 	obj->item_type != ITEM_CORPSE_PC)
     {
-	sprintf( buf, "This object was created by %s, and is owned by %s.\n\r", obj->questmaker,obj->questowner );
+identify_format( buf, sizeof(buf), "This object was created by %s, and is owned by %s.\n\r", obj->questmaker,obj->questowner );
 	send_to_char( buf, ch );
     }
     else if (obj->questmaker != NULL && strlen(obj->questmaker) > 1 && 
 	obj->item_type != ITEM_CORPSE_NPC && obj->item_type != ITEM_CORPSE_PC)
     {
-	sprintf( buf, "This object was created by %s.\n\r", obj->questmaker );
+identify_format( buf, sizeof(buf), "This object was created by %s.\n\r", obj->questmaker );
 	send_to_char( buf, ch );
     }
     else if (obj->questowner != NULL && strlen(obj->questowner) > 1 && 
 	obj->item_type != ITEM_CORPSE_NPC && obj->item_type != ITEM_CORPSE_PC)
     {
-	sprintf( buf, "This object is owned by %s.\n\r", obj->questowner );
+identify_format( buf, sizeof(buf), "This object is owned by %s.\n\r", obj->questowner );
 	send_to_char( buf, ch );
     }
 
@@ -1653,7 +1683,7 @@ void spell_identify( long sn, long level, CHAR_DATA *ch, void *vo )
     case ITEM_WEAPON:
 	sprintf( buf, "Damage is %li to %li (average %li).\n\r",
 	    obj->value[1], obj->value[2],
-	    ( obj->value[1] + obj->value[2] ) / 2 );
+    identify_average(obj->value[1], obj->value[2]) );
 	send_to_char( buf, ch );
 
 	if (obj->value[0] >= 1000)
@@ -1664,19 +1694,19 @@ void spell_identify( long sn, long level, CHAR_DATA *ch, void *vo )
 	if (itemtype > 0)
 	{
 	    if (obj->level < 10)
-		sprintf(buf,"%s is a minor spell weapon.\n\r",capitalize(obj->short_descr));
+identify_format(buf,sizeof(buf),"%s is a minor spell weapon.\n\r",capitalize(obj->short_descr != NULL ? obj->short_descr : "something"));
 	    else if (obj->level < 20)
-		sprintf(buf,"%s is a lesser spell weapon.\n\r",capitalize(obj->short_descr));
+identify_format(buf,sizeof(buf),"%s is a lesser spell weapon.\n\r",capitalize(obj->short_descr != NULL ? obj->short_descr : "something"));
 	    else if (obj->level < 30)
-		sprintf(buf,"%s is an average spell weapon.\n\r",capitalize(obj->short_descr));
+identify_format(buf,sizeof(buf),"%s is an average spell weapon.\n\r",capitalize(obj->short_descr != NULL ? obj->short_descr : "something"));
 	    else if (obj->level < 40)
-		sprintf(buf,"%s is a greater spell weapon.\n\r",capitalize(obj->short_descr));
+identify_format(buf,sizeof(buf),"%s is a greater spell weapon.\n\r",capitalize(obj->short_descr != NULL ? obj->short_descr : "something"));
 	    else if (obj->level < 50)
-		sprintf(buf,"%s is a major spell weapon.\n\r",capitalize(obj->short_descr));
+identify_format(buf,sizeof(buf),"%s is a major spell weapon.\n\r",capitalize(obj->short_descr != NULL ? obj->short_descr : "something"));
 	    else if (obj->level > 50)
-		sprintf(buf,"%s is an ultimate spell weapon.\n\r",capitalize(obj->short_descr));
+identify_format(buf,sizeof(buf),"%s is an ultimate spell weapon.\n\r",capitalize(obj->short_descr != NULL ? obj->short_descr : "something"));
 	    else
-		sprintf(buf,"%s is a supreme spell weapon.\n\r",capitalize(obj->short_descr));
+identify_format(buf,sizeof(buf),"%s is a supreme spell weapon.\n\r",capitalize(obj->short_descr != NULL ? obj->short_descr : "something"));
 	    send_to_char(buf,ch);
 	}
 
@@ -1695,7 +1725,9 @@ void spell_identify( long sn, long level, CHAR_DATA *ch, void *vo )
 	else if (itemtype == 53)
 	    sprintf (buf, "This weapon is dripping with a dark poison.\n\r");
 	else if (itemtype > 0)
-	    sprintf (buf, "This weapon has been imbued with the power of %s.\n\r",skill_table[itemtype].name);
+    identify_format (buf, sizeof(buf), "This weapon has been imbued with the power of %s.\n\r",
+        itemtype < MAX_SKILL && skill_table[itemtype].name != NULL
+            ? skill_table[itemtype].name : "an unknown spell");
 	if (itemtype > 0)
 	    send_to_char( buf, ch );
 
@@ -1812,7 +1844,8 @@ void spell_identify( long sn, long level, CHAR_DATA *ch, void *vo )
 	break;
     }
 
-    for ( paf = obj->pIndexData->affected; paf != NULL; paf = paf->next )
+    for ( paf = obj->pIndexData != NULL ? obj->pIndexData->affected : NULL;
+          paf != NULL; paf = paf->next )
     {
 	if ( paf->location != APPLY_NONE && paf->modifier != 0 )
 	{

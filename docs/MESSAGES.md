@@ -38,7 +38,21 @@ invalid contexts, colour-boundary clipping, familiar flag restoration and
 object-room audience isolation. Native cases do not deliberately exceed the
 old formatter's limits; boundary tests are separate.
 
-This is not a whole-codebase formatting audit. In particular
-`spell_identify` and other commands that build their own strings before calling
-the shared formatter still require separate review. The output layer itself
-is unchanged. Hybrid conversion and live forms remain disabled.
+## Item identification
+
+`spell_identify` now bounds variable item names, spell labels and ownership
+text before sending it, with safe line endings when clipped. Missing object,
+viewer or prototype data is handled without dereferencing it; invalid weapon
+spell indexes display an unknown-spell description. Weapon damage averages
+are calculated without signed overflow, including negative and extreme values.
+Normal output, item cost, spell effects and ownership rules are unchanged.
+The separate real-engine identification suite pins **1,248** pre-change output
+snapshots and tests 12 boundary cases plus 169 extreme-value average pairs,
+missing contexts and colour clipping. Older whole-magic pins mask only this
+independently tested identification scope; every other spell remains pinned.
+
+This is not a whole-codebase formatting audit. Other commands that build
+their own strings still require review. Callers must supply live,
+correctly typed pointers and valid acyclic affect lists: arbitrary stale
+pointers and cyclic lists cannot be made safe by output bounds. The output
+layer itself is unchanged. Hybrid conversion and live forms remain disabled.
