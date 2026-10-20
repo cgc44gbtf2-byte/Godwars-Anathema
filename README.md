@@ -1,358 +1,93 @@
 # Godwars: Anathema
 
-Godwars: Anathema is a text-based multiplayer RPG built from Genesis.
-This branch focuses on fixing class abilities, protecting player saves and
-making the legacy code easier to maintain. It is not a finished balance pass,
-and this repository does not provide a running game server.
+A classic text-based multiplayer RPG, updated with class fixes, safer player
+saves, improved client support and a more maintainable codebase.
 
-Created by LaWaylon (Luto).
-Copyright (c) 2026 LaWaylon (Luto) - Anathema modifications.
-Original code/world credits, copyrights and license obligations remain intact.
+**Development is ongoing.** This is not a completed balance pass or a guarantee
+that every legacy feature is bug-free.
 
-Game endpoint: **137.184.145.164:4000** (ordinary TCP/Telnet, no IP allowlist).
-This is the configured address, not a claim that the host has been deployed
-or checked from this checkout.
+## Classes and player changes
 
-## Quick install and startup — fresh Debian / Ubuntu
+The ten base classes are **Dragon, Drow, Elementalist, Highlander, Mage, Monk,
+Ninja, Sorcerer, Vampire and Werewolf**.
 
-After cloning this repository onto your server:
+Recent work includes:
 
-```sh
-python3 deploy/setup.py                       # preview, no host changes
-sudo python3 deploy/setup.py --apply --start  # fresh install and boot startup
-```
+- Consent-based Vampire teaching and Path of Blood abilities.
+- Highlander Counter, restored Monk attacks and crafted Drow ammunition.
+- Class-power, equipment and resource-cost fixes.
+- Updated damage wording without changing the existing damage thresholds.
+- Safer saves, reconnects, shutdowns, combat messages and item handling.
+- Mudlet/MudForge support, GMCP vitals and an optional Mudlet HUD.
 
-This installs build dependencies, builds as the unprivileged service account,
-imports the unpacked `Genesis/area/` world, installs systemd and starts it.
-Review historical world content and licensing first. It refuses existing
-installations rather than replacing players, accounts or custom server state.
-It does not configure provider/host firewalls; allow inbound TCP 4000 if needed.
-For an already installed server: `sudo systemctl start anathema.service`.
+See the [class guide](deploy/CLASS_AUDIT.md) and
+[gear guide](deploy/CLASS_GEAR.md) for commands, costs and known gaps.
 
-Create **Luto** through normal signup, log in and type **`authorize`** in full.
-Luto receives the highest staff level; HP/mana/class stats are unchanged.
-There is no offline account creation, Yami promotion or bootstrap secret.
-This intentionally trusts control of the Luto account, not real-world identity.
-See [installation details and upgrades](deploy/INSTALL.md).
+## Hybrid status
 
-For existing installations, use the [CI-gated updater](deploy/UPDATING.md).
-It supports maintenance restarts, staging a compatible binary for your
-in-game `copyover`, verification and explicit binary rollback. Preview with
-`python3 deploy/update.py`; apply only after reviewing the guide.
+**Players cannot convert into hybrids yet.**
 
-Optional [Discord crash/recovery and low-disk alerts](deploy/MONITORING.md)
-use a separate host timer and a private webhook; setup does not restart the MUD.
+`selfbrid list` and `selfbrid info` provide previews for your original class.
+Some secondary-class training and abilities work for existing configured
+records; this does not make general hybrid conversion available.
 
-## Player updates
-
-- **Vampires:** consent-based discipline teaching and five Path of Blood
-  abilities: Taste of Blood, Blood Rage, Blood Potency, Theft of Vitae and
-  Cauldron of Blood.
-- **Highlanders:** Counter can respond to incoming weapon or unarmed melee
-  attacks while using the required katana. It does not counter spells or
-  ranged attacks.
-- **Monks:** Stun Fist is restored with recovery and temporary stun immunity.
-- **Drow:** `drowarmor bolts [1-20]` crafts bolts for 100 Drow points each.
-  Shooting still uses one bolt and 500 Drow points.
-- **Werewolves:** Philodox's damage-cap bonus now checks Philodox training
-  rather than an unrelated tribe rank.
-- **Combat:** Gathering-style damage messages keep Genesis's existing damage
-  thresholds. Stance/style handling and class-ability error checks are being
-  cleaned up without a general damage rebalance. Brittle Bones now expires
-  without walking into the recycled-effect list. Invalid weapon spell values
-  are safely ignored, and ordinary melee no longer retains temporary attack
-  label allocations after each hit. Strikes now stop if a combatant is removed
-  or Friction Curse incapacitates the attacker.
-  Punch and Black Furies' charge also stop follow-up effects against removed
-  targets.
-- **Hybrid preview:** `selfbrid list` shows only the nine planned combinations
-  containing your current base class (the full internal roster remains45);
-  `selfbrid info <listed hybrid name>` shows its two parents. Conversion is not
-  enabled yet: the planned price is 50,000 quest points, but no training,
-  currency or character data is changed.
-  Other-parent info requests are rejected; characters without a supported
-  base class have no choices.
-  `help hybrid` and `help selfbrid` show all45 pairs under both possible
-  original parents; each parent class help links its nine hybrid help topics.
-  Hybrid names use stable mixed colors from `help class`, without combat RNG.
-  Generated help is a binary feature: it does not replace your live help files,
-  and existing custom file-backed topics take priority.
-  Configured Sorcerer hybrids now share a fixed book-chain limit across damage,
-  affect and action pages: Mage6, Drow/Elementalist/Vampire4, other pairings3,
-  in either parent order. Standalone Sorcerers keep10. Existing book damage
-  and affect pages now use learned secondary Sorcerer color ranks from their
-  isolated bank: one full5, others3. Original Sorcerer color access stays native.
-  Native command gates, training/crafting commands and mana costs are unchanged;
-  conversion remains disabled.
-  Existing secondary Sorcerer records can use `selfbrid colors` to see ranks,
-  `selfbrid colors focus blue` to preview a permanent full-color choice,
-  `selfbrid colors focus blue confirm` to save it, and `selfbrid colors blue`
-  to buy one rank at native primal prices. Original Sorcerers still use `colors`.
-  Failed or uncertain saves block repeat purchases until primary save recovery.
-  Existing secondary Sorcerers can also use `sorccreate book`, `sorccreate page`
-  and `sorccreate pen` at native prices:10 primal for book/pen, free blank pages.
-  With a held pen, secondary Sorcerers can also use the native `write` syntax
-  to title books and write/finish spell pages. Writing costs no extra resources,
-  grants no color ranks, and uses normal player saves; casting keeps its
-  existing learned-color requirements and hybrid book-chain limits.
-  Original and secondary Sorcerers may `enchant <item>` only when its claimed
-  owner matches their name (not merely its crafter or current carrier). Use
-  `claim <item>` first for unowned gear; someone else's claim cannot be replaced.
-  Native enchantment adds permanent +5 hitroll/+5 damroll, once per weapon/armor,
-  with no new fee. Artifacts stay excluded, and worn gear must be unequipped.
-  The shared `cast 'enchant weapon'` spell also requires the caster's own claim;
-  its native spell costs, bonuses and exclusions are otherwise unchanged.
-  `vision` now works for validated secondary Sorcerers and keeps its own saved
-  sight sources. Turning it off no longer erases another power's sight.
-  Legacy raw sight flags are preserved, not automatically reassigned; see the
-  vision migration notes in `docs/HYBRIDS.md` before updating active Sorcerers.
-  Every hybrid name also has its own fixed color motif using both parents'
-  `help class` colors; the original parent's color leads in scoped listings.
-  Validated secondary Monks can use `stunfist` after learning Tech 7 on their full
-  Tech path. The native 5,000-mana cost, recovery and shared target immunity stay
-  unchanged. This adds no conversion command, trainer or free training.
-  Their other direct Tech attacks are `repeat` (1), `aurashot` (2), `blitz` (3),
-  `cripple` (5) and `darkblaze` (6). Tech 5+ needs the chosen full Tech path;
-  the other secondary paths cap Tech at 4. Native prices/target rules remain.
-  Secondary Monks on the full Mantra path can also use `almighty` (5) and
-  `lifecloak` (8), with native costs. Cloak is a single-use rescue, not a form;
-  Favor expires at its original next sunrise, including across logout/reload.
-  Legacy blessings without a verifiable deadline need recasting; see
-  [the hybrid guide](docs/HYBRIDS.md).
-  Secondary Monks with learned Mantra 7 on their full Mantra path can use
-  `celestial <target>` for 1,500 mana. Existing destination restrictions and
-  player summon consent remain; insufficient mana never moves the caster.
-  `spiritguardian` also supports learned secondary Mantra 6 on the full
-  Mantra path. It is a free warning toggle—not a summoned pet—and does not
-  stack with existing Vampire/Werewolf access. Existing guardians can be
-  dismissed even after their enabling class or training is removed.
-  Guardians now expire automatically when no supported grant remains, including
-  after loading an older save. Regaining training does not turn them back on:
-  use `spiritguardian` again.
-  Existing secondary Monks can use `selfbrid monk` to view training,
-  `selfbrid monk focus mantra` to preview a permanent full path, then append
-  `confirm` to save that free choice. `selfbrid monk mantra gain` buys one rank
-  for 10 × next rank primal. Choose Mantra, Art or Tech: full cap 8, others 4.
-  Native `monklearn` is unchanged; this does not enable conversion or forms.
-  Learned secondary Mantra 2 also grants `readaura <target>` for characters
-  or carried objects. It uses the free Monk source independently of the
-  original class's powers; ordinary non-hybrid aura-reading rules stay intact.
-  Shared combat, social and equipment messages now safely clip oversized text
-  and handle missing descriptions; ordinary wording is unchanged.
-  Item identification also handles long names, incomplete item records and
-  invalid spell references safely, without changing normal item statistics.
-  The object-form score display has the same safeguards; weapon comparison
-  now handles extreme damage values without overflow or rounding away ties.
-  Room titles and exit lists safely clip oversized labels. `look` also
-  handles missing item prototypes and invalid liquid references without crashing.
-  Character `score` safely clips long identity text and reports unavailable
-  play time/PK score when their saved arithmetic cannot be evaluated safely.
-  Login PK-age checks and derived leaderboard scores now reject invalid
-  arithmetic; staff and covenant displays show unavailable metrics explicitly.
-  Numeric file loading now handles signed integer limits without overflowing.
-  Invalid numeric player records are refused without overwriting the file or
-  taking other players offline; staff should repair or restore the affected file.
-  See [message-formatting limits](docs/MESSAGES.md).
-  A separate object-factory fix prevents crafted items from freeing mutable
-  names, descriptions and spell messages still owned by staff-edited templates.
-  The info page also shows a read-only numeric checklist: 50,000 max HP/mana,
-  max base stats, all ten stances, four weapon proficiencies and trainable
-  styles at their original-class caps. Natural style is exempt for classes
-  that cannot normally enter it; retracting claws does not bypass it for
-  Dragon, Vampire or Werewolf. This is not full conversion eligibility.
-  Optional hybrid saving, untrained secondary initialization, native build
-  choices and paid parent-aware training are implemented internally.
-  Learned combat passives and the safe `bflash`, `bash`, and `judge`
-  Highlander adapters now use parent-owned training in internal tests.
-  Drow Attunement and Faerie Fire also have learned, parent-owned adapters,
-  retaining their native ownership/protection rules and zero activation cost.
-  Sunbath now has a trained secondary-Elementalist adapter at Sun 3, preserving
-  its 800-mana cost; native overflow, a discarded divide and unreliable
-  empty-target handling were fixed.
-  Healing Touch also safely caps HP and uses owned secondary Mantra training:
-  Mantra 4 minimum, 5,000 mana to attempt, actual cost 1.5x rolled healing.
-  These adapters do not enable player hybrid conversion.
-  Checked secondary resource accounting and independent Ninja Ki/rage/cooldown
-  updates are also implemented internally; other activation upkeep is pending.
-  Normal players still cannot create hybrids: conversion, other secondary
-  trainers and live forms remain unavailable. Only color training for an
-  existing secondary Sorcerer record, plus its book/page/pen creation, is exposed.
-  Updates use save epoch3 and reject older
-  binary-only rollbacks.
-  See [hybrid implementation status](docs/HYBRIDS.md).
-- **Vampire upkeep:** Obfuscate no longer takes empty blood below zero.
-  Obfuscate, Shadow and Peace upkeep also handle invalid negative balances
-  without integer overflow. Their normal costs and expiry behavior are unchanged.
-- **Kills and rewards:** Highest-level and highest-XP kill records track the
-  single best kill rather than adding later kills to the record. Players
-  editing in-game still count toward the online XP bonus.
-- **Death text:** Invalid custom death text uses a safe default, and long
-  corpse descriptions are bounded.
-- **MudForge / Mudlet:** Telnet option messages are kept out of commands,
-  including fragmented packets and negotiations interrupted by copyover.
-  GMCP-capable clients can also receive health, mana and applicable class
-  resources without scraping prompts. Automatic maps are not included.
-- **Reliability:** safer player saves, reconnects, shutdowns, item ownership
-  and conjured-item shop handling.
-
-There are ten classes: Vampire, Werewolf, Highlander, Mage, Sorcerer, Monk,
-Ninja, Drow, Dragon and Elementalist. Hybrids are **not enabled**.
-Connect to **137.184.145.164**, port **4000**.
-Classic Telnet traffic is plaintext: never reuse an important password.
-
-### MudForge and Mudlet
-
-Use **137.184.145.164:4000** for a TCP/Telnet connection.
-Mudlet's **Secure/TLS** option requires a separately configured TLS endpoint;
-this server's normal socket is not TLS. MudForge's browser version supplies
-its own bridge, so the game does not need a WebSocket listener.
-See [client setup, tested scope and copyover rollback notes](docs/CLIENTS.md).
-An [optional Mudlet vitals HUD with XML import and Lua source](clients/mudlet/README.md)
-shows health, mana and class resources without automating combat.
-
-## Download and build — Debian / Ubuntu
-
-Supported CI targets: Debian 12/13 and Ubuntu 22.04/24.04.
-Use an ordinary user to build; do not run the game as root.
-The repository is public; HTTPS cloning does not require a GitHub SSH key.
-
-```sh
-sudo apt-get update
-sudo apt-get install -y build-essential libcrypt-dev git ca-certificates python3 unzip luajit
-git clone --branch Godwars-Anathema https://github.com/cgc44gbtf2-byte/Godwars-Anathema.git
-cd Godwars-Anathema
-make -j2
-make test
-python3 tests/test_catalog.py
-```
-
-The executable is `Genesis/src/merc`. Optional extra checks:
-
-```sh
-make sanitize
-make -j2
-```
+See the [hybrid guide](docs/HYBRIDS.md) for implemented features, training rules,
+book limits and remaining work.
 
 ## Install and start
 
-**For an existing server, stop and back up its complete state before upgrading.**
-For a new Debian/Ubuntu server, follow the
-[step-by-step installation guide](deploy/INSTALL.md). It covers the service
-account, private data directories, world-data import, firewall and systemd.
-
-The checkout includes **69 unpacked world/help files** in `Genesis/area/`,
-including `area.lst` and all 65 listed files. No historical accounts, logs,
-notes or archive executable are unpacked. The retained `Genesis.zip` is
-unpatched historical reference material, not an installer.
-
-For a **local test as an ordinary user**, build and start from the repository:
-
-```sh
-make run
-# Optional: make run PORT=4040
-# Validate without starting: python3 tools/start_local.py --check
-```
-
-`make run` validates the world, prepares private runtime directories, changes
-into `Genesis/area/` and starts the patched binary in the foreground. It
-preserves existing saves and refuses runtime symlinks or foreign-owned
-directories. It refuses root: for a root SSH session use the fresh systemd
-installer above, which runs the service as `anathema`.
-The [world audit](docs/WORLD_AUDIT.md) records fixed dependencies and limits.
-
-The game listens on all network interfaces, with no IP allowlist. The intended
-public endpoint is `137.184.145.164:4000`; host/provider firewalls may need an
-inbound TCP 4000 rule. A private GitHub repository does not make the running
-server private. Stop a local foreground instance with Ctrl+C;
-forced kills and disk failures can still lose unsaved progress.
-
-After completing the systemd installation, use:
-
-```sh
-sudo systemctl start anathema.service
-sudo systemctl status anathema.service
-sudo journalctl -u anathema.service -n 50 --no-pager
-sudo systemctl stop anathema.service
-```
-
-Enable startup on boot only after verifying the game starts and saves correctly:
-`sudo systemctl enable anathema.service`.
-For the first owner accounts, see
-[in-game Luto authorization](deploy/INSTALL.md#owner-account-luto).
-
-## More information
-
-- [Classes, skills, costs and known gaps](deploy/CLASS_AUDIT.md)
-- [Class gear and crafted supplies](deploy/CLASS_GEAR.md)
-- [Clan management](deploy/CLAN_MANAGEMENT.md)
-- [Combat code organization and remaining work](docs/COMBAT.md)
-- [Licensing](#licensing)
-
-## Licensing
-
-Original Diku/Merc/God Wars notices are preserved. Referenced permission/license
-documents were absent from the supplied archive; resolve those requirements
-before operating or redistributing the game. This branch grants no new rights.
-
-<details>
-<summary>Developer maintenance history and technical details</summary>
-
-These notes describe successive maintenance stages. Their suite counts refer
-to those stages; the current suite list is maintained in the root `Makefile`.
-The original Diku/Merc/God Wars permissions still need to be resolved before
-operating or redistributing the game; this branch grants no new rights.
-
-Class gear inventory, prices, corrected bugs and remaining content gaps:
-[deploy/CLASS_GEAR.md](deploy/CLASS_GEAR.md).
-
-Drow can craft supplies with `drowarmor bolts [1-20]` at 100 Drow points per
-bolt (default one, no quest/gold/primal charge); firing still costs 500 points.
-
-Conjured-supply resale and timed-item shop safeguards are documented in
-[the consumable economy audit](deploy/CLASS_GEAR.md#conjured-consumables-and-market-follow-up).
-
-Managed class-clan governance is documented in
-[deploy/CLAN_MANAGEMENT.md](deploy/CLAN_MANAGEMENT.md). Staff adoption is
-required before legacy clan-management aliases confer authority. Offices are
-independent of class power ranks; existing titles and Covenants are unchanged.
-
-Reliability and modernization branch of Genesis (God Wars MUD).
-The Git branch is `Godwars-Anathema`: Git does not allow spaces or colons
-in branch names.
-
-## Source and historical archive
-
-**Build and edit `Genesis/src/`.** The original `Genesis.zip` is retained
-unchanged as a historical snapshot, not the patched distribution. Do not
-extract its old source or object files over this tree.
-
-Only source files were unpacked into version control. Historical player
-backups, notes, logs, executables and object files were not republished as
-individual files. The archive still contains historical runtime data:
-do not use its accounts or credentials on a public server.
-
-All original copyright notices are preserved. The source refers to Diku,
-Merc and God Wars licensing/permission requirements; the referenced license
-documents were not present in the supplied archive. This branch does not
-grant new permissions. Resolve those requirements before operating or
+CI targets **Debian 12/13** and **Ubuntu 22.04/24.04**.
+Review the [licensing notes](#credits-and-licensing) before running or
 redistributing the game.
 
-## Build
-
-Requires a C17-capable GCC-compatible compiler, GNU Make, and libcrypt
-development files (for example `build-essential libcrypt-dev` on Ubuntu).
-
-Debian 12/13 and Ubuntu 22.04/24.04 are covered by the CI container matrix.
-On those systems:
+On a fresh server with Git and Python 3 installed:
 
 ```sh
-sudo apt-get update
-sudo apt-get install -y build-essential libcrypt-dev git ca-certificates
+git clone --branch Godwars-Anathema https://github.com/cgc44gbtf2-byte/Godwars-Anathema.git
+cd Godwars-Anathema
+python3 deploy/setup.py                       # preview
+sudo python3 deploy/setup.py --apply --start  # install and start
 ```
 
-Use GCC for the regression suite (one isolated test uses a GCC sanitizer
-parameter to discard an unrelated command table). No administrator/root
-privileges are needed to build or run the MUD on an unprivileged port.
+The installer builds the game, imports the included world, creates the service
+account and configures systemd. It refuses to replace an existing installation.
+
+Use the [installation guide](deploy/INSTALL.md) for prerequisites, owner-account
+authorization, local testing and troubleshooting.
+
+## Server management
+
+For an installed systemd service:
+
+```sh
+sudo systemctl status anathema.service
+sudo systemctl start anathema.service
+sudo systemctl stop anathema.service
+sudo journalctl -u anathema.service -n 50 --no-pager
+```
+
+For updates, follow the [CI-gated update guide](deploy/UPDATING.md). It covers
+copyover, maintenance restarts, verification and rollback.
+Back up the complete server state before upgrading; do not bypass compatibility
+checks or assume an older binary can read migrated saves.
+
+Optional [Discord health alerts](deploy/MONITORING.md) run separately from the
+game service.
+
+## Guides
+
+- [Client setup and compatibility](docs/CLIENTS.md)
+- [Optional Mudlet HUD](clients/mudlet/README.md)
+- [Classes, skills and known gaps](deploy/CLASS_AUDIT.md)
+- [Class gear and consumables](deploy/CLASS_GEAR.md)
+- [Clan management](deploy/CLAN_MANAGEMENT.md)
+- [Hybrid implementation status](docs/HYBRIDS.md)
+- [Combat organization and remaining work](docs/COMBAT.md)
+- [World compatibility audit](docs/WORLD_AUDIT.md)
+
+## Building and testing
+
+Build and edit **`Genesis/src/`**. With the development dependencies installed:
 
 ```sh
 make -j2
@@ -361,392 +96,19 @@ make sanitize
 make -j2
 ```
 
-The executable is `Genesis/src/merc`. `make sanitize` cleans the build and
-runs the isolated regression suites under AddressSanitizer and
-UndefinedBehaviorSanitizer; rebuild afterwards for normal use.
-`LDLIBS` may be overridden for a platform-specific libcrypt path.
-Never enable `NOCRYPT` to work around a missing library.
+The executable is `Genesis/src/merc`. Rebuild normally after sanitizer testing,
+and run the game as an unprivileged service account—not root.
+Current test coverage is defined in the root `Makefile` and CI workflow.
 
-The historical Memwatch allocator is optional: `make clean` followed by
-`make MEMWATCH=1`. Do not combine it with sanitizer tests.
+## Credits and licensing
 
-For an isolated local runtime, supply the original area `.are` and `.hlp`
-files plus `area.lst` under `Genesis/area/`, and create empty sibling
-`player`, `backup`, `notes`, and `log` directories. Run `../src/merc 4000`
-from `Genesis/area`. Do not import historical accounts. The server listens
-on all interfaces by default; restrict access with the host firewall.
+Created by **LaWaylon (Luto)**.
+Copyright (c) 2026 LaWaylon (Luto) — Anathema modifications.
 
-## Verified fixes
+Original Genesis, Diku, Merc and God Wars credits, copyright notices and license
+obligations remain intact. Referenced permission/license documents were absent
+from the supplied archive; resolve those requirements before operating or
+redistributing the game. This branch grants no new rights.
 
-- GNU17 build, correct library link order, automatic header dependencies,
-  and single definitions for leaderboard and extra-description globals.
-- Removed alternate/master login credential acceptance and the embedded
-  credential. Shared password verification rejects pass-the-hash login and
-  handles crypt failures, including account deletion.
-- Descriptor reads handle capacity, interruption and would-block correctly.
-  Writes preserve pending bytes under backpressure and reject zero progress.
-- Output overflow no longer frees a descriptor underneath its caller.
-  Trailing color markers respect explicit input lengths; buffers terminate.
-  Retried output does not regenerate prompts.
-- Empty-string checks inspect string contents rather than pointer addresses.
-- `channels +all/-all` no longer applies an uninitialized bit mask.
-- Geas uses the charm skill identifier rather than an uninitialized value.
-- Friction Curse parses quintessence correctly, initializes and retains
-  adjusted spell power, checks mana before consuming quintessence, and
-  restores the caster's room after a safe-room refusal.
-- Unknown dragon skills return explicitly.
-- Command parsing is sequenced and bounded. Removed broken allocation
-  diagnostics that read uninitialized locals and could access a character
-  after a command freed it.
-- Data readers distinguish EOF from byte 255, terminate final unquoted words
-  at EOF, reject incomplete quotes/strings, and bound string-pool writes.
-  Error reporting no longer hangs on an EOF without a trailing newline.
-- Corrected Memwatch neighbor integrity checks and bounded logging copies.
-
-## Verification and remaining scope
-
-Seventeen regression suites cover network/authentication, data readers,
-editor/command buffer boundaries, atomic player saves and signal handling,
-and gameplay fixes. Normal and ASan/UBSan suites passed locally. The complete
-server compiled and booted with original area/help data in an isolated
-runtime, and returned a TCP greeting. No live player data was loaded.
-
-This is not a claim that the entire legacy game is secure or bug-free.
-Compiler warnings still identify legacy formatting/size risks and unused
-variables. Other
-gameplay paths, non-player persistence, privileged commands and
-long-running multiplayer behavior require further work. Some unflagged
-legacy plaintext passwords resembling encoded hashes are deliberately
-rejected; affected accounts require an operator-assisted reset.
-
-## Password storage and second hardening pass
-
-New and changed passwords use libxcrypt yescrypt with OS-generated random
-salts (cost 5, approximately 16 MiB). Missing entropy, unsupported hashing,
-or hashing failures reject the operation rather than falling back to weak
-hashes. `NOCRYPT` builds are deliberately rejected.
-
-Existing DES and eligible legacy plaintext credentials still verify and
-are upgraded after successful authentication. The fully loaded character
-is saved through the checked player-save path once playing, including
-level-2 accounts and reconnect/takeover paths. The short login record is
-never saved over the full inventory. A failed write does not clear the
-pending migration flag. Modern hashes are not regenerated on every login.
-
-Back up player files before upgrading. After migration, use only this
-yescrypt-capable build; historical binaries are not a supported rollback.
-Legacy DES verifies only its historical password prefix; users should
-change their password after migration. Ordinary autosave eligibility
-remains unchanged; migration uses player-save eligibility. Player-file writes use the atomic save
-path described below, but disk failures can still prevent a migration from
-being persisted.
-
-The second pass also bounds capitalization and command tokens, repairs
-editor empty-string/overflow cases, prevents shared-string mutation and
-replacement leaks, terminates end-of-line reads at EOF, and replaces the
-bug logger's unsafe arbitrary printf interpretation with bounded formatting.
-
-## Atomic saves and systemd
-
-Primary and backup player saves now use same-directory exclusive temporary
-files with mode 0600, checked serialization/flush/file sync/close, atomic
-rename, then directory sync. Pre-rename failures preserve the previous
-save. A directory-sync failure after rename is reported as uncertain
-durability: the new file is visible, but survival across power loss is not
-guaranteed. Abrupt death can leave `.save-*` temporary files; they are not
-loaded as player names. Backups and primary saves are individually atomic,
-not a single transaction.
-
-Player and backup directories must be owned by the service user and must
-not be group/world writable. Symlink directories/targets are rejected;
-keep ancestor directories trusted too. This prevents unsafe deployments
-from silently weakening file protection. Inspect permissions when migrating
-an older installation.
-
-SIGTERM/SIGINT now request shutdown in the main loop, which saves fully
-loaded players and closes connections before a normal exit. Fatal signals
-do not attempt unsafe emergency saves. A forced kill or power failure can
-still lose changes since the most recent successful save.
-
-See [Debian/Ubuntu installation](deploy/INSTALL.md) and the reviewed
-[systemd unit](deploy/anathema.service). They use a dedicated unprivileged
-account, a root-owned read-only executable and restricted writable data
-directories. No service is installed or enabled by this repository.
-
-CI validates the unit without starting systemd, runs seventeen normal/sanitizer
-suites, and boots an isolated world then verifies a clean SIGTERM exit.
-Unit validation does not prove the sandbox or service operates correctly
-on every host; follow the installation guide's host-level checks.
-
-## Class-selection and power audit
-
-Class acquisition tests exercise all ten classes, raw-stat thresholds,
-supported vampire/mage/dragon specializations and owned clan strings.
-Malkavian was advertised without any implemented discipline mapping; it is
-now omitted rather than assigned invented powers.
-
-The subsequent all-class pass repairs chained attacks after target extraction,
-Icicle Storm's missing mana payment, Drow crossbow room-context cleanup,
-named targeting and Vampire power-list names/ranks. It also hardens object-form
-recovery when the bundled world's Hell room is absent. See
-[the audit and limitations](deploy/CLASS_AUDIT.md).
-Control Weather and Energy Drain now have
-[guarded EM adaptations](deploy/RESTORED_SPELLS.md), with actual-engine
-regressions and explicit differences from EM's damage/healing rules.
-
-Power regressions cover Ninja bomb safety, Monk group-blessing initialization,
-Drow flight toggling, Elementalist flying-target immunity and independent
-per-target area damage, Sorcerer area-damage isolation, and Werewolf granite
-walls on one-way, blocked and mismatched exits. Mage spells reject malformed,
-negative or excessive quintessence, restore the caster after remote safety
-checks, and validate covered deterministic targeting failures before payment.
-Inferno initializes its botch state for nonpositive spell power.
-
-This is a targeted correctness pass, not a full balance or ability audit.
-Other explicitly disabled powers and ambiguous design choices remain unchanged;
-Stun Fist was subsequently restored with the safeguards described below.
-
-See [class catalog, costs, raw-stat caps and known gaps](deploy/CLASS_AUDIT.md)
-for the follow-up audit. The added Python catalog check detects duplicate
-command registrations, missing command implementations and unresolved literal
-skill references; run `python3 tests/test_catalog.py` alongside `make test`.
-Follow-up regressions cover Healing Touch affordability, Ninja Vanish Ki,
-Werewolf ward dispatch, Mage listing thresholds and class stat caps/costs.
-
-### Guarded Stun Fist restoration
-
-Monk Technique 7 now enables `stunfist [target]` for 5,000 mana: about one
-second of action/attack interruption, two seconds of attacker recovery, and
-six seconds of per-target Stun Fist immunity measured from application.
-Invalid, protected and immune targets cost nothing. Explicit targets are
-honored; omitting the target uses the current opponent. Players and NPCs use
-the same transient timers; automatic attacks, commands and NPC special
-procedures respect them. Existing damage-over-time/world effects continue.
-This does not enable or rebalance other disabled control powers.
-
-An eleventh regression suite links the actual engine to test casting, combat,
-commands, NPC behavior and immunity with synthetic characters only. Test
-engine objects live separately from production objects, including under
-ASan/UBSan. See the class audit for timing, restart and balance limitations.
-
-## EM-style Vampire teaching and Thaumaturgy
-
-Teaching and the five Path of Blood powers are adapted from Ethereal-Mists
-(`EM.zip`, source commit `885604dbca035103ea8bea96e9e40993e2eb00a4`).
-Genesis's discipline numbers, nine supported clan choices, generation table,
-primal training costs and rank-6/7 availability remain intact. This does **not** import
-EM player files, Ghouls, Gargoyles, hybrid classes, or other disciplines.
-
-Teaching is free and unlocks a discipline at untrained rank `-1`; it does not
-grant rank 1. A teacher may teach any supported discipline trained to rank 3,
-not just clan disciplines. Both players must be connected, visible, standing,
-on the same plane and outside combat:
-
-```
-teachdisc <student> <discipline>
-teachdisc accept <teacher> <discipline>
-teachdisc decline
-```
-
-The student must personally accept the matching named offer within 120 seconds.
-Feeding consent is not teaching consent. Dominate, order, force and nested
-interpreter calls cannot create/accept lessons; switched sessions cannot teach.
-Acceptance rechecks the teacher, student and discipline. Success is reported
-only after the student's atomic save confirms durability. Failed/uncertain
-saves retain the offer and roll the in-memory unlock back for a free,
-idempotent retry. After a post-rename fsync failure the disk may already contain
-the unlock; no XP/primal is ever charged by teaching. Offers are not saved.
-
-| Rank | Command | Effect / cost |
-|---|---|---|
-| 1 | `tasteblood <target>` | Inspect blood, derived potency, and Vampire clan/generation/trained disciplines; no blood cost, 12-pulse recovery. |
-| 2 | `bloodrage <vampire> regenerate` | Enable, never cancel, normal Genesis regeneration. Other players must lower feeding defences to consent. No casting blood cost; regeneration itself pays normal upkeep; 12 pulses. |
-| 3 | `potency` | Spend `10 * (14 - clamp(generation, 1, 13))` blood; gain +100 capacity and +1 potency for `min(rank, 5) * random(5, 10)` world ticks; 12 pulses. Does not fill the extra capacity or stack. |
-| 4 | `theftvitae [target]` | Steal `random(5, 10) * victim potency`, capped by available blood and free capacity; no upfront blood cost; 12 pulses. |
-| 5 | `cauldronblood [target]` | Spend 50 blood; boil up to 10–20 victim blood and inflict that percentage of max HP, reduced by Fortitude; 20 pulses. |
-
-Aliases: `tasteofblood`, `bloodpotency`, `theftofvitae`, `cauldronofblood`.
-A named hostile target takes precedence over the current opponent; omitting it
-uses the current opponent. Rejected casts do not charge resources or recovery.
-Normal safety/PK/plane/combat checks apply before charging. Obfuscation breaks
-on successful hostile casts. Genesis's acidic Werewolf/Vicissitude blood can
-backfire on Theft. Blood depletion does not execute any class: Theft and
-Quietus Leech transfer blood without direct HP damage; Cauldron deals only
-its calculated damage, through the existing death handler. Vampires retain
-Genesis's torpor/starvation rules. All five Thaumaturgy commands and Quietus
-Leech enforce recovery even when invoked indirectly.
-
-**Compatibility adaptations:** base potency derives from Genesis's existing
-generation pools: gen 1 = 10; 2–3 = 8; 4–5 = 5; 6–8 = 4; 9–11 = 3;
-12–13 = 2; other generations/non-Vampires = 1. No third `blood[]` slot is
-introduced. Blood Potency uses one named, serialized capacity affect and a
-derived +1 potency bonus; it survives save/load and generation updates, expires
-on normal world ticks, and clamps current blood when capacity falls. Existing
-skill IDs remain stable; the new skill is appended. Older binaries do not know
-the new skill/affect, so rolling back after using it needs explicit save cleanup.
-Blood Rage's advertised EM stat-boost option was not implemented there and is
-not invented here.
-
-The twelfth suite links the actual engine and covers teaching/forced-consent
-guards, existing training costs/caps, save failures (including post-rename
-directory-fsync uncertainty), target safety, blood boundaries, backfire,
-Fortitude, Vampire torpor, buff expiry and real save/load. These are synthetic
-tests, not multiplayer balance proof. If the world has no trained Thaumaturgy
-teacher, an operator must seed the initial rank-3 teacher through existing
-staff tools; no existing account or clan mapping is changed automatically.
-
-The follow-up [Vampire balance audit](deploy/VAMPIRE_BALANCE.md) compares costs,
-timings and damage with the other nine classes. It documents blood conservation,
-the removal of last-blood executions, Quietus Leech hardening, and the remaining
-high-HP/buff-duration playtesting questions. These are not claims of equal
-strength across classes.
-
-## Class-code organization
-
-Class-specific implementations are grouped under `Genesis/src/classes/<class>/`.
-The explicit `classes/modules.mk` manifest is shared by production and
-real-engine tests; stable saved class IDs live in `classes/class_ids.h`.
-All 15 moved class/header files preserve their pre-cleanup contents. No class
-costs, ranks, skill slots, player-data layout or hybrid availability change.
-
-See [class ownership and the remaining cleanup stages](deploy/CLASS_LAYOUT.md)
-for the ten-class map, shared engine hooks and the separate saved-field
-migration work. `make test` now includes ten layout checks alongside
-27 C suites; `python3 tests/test_catalog.py` runs fourteen additional catalog checks.
-Runtime optimization remains measurement-driven, not an assumed benefit of
-file organization.
-
-Runtime ownership cleanup now validates live reciprocal object/familiar links,
-unwinds switched sessions before player removal, preserves switched-player idle
-activity, and releases staff class-reset links. A real-engine suite exercises
-those paths with private players, rooms and socket pairs. Scope, unchanged
-behavior and remaining risks: [lifecycle safety](deploy/LIFECYCLE_SAFETY.md).
-
-Switched originals now participate in periodic saves. Primary/backup failures
-have independent bounded retries while the character remains loaded, with
-truthful manual-save outcomes and a durable-primary checkpoint before logout
-cleanup. Policy, failure cases and limitations:
-[autosave recovery](deploy/AUTOSAVE_RECOVERY.md).
-
-Manual shutdown/copyover now require durable player checkpoints, and copyover
-uses a checked atomic handoff and failure-safe socket flags. The isolated
-`python3 tests/smoke_copyover.py` exercises real exec and active TCP recovery.
-Upgrade instructions and limits: [restart safety](deploy/RESTART_SAFETY.md).
-
-The sanitizer gate also builds the full server and exercises stock-world
-boot, TCP/TERM and real copyover under ASan/UBSan with fatal diagnostics.
-High-level NPC HP is capped before unsafe squaring/narrowing. Random ranges
-support the full signed-int domain without overflow or a 24-bit ceiling;
-ordinary spans retain the legacy RNG sequence and reversed-range behavior.
-
-The first bounded extraction moved six existing Vampire/Werewolf handlers out
-of `clan.c`: Majesty, Awe, Humanity, Beastlike, Umbral Vision and Rage. Their
-function bodies are byte-identical to the previous head; shared Fangs, Claws,
-Nightsight, Calm and Flex stay in the shared module. The seventeenth suite was
-run against the old handlers before extraction and exercises the same
-real-engine behavior afterward, without loading real accounts.
-
-The next batch extracts Regenerate, Earthmeld, Vanish, Summoning, Possession,
-Mirror Image and Control Illusion into Vampire-owned modules. Each of these
-seven bodies was compared byte-for-byte with head `0f6598a`, and the eighteenth
-full-engine suite passed before and after extraction. It checks rank/class
-gates, group invisibility, summoning consent/room restrictions, NPC bindings,
-actual illusion creation and the five-follower cap. Shared commands and
-transformation commands remain in shared legacy files; no save migration or
-numerical rebalance is bundled with the extraction.
-
-A separate hardening change rejects Possession while the caster already has
-a familiar, matching Control Illusion's existing rule. Previously retargeting
-overwrote the caster's pointer but left the first NPC bound. Regression tests
-cover Dominate ranks 3–7, cross-power bindings and rebinding after NPC removal.
-
-## Shared combat organization
-
-The first staged shared-engine cleanup separates stance behavior, equipment
-styles, fight-list ownership and combat safety. See [the combat ownership,
-repair and optimization notes](docs/COMBAT.md) for the current boundaries,
-regression coverage and remaining attack/defense/damage/death extraction.
-This is not a balance rewrite or a claim of measured performance gains.
-
-## Combat damage wording
-
-Gathering's wording is compressed into Genesis's existing seven damage bands;
-no thresholds, damage calculations, verbs, class costs or recovery rules change.
-
-| Damage passed to the formatter | Severity suffix |
-| --- | --- |
-| 0–50 | like a wimp. |
-| 51–250 | lightly. |
-| 251–500 | hard. |
-| 501–1,000 | incredibly hard! |
-| 1,001–2,500 | with ULTIMATE power! |
-| 2,501–5,000 | with UNGODLY vengeance! |
-| 5,001+ | with UNMERCIFUL strength!! |
-
-Genesis's existing zero-damage formatter behavior remains in the first band;
-this does not introduce a miss tier or change the separate avoidance logic.
-The extra Gathering tiers are not imported. Numeric damage visibility stays
-unchanged for attackers, victims and observers using `PLR_SDAM`.
-Message formatting is bounded so long weapon/power names cannot overflow the
-local display buffers; a missing name displays as `attack`.
-The nineteenth full-engine suite checks both sides of every threshold, all
-six damage types, all four recipient modes, unchanged actor resources/state,
-and oversized/missing names under normal and sanitizer builds.
-
-## Transformation persistence boundary
-
-The shared, non-saving `reset_form_stats()` helper now owns equipment/stat
-cleanup in `transformation.c`. The old `clear_stats()` entry point remains a
-reset-and-save compatibility wrapper. All nine transformation call sites use
-the non-saving helper, then autosave only after flags, appearance and class
-bonuses are complete: Bat, Wolf, Mist, Serpent, Shadow Body and Dragon Form.
-Dragon's return to human also saves its completed state.
-
-Previously those handlers could save a new form bit with the old appearance
-and missing polymorph/flight/ethereal flags, or human flags with the old form
-description. The twentieth full-engine suite first reproduced that disk
-round-trip failure. It covers both directions for all six forms, equipment
-unequipping, affect removal, Dragon features, rejected class/NPC calls, the
-non-saving helper and legacy wrapper, 72 injected save-stage/direction cases,
-separately unavailable primary/backup destinations and explicit save retries.
-
-No saved-field format, class IDs, costs, rank gates or numerical bonuses
-change. Failed pre-rename writes retain the old file; directory-fsync failures
-leave a complete new file visible but durability uncertain. Live gameplay
-remains in the completed form rather than attempting unsafe equipment/affect
-rollback. Primary and backup are independently atomic, not a two-file
-transaction; retries use the existing autosave path. This does not repair
-pre-existing inconsistent saves or finish follower accounting, ownership of
-overlapping temporary flags, class teardown or hybrid migration.
-
-### Highlander safety and source comparison
-
-Highlander Bladeflash and forge safety, with a bounded comparison of
-Highlander abilities in the supplied historical sources, are documented in
-[Highlander options](deploy/HIGHLANDER_OPTIONS.md). This safety patch adds
-no foreign class powers, new save fields or balance changes.
-
-The separate original [Highlander Counter](deploy/HIGHLANDER_COUNTER.md)
-adds an all-melee katana guard and a deferred native riposte: Defense 4,
-Powers 4, 1,000 mana, two-second guard and six-second reuse. It does not
-copy TSOB code, add a Quickening pool or recursively call damage.
-
-### Mage self-targeting combat preflight
-
-Native-engine duel preparation reproduced a null-room crash when a Mage
-used Better Body on themselves. The shared safety helper no longer removes
-a caster from the room for self-targets or other same-room targets, and
-still calls the normal safety check. Remote targets retain the existing
-temporary move and restoration. Regression cases cover self-targets,
-protected self-targets and preservation of same-room character links.
-Spell costs, rank gates and numerical effects are unchanged.
-
-The next native pilot found that Heart's Blood-funded healing could debit
-more stored quintessence than remained, producing a negative body pool.
-Full-amount body debits now consume only the available stored portion;
-the existing Heart's Blood health payment covers the shortfall. Regression
-cases check empty and partially stocked pools alongside the actual health
-and mana charge. This does not change spell price constants or the
-five-quintessence Heart's Blood shortfall limit.
-
-</details>
+`Genesis.zip` is an unpatched historical reference, not an installer.
+Do not extract it over this tree or reuse its historical accounts.
