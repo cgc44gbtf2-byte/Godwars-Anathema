@@ -1205,9 +1205,8 @@ void do_readaura( CHAR_DATA *ch, char *argument )
     long       con_hit, con_dam, con_ac, con_hp, con_mana;
     long       con_max_hp, con_max_mana;
 
-    argument = one_argument( argument, arg );
-
-    if (IS_NPC(ch)) return;
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL || ch->in_room == NULL) return;
+    argument = one_argument( argument != NULL ? argument : "", arg );
 
     if (!IS_VAMPIRE(ch) && !IS_ITEMAFF(ch, ITEMA_VISION) && !IS_WEREWOLF(ch)
      && !IS_NINJA(ch) && !IS_DROW(ch) && !IS_DRAGON(ch) && !IS_MONK(ch) && !IS_MAGE(ch))
@@ -1286,7 +1285,14 @@ void do_readaura( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    act("$n examines $N intently.",ch,NULL,victim,TO_NOTVICT);
+    /* Do not pass missing/oversized mobile labels through the legacy act
+     * expander; the bounded aura line below retains a useful NPC suffix. */
+    const char *npc_label = IS_NPC(victim) ? victim->short_descr : NULL;
+    if (IS_NPC(victim) && (npc_label == NULL ||
+        strlen(npc_label) > sizeof(buf) - sizeof(" is an NPC.\n\r")))
+        act("$n examines someone intently.",ch,NULL,victim,TO_NOTVICT);
+    else
+        act("$n examines $N intently.",ch,NULL,victim,TO_NOTVICT);
     act("$n examines you intently.",ch,NULL,victim,TO_VICT);
 
     if (!IS_NPC(victim) && IS_EXTRA(victim, EXTRA_FAKE_CON))
@@ -1310,7 +1316,10 @@ void do_readaura( CHAR_DATA *ch, char *argument )
 	con_max_mana = victim->max_mana;
     }
 
-    if (IS_NPC(victim)) sprintf(buf, "%s is an NPC.\n\r",victim->short_descr);
+    if (IS_NPC(victim))
+        snprintf(buf, sizeof(buf), "%.*s is an NPC.\n\r",
+                 (int)(sizeof(buf) - sizeof(" is an NPC.\n\r")),
+                 npc_label != NULL ? npc_label : "Someone");
     else 
     {
 	if (IS_ST(victim)) sprintf(buf, "%s is a Storyteller.\n\r", victim->name);

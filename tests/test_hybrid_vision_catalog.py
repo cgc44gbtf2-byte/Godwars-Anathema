@@ -70,6 +70,9 @@ NATIVE_READERS={
     "classes/elemental/elemental.c":"da8474d2063b020b76afbf96269b889388bacf4c359ddc40c470c58f20232583",
 }
 def native_reader_tokens(text):
+    if "void do_readaura(" in text:
+        from aura_source import without_aura_stage
+        text=without_aura_stage(text)
     if "bool can_see( CHAR_DATA *ch, CHAR_DATA *victim )" in text:
         text=without_celestial_visibility_stage(text)
     text=text.replace("if (effective_holylight(victim)) strip_holylight(victim);",

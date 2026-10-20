@@ -4,6 +4,7 @@ import json
 import unittest
 from test_class_layout import ROOT,SRC,make_values
 from test_guardian_lifecycle_catalog import without_guardian_lifecycle_save
+from aura_source import without_aura_stage
 
 def once(text,old,new):
     assert text.count(old)==1,repr(old)
@@ -60,6 +61,7 @@ class GuardianCatalog(unittest.TestCase):
                          ("save.c","1f3317263a45d1a886db411d4c0a52a5bba92909")):
             text=(SRC/path).read_text()
             if path=="save.c":text=without_guardian_lifecycle_save(text)
+            if path=="clan.c":text=without_aura_stage(text)
             self.assertEqual(blob(text),sha)
         self.assertEqual(json.loads((ROOT/"deploy/update_compat.json").read_text()),
                          {"schema":1,"save_epoch":3,"handoff":2})
