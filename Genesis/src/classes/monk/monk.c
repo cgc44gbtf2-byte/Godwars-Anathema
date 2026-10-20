@@ -166,13 +166,13 @@ void do_repeat( CHAR_DATA *ch, char *argument )
     if (ch == NULL) return;
     one_argument(argument, arg);
 
-    if (!IS_MONK(ch) || ch->pcdata == NULL || ch->in_room == NULL)
+    if (!hybrid_power_parent(ch, CLASS_MONK) || ch->pcdata == NULL || ch->in_room == NULL)
     {
 	stc("Huh?\n\r", ch);
 	return;
     }
     
-    const long tech = get_monk(ch, MONK_TECH);
+    const long tech = hybrid_power_rank(ch, CLASS_MONK, HYBRID_TRAIN_MONK, MONK_TECH);
     if (tech < 1)
     {
 	stc("You need Tech 1 for Repeating Fist.\n\r", ch);
@@ -238,13 +238,13 @@ void do_aurashot( CHAR_DATA *ch, char *argument )
     if (ch == NULL) return;
     one_argument(argument, arg);
 
-    if (!IS_MONK(ch) || ch->pcdata == NULL || ch->in_room == NULL)
+    if (!hybrid_power_parent(ch, CLASS_MONK) || ch->pcdata == NULL || ch->in_room == NULL)
     {
 	stc("Huh?\n\r", ch);
 	return;
     }
 
-    const long tech = get_monk(ch, MONK_TECH);
+    const long tech = hybrid_power_rank(ch, CLASS_MONK, HYBRID_TRAIN_MONK, MONK_TECH);
     if (tech < 2)
     {
 	stc("You need Tech 2 for Aura Shot.\n\r", ch);
@@ -319,13 +319,13 @@ void do_blitz( CHAR_DATA *ch, char *argument )
     if (ch == NULL) return;
     one_argument(argument, arg);
 
-    if (!IS_MONK(ch) || ch->pcdata == NULL || ch->in_room == NULL)
+    if (!hybrid_power_parent(ch, CLASS_MONK) || ch->pcdata == NULL || ch->in_room == NULL)
     {
         stc("Huh?\n\r", ch);
         return;
     }
 
-    const long tech = get_monk(ch, MONK_TECH);
+    const long tech = hybrid_power_rank(ch, CLASS_MONK, HYBRID_TRAIN_MONK, MONK_TECH);
     if (tech < 3)
     {
 	stc("You need Tech 3 to use Blitz.\n\r", ch);
@@ -454,13 +454,13 @@ void do_cripple( CHAR_DATA *ch, char *argument )
     if (ch == NULL) return;
     one_argument(argument, arg);
 
-    if (!IS_MONK(ch) || ch->pcdata == NULL || ch->in_room == NULL)
+    if (!hybrid_power_parent(ch, CLASS_MONK) || ch->pcdata == NULL || ch->in_room == NULL)
     {
 	stc("Huh?\n\r", ch);
 	return;
     }
 
-    const long tech = get_monk(ch, MONK_TECH);
+    const long tech = hybrid_power_rank(ch, CLASS_MONK, HYBRID_TRAIN_MONK, MONK_TECH);
     if (tech < 5)
     {
 	stc("You need Tech 5 for Crippling Kick.\n\r", ch);
@@ -524,7 +524,7 @@ void do_darkblaze( CHAR_DATA *ch, char *argument )
     int sn;
 
     if (ch == NULL) return;
-    if (!IS_MONK(ch) || ch->pcdata == NULL || ch->in_room == NULL)
+    if (!hybrid_power_parent(ch, CLASS_MONK) || ch->pcdata == NULL || ch->in_room == NULL)
     {
 	stc("Huh?\n\r", ch);
 	return;
@@ -538,7 +538,7 @@ void do_darkblaze( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    const long tech = get_monk(ch, MONK_TECH);
+    const long tech = hybrid_power_rank(ch, CLASS_MONK, HYBRID_TRAIN_MONK, MONK_TECH);
     if (tech < 6)
     {
 	stc("You need Tech 6 to use Dark Blaze.\n\r", ch);

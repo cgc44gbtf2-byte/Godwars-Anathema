@@ -85,7 +85,7 @@ class MonkCombatCatalog(unittest.TestCase):
             self.assertIn(f"if (tech < {minimum})",body)
             self.assertEqual(body.count(NATIVE_RANK)+body.count(HYBRID_RANK),1)
             self.assertNotRegex(body,r"(?:ch->class\s*=(?!=)|hybrid_secondary_\w+\s*\()")
-        self.assertTrue(all(phases) or not any(phases))
+        self.assertTrue(all(phases))
 
     def test_native_resource_costs_and_attack_count(self):
         text=(SRC/"classes/monk/monk.c").read_text()
@@ -142,6 +142,26 @@ class MonkCombatCatalog(unittest.TestCase):
             self.assertNotIn("AFF_POLYMORPH",body)
             self.assertNotIn("hybrid_forms_",body)
             self.assertNotIn("save_char",body)
+
+    def test_branch_caps_and_live_original_banks_in_engine_matrix(self):
+        test=(ROOT/"tests/test_hybrid_monk_combat.c").read_text()
+        for fragment in ("focus==MONK_TECH?rank:UMIN(rank,4)","rank<=8",
+                         "focus<3","mode<16","skill<5","pairs==25920",
+                         "pairs==32400","fixture(CLASS_MONK,parents[p],rank,-1)",
+                         "secondary_progression.monk[MONK_TECH]=9",
+                         "actors[0].pcdata=NULL","__real_one_hit","__real_hurt_person"):
+            self.assertIn(fragment,test)
+
+    def test_command_costs_guide_and_nonplayable_status_are_documented(self):
+        doc=(ROOT/"docs/HYBRIDS.md").read_text()
+        for fragment in ("Secondary Monk direct attacks","1,200 mana",
+                         "600 per","2,000 mana","5,000 mana","32,400 paired",
+                         "No playable `selfbrid` conversion","Chimera, Almighty Favor"):
+            self.assertIn(fragment,doc)
+        help=(SRC/"classes/hybrid/help.c").read_text()
+        for fragment in ("repeat (1)","aurashot (2)","blitz (3)",
+                         "cripple (5)","darkblaze (6)","Forms and buffs remain native-only"):
+            self.assertIn(fragment,help)
 
 if __name__=="__main__":
     unittest.main()

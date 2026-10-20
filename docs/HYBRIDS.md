@@ -224,6 +224,43 @@ format change (record4/save epoch3/handoff2). Training/attachment are still
 backend operations. Live PvP balance and full hybrid forms remain unproven.
 Generated help describes this scope; custom live-world helps retain priority.
 
+### Secondary Monk direct attacks (existing records only)
+
+The five native Tech attacks accept valid secondary-Monk records and use the
+effective learned Tech rank, not raw storage or the original parent's ranks.
+Tech 1–4 remains available on any secondary Monk path; Tech 5+ requires the
+chosen full Tech path. Nothing grants training for free. Original Monks keep
+the native rank getter and all their original abilities.
+
+- `repeat <target>` — Tech 1; at least 1,200 mana to start, then 600 per
+  attempted unarmed strike, up to `1 + floor(Tech/2)` attacks; 15-pulse wait.
+  Its actual hit damage still uses the original parent's weapon/style rules.
+- `aurashot <target>` — Tech 2; 2,000 mana, 12-pulse wait. A landed shot
+  deals `(200–300) × Tech` and heals the caster for 80% of displayed damage,
+  capped at max HP.
+- `blitz` — Tech 3; 5,000 mana, 18-pulse wait. Native group/safety filters
+  remain: hostile NPCs in the room and only PCs already in combat with the
+  caster. NPC damage is `(750–1,250) × Tech`; PC damage is `(500–750) × Tech`.
+- `cripple <target>` — Tech 5; 2,000 mana, 9-pulse wait. Its unarmed melee
+  contact still meets Counter before damage; a hit drains the target's mana
+  by three times its damage without going below zero.
+- `darkblaze <target>` — Tech 6; 2,000 mana, 18-pulse wait. Retains the
+  native blind duration and strips the target's holy sight, including
+  source-owned Sorcerer sight, without changing the other sight modes.
+
+Native command bodies remain structurally unchanged beyond scoped class/rank
+gates and separately characterized safety repairs: Aura Shot's HP addition,
+Cripple's mana subtraction, missing combat room/PC data, and callback-driven
+target/actor removal in Repeat/Blitz. The tests reproduced the old failures,
+pin 720 normal native command snapshots, compare 32,400 paired real-engine
+command runs, and reject 50 invalid or untrained secondary cases. They do
+not establish live PvP balance or full multi-class form compatibility.
+
+No playable `selfbrid` conversion, Monk focus/trainer UI, saved form ownership,
+or access to Chimera, Almighty Favor, Celestial Path, Life Cloak, or clan
+leadership commands is added here. Record4/save epoch3/handoff2 are unchanged;
+custom world help files still take priority over generated hybrid help.
+
 ### Native material-factory ownership audit
 
 The recipe audit also reproduced a native item-factory ownership defect:

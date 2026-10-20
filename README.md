@@ -111,6 +111,9 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   Validated secondary Monks can use `stunfist` after learning Tech 7 on their full
   Tech path. The native 5,000-mana cost, recovery and shared target immunity stay
   unchanged. This adds no conversion command, trainer or free training.
+  Their other direct Tech attacks are `repeat` (1), `aurashot` (2), `blitz` (3),
+  `cripple` (5) and `darkblaze` (6). Tech 5+ needs the chosen full Tech path;
+  the other secondary paths cap Tech at 4. Native prices/target rules remain.
   A separate object-factory fix prevents crafted items from freeing mutable
   names, descriptions and spell messages still owned by staff-edited templates.
   The info page also shows a read-only numeric checklist: 50,000 max HP/mana,

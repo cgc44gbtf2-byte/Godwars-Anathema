@@ -169,6 +169,78 @@ static void boundaries(int mode)
     }
 }
 
+static void paired(void)
+{
+    int pairs=0;
+    for(int p=0;p<9;p++)for(long rank=0;rank<=8;rank++)
+    for(long focus=-1;focus<3;focus++)for(int mode=0;mode<16;mode++)
+    for(int skill=0;skill<5;skill++){
+        long effective=focus==MONK_TECH?rank:UMIN(rank,4);
+        SNAPSHOT native,hybrid;
+        fixture(CLASS_MONK,0,effective,-1);run(skill,mode,&native);
+        fixture(parents[p],CLASS_MONK,rank,focus);
+        assert(hybrid_power_rank(actors,CLASS_MONK,HYBRID_TRAIN_MONK,MONK_TECH)==effective);
+        run(skill,mode,&hybrid);
+        /* one_hit intentionally uses the original parent's native weapon
+         * bonuses; those damage/RNG rolls need not equal a pure Monk's. */
+        if(skill==0){
+            for(int i=0;i<23;i++){
+                if(i==6||i==8||i==21)continue; /* victim HP, position, RNG */
+                if(native.v[i]!=hybrid.v[i])
+                    fprintf(stderr,"repeat difference p=%d rank=%ld focus=%ld mode=%d field=%d native=%ld hybrid=%ld\n",
+                            p,rank,focus,mode,i,native.v[i],hybrid.v[i]);
+                assert(native.v[i]==hybrid.v[i]);
+            }
+        }else if(memcmp(&native,&hybrid,sizeof(native))){
+            fprintf(stderr,"skill difference p=%d rank=%ld focus=%ld mode=%d skill=%d\n",
+                    p,rank,focus,mode,skill);
+            for(int i=0;i<23;i++)if(native.v[i]!=hybrid.v[i])
+                fprintf(stderr," field%d native=%ld hybrid=%ld\n",i,native.v[i],hybrid.v[i]);
+            assert(!memcmp(&native,&hybrid,sizeof(native)));
+        }
+        pairs++;
+    }
+    assert(pairs==25920);
+    for(int p=0;p<9;p++)for(long rank=0;rank<=8;rank++)
+    for(int mode=0;mode<16;mode++)for(int skill=0;skill<5;skill++){
+        SNAPSHOT native,hybrid;
+        fixture(CLASS_MONK,0,rank,-1);run(skill,mode,&native);
+        fixture(CLASS_MONK,parents[p],rank,-1);run(skill,mode,&hybrid);
+        if(memcmp(&native,&hybrid,sizeof(native))){
+            fprintf(stderr,"original Monk difference p=%d rank=%ld mode=%d skill=%d\n",p,rank,mode,skill);
+            assert(!memcmp(&native,&hybrid,sizeof(native)));
+        }
+        pairs++;
+    }
+    assert(pairs==32400);
+}
+
+static void fail_closed(void)
+{
+    for(int mode=0;mode<10;mode++)for(int skill=0;skill<5;skill++){
+        fixture(CLASS_NINJA,CLASS_MONK,8,MONK_TECH);
+        if(mode==0)pcs[0].hybrid_present=0;
+        if(mode==1)pcs[0].hybrid_present=2;
+        if(mode==2)pcs[0].player_load_failed=1;
+        if(mode==3)pcs[0].hybrid.primary_class=CLASS_DROW;
+        if(mode==4)pcs[0].hybrid.secondary_class=CLASS_SORCERER;
+        if(mode==5)pcs[0].hybrid.secondary_progression.monk[MONK_TECH]=9;
+        if(mode==6){actors[0].act=ACT_IS_NPC;actors[0].pcdata=NULL;}
+        if(mode==7){actors[0].class=CLASS_NONE;actors[0].level=LEV_IMP;}
+        if(mode==8)actors[0].pcdata=NULL;
+        if(mode==9)pcs[0].hybrid.secondary_progression.monk[MONK_TECH]=0;
+        switch(skill){
+        case 0:do_repeat(actors,"beta");break;
+        case 1:do_aurashot(actors,"beta");break;
+        case 2:do_blitz(actors,"");break;
+        case 3:do_cripple(actors,"beta");break;
+        case 4:do_darkblaze(actors,"beta");break;
+        }
+        assert(actors[0].mana==50000&&!actors[0].wait&&
+               actors[1].hit==50000000&&!actors[1].affected_by&&!hits&&!hurts);
+    }
+}
+
 int main(int argc,char **argv)
 {
     if(argc==2&&!strcmp(argv[1],"--native-dump")){native_dump(1);return 0;}
@@ -179,6 +251,7 @@ int main(int argc,char **argv)
     }
     assert(native_dump(0)==UINT64_C(0xd7e43eace6e725b7));
     for(int mode=1;mode<=7;mode++)boundaries(mode);
-    printf("Monk combat:720 native snapshots,7 numeric/lifecycle boundaries; native stage.\n");
+    paired();fail_closed();
+    printf("Monk combat:720 native snapshots,32400 paired command replays,50 denial guards,7 native boundary fixes.\n");
     return 0;
 }
