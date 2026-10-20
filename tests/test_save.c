@@ -12,6 +12,7 @@
 #include <sys/wait.h>
 
 time_t current_time = 12345;
+TIME_INFO_DATA time_info;
 FILE *fpReserve;
 const struct skill_type skill_table[MAX_SKILL] = {{0}};
 BOARD_DATA boards[MAX_BOARD];

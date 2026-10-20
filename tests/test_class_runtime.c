@@ -9,6 +9,7 @@
 #include <string.h>
 #include <strings.h>
 #include "../Genesis/src/merc.h"
+TIME_INFO_DATA time_info;
 
 static CHAR_DATA caster, opponent, *target;
 static PC_DATA caster_pc, opponent_pc, target_pc;

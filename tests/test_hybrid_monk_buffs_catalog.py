@@ -3,6 +3,7 @@ import hashlib
 import json
 import unittest
 from test_class_layout import ROOT, SRC, make_values
+from test_favour_expiry_catalog import without_favour_metadata_monk,without_favour_metadata_merc
 
 BASE_MONK="6b39e0bfa7c961f53a82ce8061044152c2d26809"
 BASE_DEATH="c4dd62ddf5117d3d7f01e788f526b497ee58cf08"
@@ -33,6 +34,7 @@ def replace_once(text,old,new):
     return text.replace(old,new,1)
 
 def without_monk_buff_stage(text):
+    text=without_favour_metadata_monk(text)
     start=text.index("void do_almighty(")
     helper=text.index("void monk_favour_sunrise(void)",start)
     end=text.index("void do_celestial(",helper)
@@ -85,7 +87,7 @@ class MonkBuffCatalog(unittest.TestCase):
     def test_death_dawn_and_declarations_restore_exact_originals(self):
         self.assertEqual(blob(without_cloak_death_stage((SRC/"combat_death.c").read_text())),BASE_DEATH)
         self.assertEqual(blob(without_favour_dawn_stage((SRC/"update.c").read_text())),BASE_UPDATE)
-        text=(SRC/"merc.h").read_text()
+        text=without_favour_metadata_merc((SRC/"merc.h").read_text())
         self.assertEqual(blob(replace_once(text,
             "void monk_favour_sunrise(void);\nbool monk_cloak_can_save(CHAR_DATA *victim);\n","")),
             BASE_MERC)
@@ -101,7 +103,7 @@ class MonkBuffCatalog(unittest.TestCase):
                             r"weather_update|update_pos)\s*\([^;]*\)\s*\{")
 
     def test_resource_flags_and_accounting_are_unchanged(self):
-        text=(SRC/"classes/monk/monk.c").read_text()
+        text=without_favour_metadata_monk((SRC/"classes/monk/monk.c").read_text())
         for v in ("ch->mana -= 20000;","ch->mana -= 5000;",
                   "WAIT_STATE(ch, 24);","WAIT_STATE(ch, 12);",
                   "SET_BIT(vch->more, MORE_FAVOUR);","SET_BIT(victim->more, MORE_FAVOUR);",
@@ -143,7 +145,7 @@ class MonkBuffCatalog(unittest.TestCase):
         self.assertIn("ch->more==(MORE_FAVOUR|MORE_CLOAK|MORE_GUARDIAN)",load)
 
     def test_only_owned_flags_are_cleared(self):
-        text=(SRC/"classes/monk/monk.c").read_text()
+        text=without_favour_metadata_monk((SRC/"classes/monk/monk.c").read_text())
         sweep=text.split("void monk_favour_sunrise(void)",1)[1].split("bool monk_cloak_can_save(",1)[0]
         self.assertIn("vch=char_list",sweep)
         self.assertEqual(sweep.count("REMOVE_BIT("),1)
@@ -153,13 +155,13 @@ class MonkBuffCatalog(unittest.TestCase):
     def test_usage_and_offline_rollback_limits_are_honest(self):
         docs=(ROOT/"docs/HYBRIDS.md").read_text()
         for fragment in ("Secondary Monk persistent buffs","14,580 paired",
-                         "180 full/short loads","no persisted absolute-expiry",
+                         "180 full/short loads","Offline Favor expiry",
                          "An older binary","Chimera and live form"):
             self.assertIn(fragment,docs)
         help=(SRC/"classes/hybrid/help.c").read_text()
         self.assertIn("Secondary Monk Mantra: almighty (5;",help)
         self.assertIn("lifecloak (8;",help)
-        self.assertIn("not offline expiry timestamps",help)
+        self.assertIn("Favor deadlines are also checked on reload",help)
 
 if __name__=="__main__":
     unittest.main()

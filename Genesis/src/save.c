@@ -35,6 +35,7 @@
 #include "merc.h"
 #include "atomic_save.h"
 #include "classes/hybrid/player.h"
+#include "classes/monk/favour.h"
 
 #if !defined(macintosh)
 extern	long	_filbuf		args( (FILE *) );
@@ -298,7 +299,8 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
     fprintf( fp, "Act          %li\n",  ch->act			);
     /* Descriptor ownership is runtime-only; keep the live switch untouched. */
     fprintf( fp, "Extra        %li\n",  ch->extra & ~EXTRA_SWITCH);
-    fprintf( fp, "More         %li\n",  ch->more		);
+    fprintf( fp, "More         %li\n",monk_favour_saved_more(ch, &time_info));
+    monk_favour_write(fp, ch, &time_info);
     fprintf( fp, "Xtra         %li\n",  ch->xtra		);
     fprintf( fp, "AffectedBy   %li\n",	ch->affected_by		);
     fprintf( fp, "Spheres      %li %li %li %li %li %li %li %li %li\n",
@@ -1296,7 +1298,8 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
 	{
 	case '*':
 	    fMatch = TRUE;
-	    fread_to_eol( fp );
+    if (!str_cmp(word, "*AnathemaFavor")) monk_favour_read(ch, fp);
+    else fread_to_eol( fp );
 	    break;
 
 	case 'A':
@@ -1517,6 +1520,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
                 /* Older saves may contain this runtime-only marker. */
                 REMOVE_BIT(ch->extra,EXTRA_SWITCH);
                 normalize_combat_training(ch);
+                monk_favour_reconcile(ch, &time_info);
                 return;
             }
 	    KEY( "Exp",		ch->exp,		fread_number( fp ) );

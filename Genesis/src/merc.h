@@ -1545,6 +1545,8 @@ struct	char_data
     long		act;
     long		extra;
     long		more;
+    long                favour_since; /* Optional next-dawn metadata, game hours. */
+    long                favour_until;
     long		xtra;
     long		affected_by;
     long		position;

@@ -119,8 +119,8 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
         send_to_char("Secondary Monk Mantra: almighty (5; 5000 mana single / "
                      "20000 group), lifecloak (8; full HP/mana, spends all mana). "
                      "Both need the full Mantra path; other paths cap Mantra at4. "
-                     "Cloak rescues once. Favor dawn cleanup covers loaded characters, "
-                     "not offline expiry timestamps.\n\r", ch);
+                     "Cloak rescues once. Favor dawn cleanup covers loaded characters. "
+                     "Favor deadlines are also checked on reload; legacy Favor needs recasting.\n\r", ch);
     }
     long pages = hybrid_book_chain_policy(h);
     if (pages) {

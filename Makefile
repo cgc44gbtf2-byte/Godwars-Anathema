@@ -43,9 +43,10 @@ TESTS += tests/test_hybrid_vision
 TESTS += tests/test_hybrid_stun
 TESTS += tests/test_hybrid_monk_combat
 TESTS += tests/test_hybrid_monk_buffs
+TESTS += tests/test_favour_expiry
 # Real validators/effective access for older isolated native fixtures too.
 # Never replace hybrid access with permissive stubs just to satisfy linking.
-HYBRID_ACCESS_SOURCES = $(addprefix Genesis/src/classes/hybrid/,registry.c state.c player.c build.c progression.c specialization.c access.c passives.c books.c) Genesis/src/classes/sorcerer/vision.c
+HYBRID_ACCESS_SOURCES = $(addprefix Genesis/src/classes/hybrid/,registry.c state.c player.c build.c progression.c specialization.c access.c passives.c books.c) Genesis/src/classes/sorcerer/vision.c Genesis/src/classes/monk/favour.c
 
 all:
 	$(MAKE) -C Genesis/src
@@ -72,7 +73,7 @@ tests/test_signals: tests/test_signals.c $(ENGINE_SOURCES) $(ENGINE_HEADERS)
 # test_save embeds save.c; retain its isolated atomic fault injection while
 # linking the real optional record validator/codec, not permissive test stubs.
 tests/test_save: tests/test_save.c $(ENGINE_SOURCES) $(ENGINE_HEADERS)
-	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< Genesis/src/classes/hybrid/state.c Genesis/src/classes/hybrid/player.c Genesis/src/classes/hybrid/build.c Genesis/src/classes/hybrid/progression.c Genesis/src/classes/hybrid/specialization.c Genesis/src/classes/hybrid/registry.c $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< Genesis/src/classes/hybrid/state.c Genesis/src/classes/hybrid/player.c Genesis/src/classes/hybrid/build.c Genesis/src/classes/hybrid/progression.c Genesis/src/classes/hybrid/specialization.c Genesis/src/classes/hybrid/registry.c Genesis/src/classes/monk/favour.c $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_classes tests/test_wall tests/test_mage_powers: tests/%: tests/%.c $(ENGINE_SOURCES) $(ENGINE_HEADERS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) -O0 $< $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
@@ -109,6 +110,7 @@ check-layout:
 	python3 tests/test_hybrid_stun_catalog.py
 	python3 tests/test_hybrid_monk_combat_catalog.py
 	python3 tests/test_hybrid_monk_buffs_catalog.py
+	python3 tests/test_favour_expiry_catalog.py
 	python3 tests/test_combat_layout.py
 	python3 tests/test_telnet_layout.py
 	python3 tests/test_gmcp_layout.py
@@ -189,6 +191,9 @@ tests/test_hybrid_monk_combat: tests/test_hybrid_monk_combat.c $(ENGINE_OBJECTS)
 
 tests/test_hybrid_monk_buffs: tests/test_hybrid_monk_buffs.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
+tests/test_favour_expiry: tests/test_favour_expiry.c Genesis/src/classes/monk/favour.c $(ENGINE_HEADERS)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< Genesis/src/classes/monk/favour.c $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_hybrid_vision: tests/test_hybrid_vision.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@

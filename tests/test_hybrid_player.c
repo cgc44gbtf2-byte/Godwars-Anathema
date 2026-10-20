@@ -12,6 +12,7 @@
 #include "atomic_save.h"
 #include "classes/hybrid/player.h"
 #include "classes/hybrid/specialization.h"
+#include "classes/monk/favour.h"
 
 extern char *string_space, *top_string;
 extern void init_mm(void);
@@ -120,6 +121,7 @@ static void all_pairs(void)
                    ch->pcdata->powers[2] == 7 && ch->pcdata->quest == 50000);
             /* Existing More serialization, not a new hybrid save field. */
             ch->more=MORE_FAVOUR|MORE_CLOAK|MORE_GUARDIAN;
+            assert(monk_favour_grant(ch, &time_info));
             assert(save_char_obj_checked(ch));
             assert(save_char_obj_backup_checked(ch));
             char *disk = read_file("../player/Newfixture");
@@ -248,6 +250,37 @@ static void corruptions(void)
     }
 }
 
+static void favour_expiry(void)
+{
+    const long keep=MORE_CLOAK|MORE_GUARDIAN;
+    for(int short_load=0;short_load<2;short_load++)
+    for(int expired=0;expired<2;expired++){
+        time_info.hour=5;time_info.day=34;time_info.month=16;time_info.year=1300;
+        CHAR_DATA *ch=fresh();ch->class=CLASS_MONK;
+        ch->pcdata->monk[MONK_MANTRA]=5;ch->more=keep;
+        assert(monk_favour_grant(ch,&time_info)&&save_char_obj_checked(ch));
+        release(ch);
+        if(expired)time_info.hour=6;
+        memset(&shell,0,sizeof(shell));
+        assert(short_load?load_char_short(&shell,"Newfixture"):load_char_obj(&shell,"Newfixture"));
+        ch=shell.character;assert(!ch->pcdata->player_load_failed);
+        assert((ch->more&keep)==keep&&!!IS_MORE(ch,MORE_FAVOUR)==!expired);
+        if(!expired)assert(ch->favour_until>ch->favour_since);
+        else assert(!ch->favour_since&&!ch->favour_until);
+        release(ch);assert(unlink("../player/Newfixture")==0);
+    }
+    /* Legacy More flags have no evidence that the original dawn is pending. */
+    for(int short_load=0;short_load<2;short_load++){
+        FILE *fp=fopen("../player/Newfixture","w");assert(fp);
+        fprintf(fp,"#PLAYER\nName Newfixture~\nLevel 2\nMore %ld\nEnd\n#END\n",keep|MORE_FAVOUR);
+        assert(fclose(fp)==0);memset(&shell,0,sizeof(shell));
+        assert(short_load?load_char_short(&shell,"Newfixture"):load_char_obj(&shell,"Newfixture"));
+        assert(shell.character->more==keep&&!shell.character->pcdata->player_load_failed);
+        release(shell.character);assert(unlink("../player/Newfixture")==0);
+    }
+    memset(&time_info,0,sizeof(time_info));
+}
+
 int main(void)
 {
     char root[] = "/tmp/anathema-hybrid-player-XXXXXX", cwd[4096];
@@ -260,7 +293,7 @@ int main(void)
     room.vnum = 900; room.area = &area;
     room.name = "Private fixture room"; room.description = "";
     room_index_hash[900 % MAX_KEY_HASH] = &room;
-    all_pairs(); legacy_and_atomic(); corruptions();
+    favour_expiry();all_pairs(); legacy_and_atomic(); corruptions();
     assert(fclose(fpReserve) == 0 && chdir("..") == 0);
     assert(rmdir("player") == 0 && rmdir("backup") == 0 &&
            rmdir("run") == 0 && chdir(cwd) == 0 && rmdir(root) == 0);

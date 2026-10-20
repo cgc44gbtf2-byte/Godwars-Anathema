@@ -27,6 +27,7 @@
 #include <limits.h>
 #include "merc.h"
 #include "classes/hybrid/access.h"
+#include "classes/monk/favour.h"
 
 
 void do_monklearn( CHAR_DATA *ch, char *argument )
@@ -810,6 +811,12 @@ void do_almighty( CHAR_DATA *ch, char *argument )
 	return;
     }
 
+    if (!monk_favour_clock_valid(&time_info))
+    {
+stc("The blessing is unavailable while the world clock is invalid.\n\r", ch);
+return;
+    }
+
     if (arg[0] == '\0') victim = ch;
 
     if (!str_cmp(arg, "group"))
@@ -833,7 +840,7 @@ void do_almighty( CHAR_DATA *ch, char *argument )
 	    stc("You feel your worries disappear.\n\r", vch);
 	    act("$n begins to glow with a soft light.", vch, NULL, NULL, TO_ROOM);
 
-	    SET_BIT(vch->more, MORE_FAVOUR);
+	    monk_favour_grant(vch, &time_info);
 	}
 
 	if (!any_affected)
@@ -884,7 +891,7 @@ void do_almighty( CHAR_DATA *ch, char *argument )
     }
 
     ch->mana -= 5000;
-    SET_BIT(victim->more, MORE_FAVOUR);
+    monk_favour_grant(victim, &time_info);
     WAIT_STATE(ch, 12);
     return;
 }
@@ -898,7 +905,7 @@ void monk_favour_sunrise(void)
     {
 next=vch->next;
 if (!IS_MORE(vch, MORE_FAVOUR)) continue;
-REMOVE_BIT(vch->more, MORE_FAVOUR);
+monk_favour_clear(vch);
 if (!IS_NPC(vch))
     stc("You feel weary as the blessing of the almighty fades from you.\n\r", vch);
     }

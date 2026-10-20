@@ -74,6 +74,7 @@ tests/test_hybrid_vision
 tests/test_hybrid_stun
 tests/test_hybrid_monk_combat
 tests/test_hybrid_monk_buffs
+tests/test_favour_expiry
 bootstrap-backups/
 __pycache__/
 *.py[cod]

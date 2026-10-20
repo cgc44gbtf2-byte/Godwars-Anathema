@@ -17,7 +17,7 @@ EXPECTED = {
     "mage": ("mage",),
     "dragon": ("dragon",),
     "ninja": ("ninja",),
-    "monk": ("monk",),
+    "monk": ("monk", "favour"),
     "elemental": ("elemental",),
     "hybrid": ("registry", "selfbrid", "state", "player", "progression", "specialization", "forms", "build", "training", "access", "passives", "resources", "readiness", "help", "books", "colors"),
 }
@@ -47,7 +47,7 @@ class ClassLayoutChecks(unittest.TestCase):
         expected = {f"classes/{family}/{stem}.c"
                     for family, stems in EXPECTED.items() for stem in stems}
         selected = manifest()
-        self.assertEqual(len(selected), 38)
+        self.assertEqual(len(selected), 39)
         self.assertEqual(len(selected), len(set(selected)))
         self.assertEqual(set(selected), expected)
         self.assertEqual(

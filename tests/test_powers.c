@@ -14,6 +14,7 @@
 #include <string.h>
 #include <strings.h>
 #include "../Genesis/src/merc.h"
+TIME_INFO_DATA time_info;
 
 /* This isolated power fixture has no Highlander guard; the real-engine
  * Counter suite exercises guarded contact attacks and their side effects. */

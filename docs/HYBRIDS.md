@@ -291,11 +291,32 @@ Favor and unrelated flags intact. Tests pin324 native buff snapshots, compare
 sunrise cleanup, and preserve both buff flags through180 full/short loads
 across all45 hybrid pairings in both orders.
 
-**Remaining lifecycle limits:** Favor still has no persisted absolute-expiry
-timestamp. A character unloaded across sunrise can load an old saved Favor
-until a later sunrise; this stage does not claim offline expiry is solved.
-The existing `More` save field is reused: record4/save epoch3/handoff2 stay
-unchanged. Ordinary save timing is not a crash journal or power-loss guarantee.
+### Offline Favor expiry
+
+Favor now saves an optional `*AnathemaFavor 1 <grant> <dawn>` comment beside
+the existing `More` field. The deadline is an absolute **game-calendar**
+hour at the original next sunrise, not a fresh duration on login. Full and
+short loaders retain a valid blessing before that dawn and remove only Favor
+at or after it. Month/year rollover is supported; repeated saves do not
+refresh its lifetime. Cloak, Guardian and other effects are not removed.
+Invalid, duplicate, overlong, truncated or future-grant metadata cannot
+grant protection or lock an otherwise valid player out. Unverifiable legacy
+flags have no proven remaining lifetime: **unverifiable legacy Favor is
+cleared on load**, so it must be recast after the first upgrade.
+
+An older binary already treats `*` lines as comments and can read these
+files, but does not enforce the new offline deadlines while running.
+If it rewrites a player, it drops the optional deadline; on re-upgrade,
+that unverifiable Favor is cleared rather than resurrected. Record4/save
+epoch3/handoff2 remain unchanged; no hybrid record or copyover schema changes.
+Clock checks follow the native 17-month/35-day calendar. Reboot/copyover uses
+the existing boot-time clock reconstruction, which may expire a blessing
+sooner after server lag. Manual clock rewinds outside the grant/deadline
+window fail closed; this is not a wall-clock timestamp or protection against
+arbitrary administrator time manipulation. Loaded/NPC sunrise cleanup also
+clears the deadline. Ordinary save timing is not a crash journal or power-loss
+guarantee; no player-file sweep or live-data edit is performed by this update.
+
 An older binary predating this adapter cannot rescue a secondary Monk with
 Cloak, even if it can parse the save. Before rollback, move such characters
 out of danger and do not rely on that protection. Chimera and live form
