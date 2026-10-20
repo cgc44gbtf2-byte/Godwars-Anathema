@@ -42,6 +42,7 @@ TESTS += tests/test_hybrid_enchant
 TESTS += tests/test_hybrid_vision
 TESTS += tests/test_hybrid_stun
 TESTS += tests/test_hybrid_monk_combat
+TESTS += tests/test_hybrid_monk_buffs
 # Real validators/effective access for older isolated native fixtures too.
 # Never replace hybrid access with permissive stubs just to satisfy linking.
 HYBRID_ACCESS_SOURCES = $(addprefix Genesis/src/classes/hybrid/,registry.c state.c player.c build.c progression.c specialization.c access.c passives.c books.c) Genesis/src/classes/sorcerer/vision.c
@@ -107,6 +108,7 @@ check-layout:
 	python3 tests/test_hybrid_vision_catalog.py
 	python3 tests/test_hybrid_stun_catalog.py
 	python3 tests/test_hybrid_monk_combat_catalog.py
+	python3 tests/test_hybrid_monk_buffs_catalog.py
 	python3 tests/test_combat_layout.py
 	python3 tests/test_telnet_layout.py
 	python3 tests/test_gmcp_layout.py
@@ -184,6 +186,9 @@ tests/test_hybrid_stun: tests/test_hybrid_stun.c $(ENGINE_OBJECTS)
 
 tests/test_hybrid_monk_combat: tests/test_hybrid_monk_combat.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) -Wl,--wrap=one_hit,--wrap=hurt_person $(LDLIBS) -o $@
+
+tests/test_hybrid_monk_buffs: tests/test_hybrid_monk_buffs.c $(ENGINE_OBJECTS)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_hybrid_vision: tests/test_hybrid_vision.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@

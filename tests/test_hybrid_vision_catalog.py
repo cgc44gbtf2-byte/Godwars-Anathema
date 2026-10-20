@@ -3,6 +3,7 @@ import hashlib
 import re
 import unittest
 from test_class_layout import ROOT, SRC, make_values
+from test_hybrid_monk_buffs_catalog import without_cloak_death_stage
 from test_hybrid_stun_catalog import without_hybrid_stun_adapter
 
 NEW_VISION="""void do_vision( CHAR_DATA *ch, char *argument )
@@ -137,6 +138,7 @@ class HybridVisionCatalog(unittest.TestCase):
         for path,sha,count in (("combat_death.c","72ef15ef3b963af036544d58777669b686ec752a",2),
                                ("act_wiz.c","0950ea07266c99236164467c60d9d1225d371ff4",2)):
             text=(SRC/path).read_text()
+            if path=="combat_death.c":text=without_cloak_death_stage(text)
             native,n=re.subn(r"^    strip_shadowsight\((?:ch|victim)\);\n","",text,flags=re.M)
             self.assertEqual(n,count)
             data=native.encode()

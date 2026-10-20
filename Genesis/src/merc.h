@@ -2242,6 +2242,8 @@ DECLARE_DO_FUN(	do_affects	);
 DECLARE_DO_FUN( do_afk          );
 DECLARE_DO_FUN(	do_allow	);
 DECLARE_DO_FUN(	do_almighty	);
+void monk_favour_sunrise(void);
+bool monk_cloak_can_save(CHAR_DATA *victim);
 DECLARE_DO_FUN( do_alterweight  );
 DECLARE_DO_FUN( do_analyze      );  
 DECLARE_DO_FUN(	do_anesthetic	);

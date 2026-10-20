@@ -4,6 +4,7 @@ import json
 import re
 import unittest
 from test_class_layout import ROOT, SRC, make_values
+from test_hybrid_monk_buffs_catalog import without_monk_buff_stage
 
 NAMES=("repeat","aurashot","blitz","cripple","darkblaze")
 MINIMUM=(1,2,3,5,6)
@@ -24,6 +25,7 @@ def function_span(text,name):
     return match.start(),match.end()+end.start()
 
 def without_monk_combat_stage(text):
+    text=without_monk_buff_stage(text)
     for name,minimum in zip(NAMES,MINIMUM):
         a,b=function_span(text,name);body=text[a:b]
         gate=HYBRID_GATE if HYBRID_GATE in body else NATIVE_GATE

@@ -585,19 +585,7 @@ if (ch->spec_fun != 0)
          case  6:
             weather_info.sunlight = SUN_RISE;
             strcat( buf, "The sun rises in the east.\n\r" );
-            for ( d = descriptor_list; d != NULL; d = d->next )
-            {
-               if ( d->connected == CON_PLAYING
-                  && ( ch = d->character) != NULL
-                  &&  !IS_NPC(ch)
-                  &&  !IS_EXTRA(ch, EXTRA_OSWITCH)
-                  &&  !IS_MORE(ch, MORE_HEAD)
-		  &&  IS_MORE(ch, MORE_FAVOUR))
-	       {
-		  REMOVE_BIT(ch->more, MORE_FAVOUR);
-		  stc("You feel weary as the blessing of the almighty fades from you.\n\r", ch);
-	       }
-            }
+            monk_favour_sunrise();
             break;
       
          case 19:

@@ -795,9 +795,10 @@ void do_almighty( CHAR_DATA *ch, char *argument )
     char arg[MIL];
     bool any_affected = FALSE;
 
+    if (ch == NULL) return;
     argument = one_argument(argument, arg);
 
-    if (!IS_MONK(ch))
+    if (!IS_MONK(ch) || ch->pcdata == NULL || ch->in_room == NULL)
     {
 	stc("Huh?\n\r", ch);
 	return;
@@ -846,7 +847,7 @@ void do_almighty( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    if ((victim = get_char_room(ch, arg)) == NULL)
+    if (arg[0] != '\0' && (victim = get_char_room(ch, arg)) == NULL)
     {
 	stc("They aren't here.\n\r", ch);
 	return;
@@ -886,6 +887,31 @@ void do_almighty( CHAR_DATA *ch, char *argument )
     SET_BIT(victim->more, MORE_FAVOUR);
     WAIT_STATE(ch, 12);
     return;
+}
+
+void monk_favour_sunrise(void)
+{
+    CHAR_DATA *vch, *next;
+    /* Switched originals, linkless PCs and legacy NPC recipients are also
+     * world characters. A descriptor-only sweep misses their expiry. */
+    for (vch=char_list;vch!=NULL;vch=next)
+    {
+next=vch->next;
+if (!IS_MORE(vch, MORE_FAVOUR)) continue;
+REMOVE_BIT(vch->more, MORE_FAVOUR);
+if (!IS_NPC(vch))
+    stc("You feel weary as the blessing of the almighty fades from you.\n\r", vch);
+    }
+}
+
+bool monk_cloak_can_save(CHAR_DATA *victim)
+{
+    if (victim == NULL || !IS_MORE(victim, MORE_CLOAK)) return FALSE;
+    if (!IS_NPC(victim) && victim->pcdata != NULL && victim->max_hit > 0
+        && IS_MONK(victim) && get_monk(victim, MONK_MANTRA) >= 8) return TRUE;
+    /* No class or learned source owns this saved flag any longer. */
+    REMOVE_BIT(victim->more, MORE_CLOAK);
+    return FALSE;
 }
 
 void do_celestial( CHAR_DATA *ch, char *argument)
@@ -945,7 +971,8 @@ void do_celestial( CHAR_DATA *ch, char *argument)
 
 void do_lifecloak( CHAR_DATA *ch, char *argument)
 {
-    if (!IS_MONK(ch))
+    if (ch == NULL) return;
+    if (!IS_MONK(ch) || ch->pcdata == NULL || ch->in_room == NULL)
     {
 	stc("Huh?\n\r", ch);
 	return;
@@ -963,7 +990,8 @@ void do_lifecloak( CHAR_DATA *ch, char *argument)
 	return;
     }
 
-    if (ch->hit < ch-> max_hit || ch->mana < ch->max_mana)
+    if (ch->max_hit <= 0 || ch->max_mana <= 0 ||
+        ch->hit != ch->max_hit || ch->mana != ch->max_mana)
     {
 	stc("You may only use this power while completely full.\n\r", ch);
 	return;
@@ -972,7 +1000,7 @@ void do_lifecloak( CHAR_DATA *ch, char *argument)
     stc("You wrap yourself in divine essence.\n\r", ch);
     act("$n calls upon divine forces to protect $mself.", ch, NULL, NULL, TO_ROOM);
     SET_BIT(ch->more, MORE_CLOAK);
-    ch->hit = ch->hit * .8;
+    ch->hit = (ch->hit / 5) * 4 + (ch->hit % 5) * 4 / 5;
     ch->mana = 0;
     return;
 }

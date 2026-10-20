@@ -69,12 +69,12 @@ void update_pos( CHAR_DATA *victim )
 	return;
     }
 
-    if (victim->hit <= 0 && IS_MONK(victim) && IS_MORE(victim, MORE_CLOAK))
+    if (victim->hit <= 0 && monk_cloak_can_save(victim))
     {
 	stc("Your Cloak of Life saves you from death!\n\r", victim);
 	act("A flash of light bursts outward from $n, saving him from certain death!", victim, NULL, NULL, TO_ROOM);
 	REMOVE_BIT(victim->more, MORE_CLOAK);
-	victim->hit = victim->max_hit * .2;
+victim->hit = UMAX(1, victim->max_hit / 5);
     }
 
     if (victim->hit <= 0 && IS_DROW(victim) && get_drow(victim, DROW_GLOBE))

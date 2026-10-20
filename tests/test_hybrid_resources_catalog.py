@@ -4,11 +4,12 @@ import json
 import re
 import unittest
 from test_class_layout import ROOT, SRC, make_values
+from test_hybrid_monk_buffs_catalog import without_favour_dawn_stage
 
 
 class HybridResourceCatalog(unittest.TestCase):
     def test_native_update_except_owned_hook_and_checked_debits(self):
-        text=(SRC/"update.c").read_text()
+        text=without_favour_dawn_stage((SRC/"update.c").read_text())
         include='#include "classes/hybrid/resources.h"\n'
         hook='\t    hybrid_secondary_mobile_update(ch);\n'
         self.assertEqual(text.count(include),1)
