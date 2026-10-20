@@ -8,7 +8,7 @@ class RoomDisplayCatalog(unittest.TestCase):
     def test_only_room_display_scopes_changed(self):
         data=without_room_display_stage((SRC/"act_info.c").read_text()).encode()
         self.assertEqual(hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest(),
-                         "cdc47e30e6cff650b4b25b93947d0e405d300ff1")
+                         "7fad52f6e6da6626ea1f307c6b604ede8ab3af0c")
 
     def test_bounded_titles_and_exit_append(self):
         source=(SRC/"act_info.c").read_text()

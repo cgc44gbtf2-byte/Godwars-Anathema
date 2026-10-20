@@ -1708,22 +1708,71 @@ room_report(buf, strlen(buf), "#r]#n\n\r");
 }
 
 /* Score command redone - Kai */
+/* Character score scope: display bounds/validation, not combat metric policy. */
+static void character_report(char *buf, const char *format, ...)
+{
+    va_list args;
+    int length;
+    va_start(args, format);
+    length = vsnprintf(buf, MSL, format, args);
+    va_end(args);
+    if (length < 0) { buf[0] = '\0'; return; }
+    if (length >= MSL) {
+        size_t end = MSL - 3, hashes = 0;
+        while (hashes < end && buf[end - hashes - 1] == '#') hashes++;
+        if (hashes % 2 != 0) end--;
+        buf[end++] = '\n'; buf[end++] = '\r'; buf[end] = '\0';
+    }
+}
+
+static bool character_hours(CHAR_DATA *ch, long *hours)
+{
+    time_t elapsed;
+    long elapsed_seconds, seconds;
+    /* Retain the legacy integer formula only when its intermediates fit. */
+    if (__builtin_sub_overflow(current_time, ch->logon, &elapsed) ||
+        __builtin_add_overflow(elapsed, 0L, &elapsed_seconds) ||
+        __builtin_add_overflow(ch->played, elapsed_seconds, &seconds)) return FALSE;
+    *hours = seconds / 3600;
+    return TRUE;
+}
+
+static bool character_pk_score(CHAR_DATA *ch, long *ratio)
+{
+    long sum, denominator, numerator;
+    if (ch->pdeath == 0)
+        return !__builtin_mul_overflow(100L, ch->pkill, ratio);
+    /* Preserve the old division order/rounding; reject undefined intermediates. */
+    if (__builtin_add_overflow(ch->pkill, ch->pdeath, &sum) || sum == 0 ||
+        __builtin_mul_overflow(sum, sum, &denominator) ||
+        __builtin_mul_overflow(100L, ch->pkill, &numerator) ||
+        __builtin_mul_overflow(numerator, ch->pkill, &numerator)) return FALSE;
+    return !__builtin_mul_overflow(ch->pkill, numerator / denominator, ratio);
+}
+
 void do_score( CHAR_DATA *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
     char ss1[MAX_STRING_LENGTH];
     char ss2[MAX_STRING_LENGTH];
+    long displayed;
 
-    if (IS_NPC(ch)) return;
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL) return;
 
     if (IS_EXTRA(ch,EXTRA_OSWITCH) || IS_MORE(ch, MORE_HEAD))
 	{obj_score(ch,ch->pcdata->chobj);return;}
-    sprintf( buf, "%s%s #nis here.\n\r", ch->name, ch->pcdata->title);
+    character_report(buf, "%s%s #nis here.\n\r",
+        ch->name != NULL ? ch->name : "Someone",
+        ch->pcdata->title != NULL ? ch->pcdata->title : "");
     send_to_char( buf, ch );
     send_to_char("#l-----------------------------------------------------------------------#n\n\r",ch);
-    sprintf( buf, "Character Created: %s\n\r", ch->createtime );
+    character_report(buf, "Character Created: %s\n\r",
+        ch->createtime != NULL ? ch->createtime : "unknown");
     send_to_char( buf, ch );
-    sprintf( buf, "You have been playing for %li hours.\n\r", get_hours(ch));
+    if (character_hours(ch, &displayed))
+        sprintf(buf, "You have been playing for %li hours.\n\r", displayed);
+    else
+        strcpy(buf, "Playing time unavailable (invalid saved timing).\n\r");
     send_to_char( buf, ch );
     send_to_char("#l-----------------------------------------------------------------------#n\n\r",ch);
     sprintf(buf,"Str: %2i/%-2i Dex: %2i/%-2i Con: %2i/%-2i Int: %2i/%-2i Wis: %2i/%-2i\n\r\n\r",
@@ -1737,7 +1786,10 @@ void do_score( CHAR_DATA *ch, char *argument )
     send_to_char( buf, ch );
     sprintf(buf, "Quest Points: %-15li       Quests Completed: %li\n\r", ch->pcdata->quest, ch->pcdata->score[SCORE_NUM_QUEST]);
     send_to_char( buf, ch );
-    sprintf(buf, "PK Score: %li\n\r\n\r", get_ratio(ch));
+    if (character_pk_score(ch, &displayed))
+        sprintf(buf, "PK Score: %li\n\r\n\r", displayed);
+    else
+        strcpy(buf, "PK Score: unavailable\n\r\n\r");
     send_to_char( buf, ch );
 
     sprintf(buf, "Hitroll: %-8li Damroll: %-8li Armor: %li\n\r", char_hitroll(ch), char_damroll(ch), char_ac(ch));

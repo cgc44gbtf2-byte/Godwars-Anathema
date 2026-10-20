@@ -61,7 +61,7 @@ def without_vision_info_adapter(text):
 
 NATIVE_READERS={
     "handler.c":"c44c59c1d7db88fb090fcc221ee0962d66367cae51ff59954d59edf920031c0e",
-    "act_info.c":"ea1a9e5aa04fdf8afd889f497336a1a2c4fddc478555d9e206e8477f1af62578",
+    "act_info.c":"9329784bc5c9ee2aaa28a45a586120cceac85a4e7a5953479a29885f597cbfa4",
     "kav_info.c":"7033361ae7f06dee67bb381072d513cc252f5f3125b770a86d74a94e885920bc",
     "random.c":"b4e5b7721b560e6a2fc256ccf9ab08697c21c7e8c75e5a4631661993d75dd072",
     "clan.c":"9a416f47b1ef3de879819cd9ba1007a87f053fa7fc5641855e384bfe143d5803",
@@ -97,7 +97,7 @@ class HybridVisionCatalog(unittest.TestCase):
     def test_consumers_only_readers_and_hostile_holy_removal_changed(self):
         data=without_vision_info_adapter((SRC/"act_info.c").read_text()).encode()
         self.assertEqual(hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest(),
-                         "c1a28c87bf682e877b2f9a7c953b36720ef7914e")
+                         "b24546978b3f3cf3a2191c8ec0803383bb89dea1")
         for path,digest in NATIVE_READERS.items():
             with self.subTest(path=path):
                 text=(SRC/path).read_text()

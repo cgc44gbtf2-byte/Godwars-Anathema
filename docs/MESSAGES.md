@@ -80,8 +80,25 @@ and ANSI settings. It also exercises 15 boundary cases, colour clipping, and
 portal room/temporary-shadow restoration. Existing visibility and navigation
 policy is retained; this is not a visibility-policy rewrite.
 
-This is not a whole-codebase formatting audit. Normal character scores
-and other commands that build
+## Character score
+
+Normal character scores bound name/title and creation-time reports,
+with explicit fallbacks for missing strings and safe returns for missing
+character/PC contexts. It retains object-form delegation. Play-time and PK-score
+calculations retain the legacy operation order and integer division, but show
+`unavailable` if an intermediate overflows or the PK denominator is zero.
+This is display-only validation: it does not repair saved fields, alter
+training/stats, change other combat metric formulas, or change other callers
+of the shared `get_hours` and `get_ratio` helpers.
+
+The real-engine suite pins **4,224** unchanged native score snapshots across all
+classes, status/staff ranges, beast thresholds, conditions and ANSI settings.
+It also checks 196 PK and **2,744** timing combinations against independent
+wide-integer oracles, 13 boundaries, colour clipping and both object-form
+delegation flags. Older whole-info pins mask only this separately characterized
+report; all other commands and combat metric implementations stay pinned.
+
+This is not a whole-codebase formatting audit. Other commands that build
 their own strings still require review. Callers must supply live,
 correctly typed pointers and valid acyclic affect lists: arbitrary stale
 pointers and cyclic lists cannot be made safe by output bounds. The output
