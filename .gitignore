@@ -78,6 +78,7 @@ tests/test_favour_expiry
 tests/test_hybrid_celestial
 tests/test_hybrid_guardian
 tests/test_guardian_lifecycle
+tests/test_hybrid_monk_training
 bootstrap-backups/
 __pycache__/
 *.py[cod]

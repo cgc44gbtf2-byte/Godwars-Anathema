@@ -219,9 +219,11 @@ shared-immunity timer sequences. The native CSV SHA256 is
 Only two guard expressions in the Monk module change; no other powers or
 `IS_MONK`/native getter definitions are broadened.
 
-There is no new conversion, no new trainer or focus-selection UI, and no save
-format change (record4/save epoch3/handoff2). Training/attachment are still
-backend operations. Live PvP balance and full hybrid forms remain unproven.
+These power adapters do not enable conversion or change the save format
+(record4/save epoch3/handoff2). Explicit secondary-Monk training controls
+are described below; attachment remains backend-only. Live PvP balance
+and full hybrid forms remain unproven.
+The Stun Fist stage itself added no new conversion and no new trainer.
 Generated help describes this scope; custom live-world helps retain priority.
 
 ### Secondary Monk direct attacks (existing records only)
@@ -256,8 +258,8 @@ pin 720 normal native command snapshots, compare 32,400 paired real-engine
 command runs, and reject 50 invalid or untrained secondary cases. They do
 not establish live PvP balance or full multi-class form compatibility.
 
-No playable `selfbrid` conversion, Monk focus/trainer UI, saved form ownership,
-or access to Chimera or clan leadership commands is added by the attack adapter.
+No playable `selfbrid` conversion, saved form ownership or
+access to Chimera or clan leadership commands is added by the attack adapter.
 Almighty Favor, Life Cloak and Celestial Path are handled separately below.
 Record4/save epoch3/handoff2 are unchanged;
 custom world help files still take priority over generated hybrid help.
@@ -347,7 +349,7 @@ snapshots with sufficient mana, compare **8,100 paired** real-engine command
 replays, check10 invalid records and exercise **90 full/short** player loads.
 These establish scoped behavior and bank retention, not live PvP balance.
 
-No conversion, Monk focus/trainer UI, clan privileges, Chimera or other live
+No conversion, clan privileges, Chimera or other live
 forms are enabled. Record4/save epoch3/handoff2 remain unchanged. Custom world
 help files retain priority; no live world/help import is performed here.
 
@@ -1030,9 +1032,47 @@ compare 2,970 command/eligibility cases, 11,880 connection-state pulses, 20,790
 pure projections, 32 rejected-record/native-grant combinations and **630 full/short**
 loads, including legacy flags forcibly retained on disk. No other flags,
 learned banks or resources are changed.
-No conversion, Monk focus/trainer UI, clan-role expansion or live forms
+No conversion, clan-role expansion or live forms
 are enabled. Record4/save epoch3/handoff2 remain unchanged. Generated help is
 updated; custom world helps keep priority and no live help import is performed.
+
+### Explicit secondary-Monk training controls
+
+Only an already attached, validated secondary-Monk record can use this UI.
+Original Monks continue to use native `monklearn`, with its existing full
+ranks, caps, prices and ordinary save timing unchanged.
+
+- `selfbrid monk` lists the three effective/stored ranks, caps and next prices.
+- `selfbrid monk mantra` displays one path without buying anything.
+- `selfbrid monk focus mantra` previews a free, permanent full-path choice.
+- `selfbrid monk focus mantra confirm` atomically saves that choice, granting no ranks.
+- `selfbrid monk mantra gain` buys exactly one rank for **10 x next rank** primal.
+
+The path names are `tech`, `mantra` and `art`. The chosen path has cap8;
+the other two have caps4. Confirmed focus cannot be changed through this UI.
+Pick and confirm a focus before buying ranks. Every lesson uses the existing
+secondary-only transaction backend: own connected body, standing, out of
+combat, valid training data, enough primal and no pending primary-save recovery.
+Native primary banks, currency unrelated to the lesson and class identity
+are never swapped or normalized. Over-policy stored ranks are displayed at
+their effective caps and require staff review rather than silently changing.
+
+Failed saves apply neither payment nor lesson. If the new file is visible but
+directory durability is uncertain, the lesson/payment are applied once and
+further purchases wait for primary-save recovery; **do not repeat** the lesson.
+Neither training nor choosing focus automatically activates a guardian or
+other power. However, not every secondary power has been integrated: conversion,
+Invite Beast, Chimera and other live hybrid forms remain disabled/unadapted.
+This UI does not add casting permissions or those missing power adapters.
+
+Real-engine tests cover27 parent/focus paths, **432 paid** rank lessons and27
+free focus transactions, **918 full/short** path loads, all nine original-Monk
+pairings using unchanged native `monklearn`, malformed input, cap/raw-rank
+guards, missing/switching/invalid actor contexts, save failures and uncertain
+durability recovery. Secondary Mantra6 enables explicit `spiritguardian` only
+on the full Mantra path; training alone never turns it on.
+Record4/save epoch3/handoff2 are unchanged. Generated help is updated, but
+custom world helps keep priority; no live help-file import is performed.
 
 ## Numeric readiness preview — no conversion
 
