@@ -257,8 +257,8 @@ command runs, and reject 50 invalid or untrained secondary cases. They do
 not establish live PvP balance or full multi-class form compatibility.
 
 No playable `selfbrid` conversion, Monk focus/trainer UI, saved form ownership,
-or access to Chimera, Celestial Path, or clan leadership commands is added here.
-Almighty Favor and Life Cloak are handled separately below.
+or access to Chimera or clan leadership commands is added by the attack adapter.
+Almighty Favor, Life Cloak and Celestial Path are handled separately below.
 Record4/save epoch3/handoff2 are unchanged;
 custom world help files still take priority over generated hybrid help.
 
@@ -322,6 +322,34 @@ Cloak, even if it can parse the save. Before rollback, move such characters
 out of danger and do not rely on that protection. Chimera and live form
 ownership remain untouched. Custom world help still takes priority over
 generated hybrid help; no live area files are imported by a binary update.
+
+### Secondary Monk Celestial Path
+
+`celestial <target>` accepts a valid secondary-Monk record with learned
+Mantra7. Only the selected full Mantra path can reach7; all other secondary
+paths remain capped at4, including migrated raw ranks above that effective cap.
+Original Monks retain their full native access and ranks in either parent order.
+No primary training, secondary training or class identity is changed by travel.
+
+A successful cast costs **1,500 mana**, with no new recovery or random roll.
+Insufficient or negative mana is rejected before movement, effects or spending.
+Native destination privacy, solitary/no-teleport room rules, player summon
+consent, same-room rejection, target-level restriction and Guardian warning
+remain. NPC targets retain their native consent exception. The origin-room
+policy is not broadened or tightened by this adapter; this is not a global
+travel-policy rewrite. The interpreter still requires standing and awake level.
+
+Separately characterized native repairs reject missing caster context safely.
+Shared visibility lookup rejects missing actors and ordinary unplaced targets
+without dereferencing a null room; existing self, staff and item-vision
+shortcuts remain. Tests reproduce seven old failure cases, pin180 native
+snapshots with sufficient mana, compare **8,100 paired** real-engine command
+replays, check10 invalid records and exercise **90 full/short** player loads.
+These establish scoped behavior and bank retention, not live PvP balance.
+
+No conversion, Monk focus/trainer UI, clan privileges, Chimera or other live
+forms are enabled. Record4/save epoch3/handoff2 remain unchanged. Custom world
+help files retain priority; no live world/help import is performed here.
 
 ### Native material-factory ownership audit
 

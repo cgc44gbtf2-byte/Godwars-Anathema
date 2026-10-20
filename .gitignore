@@ -75,6 +75,7 @@ tests/test_hybrid_stun
 tests/test_hybrid_monk_combat
 tests/test_hybrid_monk_buffs
 tests/test_favour_expiry
+tests/test_hybrid_celestial
 bootstrap-backups/
 __pycache__/
 *.py[cod]

@@ -119,6 +119,9 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   Favor expires at its original next sunrise, including across logout/reload.
   Legacy blessings without a verifiable deadline need recasting; see
   [the hybrid guide](docs/HYBRIDS.md).
+  Secondary Monks with learned Mantra 7 on their full Mantra path can use
+  `celestial <target>` for 1,500 mana. Existing destination restrictions and
+  player summon consent remain; insufficient mana never moves the caster.
   A separate object-factory fix prevents crafted items from freeing mutable
   names, descriptions and spell messages still owned by staff-edited templates.
   The info page also shows a read-only numeric checklist: 50,000 max HP/mana,

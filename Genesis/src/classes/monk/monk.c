@@ -929,13 +929,13 @@ void do_celestial( CHAR_DATA *ch, char *argument)
     if (ch == NULL) return;
     argument = one_argument(argument ? argument : "", arg);
 
-    if (!IS_MONK(ch) || ch->pcdata == NULL || ch->in_room == NULL)
+    if (!hybrid_power_parent(ch, CLASS_MONK) || ch->pcdata == NULL || ch->in_room == NULL)
     {
 	stc("Huh?\n\r", ch);
 	return;
     }
 
-    if (get_monk(ch, MONK_MANTRA) < 7)
+    if (hybrid_power_rank(ch, CLASS_MONK, HYBRID_TRAIN_MONK, MONK_MANTRA) < 7)
     {
 	stc("You need Mantra 7 for Celestial Path.\n\r", ch);
 	return;

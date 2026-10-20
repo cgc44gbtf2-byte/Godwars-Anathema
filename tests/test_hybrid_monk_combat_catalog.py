@@ -158,7 +158,7 @@ class MonkCombatCatalog(unittest.TestCase):
         doc=(ROOT/"docs/HYBRIDS.md").read_text()
         for fragment in ("Secondary Monk direct attacks","1,200 mana",
                          "600 per","2,000 mana","5,000 mana","32,400 paired",
-                          "No playable `selfbrid` conversion","Chimera, Celestial Path"):
+                           "No playable `selfbrid` conversion","Chimera or clan leadership"):
             self.assertIn(fragment,doc)
         help=(SRC/"classes/hybrid/help.c").read_text()
         for fragment in ("repeat (1)","aurashot (2)","blitz (3)",

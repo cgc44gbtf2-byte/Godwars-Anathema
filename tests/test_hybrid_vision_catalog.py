@@ -5,6 +5,7 @@ import unittest
 from test_class_layout import ROOT, SRC, make_values
 from test_hybrid_monk_buffs_catalog import without_cloak_death_stage
 from test_hybrid_stun_catalog import without_hybrid_stun_adapter
+from test_hybrid_celestial_catalog import without_celestial_visibility_stage
 
 NEW_VISION="""void do_vision( CHAR_DATA *ch, char *argument )
 {
@@ -69,6 +70,8 @@ NATIVE_READERS={
     "classes/elemental/elemental.c":"da8474d2063b020b76afbf96269b889388bacf4c359ddc40c470c58f20232583",
 }
 def native_reader_tokens(text):
+    if "bool can_see( CHAR_DATA *ch, CHAR_DATA *victim )" in text:
+        text=without_celestial_visibility_stage(text)
     text=text.replace("if (effective_holylight(victim)) strip_holylight(victim);",
                       "if (IS_SET(victim->act, PLR_HOLYLIGHT)) REMOVE_BIT(victim->act, PLR_HOLYLIGHT);")
     for new,old in (("holylight","IS_SET({}->act, PLR_HOLYLIGHT)"),

@@ -121,6 +121,9 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
                      "Both need the full Mantra path; other paths cap Mantra at4. "
                      "Cloak rescues once. Favor dawn cleanup covers loaded characters. "
                      "Favor deadlines are also checked on reload; legacy Favor needs recasting.\n\r", ch);
+        send_to_char("Secondary Monk travel: celestial (7; 1500 mana) needs full "
+                     "Mantra and learned rank. Native destination restrictions and "
+                     "player summon consent remain. Conversion/forms are not enabled.\n\r", ch);
     }
     long pages = hybrid_book_chain_policy(h);
     if (pages) {

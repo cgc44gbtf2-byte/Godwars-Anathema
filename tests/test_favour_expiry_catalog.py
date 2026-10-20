@@ -3,6 +3,7 @@ import hashlib
 import json
 import unittest
 from test_class_layout import ROOT,SRC,make_values
+from test_hybrid_celestial_catalog import without_celestial_stage
 
 def once(text,old,new):
     assert text.count(old)==1,repr(old)
@@ -13,6 +14,7 @@ def blob(text):
     return hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest()
 
 def without_favour_metadata_monk(text):
+    text=without_celestial_stage(text)
     text=once(text,'#include "classes/monk/favour.h"\n',"")
     text=once(text,
         '    if (!monk_favour_clock_valid(&time_info))\n    {\n'
