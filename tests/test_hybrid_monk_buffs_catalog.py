@@ -116,5 +116,50 @@ class MonkBuffCatalog(unittest.TestCase):
         source=(SRC/"classes/monk/monk.c").read_text()
         self.assertNotIn("hybrid_forms_",source)
 
+    def test_only_effective_mantra_can_activate_or_rescue(self):
+        text=(SRC/"classes/monk/monk.c").read_text()
+        for name,end,rank in (("almighty","monk_favour_sunrise",5),
+                              ("lifecloak","do_mclan",8)):
+            body=text.split("void do_"+name+"(",1)[1].split("void "+end+"(",1)[0]
+            self.assertIn(HYBRID_GATE,body)
+            self.assertIn("hybrid_power_rank(ch, CLASS_MONK, HYBRID_TRAIN_MONK, MONK_MANTRA) < "+str(rank),body)
+            self.assertNotIn("get_monk(",body)
+            self.assertNotIn("ch->class =",body)
+        helper=text.split("bool monk_cloak_can_save(",1)[1].split("void do_celestial(",1)[0]
+        self.assertIn("hybrid_power_rank(victim, CLASS_MONK, HYBRID_TRAIN_MONK, MONK_MANTRA) >= 8",helper)
+        self.assertIn("REMOVE_BIT(victim->more, MORE_CLOAK);",helper)
+
+    def test_real_matrix_and_switched_cleanup_are_not_mocked(self):
+        test=(ROOT/"tests/test_hybrid_monk_buffs.c").read_text()
+        for fragment in ("secondary==11664&&original==2916",
+                         "focus==MONK_MANTRA?rank:UMIN(rank,4)",
+                         "bad<12","descs[0].original=actors",
+                         "descs[1].connected=CON_NOTE_TEXT","MORE_HEAD",
+                         "get_soak(actors)==soak+100",
+                         "get_damcap(actors)==cap+100","actors[0].hit==0"):
+            self.assertIn(fragment,test)
+        load=(ROOT/"tests/test_hybrid_player.c").read_text()
+        self.assertIn("ch->more=MORE_FAVOUR|MORE_CLOAK|MORE_GUARDIAN;",load)
+        self.assertIn("ch->more==(MORE_FAVOUR|MORE_CLOAK|MORE_GUARDIAN)",load)
+
+    def test_only_owned_flags_are_cleared(self):
+        text=(SRC/"classes/monk/monk.c").read_text()
+        sweep=text.split("void monk_favour_sunrise(void)",1)[1].split("bool monk_cloak_can_save(",1)[0]
+        self.assertIn("vch=char_list",sweep)
+        self.assertEqual(sweep.count("REMOVE_BIT("),1)
+        self.assertIn("REMOVE_BIT(vch->more, MORE_FAVOUR);",sweep)
+        self.assertNotIn("descriptor_list",sweep)
+
+    def test_usage_and_offline_rollback_limits_are_honest(self):
+        docs=(ROOT/"docs/HYBRIDS.md").read_text()
+        for fragment in ("Secondary Monk persistent buffs","14,580 paired",
+                         "180 full/short loads","no persisted absolute-expiry",
+                         "An older binary","Chimera and live form"):
+            self.assertIn(fragment,docs)
+        help=(SRC/"classes/hybrid/help.c").read_text()
+        self.assertIn("Secondary Monk Mantra: almighty (5;",help)
+        self.assertIn("lifecloak (8;",help)
+        self.assertIn("not offline expiry timestamps",help)
+
 if __name__=="__main__":
     unittest.main()

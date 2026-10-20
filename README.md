@@ -114,6 +114,11 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   Their other direct Tech attacks are `repeat` (1), `aurashot` (2), `blitz` (3),
   `cripple` (5) and `darkblaze` (6). Tech 5+ needs the chosen full Tech path;
   the other secondary paths cap Tech at 4. Native prices/target rules remain.
+  Secondary Monks on the full Mantra path can also use `almighty` (5) and
+  `lifecloak` (8), with native costs. Cloak is a single-use rescue, not a form;
+  Favor expires at sunrise for loaded players, including switched originals.
+  Offline expiry is not yet timestamped; see the persistent-buff limits in
+  [the hybrid guide](docs/HYBRIDS.md).
   A separate object-factory fix prevents crafted items from freeing mutable
   names, descriptions and spell messages still owned by staff-edited templates.
   The info page also shows a read-only numeric checklist: 50,000 max HP/mana,

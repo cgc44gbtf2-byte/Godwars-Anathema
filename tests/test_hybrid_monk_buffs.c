@@ -184,6 +184,125 @@ static void secondary_repro(void)
     assert(actors[0].hit==10000&&!IS_MORE(actors,MORE_CLOAK));
 }
 
+static void paired(void)
+{
+    unsigned secondary=0,original=0;
+    for(unsigned p=0;p<9;p++)for(long rank=0;rank<=8;rank++)
+    for(long focus=-1;focus<3;focus++)for(int skill=0;skill<2;skill++)
+    for(int mode=0;mode<18;mode++){
+        SNAPSHOT expected,actual;
+        long effective=focus==MONK_MANTRA?rank:UMIN(rank,4);
+        fixture(CLASS_MONK,0,effective,-1);run(skill,mode,&expected);
+        fixture(parents[p],CLASS_MONK,rank,focus);run(skill,mode,&actual);
+        if(memcmp(&expected,&actual,sizeof(expected))){
+            fprintf(stderr,"Monk buff mismatch:p%u rank%ld focus%ld skill%d mode%d\n",
+                    p,rank,focus,skill,mode);
+            for(int i=0;i<17;i++)if(expected.v[i]!=actual.v[i])
+                fprintf(stderr," v%d expected%ld actual%ld\n",i,expected.v[i],actual.v[i]);
+            fprintf(stderr," text expected%" PRIu64 " actual%" PRIu64 "\n",
+                    expected.text,actual.text);
+            abort();
+        }
+        secondary++;
+    }
+    for(unsigned p=0;p<9;p++)for(long rank=0;rank<=8;rank++)
+    for(int skill=0;skill<2;skill++)for(int mode=0;mode<18;mode++){
+        SNAPSHOT expected,actual;
+        fixture(CLASS_MONK,0,rank,-1);run(skill,mode,&expected);
+        fixture(CLASS_MONK,parents[p],rank,-1);run(skill,mode,&actual);
+        assert(!memcmp(&expected,&actual,sizeof(expected)));original++;
+    }
+    assert(secondary==11664&&original==2916);
+}
+
+static void malformed(void)
+{
+    for(int bad=0;bad<12;bad++){
+        fixture(CLASS_NINJA,CLASS_MONK,8,MONK_MANTRA);
+        switch(bad){
+        case 0:pcs[0].hybrid.secondary_progression.monk[MONK_MANTRA]=9;break;
+        case 1:pcs[0].hybrid.secondary_class=CLASS_DRAGON;break;
+        case 2:pcs[0].hybrid_present=0;break;
+        case 3:pcs[0].hybrid_present=2;break;
+        case 4:pcs[0].player_load_failed=1;break;
+        case 5:pcs[0].hybrid.primary_class=CLASS_MONK;break;
+        case 6:actors[0].class=CLASS_NONE;break;
+        case 7:actors[0].pcdata=NULL;break;
+        case 8:SET_BIT(actors[0].act,ACT_IS_NPC);break;
+        case 9:actors[0].in_room=NULL;break;
+        case 10:pcs[0].hybrid.secondary_progression.monk[MONK_MANTRA]=-1;break;
+        case 11:pcs[0].hybrid.secondary_progression.full_branch=MONK_TECH;break;
+        }
+        do_almighty(actors,"beta");do_lifecloak(actors,"");
+        assert(actors[0].more==0&&actors[1].more==0&&actors[0].hit==50000
+               &&actors[0].mana==50000);
+        if(bad!=9){
+            SET_BIT(actors[0].more,MORE_CLOAK);actors[0].hit=0;
+            update_pos(actors);
+            assert(!IS_MORE(actors,MORE_CLOAK)&&actors[0].hit<=0);
+        }
+    }
+    do_almighty(NULL,"");do_lifecloak(NULL,"");
+}
+
+static void ownership(void)
+{
+    fixture(CLASS_NINJA,CLASS_MONK,8,MONK_MANTRA);
+    SET_BIT(actors[0].more,MORE_GUARDIAN);
+    do_lifecloak(actors,"");actors[0].hit=actors[0].max_hit;
+    actors[0].mana=actors[0].max_mana;
+    do_almighty(actors,"alpha");
+    assert(IS_MORE(actors,MORE_CLOAK)&&IS_MORE(actors,MORE_FAVOUR)
+           &&IS_MORE(actors,MORE_GUARDIAN)&&actors[0].mana==45000);
+    long mana=actors[0].mana;
+    do_almighty(actors,"alpha");
+    assert(actors[0].mana==mana); /* The same benefit cannot be paid for twice. */
+    actors[0].hit=0;update_pos(actors);
+    assert(actors[0].hit==10000&&!IS_MORE(actors,MORE_CLOAK)
+           &&IS_MORE(actors,MORE_FAVOUR)&&IS_MORE(actors,MORE_GUARDIAN));
+    actors[0].hit=0;update_pos(actors);
+    assert(actors[0].hit==0); /* One-use rescue, not permanent invulnerability. */
+
+    fixture(CLASS_NINJA,CLASS_MONK,8,MONK_MANTRA);
+    do_lifecloak(actors,"");
+    pcs[0].hybrid.secondary_progression.full_branch=MONK_TECH;
+    actors[0].hit=0;update_pos(actors);
+    assert(actors[0].hit==0&&!IS_MORE(actors,MORE_CLOAK));
+
+    fixture(CLASS_MONK,CLASS_NINJA,8,-1);
+    do_lifecloak(actors,"");actors[0].hit=actors[0].max_hit;
+    actors[0].mana=actors[0].max_mana;
+    do_almighty(actors,"alpha");
+    SET_BIT(actors[0].more,MORE_GUARDIAN);
+    descriptor_list=NULL;weather_update();
+    assert(!IS_MORE(actors,MORE_FAVOUR)&&IS_MORE(actors,MORE_CLOAK)
+           &&IS_MORE(actors,MORE_GUARDIAN));
+    actors[0].hit=0;update_pos(actors);
+    assert(actors[0].hit==10000&&!IS_MORE(actors,MORE_CLOAK)
+           &&IS_MORE(actors,MORE_GUARDIAN));
+
+    fixture(CLASS_NINJA,CLASS_MONK,8,MONK_MANTRA);
+    long soak=get_soak(actors),cap=get_damcap(actors);
+    do_almighty(actors,"alpha");
+    assert(get_soak(actors)==soak+100&&get_damcap(actors)==cap+100);
+    do_almighty(actors,"alpha");
+    assert(get_soak(actors)==soak+100&&get_damcap(actors)==cap+100
+           &&actors[0].mana==45000);
+
+    /* The actual switched descriptor owns an NPC, not its original PC. */
+    fixture(CLASS_NINJA,CLASS_MONK,8,MONK_MANTRA);
+    do_lifecloak(actors,"");
+    for(int n=0;n<4;n++)SET_BIT(actors[n].more,MORE_FAVOUR);
+    actors[0].desc=NULL;descs[0].original=actors;
+    descs[0].character=&actors[3];actors[3].desc=&descs[0];
+    SET_BIT(actors[0].extra,EXTRA_OSWITCH);
+    descs[1].connected=CON_NOTE_TEXT;actors[2].desc=NULL;descs[1].next=NULL;
+    SET_BIT(actors[2].more,MORE_HEAD);
+    weather_update();
+    for(int n=0;n<4;n++)assert(!IS_MORE(&actors[n],MORE_FAVOUR));
+    assert(IS_MORE(actors,MORE_CLOAK)&&IS_MORE(&actors[2],MORE_HEAD));
+}
+
 int main(int argc,char **argv)
 {
     if(argc==2&&!strcmp(argv[1],"--native-dump")){native_dump(1);return 0;}
@@ -194,6 +313,8 @@ int main(int argc,char **argv)
     assert(argc==1);
     assert(native_dump(0)==UINT64_C(0x440019fda0994e7f));
     for(int mode=1;mode<=8;mode++)boundaries(mode);
-    puts("Monk buffs:324 native snapshots,8 safety/expiry boundaries; native stage.");
+    secondary_repro();paired();malformed();ownership();
+    puts("Monk buffs:324 native snapshots,14580 paired replays,8 boundaries,"
+         "12 corrupt guards,independent one-use cloak and dawn expiry.");
     return 0;
 }

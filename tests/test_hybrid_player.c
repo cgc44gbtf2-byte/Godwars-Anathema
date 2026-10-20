@@ -118,6 +118,8 @@ static void all_pairs(void)
             assert(!hybrid_player_attach(ch, &state));
             assert(ch->class == before.class && ch->vampgen == 4 &&
                    ch->pcdata->powers[2] == 7 && ch->pcdata->quest == 50000);
+            /* Existing More serialization, not a new hybrid save field. */
+            ch->more=MORE_FAVOUR|MORE_CLOAK|MORE_GUARDIAN;
             assert(save_char_obj_checked(ch));
             assert(save_char_obj_backup_checked(ch));
             char *disk = read_file("../player/Newfixture");
@@ -133,6 +135,7 @@ static void all_pairs(void)
                                     load_char_obj(&shell, "Newfixture"));
                 ch = shell.character;
                 assert(!ch->pcdata->player_load_failed && ch->pcdata->hybrid_present);
+                assert(ch->more==(MORE_FAVOUR|MORE_CLOAK|MORE_GUARDIAN));
                 equal_state(&state, &ch->pcdata->hybrid);
                 assert(ch->class == before.class && ch->gold == 123456 &&
                        ch->max_hit == 50000 && ch->max_mana == 51000 &&

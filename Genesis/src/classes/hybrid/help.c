@@ -115,7 +115,12 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
                      "Original Monks keep native access; no free ranks or conversion.\n\r", ch);
         send_to_char("Secondary Monk Tech: repeat (1), aurashot (2), blitz (3); "
                      "cripple (5) and darkblaze (6) need the full Tech path. "
-                     "Native costs and timing apply. Forms and buffs remain native-only.\n\r", ch);
+                     "Native costs and timing apply. Forms remain native-only.\n\r", ch);
+        send_to_char("Secondary Monk Mantra: almighty (5; 5000 mana single / "
+                     "20000 group), lifecloak (8; full HP/mana, spends all mana). "
+                     "Both need the full Mantra path; other paths cap Mantra at4. "
+                     "Cloak rescues once. Favor dawn cleanup covers loaded characters, "
+                     "not offline expiry timestamps.\n\r", ch);
     }
     long pages = hybrid_book_chain_policy(h);
     if (pages) {

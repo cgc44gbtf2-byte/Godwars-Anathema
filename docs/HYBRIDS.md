@@ -257,9 +257,50 @@ command runs, and reject 50 invalid or untrained secondary cases. They do
 not establish live PvP balance or full multi-class form compatibility.
 
 No playable `selfbrid` conversion, Monk focus/trainer UI, saved form ownership,
-or access to Chimera, Almighty Favor, Celestial Path, Life Cloak, or clan
-leadership commands is added here. Record4/save epoch3/handoff2 are unchanged;
+or access to Chimera, Celestial Path, or clan leadership commands is added here.
+Almighty Favor and Life Cloak are handled separately below.
+Record4/save epoch3/handoff2 are unchanged;
 custom world help files still take priority over generated hybrid help.
+
+### Secondary Monk persistent buffs (existing records only)
+
+Validated secondary Monks can use the original commands with their effective
+learned Mantra rank. `almighty` needs Mantra5 and `lifecloak` needs Mantra8,
+so both require the chosen full Mantra path. The other secondary paths cap
+Mantra at4. Original Monks retain their normal ranks and access in either
+parent order. This grants no ranks, focus UI, trainer or playable conversion.
+
+- `almighty [target]` costs5,000 mana with a12-pulse wait; omitting the target
+  blesses self. The native single-target NPC option remains available.
+  `almighty group` costs20,000 mana and waits24 pulses only when it blesses at
+  least one eligible group PC; already-blessed recipients do not stack.
+  The existing shared flag grants the native100 soak,15 avoidance and100
+  damage-cap bonuses. No second copy of those bonuses is added for hybrids.
+- `lifecloak` requires positive, completely full HP and mana. It leaves
+  `floor(4 × HP / 5)` HP and spends all current mana. At zero or negative HP,
+  a still-qualified Mantra8 owner consumes the cloak once and recovers
+  `max(1, floor(max HP / 5))` HP. Integer arithmetic avoids large-HP rounding
+  drift. Unowned, invalid or no-longer-qualified saved cloak flags are removed
+  at the death check instead of granting a free rescue.
+
+Favor's sunrise sweep now covers every loaded character, including switched
+originals, linkless PCs, editors, head-only PCs and NPC recipients. It clears
+only Favor, not Cloak or other effects. Cloak consumption likewise leaves
+Favor and unrelated flags intact. Tests pin324 native buff snapshots, compare
+14,580 paired real-engine command replays, exercise invalid records and live
+sunrise cleanup, and preserve both buff flags through180 full/short loads
+across all45 hybrid pairings in both orders.
+
+**Remaining lifecycle limits:** Favor still has no persisted absolute-expiry
+timestamp. A character unloaded across sunrise can load an old saved Favor
+until a later sunrise; this stage does not claim offline expiry is solved.
+The existing `More` save field is reused: record4/save epoch3/handoff2 stay
+unchanged. Ordinary save timing is not a crash journal or power-loss guarantee.
+An older binary predating this adapter cannot rescue a secondary Monk with
+Cloak, even if it can parse the save. Before rollback, move such characters
+out of danger and do not rely on that protection. Chimera and live form
+ownership remain untouched. Custom world help still takes priority over
+generated hybrid help; no live area files are imported by a binary update.
 
 ### Native material-factory ownership audit
 

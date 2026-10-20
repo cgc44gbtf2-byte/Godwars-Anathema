@@ -798,13 +798,13 @@ void do_almighty( CHAR_DATA *ch, char *argument )
     if (ch == NULL) return;
     argument = one_argument(argument, arg);
 
-    if (!IS_MONK(ch) || ch->pcdata == NULL || ch->in_room == NULL)
+    if (!hybrid_power_parent(ch, CLASS_MONK) || ch->pcdata == NULL || ch->in_room == NULL)
     {
 	stc("Huh?\n\r", ch);
 	return;
     }
 
-    if (get_monk(ch, MONK_MANTRA) < 5)
+    if (hybrid_power_rank(ch, CLASS_MONK, HYBRID_TRAIN_MONK, MONK_MANTRA) < 5)
     {
 	stc("You need Mantra 5 for Almighty Favor.\n\r", ch);
 	return;
@@ -908,7 +908,7 @@ bool monk_cloak_can_save(CHAR_DATA *victim)
 {
     if (victim == NULL || !IS_MORE(victim, MORE_CLOAK)) return FALSE;
     if (!IS_NPC(victim) && victim->pcdata != NULL && victim->max_hit > 0
-        && IS_MONK(victim) && get_monk(victim, MONK_MANTRA) >= 8) return TRUE;
+        && hybrid_power_rank(victim, CLASS_MONK, HYBRID_TRAIN_MONK, MONK_MANTRA) >= 8) return TRUE;
     /* No class or learned source owns this saved flag any longer. */
     REMOVE_BIT(victim->more, MORE_CLOAK);
     return FALSE;
@@ -972,13 +972,13 @@ void do_celestial( CHAR_DATA *ch, char *argument)
 void do_lifecloak( CHAR_DATA *ch, char *argument)
 {
     if (ch == NULL) return;
-    if (!IS_MONK(ch) || ch->pcdata == NULL || ch->in_room == NULL)
+    if (!hybrid_power_parent(ch, CLASS_MONK) || ch->pcdata == NULL || ch->in_room == NULL)
     {
 	stc("Huh?\n\r", ch);
 	return;
     }
 
-    if (get_monk(ch, MONK_MANTRA) < 8)
+    if (hybrid_power_rank(ch, CLASS_MONK, HYBRID_TRAIN_MONK, MONK_MANTRA) < 8)
     {
 	stc("You need Mantra 8 for Cloak of Life.\n\r", ch);
 	return;
