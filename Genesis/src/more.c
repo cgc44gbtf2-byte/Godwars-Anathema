@@ -2219,6 +2219,23 @@ void do_spiritform( CHAR_DATA *ch, char *argument )
 
 void do_spiritguardian( CHAR_DATA *ch, char *argument )
 {
+    if (ch == NULL) return;
+    if (IS_NPC(ch) || ch->pcdata == NULL)
+    {
+        stc("Huh?\n\r",ch);
+        return;
+    }
+    /* Removing an existing toggle never grants an ability.  Do not strand
+     * it when class/training is removed or a secondary record is rejected. */
+    if (IS_MORE(ch, MORE_GUARDIAN))
+    {
+	stc("You dismiss your Spirit Guardian.\n\r", ch);
+	guardian_message(ch);
+	stc("I shall return when you call me, Master.\n\r", ch);
+	REMOVE_BIT(ch->more, MORE_GUARDIAN);
+	return;
+    }
+
     if (!IS_VAMPIRE(ch) && !IS_WEREWOLF(ch) && !IS_MONK(ch))
     {
 	stc("Huh?\n\r",ch);
@@ -2241,14 +2258,6 @@ void do_spiritguardian( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    if (IS_MORE(ch, MORE_GUARDIAN))
-    {
-	stc("You dismiss your Spirit Guardian.\n\r", ch);
-	guardian_message(ch);
-	stc("I shall return when you call me, Master.\n\r", ch);
-	REMOVE_BIT(ch->more, MORE_GUARDIAN);
-	return;
-    }
     stc("You call your Spirit Guardian.\n\r", ch);
     guardian_message(ch);
     send_to_char("I have arrived, Master.\n\r", ch);
