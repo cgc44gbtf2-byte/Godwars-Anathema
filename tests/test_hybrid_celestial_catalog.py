@@ -5,12 +5,14 @@ import re
 import unittest
 from test_class_layout import ROOT,SRC,make_values
 from test_guardian_lifecycle_catalog import without_guardian_lifecycle_save
+from item_info_source import without_item_info_stage
 
 def once(text,old,new):
     assert text.count(old)==1,repr(old)
     return text.replace(old,new,1)
 
 def blob(text):
+    if "void obj_score(" in text:text=without_item_info_stage(text)
     data=text.encode()
     return hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest()
 
@@ -52,7 +54,7 @@ class CelestialCatalog(unittest.TestCase):
     def test_no_macro_getter_interpreter_or_save_changes(self):
         for path,sha in (("merc.h","b843f157662ab181daabe913d74685f1c8bc75e6"),
                          ("interp.c","ccb0125d4264a8a5447618c29a9240ec674d2eb4"),
-                         ("act_info.c","a3831d41ddd053a65c2e06567e913c8db8a90f5c"),
+                         ("act_info.c","35ad74c88203e8f2ea1ad53b09cab39fae4b74ea"),
                          ("save.c","1f3317263a45d1a886db411d4c0a52a5bba92909")):
             text=(SRC/path).read_text()
             if path=="save.c":text=without_guardian_lifecycle_save(text)

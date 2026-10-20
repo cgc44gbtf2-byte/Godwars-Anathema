@@ -141,6 +141,8 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   and handle missing descriptions; ordinary wording is unchanged.
   Item identification also handles long names, incomplete item records and
   invalid spell references safely, without changing normal item statistics.
+  The object-form score display has the same safeguards; weapon comparison
+  now handles extreme damage values without overflow or rounding away ties.
   See [message-formatting limits](docs/MESSAGES.md).
   A separate object-factory fix prevents crafted items from freeing mutable
   names, descriptions and spell messages still owned by staff-edited templates.

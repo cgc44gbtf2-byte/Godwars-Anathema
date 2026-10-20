@@ -5,6 +5,7 @@ import unittest
 from test_class_layout import ROOT,SRC,make_values
 from test_guardian_lifecycle_catalog import without_guardian_lifecycle_save
 from aura_source import without_aura_stage
+from item_info_source import without_item_info_stage
 
 def once(text,old,new):
     assert text.count(old)==1,repr(old)
@@ -45,6 +46,7 @@ def without_guardian_stage(text):
     return text[:start]+body+text[end:]
 
 def blob(text):
+    if "void obj_score(" in text:text=without_item_info_stage(text)
     b=text.encode()
     return hashlib.sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest()
 
@@ -55,7 +57,7 @@ class GuardianCatalog(unittest.TestCase):
 
     def test_macro_getters_consumers_serializers_and_interpreter_unchanged(self):
         for path,sha in (("merc.h","b843f157662ab181daabe913d74685f1c8bc75e6"),
-                         ("act_info.c","a3831d41ddd053a65c2e06567e913c8db8a90f5c"),
+                         ("act_info.c","35ad74c88203e8f2ea1ad53b09cab39fae4b74ea"),
                          ("clan.c","a5570740eb895b02ff7aa058ed631e153ecbeef3"),
                          ("interp.c","ccb0125d4264a8a5447618c29a9240ec674d2eb4"),
                          ("save.c","1f3317263a45d1a886db411d4c0a52a5bba92909")):

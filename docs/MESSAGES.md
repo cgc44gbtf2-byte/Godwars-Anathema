@@ -51,7 +51,21 @@ snapshots and tests 12 boundary cases plus 169 extreme-value average pairs,
 missing contexts and colour clipping. Older whole-magic pins mask only this
 independently tested identification scope; every other spell remains pinned.
 
-This is not a whole-codebase formatting audit. Other commands that build
+## Object-form score and comparison
+
+The object-form `score` report bounds item descriptions and ownership text,
+handles missing objects/prototypes and invalid weapon-spell indexes, and uses
+an overflow-safe damage average. `compare` retains exact ordering of summed
+weapon damage, including one-point differences and ties, without overflowing.
+It does not compare rounded averages or change the existing armor comparison,
+selection, equipment/visibility checks, item stats, powers or prices.
+The real-engine suite pins **732** original output snapshots and exercises
+**28,561** extreme-value weapon comparisons, 169 averages and nine boundaries.
+The old full-info pins now mask just these separately tested scopes; all other
+commands and class getters remain pinned.
+
+This is not a whole-codebase formatting audit. Room/exit displays, normal
+character scores and other commands that build
 their own strings still require review. Callers must supply live,
 correctly typed pointers and valid acyclic affect lists: arbitrary stale
 pointers and cyclic lists cannot be made safe by output bounds. The output

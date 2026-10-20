@@ -30,6 +30,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -2638,6 +2639,24 @@ void do_equipment( CHAR_DATA *ch, char *argument )
     return;
 }
 
+/* Item comparison scope: exact two-long sums represented as half + parity. */
+static int item_damage_compare(const OBJ_DATA *left, const OBJ_DATA *right)
+{
+    long halves[2], remainders[2];
+    const OBJ_DATA *items[2] = {left, right};
+    for (int n = 0; n < 2; n++) {
+        long a = items[n]->value[1], b = items[n]->value[2];
+        halves[n] = a / 2 + b / 2;
+        remainders[n] = a % 2 + b % 2;
+        if (remainders[n] < 0) { halves[n]--; remainders[n] += 2; }
+        else if (remainders[n] > 1) { halves[n]++; remainders[n] -= 2; }
+    }
+    /* Floor-half remains representable even for LONG_MIN + LONG_MIN.
+     * Parity preserves differences of one, unlike rounded averages. */
+    if (halves[0] != halves[1]) return halves[0] > halves[1] ? 1 : -1;
+    return (remainders[0] > remainders[1]) - (remainders[0] < remainders[1]);
+}
+
 void do_compare( CHAR_DATA *ch, char *argument )
 {
     char arg1[MAX_INPUT_LENGTH];
@@ -2647,6 +2666,9 @@ void do_compare( CHAR_DATA *ch, char *argument )
     long value1;
     long value2;
     char *msg;
+
+    if (ch == NULL || argument == NULL ||
+        (!IS_NPC(ch) && ch->pcdata == NULL)) return;
 
     argument = one_argument( argument, arg1 );
     argument = one_argument( argument, arg2 );
@@ -2714,8 +2736,8 @@ void do_compare( CHAR_DATA *ch, char *argument )
 	    break;
 
 	case ITEM_WEAPON:
-	    value1 = obj1->value[1] + obj1->value[2];
-	    value2 = obj2->value[1] + obj2->value[2];
+    value1 = item_damage_compare(obj1, obj2);
+    value2 = 0;
 	    break;
 	}
     }
@@ -3669,13 +3691,40 @@ void do_showdamage( CHAR_DATA *ch, char *argument )
     return;
 }
 
+/* Item score reporting scope: bound only variable item text, not gameplay. */
+static void item_score_format(char *buf, size_t size, const char *format, ...)
+{
+    va_list args;
+    int length;
+    va_start(args, format);
+    length = vsnprintf(buf, size, format, args);
+    va_end(args);
+    if (length < 0) { buf[0] = '\0'; return; }
+    if ((size_t)length >= size) {
+        size_t used = size - 3, hashes = 0;
+        while (hashes < used && buf[used - hashes - 1] == '#') hashes++;
+        if (hashes % 2 != 0) used--;
+        buf[used++] = '\n'; buf[used++] = '\r'; buf[used] = '\0';
+    }
+}
+
+static long item_score_average(long a, long b)
+{
+    if ((a < 0) != (b < 0)) return (a + b) / 2;
+    return a / 2 + b / 2 + (a % 2 + b % 2) / 2;
+}
+
 void obj_score( CHAR_DATA *ch, OBJ_DATA *obj )
 {
     char buf[MAX_STRING_LENGTH];
     AFFECT_DATA *paf;
     long itemtype;
 
-    sprintf( buf,"You are %s.\n\r",obj->short_descr);
+    if (ch == NULL || obj == NULL ||
+        (!IS_NPC(ch) && ch->pcdata == NULL)) return;
+
+    item_score_format( buf,sizeof(buf),"You are %s.\n\r",
+        obj->short_descr != NULL ? obj->short_descr : "something");
     send_to_char( buf, ch );
 
     sprintf( buf,"Type %s, Extra flags %s.\n\r",item_type_name(obj->item_type),
@@ -3688,17 +3737,17 @@ void obj_score( CHAR_DATA *ch, OBJ_DATA *obj )
     if (obj->questmaker != NULL && strlen(obj->questmaker) > 1 &&
 	obj->questowner != NULL && strlen(obj->questowner) > 1)
     {
-	sprintf( buf, "You were created by %s, and are owned by %s.\n\r", obj->questmaker,obj->questowner );
+item_score_format( buf, sizeof(buf), "You were created by %s, and are owned by %s.\n\r", obj->questmaker,obj->questowner );
 	send_to_char( buf, ch );
     }
     else if (obj->questmaker != NULL && strlen(obj->questmaker) > 1)
     {
-	sprintf( buf, "You were created by %s.\n\r", obj->questmaker );
+item_score_format( buf, sizeof(buf), "You were created by %s.\n\r", obj->questmaker );
 	send_to_char( buf, ch );
     }
     else if (obj->questowner != NULL && strlen(obj->questowner) > 1)
     {
-	sprintf( buf, "You are owned by %s.\n\r", obj->questowner );
+item_score_format( buf, sizeof(buf), "You are owned by %s.\n\r", obj->questowner );
 	send_to_char( buf, ch );
     }
 
@@ -3757,7 +3806,7 @@ void obj_score( CHAR_DATA *ch, OBJ_DATA *obj )
     case ITEM_WEAPON:
 	sprintf( buf, "You inflict %li to %li damage in combat (average %li).\n\r",
 	    obj->value[1], obj->value[2],
-	    ( obj->value[1] + obj->value[2] ) / 2 );
+    item_score_average(obj->value[1], obj->value[2]) );
 	send_to_char( buf, ch );
 
 	if (obj->value[0] >= 1000)
@@ -3797,7 +3846,9 @@ void obj_score( CHAR_DATA *ch, OBJ_DATA *obj )
 	else if (itemtype == 53)
 	    sprintf (buf, "You are dripping with a dark poison.\n\r");
 	else if (itemtype > 0)
-	    sprintf (buf, "You have been imbued with the power of %s.\n\r",skill_table[itemtype].name);
+    item_score_format (buf, sizeof(buf), "You have been imbued with the power of %s.\n\r",
+        itemtype < MAX_SKILL && skill_table[itemtype].name != NULL
+            ? skill_table[itemtype].name : "an unknown spell");
 	if (itemtype > 0)
 	    send_to_char( buf, ch );
 
@@ -3924,7 +3975,8 @@ void obj_score( CHAR_DATA *ch, OBJ_DATA *obj )
 	break;
     }
 
-    for ( paf = obj->pIndexData->affected; paf != NULL; paf = paf->next )
+    for ( paf = obj->pIndexData != NULL ? obj->pIndexData->affected : NULL;
+          paf != NULL; paf = paf->next )
     {
 	if ( paf->location != APPLY_NONE && paf->modifier != 0 )
 	{

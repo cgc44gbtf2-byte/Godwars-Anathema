@@ -40,7 +40,7 @@ class HybridColorsCatalog(unittest.TestCase):
     def test_native_trainers_getters_and_command_table_unchanged(self):
         for path,sha in {
             "classes/sorcerer/sorcerer.c":"91fd66c8ba3a020d09525ca3fdbd13c33065812d",
-            "act_info.c":"9510008085cc695c0f58a563d62415b3c18cb8cd",
+            "act_info.c":"135a7d098dede2187bff9572b27694d651f8a80a",
             "interp.c":"ccb0125d4264a8a5447618c29a9240ec674d2eb4",
         }.items():
             data=(SRC/path).read_bytes()

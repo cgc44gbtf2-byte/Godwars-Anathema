@@ -51,6 +51,7 @@ TESTS += tests/test_hybrid_monk_training
 TESTS += tests/test_hybrid_aura
 TESTS += tests/test_message_format
 TESTS += tests/test_identify
+TESTS += tests/test_item_inspection
 # Real validators/effective access for older isolated native fixtures too.
 # Never replace hybrid access with permissive stubs just to satisfy linking.
 HYBRID_ACCESS_SOURCES = $(addprefix Genesis/src/classes/hybrid/,registry.c state.c player.c build.c progression.c specialization.c access.c passives.c books.c) Genesis/src/classes/sorcerer/vision.c Genesis/src/classes/monk/favour.c Genesis/src/guardian.c
@@ -128,6 +129,7 @@ check-layout:
 	python3 tests/test_hybrid_aura_catalog.py
 	python3 tests/test_message_format_catalog.py
 	python3 tests/test_identify_catalog.py
+	python3 tests/test_item_inspection_catalog.py
 	python3 tests/test_combat_layout.py
 	python3 tests/test_telnet_layout.py
 	python3 tests/test_gmcp_layout.py
@@ -228,6 +230,9 @@ tests/test_message_format: tests/test_message_format.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_identify: tests/test_identify.c $(ENGINE_OBJECTS)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
+tests/test_item_inspection: tests/test_item_inspection.c tests/test_identify.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_favour_expiry: tests/test_favour_expiry.c Genesis/src/classes/monk/favour.c $(ENGINE_HEADERS)

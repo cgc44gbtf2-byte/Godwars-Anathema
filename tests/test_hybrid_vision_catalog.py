@@ -6,6 +6,7 @@ from test_class_layout import ROOT, SRC, make_values
 from test_hybrid_monk_buffs_catalog import without_cloak_death_stage
 from test_hybrid_stun_catalog import without_hybrid_stun_adapter
 from test_hybrid_celestial_catalog import without_celestial_visibility_stage
+from item_info_source import without_item_info_stage
 
 NEW_VISION="""void do_vision( CHAR_DATA *ch, char *argument )
 {
@@ -50,6 +51,7 @@ def without_hostile_sight_adapter(text):
     return text.replace(new,"if (IS_SET(victim->act, PLR_HOLYLIGHT)) REMOVE_BIT(victim->act, PLR_HOLYLIGHT);",1)
 
 def without_vision_info_adapter(text):
+    text=without_item_info_stage(text)
     for new,old in (("holylight","IS_SET({}->act, PLR_HOLYLIGHT)"),
                     ("shadowsight","IS_AFFECTED({},AFF_SHADOWSIGHT)"),
                     ("nightsight","IS_VAMPAFF({}, VAM_NIGHTSIGHT)")):
@@ -59,7 +61,7 @@ def without_vision_info_adapter(text):
 
 NATIVE_READERS={
     "handler.c":"c44c59c1d7db88fb090fcc221ee0962d66367cae51ff59954d59edf920031c0e",
-    "act_info.c":"13aeb7a8f100cf37395e6ac32467e448465f7b4b4d406c7464fdf95e500efbd6",
+    "act_info.c":"4fba28f0f7198617e194816609b2a34025ccd2874347402b70e85489a13021da",
     "kav_info.c":"7033361ae7f06dee67bb381072d513cc252f5f3125b770a86d74a94e885920bc",
     "random.c":"b4e5b7721b560e6a2fc256ccf9ab08697c21c7e8c75e5a4631661993d75dd072",
     "clan.c":"9a416f47b1ef3de879819cd9ba1007a87f053fa7fc5641855e384bfe143d5803",
@@ -70,6 +72,7 @@ NATIVE_READERS={
     "classes/elemental/elemental.c":"da8474d2063b020b76afbf96269b889388bacf4c359ddc40c470c58f20232583",
 }
 def native_reader_tokens(text):
+    if "void obj_score(" in text:text=without_item_info_stage(text)
     if "void do_readaura(" in text:
         from aura_source import without_aura_stage
         text=without_aura_stage(text)
@@ -94,7 +97,7 @@ class HybridVisionCatalog(unittest.TestCase):
     def test_consumers_only_readers_and_hostile_holy_removal_changed(self):
         data=without_vision_info_adapter((SRC/"act_info.c").read_text()).encode()
         self.assertEqual(hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest(),
-                         "9510008085cc695c0f58a563d62415b3c18cb8cd")
+                         "135a7d098dede2187bff9572b27694d651f8a80a")
         for path,digest in NATIVE_READERS.items():
             with self.subTest(path=path):
                 text=(SRC/path).read_text()
