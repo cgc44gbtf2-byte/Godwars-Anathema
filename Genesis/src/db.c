@@ -35,6 +35,8 @@
 #include <time.h>
 #include "merc.h"
 #include "file_number.h"
+#include "object_numbers.h"
+#include "file_io.h"
 
 #if !defined(macintosh)
 extern	long	_filbuf		args( (FILE *) );
@@ -1830,8 +1832,11 @@ OBJ_DATA *create_object( OBJ_INDEX_DATA *pObjIndex, long level )
     obj->value[2]	= pObjIndex->value[2];
     obj->value[3]	= pObjIndex->value[3];
     obj->weight		= pObjIndex->weight;
-    obj->cost		= number_fuzzy( 10 )
-			* number_fuzzy( level ) * number_fuzzy( level );
+    /* Keep the three RNG draws in legacy order, but multiply as long. */
+    long cost_base=number_fuzzy(10);
+    long cost_first=number_fuzzy(object_fuzzy_input(level));
+    long cost_second=number_fuzzy(object_fuzzy_input(level));
+    obj->cost=object_cost_bounded(cost_base,cost_first,cost_second);
 
     obj->toughness = -1;
 
@@ -1907,13 +1912,13 @@ OBJ_DATA *create_object( OBJ_INDEX_DATA *pObjIndex, long level )
 	break;
 
     case ITEM_SCROLL:
-	obj->value[0]	= number_fuzzy( obj->value[0] );
+	obj->value[0]	= number_fuzzy(object_fuzzy_input(obj->value[0]));
 	break;
 
     case ITEM_WAND:
     case ITEM_STAFF:
-	obj->value[0]	= number_fuzzy( obj->value[0] );
-	obj->value[1]	= number_fuzzy( obj->value[1] );
+	obj->value[0]	= number_fuzzy(object_fuzzy_input(obj->value[0]));
+	obj->value[1]	= number_fuzzy(object_fuzzy_input(obj->value[1]));
 	obj->value[2]	= obj->value[1];
 	break;
 
@@ -1934,7 +1939,7 @@ OBJ_DATA *create_object( OBJ_INDEX_DATA *pObjIndex, long level )
 
     case ITEM_POTION:
     case ITEM_PILL:
-	obj->value[0]	= number_fuzzy( number_fuzzy( obj->value[0] ) );
+	obj->value[0]	= number_fuzzy(number_fuzzy(object_fuzzy_input(obj->value[0])));
 	break;
 
     case ITEM_MONEY:
@@ -2611,8 +2616,8 @@ int number_fuzzy( int number )
 {
     switch ( number_bits( 2 ) )
     {
-    case 0:  number -= 1; break;
-    case 3:  number += 1; break;
+    case 0:  if(number>INT_MIN) number -= 1; break;
+    case 3:  if(number<INT_MAX) number += 1; break;
     }
 
     return UMAX( 1, number );
@@ -2938,8 +2943,7 @@ void append_file( CHAR_DATA *ch, char *file, char *str )
     if ( IS_NPC(ch) || str[0] == '\0' )
 	return;
 
-    fflush( fpReserve );
-    fclose( fpReserve );
+    file_reserve_close();
     if ( ( fp = fopen( file, "a" ) ) == NULL )
     {
 	perror( file );
@@ -2953,7 +2957,7 @@ void append_file( CHAR_DATA *ch, char *file, char *str )
 	fclose( fp );
     }
 
-    fpReserve = fopen( NULL_FILE, "r" );
+    file_reserve_open();
     return;
 }
 
@@ -3060,12 +3064,7 @@ void bug( const char *str, long param )
     format_bug( buf + strlen(buf), sizeof(buf) - strlen(buf), str, param );
     log_string( buf );
 
-    if ( fpReserve != NULL )
-    {
-        fflush( fpReserve );
-        fclose( fpReserve );
-    }
-    fpReserve = fopen( NULL_FILE, "r" );
+    file_reserve_open();
 
     return;
 }

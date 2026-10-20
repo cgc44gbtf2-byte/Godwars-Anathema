@@ -33,6 +33,7 @@
 #include <time.h>
 #include <malloc.h>
 #include "merc.h"
+#include "file_io.h"
 #include "classes/hybrid/access.h"
 
 /*
@@ -2370,7 +2371,7 @@ bool char_exists( char *name )
 
         valid = FALSE;
 
-        fclose(fpReserve);
+        file_reserve_close();
         sprintf(path, "%s%s", PLAYER_DIR, capitalize( name ) );
 
         if ( (renamefp = fopen(path, "r")) == NULL) 
@@ -2383,7 +2384,7 @@ bool char_exists( char *name )
                 fclose(renamefp);
                 }
 
-   fpReserve = fopen( NULL_FILE, "r" );
+   file_reserve_open();
    return valid;
 }
 

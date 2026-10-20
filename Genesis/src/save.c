@@ -34,6 +34,8 @@
 #include <malloc.h>
 #include "merc.h"
 #include "file_number.h"
+#include "file_io.h"
+#include <errno.h>
 #include "atomic_save.h"
 #include "classes/hybrid/player.h"
 #include "classes/monk/favour.h"
@@ -139,11 +141,7 @@ static enum atomic_save_result save_player_atomic_record(CHAR_DATA *ch,
         name[i] = i == 0 ? UPPER(c) : LOWER(c);
     }
     name[i] = '\0';
-    if (fpReserve != NULL)
-    {
-        fclose(fpReserve);
-        fpReserve = NULL;
-    }
+    file_reserve_close();
     result = atomic_save(directory, name, write_player_save,
                          record ? record : ch, &error);
     /* Queue each destination independently. Failed or backup writes must not
@@ -161,7 +159,7 @@ static enum atomic_save_result save_player_atomic_record(CHAR_DATA *ch,
         ch->save_retry_delay[slot] = delay == 0 ? 30 :
             (delay >= 150 ? 300 : delay * 2);
     }
-    fpReserve = fopen( NULL_FILE, "r" );
+    file_reserve_open();
     if (fpReserve == NULL)
         bug("Player save: could not reopen reserve file", 0);
     if (result != ATOMIC_SAVE_OK)
@@ -871,8 +869,7 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
     ch->pcdata->majesty			= 0;
     ch->pcdata->flag			= 0;
     found = FALSE;
-    fflush( fpReserve );
-    fclose( fpReserve );
+    file_reserve_close();
     sprintf( strsave, "%s%s", PLAYER_DIR, capitalize( name ) );
     if ( ( fp = fopen( strsave, "r" ) ) != NULL )
     {
@@ -925,11 +922,14 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
 		break;
 	    }
 	}
-	fflush( fp );
-	fclose( fp );
+        if(ferror(fp)) ch->pcdata->player_load_failed=1;
+        if(fclose(fp)!=0) ch->pcdata->player_load_failed=1;
     }
-
-    fpReserve = fopen( NULL_FILE, "r" );
+    else if(errno!=ENOENT) {
+        /* An inaccessible existing account must not become a new signup. */
+        found=TRUE;ch->pcdata->player_load_failed=1;
+    }
+    file_reserve_open();
     if (found && !ch->pcdata->player_load_failed) {
         clan_sync_player(ch);
         refresh_equipment_state(ch);
@@ -1186,8 +1186,7 @@ bool load_char_short( DESCRIPTOR_DATA *d, char *name )
     ch->pcdata->flag			= 0;
 
     found = FALSE;
-    fflush( fpReserve );
-    fclose( fpReserve );
+    file_reserve_close();
     sprintf( strsave, "%s%s", PLAYER_DIR, capitalize( name ) );
     if ( ( fp = fopen( strsave, "r" ) ) != NULL )
     {
@@ -1238,11 +1237,13 @@ bool load_char_short( DESCRIPTOR_DATA *d, char *name )
 		break;
 	    }
 	}
-	fflush( fp );
-	fclose( fp );
+        if(ferror(fp)) ch->pcdata->player_load_failed=1;
+        if(fclose(fp)!=0) ch->pcdata->player_load_failed=1;
     }
-
-    fpReserve = fopen( NULL_FILE, "r" );
+    else if(errno!=ENOENT) {
+        found=TRUE;ch->pcdata->player_load_failed=1;
+    }
+    file_reserve_open();
     return found;
 }
 
@@ -2359,17 +2360,15 @@ void do_finger( CHAR_DATA *ch, char *argument )
 	    return;
 	}
 
-	fflush( fpReserve );
-	fclose( fpReserve );
+file_reserve_close();
 	sprintf( strsave, "%s%s", PLAYER_DIR, capitalize(argument) );
 	if ( ( fp = fopen( strsave, "r" ) ) != NULL )
 	{
 	    if ( ( letter = fread_letter( fp ) ) == EOF)
 	    {
 		send_to_char("Their playerfile has been corrupted.\n\r",ch);
-		fflush( fp );
 		fclose( fp );
-		fpReserve = fopen( NULL_FILE, "r" );
+file_reserve_open();
 		return;
 	    }
 	    fread_to_eol( fp );
@@ -2446,17 +2445,18 @@ void do_finger( CHAR_DATA *ch, char *argument )
 	}
 	else
 	{
-	    bug( "Do_finger: fopen", 0 );
-	    perror( strsave );
+    file_reserve_open();
+    send_to_char("Their playerfile could not be opened.\n\r",ch);
+    return;
 	}
-	fflush( fp );
-	fclose( fp );
-	fpReserve = fopen( NULL_FILE, "r" );
+if(ferror(fp)) numbers_ok=FALSE;
+if(fclose(fp)!=0) numbers_ok=FALSE;
+file_reserve_open();
     }
     if (!numbers_ok) {
         free_string(f_title);free_string(f_lasthost);free_string(f_lasttime);
         free_string(f_createtime);free_string(f_marriage);free_string(f_email);
-        send_to_char("Their playerfile has invalid numeric data.\n\r",ch);
+        send_to_char("Their playerfile could not be read safely.\n\r",ch);
         return;
     }
     send_to_char("#l--------------------------------------------------------------------------------#n\n\r",ch);

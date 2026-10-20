@@ -45,6 +45,9 @@ class MessageFormatCatalog(unittest.TestCase):
             b=(SRC/path).read_bytes()
             if path=="magic.c": b=without_identify_stage(b.decode()).encode()
             if path in ("handler.c","comm.c"): b=without_progress_metrics_stage(b.decode()).encode()
+            if path in ("clan.c","interp.c"):
+                from reader_fields_source import without_reader_fields_stage
+                b=without_reader_fields_stage(b.decode()).encode()
             self.assertEqual(hashlib.sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest(),sha)
         source=(SRC/"core.c").read_text()
         self.assertEqual(re.findall(r"^void (\w+)\(",source,re.M),["act","act2","kavitem"])

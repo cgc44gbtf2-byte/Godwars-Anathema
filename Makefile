@@ -56,6 +56,7 @@ TESTS += tests/test_room_display
 TESTS += tests/test_character_score
 TESTS += tests/test_progress_metrics
 TESTS += tests/test_file_numbers
+TESTS += tests/test_reader_fields
 # Real validators/effective access for older isolated native fixtures too.
 # Never replace hybrid access with permissive stubs just to satisfy linking.
 HYBRID_ACCESS_SOURCES = $(addprefix Genesis/src/classes/hybrid/,registry.c state.c player.c build.c progression.c specialization.c access.c passives.c books.c) Genesis/src/classes/sorcerer/vision.c Genesis/src/classes/monk/favour.c Genesis/src/guardian.c
@@ -138,6 +139,7 @@ check-layout:
 	python3 tests/test_character_score_catalog.py
 	python3 tests/test_progress_metrics_catalog.py
 	python3 tests/test_file_numbers_catalog.py
+	python3 tests/test_reader_fields_catalog.py
 	python3 tests/test_combat_layout.py
 	python3 tests/test_telnet_layout.py
 	python3 tests/test_gmcp_layout.py
@@ -253,6 +255,9 @@ tests/test_progress_metrics: tests/test_progress_metrics.c tests/test_identify.c
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 tests/test_file_numbers: tests/test_file_numbers.c tests/test_progress_metrics.c tests/test_identify.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
+tests/test_reader_fields: tests/test_reader_fields.c tests/test_file_numbers.c tests/test_progress_metrics.c tests/test_identify.c $(ENGINE_OBJECTS)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) -Wl,--wrap=fopen -Wl,--wrap=fclose $(LDLIBS) -o $@
 
 tests/test_favour_expiry: tests/test_favour_expiry.c Genesis/src/classes/monk/favour.c $(ENGINE_HEADERS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< Genesis/src/classes/monk/favour.c $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@

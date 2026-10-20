@@ -19,6 +19,8 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "file_io.h"
+#include <errno.h>
 #include <unistd.h> 
 
 /* Voltecs attempt at re-naming players in game... 
@@ -128,12 +130,13 @@ bool valid_name(char *name)
 
 	valid = FALSE;
 
-	fclose(fpReserve);
+file_reserve_close();
 	sprintf(path, "%s%s", PLAYER_DIR, capitalize( name ) );
 
 	if ( (renamefp = fopen(path, "r")) == NULL) /* Cant open the p-file, so player doesn't exist yet*/
 		{
-		valid = check_parse_name(name);
+		/* Failed reads are not proof a name is available. */
+		valid = errno==ENOENT && check_parse_name(name);
 		}
 	else
 		{
@@ -141,6 +144,6 @@ bool valid_name(char *name)
 		fclose(renamefp);
 		}
    
-   fpReserve = fopen( NULL_FILE, "r" );
+   file_reserve_open();
    return valid;
 }

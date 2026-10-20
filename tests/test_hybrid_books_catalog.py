@@ -61,6 +61,9 @@ class HybridBooksCatalog(unittest.TestCase):
         }.items():
             data=(SRC/path).read_bytes()
             if path=="act_info.c":data=without_vision_info_adapter(data.decode()).encode()
+            if path=="interp.c":
+                from reader_fields_source import without_reader_fields_stage
+                data=without_reader_fields_stage(data.decode()).encode()
             self.assertEqual(blob(data), expected)
 
     def test_color_adapter_is_page_scoped_and_uses_valid_earned_bank(self):

@@ -160,7 +160,7 @@ static void live_failures(void)
     for(unsigned n=0;n<3;n++){
         player_fixture(finger_bad[n]);desc.outtop=0;output[0]=0;
         char name[]="Numfixture";do_finger(&actor,name);
-        assert(strstr(output,"invalid numeric data"));
+        assert(strstr(output,"could not be read safely"));
         assert(!pc.player_load_failed&&fpReserve&&!ferror(fpReserve));
     }
     for(int shorter=0;shorter<2;shorter++){
@@ -197,6 +197,7 @@ static void old_boundary(int n)
     if(n<5){FILE *fp=input(text);printf("%ld\n",fread_number(fp));fclose(fp);}
     else {player_fixture(text);CHAR_DATA *ch=read_player(n%2);drop_player(ch);}
 }
+#ifndef FILE_NUMBERS_FIXTURE_ONLY
 int main(int argc,char **argv)
 {
     sandbox_begin();assert(mkdir("../player",0700)==0);
@@ -219,3 +220,4 @@ int main(int argc,char **argv)
     obj_index_hash[900%MAX_KEY_HASH]=NULL;
     sandbox_end();return 0;
 }
+#endif

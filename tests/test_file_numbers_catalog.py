@@ -40,7 +40,7 @@ class FileNumbersCatalog(unittest.TestCase):
                      "#define fread_number(fp) saved_number((fp),&numbers_ok)",
                      "#undef fread_number","discard_saved_object(obj)",
                      "num<0 || num>1024","prototype=get_obj_index(vnum)",
-                     'Their playerfile has invalid numeric data.'):
+                     'Their playerfile could not be read safely.'):
             self.assertIn(part,text)
         self.assertEqual(text.count("bool numbers_ok=TRUE;"),4)
         self.assertEqual(text.count("if (!numbers_ok) continue;"),2)

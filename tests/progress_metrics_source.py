@@ -1,5 +1,7 @@
 """Only checked metric implementations and their narrow caller sites are masked."""
 def without_progress_metrics_stage(text):
+    from reader_fields_source import without_reader_fields_stage
+    text=without_reader_fields_stage(text)
     text=text.replace('#include "progress_metrics.h"\n',"",1)
     if "bool is_name(" in text and ("long get_hours(" in text or "long get_hours( " in text):
         marker="/* Shared played-time metrics scope:"

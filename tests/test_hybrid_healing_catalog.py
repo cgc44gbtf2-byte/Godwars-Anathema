@@ -85,7 +85,8 @@ class HybridHealingCatalog(unittest.TestCase):
             self.assertNotRegex(text,r"\b(?:int|long)\s+hybrid_power_(?:parent|rank)\s*\(")
 
     def test_empty_parser_output_is_the_only_interpreter_change(self):
-        text=(SRC/"interp.c").read_text()
+        from reader_fields_source import without_reader_fields_stage
+        text=without_reader_fields_stage((SRC/"interp.c").read_text())
         fixed="    if (*argument == '\\0')\n    {\n        arg[0]='\\0';\n        return 0;\n    }"
         native="    if (*argument == '\\0')\n\treturn 0;"
         self.assertEqual(text.count(fixed),1)

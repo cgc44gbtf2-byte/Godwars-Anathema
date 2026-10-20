@@ -44,6 +44,9 @@ class HybridColorsCatalog(unittest.TestCase):
             "interp.c":"ccb0125d4264a8a5447618c29a9240ec674d2eb4",
         }.items():
             data=(SRC/path).read_bytes()
+            if path=="interp.c":
+                from reader_fields_source import without_reader_fields_stage
+                data=without_reader_fields_stage(data.decode()).encode()
             if path=="classes/sorcerer/sorcerer.c":
                 data=without_sorcerer_creation_adapter(data.decode()).encode()
             if path=="act_info.c":

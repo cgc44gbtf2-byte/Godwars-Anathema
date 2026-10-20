@@ -25,6 +25,8 @@ GRANT=('    /* A learned Monk grant is independent of the original class. Its\n'
        '        HYBRID_TRAIN_MONK, MONK_MANTRA) >= 2;\n\n')
 
 def without_aura_stage(text):
+    from reader_fields_source import without_reader_fields_stage
+    text=without_reader_fields_stage(text)
     start=text.index("void do_readaura(");end=text.index("\nvoid do_shield(",start)
     body=text[start:end]
     if GRANT in body:

@@ -4,12 +4,16 @@ def replace_once(text,old,new="",count=1):
     return text.replace(old,new)
 
 def without_file_number_db(text):
+    from reader_fields_source import without_reader_fields_stage
+    text=without_reader_fields_stage(text)
     text=text.replace('#include "file_number.h"\n',"",1)
     start=text.index("long fread_number(")
     stop=text.index("char *fread_string(",start)
     return text[:start]+"/* checked numeric reader scope */\n\n"+text[stop:]
 
 def without_file_number_save(text):
+    from reader_fields_source import without_reader_fields_stage
+    text=without_reader_fields_stage(text)
     if "static long saved_number(" not in text:return text
     text=replace_once(text,'#include "file_number.h"\n')
     start=text.index("/* Numeric player-reader scope:")

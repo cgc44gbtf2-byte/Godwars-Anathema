@@ -34,6 +34,7 @@
 #include <time.h>
 #include <unistd.h> /* unlink() */
 #include "merc.h"
+#include "file_io.h"
 
 
 
@@ -3557,7 +3558,7 @@ disable <command> - toggles disable status of command
          return;
       }
    
-      fclose(fpReserve);
+      file_reserve_close();
       fp = fopen ("ban.txt", "w");
    
       if (!fp) {bug("could not open ban.txt",0);
@@ -3566,6 +3567,6 @@ disable <command> - toggles disable status of command
       for (p = ban_list; p != NULL; p = p->next) {
          fprintf(fp, "%s\n", p->name);}
       fclose(fp);
-      fpReserve = fopen(NULL_FILE, "r");
+      file_reserve_open();
    
    }
