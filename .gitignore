@@ -71,6 +71,7 @@ tests/test_object_strings
 tests/test_hybrid_writing
 tests/test_hybrid_enchant
 tests/test_hybrid_vision
+tests/test_hybrid_stun
 bootstrap-backups/
 __pycache__/
 *.py[cod]

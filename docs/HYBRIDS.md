@@ -193,6 +193,37 @@ Full conversion/forms/other secondary powers and PvP balance remain pending.
 Custom world help files still take priority; this is generated help, not an
 automatic live-world help replacement.
 
+### Secondary Monk Stun Fist (existing records only)
+
+`stunfist <target>` is now routed through owned Monk access and learned Tech.
+A secondary Monk must select the full Tech path and actually learn Tech7 or8;
+other secondary Monk paths cap Tech at4, even if a migrated raw bank contains
+rank7/8. No original-parent Monk training is read as a secondary bank or
+overwritten. Original Monks retain their native learned-rank behavior regardless
+of the secondary parent, and secondary records must be valid before use.
+
+The ability still costs 5,000 mana only after its native target/safety checks.
+It interrupts the target for1second, recovers the caster for2seconds, and applies
+shared per-target immunity for6seconds from application. Another attacker cannot
+refresh that immunity or evade it with a different parent class. Melee Counter
+still intercepts it in the same place, after native spending/recovery; the native
+safe-room, sleeping/offline, charm/master, missing-room and no-kill guards stay.
+Failed rank/eligibility checks grant no interruption, resources or free attacks.
+Mana remains the character's existing shared mana, not a copied secondary pool.
+
+The real-engine suite pins264 native snapshots (including rank/cost boundaries),
+compares9720 paired replays across all nine pairings and both original-parent
+orientations, and exercises nine corrupt/permission guards plus nine real
+shared-immunity timer sequences. The native CSV SHA256 is
+`5507225d148cfb29700f4a585b4e035e8e75265ed6b7061b80abec9cf725c82c`.
+Only two guard expressions in the Monk module change; no other powers or
+`IS_MONK`/native getter definitions are broadened.
+
+There is no new conversion, no new trainer or focus-selection UI, and no save
+format change (record4/save epoch3/handoff2). Training/attachment are still
+backend operations. Live PvP balance and full hybrid forms remain unproven.
+Generated help describes this scope; custom live-world helps retain priority.
+
 ### Native material-factory ownership audit
 
 The recipe audit also reproduced a native item-factory ownership defect:

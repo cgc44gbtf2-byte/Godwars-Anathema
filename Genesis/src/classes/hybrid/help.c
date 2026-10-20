@@ -107,6 +107,11 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
     send_to_char(line, ch);
     send_to_char("Original training is retained; the second parent starts untrained. "
                  "There is no playable conversion yet.\n\r", ch);
+    if (hybrid_has_parent(h, CLASS_MONK))
+        send_to_char("Existing records: secondary Monk Stun Fist needs Tech 7 on the full Tech path; "
+                     "other paths cap Tech at4. Costs5000 mana, with1-second interruption, "
+                     "2-second caster recovery and shared6-second target immunity. "
+                     "Original Monks keep native access; no free ranks or conversion.\n\r", ch);
     long pages = hybrid_book_chain_policy(h);
     if (pages) {
         snprintf(line, sizeof(line), "Approved book-chain policy: %ld pages in either "

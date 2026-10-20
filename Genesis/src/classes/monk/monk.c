@@ -583,7 +583,7 @@ void do_stunfist( CHAR_DATA *ch, char *argument )
 
     if (ch == NULL) return;
 
-    if (!IS_MONK(ch) || ch->pcdata == NULL)
+    if (!hybrid_power_parent(ch, CLASS_MONK) || ch->pcdata == NULL)
     {
 	stc("Huh?\n\r", ch);
 	return;
@@ -595,7 +595,7 @@ stc("You are still recovering from a combat interruption.\n\r", ch);
 return;
     }
 
-    if (get_monk(ch, MONK_TECH) < 7)
+    if (hybrid_power_rank(ch, CLASS_MONK, HYBRID_TRAIN_MONK, MONK_TECH) < 7)
     {
 	stc("You need Tech 7 for Stun Fist.\n\r", ch);
 	return;

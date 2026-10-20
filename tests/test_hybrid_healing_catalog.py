@@ -4,6 +4,7 @@ import json
 import unittest
 from test_class_layout import ROOT, SRC, make_values
 from test_hybrid_vision_catalog import without_hostile_sight_adapter
+from test_hybrid_stun_catalog import without_hybrid_stun_adapter
 
 
 def blob(text):
@@ -94,7 +95,7 @@ class HybridHealingCatalog(unittest.TestCase):
         self.assertIn('assert(number_argument("",empty)==0&&empty[0]',tests)
 
     def test_touch_permissions_only_restore_fixed_native_module(self):
-        text=without_hostile_sight_adapter((SRC/"classes/monk/monk.c").read_text())
+        text=without_hostile_sight_adapter(without_hybrid_stun_adapter((SRC/"classes/monk/monk.c").read_text()))
         self.assertEqual(text.count('#include "classes/hybrid/access.h"\n'),1)
         self.assertEqual(text.count("hybrid_power_parent("),1)
         self.assertEqual(text.count("hybrid_power_rank("),1)

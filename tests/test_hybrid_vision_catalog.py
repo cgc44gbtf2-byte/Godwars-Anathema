@@ -3,6 +3,7 @@ import hashlib
 import re
 import unittest
 from test_class_layout import ROOT, SRC, make_values
+from test_hybrid_stun_catalog import without_hybrid_stun_adapter
 
 NEW_VISION="""void do_vision( CHAR_DATA *ch, char *argument )
 {
@@ -89,7 +90,9 @@ class HybridVisionCatalog(unittest.TestCase):
                          "9510008085cc695c0f58a563d62415b3c18cb8cd")
         for path,digest in NATIVE_READERS.items():
             with self.subTest(path=path):
-                self.assertEqual(hashlib.sha256(native_reader_tokens((SRC/path).read_text()).encode()).hexdigest(),digest)
+                text=(SRC/path).read_text()
+                if path=="classes/monk/monk.c":text=without_hybrid_stun_adapter(text)
+                self.assertEqual(hashlib.sha256(native_reader_tokens(text).encode()).hexdigest(),digest)
 
     def test_source_bits_are_independent_and_persist_in_existing_extra(self):
         header=(SRC/"merc.h").read_text()

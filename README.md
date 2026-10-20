@@ -108,6 +108,9 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   vision migration notes in `docs/HYBRIDS.md` before updating active Sorcerers.
   Every hybrid name also has its own fixed color motif using both parents'
   `help class` colors; the original parent's color leads in scoped listings.
+  Validated secondary Monks can use `stunfist` after learning Tech 7 on their full
+  Tech path. The native 5,000-mana cost, recovery and shared target immunity stay
+  unchanged. This adds no conversion command, trainer or free training.
   A separate object-factory fix prevents crafted items from freeing mutable
   names, descriptions and spell messages still owned by staff-edited templates.
   The info page also shows a read-only numeric checklist: 50,000 max HP/mana,
