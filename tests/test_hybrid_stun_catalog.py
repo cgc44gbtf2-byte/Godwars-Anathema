@@ -4,6 +4,7 @@ import json
 import re
 import unittest
 from test_class_layout import ROOT, SRC, make_values
+from test_hybrid_monk_combat_catalog import without_monk_combat_stage
 
 NEW_PARENT="if (!hybrid_power_parent(ch, CLASS_MONK) || ch->pcdata == NULL)"
 OLD_PARENT="if (!IS_MONK(ch) || ch->pcdata == NULL)"
@@ -11,6 +12,7 @@ NEW_RANK="if (hybrid_power_rank(ch, CLASS_MONK, HYBRID_TRAIN_MONK, MONK_TECH) < 
 OLD_RANK="if (get_monk(ch, MONK_TECH) < 7)"
 
 def without_hybrid_stun_adapter(text):
+    text=without_monk_combat_stage(text)
     before,body=text.split("void do_stunfist( CHAR_DATA *ch, char *argument )",1)
     body,after=body.split("void do_chimera(",1)
     assert body.count(NEW_PARENT)==body.count(NEW_RANK)==1

@@ -72,6 +72,7 @@ tests/test_hybrid_writing
 tests/test_hybrid_enchant
 tests/test_hybrid_vision
 tests/test_hybrid_stun
+tests/test_hybrid_monk_combat
 bootstrap-backups/
 __pycache__/
 *.py[cod]

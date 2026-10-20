@@ -163,15 +163,17 @@ void do_repeat( CHAR_DATA *ch, char *argument )
     char arg[MIL];
     int loop;
 
+    if (ch == NULL) return;
     one_argument(argument, arg);
 
-    if (!IS_MONK(ch))
+    if (!IS_MONK(ch) || ch->pcdata == NULL || ch->in_room == NULL)
     {
 	stc("Huh?\n\r", ch);
 	return;
     }
     
-    if (get_monk(ch, MONK_TECH) < 1)
+    const long tech = get_monk(ch, MONK_TECH);
+    if (tech < 1)
     {
 	stc("You need Tech 1 for Repeating Fist.\n\r", ch);
 	return;
@@ -209,9 +211,10 @@ void do_repeat( CHAR_DATA *ch, char *argument )
     stc("Your begin an onslaught of attacks!\n\r", ch);
     act("$n concentrates and releases a barrage of punches!", ch, NULL, NULL, TO_ROOM);
 
-    for (loop = 0; loop <= get_monk(ch, MONK_TECH) / 2; loop++)
+    ROOM_INDEX_DATA *combat_room = ch->in_room;
+    for (loop = 0; loop <= tech / 2; loop++)
     {
-if (!combat_target_live(ch, victim)) break;
+if (!combat_pair_in_room(combat_room, ch, victim)) break;
 	if (ch->mana < 600)
 	{
 	    stc("You don't have enough mana to continue\n\r", ch);
@@ -221,7 +224,7 @@ if (!combat_target_live(ch, victim)) break;
 one_hit(ch, victim, TYPE_UNARMED, "repeating fist");
     }
 
-    WAIT_STATE(ch, 15);
+    if (combat_character_in_room(combat_room, ch)) WAIT_STATE(ch, 15);
     return;
 }
 
@@ -232,15 +235,17 @@ void do_aurashot( CHAR_DATA *ch, char *argument )
     char buf[MIL];
     int dam;
 
+    if (ch == NULL) return;
     one_argument(argument, arg);
 
-    if (!IS_MONK(ch))
+    if (!IS_MONK(ch) || ch->pcdata == NULL || ch->in_room == NULL)
     {
 	stc("Huh?\n\r", ch);
 	return;
     }
 
-    if (get_monk(ch, MONK_TECH) < 2)
+    const long tech = get_monk(ch, MONK_TECH);
+    if (tech < 2)
     {
 	stc("You need Tech 2 for Aura Shot.\n\r", ch);
 	return;
@@ -287,7 +292,7 @@ void do_aurashot( CHAR_DATA *ch, char *argument )
 	act("$N avoids $n's Aura Shot!", ch, NULL, victim, TO_NOTVICT);
 	return;
     }
-    dam =  number_range(200, 300) * get_monk(ch, MONK_TECH);
+    dam =  number_range(200, 300) * tech;
 
     sprintf(buf, "Your Aura Shot strikes $N and begins draining. [#g%i#n]", dam);
     act(buf, ch, NULL, victim, TO_CHAR);
@@ -296,8 +301,9 @@ void do_aurashot( CHAR_DATA *ch, char *argument )
     sprintf(buf, "$n's Aura Shot stikes $N and drains his lifeforce. [#0%i#n]", dam);
     act(buf, ch, NULL, victim, TO_NOTVICT);
 
-    ch->hit += dam * .8;
-    if (ch->hit > ch->max_hit) ch->hit = ch->max_hit;
+    const long heal = dam * 4L / 5;
+    ch->hit = ch->hit > LONG_MAX-heal ? ch->max_hit
+                                    : UMIN(ch->hit+heal,ch->max_hit);
     hurt_person(ch, victim, dam);
     return;
 }
@@ -310,15 +316,17 @@ void do_blitz( CHAR_DATA *ch, char *argument )
     char buf[MIL];
     int damage;
 
+    if (ch == NULL) return;
     one_argument(argument, arg);
 
-    if (!IS_MONK(ch))
+    if (!IS_MONK(ch) || ch->pcdata == NULL || ch->in_room == NULL)
     {
         stc("Huh?\n\r", ch);
         return;
     }
 
-    if (get_monk(ch, MONK_TECH) < 3)
+    const long tech = get_monk(ch, MONK_TECH);
+    if (tech < 3)
     {
 	stc("You need Tech 3 to use Blitz.\n\r", ch);
 	return;
@@ -334,8 +342,12 @@ void do_blitz( CHAR_DATA *ch, char *argument )
     act("$n glows yellow and releases massive energy waves!", ch, NULL, NULL, TO_ROOM);
     ch->mana -= 5000;
 
-    for (victim = ch->in_room->people; victim; victim = victim_next)
+    ROOM_INDEX_DATA *combat_room = ch->in_room;
+    for (victim = combat_room->people; victim; victim = victim_next)
     {
+if (!combat_character_in_room(combat_room, ch)) return;
+/* A damage callback may remove the saved next room member. */
+if (!combat_character_in_room(combat_room, victim)) break;
 	victim_next = victim->next_in_room;
 	if (ch == victim) continue;
 	if (is_same_group(ch, victim)) continue;
@@ -344,8 +356,8 @@ void do_blitz( CHAR_DATA *ch, char *argument )
 
 	if (!hurt_fighting(ch, victim)) continue;
 
-	if (IS_NPC(victim)) damage = number_range(750, 1250) * get_monk(ch, MONK_TECH);
-	else damage = number_range(500, 750) * get_monk(ch, MONK_TECH);
+if (IS_NPC(victim)) damage = number_range(750, 1250) * tech;
+else damage = number_range(500, 750) * tech;
 
 	sprintf(buf, "$N flies back as the force wracks $S body! [#g%i#n]", damage);
 	act(buf, ch, NULL, victim, TO_CHAR);
@@ -356,7 +368,7 @@ void do_blitz( CHAR_DATA *ch, char *argument )
 	hurt_person(ch, victim, damage);
     }
 
-    WAIT_STATE(ch, 18);
+    if (combat_character_in_room(combat_room, ch)) WAIT_STATE(ch, 18);
     return;
 }
 
@@ -439,15 +451,17 @@ void do_cripple( CHAR_DATA *ch, char *argument )
     char buf[MIL];
     int dam;
 
+    if (ch == NULL) return;
     one_argument(argument, arg);
 
-    if (!IS_MONK(ch))
+    if (!IS_MONK(ch) || ch->pcdata == NULL || ch->in_room == NULL)
     {
 	stc("Huh?\n\r", ch);
 	return;
     }
 
-    if (get_monk(ch, MONK_TECH) < 5)
+    const long tech = get_monk(ch, MONK_TECH);
+    if (tech < 5)
     {
 	stc("You need Tech 5 for Crippling Kick.\n\r", ch);
 	return;
@@ -496,8 +510,7 @@ void do_cripple( CHAR_DATA *ch, char *argument )
     sprintf(buf, "$n kick $N in the head. [#0%i#n]", dam);
     act(buf, ch, NULL, victim, TO_NOTVICT);
 
-    victim->mana -= dam * 3;
-    if (victim->mana < 0) victim->mana = 0;
+    victim->mana = victim->mana > dam * 3L ? victim->mana-dam * 3L : 0;
 
     hurt_person(ch, victim, dam);
     return;
@@ -510,7 +523,8 @@ void do_darkblaze( CHAR_DATA *ch, char *argument )
     char arg [MIL];
     int sn;
 
-    if (!IS_MONK(ch))
+    if (ch == NULL) return;
+    if (!IS_MONK(ch) || ch->pcdata == NULL || ch->in_room == NULL)
     {
 	stc("Huh?\n\r", ch);
 	return;
@@ -524,7 +538,8 @@ void do_darkblaze( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    if (get_monk(ch, MONK_TECH) < 6)
+    const long tech = get_monk(ch, MONK_TECH);
+    if (tech < 6)
     {
 	stc("You need Tech 6 to use Dark Blaze.\n\r", ch);
 	return;
