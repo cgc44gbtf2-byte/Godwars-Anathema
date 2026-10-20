@@ -43,6 +43,7 @@ struct board_data
 		
 	NOTE_DATA *note_first; /* pointer to board's first note */
 	bool changed; /* currently unused */
+bool load_failed; /* rejected disk snapshot: read-only until repaired/reloaded */
 		
 };
 
@@ -56,7 +57,8 @@ extern BOARD_DATA boards[MAX_BOARD]; /* Declare */
 
 /* Prototypes */
 
-void finish_note (BOARD_DATA *board, NOTE_DATA *note); /* attach a note to a board */
+/* TRUE transfers ownership to the board, not a disk-durability guarantee. */
+bool finish_note (BOARD_DATA *board, NOTE_DATA *note);
 void free_note   (NOTE_DATA *note); /* deallocate memory used by a note */
 void load_boards (void); /* load all boards */
 long board_lookup (const char *name); /* Find a board with that name */

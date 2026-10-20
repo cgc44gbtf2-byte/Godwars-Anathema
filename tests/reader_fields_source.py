@@ -10,6 +10,8 @@ def once(text, new, old, count=1):
     return text.replace(new,old)
 
 def without_reader_fields_stage(text):
+    from aux_readers_source import without_aux_readers_stage
+    text=without_aux_readers_stage(text)
     text=without_word_readers_stage(text)
     if '#include "file_io.h"\n' not in text:return text
     text=once(text,'#include "file_io.h"\n','')

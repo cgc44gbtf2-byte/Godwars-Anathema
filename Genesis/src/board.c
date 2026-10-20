@@ -21,12 +21,16 @@
 #include <sys/types.h>
 #endif
 #include <ctype.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include "merc.h"
 #include "colordef.h"
+#include "file_number.h"
+#include "file_string.h"
+#include "file_word.h"
 
 
 /*
@@ -141,11 +145,16 @@ static void append_note (FILE *fp, NOTE_DATA *note)
 
 
 /* Save a note in a given board */
-void finish_note (BOARD_DATA *board, NOTE_DATA *note)
+bool finish_note (BOARD_DATA *board, NOTE_DATA *note)
 {
 	FILE *fp;
 	NOTE_DATA *p;
 	char filename[200];
+	if (board->load_failed)
+	{
+		bug ("finish_note: rejected board is read-only", 0);
+		return FALSE;
+	}
 	
 	/* The following is done in order to generate unique date_stamps */
 
@@ -176,11 +185,12 @@ void finish_note (BOARD_DATA *board, NOTE_DATA *note)
 	{
 		bug ("Could not open one of the note files in append mode",0);
 		board->changed = TRUE; /* set it to TRUE hope it will be OK later? */
-		return;
+		return TRUE;
 	}
 	
 	append_note (fp, note);
 	fclose (fp);
+	return TRUE;
 }
 
 /* Find the number of a board */
@@ -248,6 +258,8 @@ static void save_board (BOARD_DATA *board)
 	char filename[200];
 	char buf[200];
 	NOTE_DATA *note;
+	if (board->load_failed)
+		return; /* Never replace a rejected file with a partial/empty snapshot. */
 	
 	sprintf (filename, "%s%s", NOTE_DIR, board->short_name);
 	
@@ -269,10 +281,10 @@ static void save_board (BOARD_DATA *board)
 /* Show one not to a character */
 static void show_note_to_char (CHAR_DATA *ch, NOTE_DATA *note, long num)
 {
-	char buf[4*MAX_STRING_LENGTH];
+char buf[5*MAX_STRING_LENGTH];
 
 	/* Ugly colors ? */	
-	sprintf (buf,
+snprintf (buf, sizeof buf,
 			 "[" BOLD "%4li" NO_COLOR "] " BOLD YELLOW "%s" NO_COLOR ": " GREEN "%s" NO_COLOR "\n\r"
 	         BOLD YELLOW "Date" NO_COLOR ":  %s\n\r"
 			 BOLD YELLOW "To" NO_COLOR ":    %s\n\r"
@@ -283,7 +295,24 @@ static void show_note_to_char (CHAR_DATA *ch, NOTE_DATA *note, long num)
 	         note->to_list,
 	         note->text);
 
-	send_to_char (buf,ch);	         
+/* write_to_buffer rejects a single input of MAX_STRING_LENGTH or more.
+ * Keep color-code pairs intact while allowing the editor's full body length. */
+for (const char *part=buf; *part; )
+{
+char chunk[MAX_STRING_LENGTH];
+size_t length=0;
+while (part[length] && length<sizeof chunk-1)
+{
+if (part[length]=='#' && part[length+1])
+{
+if (length+2>sizeof chunk-1) break;
+length+=2;
+}
+else length++;
+}
+memcpy(chunk,part,length);chunk[length]='\0';
+send_to_char(chunk,ch);part+=length;
+}
 }
 
 /* Save changed boards */
@@ -296,95 +325,80 @@ void save_notes ()
 			save_board (&boards[i]);
 }
 
-/* Load a single board */
-static void load_board (BOARD_DATA *board)
+/* Read complete snapshots before publishing or pruning anything. Header limits
+ * match runtime input; bodies retain the editor's larger MAX_NOTE_TEXT limit. */
+static bool board_keyword(FILE *fp,const char *expected)
 {
-	FILE *fp;
-	NOTE_DATA *last_note;
-	char filename[200];
-	
-	sprintf (filename, "%s%s", NOTE_DIR, board->short_name);
-	
-	fp = fopen (filename, "r");
-	
-	/* Silently return */
-	if (!fp)
-		return;		
-		
-	/* Start note fetching. copy of db.c:load_notes() */
+    char key[MAX_INPUT_LENGTH];
+    return fread_word_checked(fp,key,sizeof key)==FILE_WORD_OK
+        && !str_cmp(key,expected);
+}
 
-    last_note = NULL;
+static bool board_string(FILE *fp,char **out,size_t capacity)
+{
+    char text[MAX_NOTE_TEXT+1];
+    if (fread_tilde_checked(fp,text,capacity)!=FILE_STRING_OK)
+        return FALSE;
+    *out=str_dup(text);
+    return TRUE;
+}
 
-    for ( ; ; )
-    {
-        NOTE_DATA *pnote;
-        char letter;
+static void board_free_list(NOTE_DATA *note)
+{
+    while(note){NOTE_DATA *next=note->next;free_note(note);note=next;}
+}
 
-        do
-        {
-            letter = getc( fp );
-            if ( feof(fp) )
-            {
-                fclose( fp );
-                return;
-            }
-        }
-        while ( isspace(letter) );
-        ungetc( letter, fp );
-
-        pnote             = alloc_perm( sizeof(*pnote) );
-
-        if ( str_cmp( fread_word( fp ), "sender" ) )
-            break;
-        pnote->sender     = fread_string( fp );
-
-        if ( str_cmp( fread_word( fp ), "date" ) )
-            break;
-        pnote->date       = fread_string( fp );
-
-        if ( str_cmp( fread_word( fp ), "stamp" ) )
-            break;
-        pnote->date_stamp = fread_number( fp );
-
-        if ( str_cmp( fread_word( fp ), "expire" ) )
-            break;
-        pnote->expire = fread_number( fp );
-
-        if ( str_cmp( fread_word( fp ), "to" ) )
-            break;
-        pnote->to_list    = fread_string( fp );
-
-        if ( str_cmp( fread_word( fp ), "subject" ) )
-            break;
-        pnote->subject    = fread_string( fp );
-
-        if ( str_cmp( fread_word( fp ), "text" ) )
-            break;
-        pnote->text       = fread_string( fp );
-        
-        pnote->next = NULL; /* jic */
-        
-        /* Should this note be archived right now ? */
-        
-        if (pnote->expire < current_time)
-        {
-		free_note (pnote);
-		board->changed = TRUE;
-		continue;
-			
-        }
-        
-
-        if ( board->note_first == NULL )
-            board->note_first = pnote;
-        else
-            last_note->next     = pnote;
-
-        last_note         = pnote;
+static bool load_board (BOARD_DATA *board)
+{
+    char filename[200],key[MAX_INPUT_LENGTH];
+    NOTE_DATA *first=NULL,*last=NULL,*note=NULL;
+    FILE *fp;
+    bool changed=FALSE;
+    snprintf(filename,sizeof filename,"%s%s",NOTE_DIR,board->short_name);
+    fp=fopen(filename,"r");
+    if(!fp){
+        if(errno==ENOENT)return TRUE;
+        bug("load_board: cannot read board; preserving snapshot",0);
+        return FALSE;
     }
-
-    bug( "Load_notes: bad key word.", 0 );
-    return; /* just return */
+    for(;;){
+        long stamp,expire;
+        enum file_word_status status=fread_word_checked(fp,key,sizeof key);
+        if(status==FILE_WORD_EOF)break;
+        if(status!=FILE_WORD_OK||str_cmp(key,"sender"))goto failed;
+        note=new_note();
+        if(!board_string(fp,&note->sender,MAX_INPUT_LENGTH)
+           ||!board_keyword(fp,"date")
+           ||!board_string(fp,&note->date,MAX_INPUT_LENGTH)
+           ||!board_keyword(fp,"stamp")
+           ||fread_number_checked(fp,&stamp)!=FILE_NUMBER_OK
+           ||!board_keyword(fp,"expire")
+           ||fread_number_checked(fp,&expire)!=FILE_NUMBER_OK
+           ||!board_keyword(fp,"to")
+           ||!board_string(fp,&note->to_list,MAX_INPUT_LENGTH)
+           ||!board_keyword(fp,"subject")
+           ||!board_string(fp,&note->subject,MAX_INPUT_LENGTH)
+           ||!board_keyword(fp,"text")
+           ||!board_string(fp,&note->text,MAX_NOTE_TEXT+1))goto failed;
+        note->date_stamp=(time_t)stamp;note->expire=(time_t)expire;
+        if((long)note->date_stamp!=stamp||(long)note->expire!=expire)goto failed;
+        if(note->expire<current_time){free_note(note);changed=TRUE;}
+        else{
+            if(last)last->next=note;else first=note;
+            last=note;
+        }
+        note=NULL;
+    }
+    if(fclose(fp)!=0){fp=NULL;goto failed;}
+    board_free_list(board->note_first);
+    board->note_first=first;board->changed=changed;
+    return TRUE;
+failed:
+    if(note)free_note(note);
+    board_free_list(first);
+    if(fp)fclose(fp);
+    bug("load_board: bad/incomplete board; preserving snapshot and file",0);
+    return FALSE;
 }
 
 /* Initialize structures. Load all boards. */
@@ -393,7 +407,7 @@ void load_boards ()
 	long i;
 	
 	for (i = 0; i < MAX_BOARD; i++)
-		load_board (&boards[i]);
+boards[i].load_failed = !load_board (&boards[i]);
 }
 
 /* Returns TRUE if the specified note is address to ch */
@@ -452,6 +466,11 @@ static void do_nwrite (CHAR_DATA *ch, char *argument)
 		send_to_char ("You cannot post notes on this board.\n\r",ch);
 		return;
 	}
+if (ch->pcdata->board->load_failed)
+{
+send_to_char ("This board is read-only until its damaged file is repaired.\n\r",ch);
+return;
+}
 	
 	/* continue previous note, if any text was written*/ 
 	if (ch->pcdata->in_progress && (!ch->pcdata->in_progress->text))
@@ -844,7 +863,8 @@ void make_note (const char* board_name, const char *sender, const char *to, cons
 	
 	note->date = str_dup (strtime);
 	
-	finish_note (board, note);
+if (!finish_note (board, note))
+free_note (note);
 	
 }
 
@@ -1139,7 +1159,12 @@ void handle_con_note_finish (DESCRIPTOR_DATA *d, char * argument)
 			REMOVE_BIT(ch->pcdata->flag,FLAG_AFK);
 			break;
 		case 'p': /* post note */
-			finish_note (ch->pcdata->board, ch->pcdata->in_progress);
+if (!finish_note (ch->pcdata->board, ch->pcdata->in_progress))
+{
+write_to_buffer (d, "This board is read-only. Your draft has been kept; continue or forget it.\n\r",0);
+write_to_buffer (d, szFinishPrompt, 0);
+break;
+}
 			write_to_buffer (d, "Note posted.\n\r",0);
 			d->connected = CON_PLAYING;
 			for (d = descriptor_list; d != NULL; d = d->next)

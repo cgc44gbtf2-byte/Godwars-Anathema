@@ -4,14 +4,19 @@
 #include <sys/types.h>
 #endif
 #include <stdio.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include "merc.h"
 #include "progress_metrics.h"
+#include "file_number.h"
+#include "file_string.h"
+#include "file_word.h"
 #include <unistd.h>
 
 LEADER_BOARD leader_board;
+static bool leaderboard_load_failed;
 
 void do_expmod( CHAR_DATA *ch, char *argument )
 {
@@ -645,35 +650,55 @@ void mageupkeep(CHAR_DATA *ch)
 void load_leaderboard()
 {
     FILE *fp;
-
+    LEADER_BOARD staged={0};
+    char **names[]={&staged.bestpk_name,&staged.worstpk_name,
+        &staged.pk_name,&staged.pd_name,&staged.mk_name,&staged.md_name,
+        &staged.tt_name,&staged.qc_name};
+    long *numbers[]={&staged.bestpk_number,&staged.worstpk_number,
+        &staged.pk_number,&staged.pd_number,&staged.mk_number,&staged.md_number,
+        &staged.tt_number,&staged.qc_number};
+    char **old_names[]={&leader_board.bestpk_name,&leader_board.worstpk_name,
+        &leader_board.pk_name,&leader_board.pd_name,&leader_board.mk_name,
+        &leader_board.md_name,&leader_board.tt_name,&leader_board.qc_name};
+    char text[MAX_INPUT_LENGTH],extra[2];
+    unsigned i;
     if ((fp = fopen("../area/leader.txt", "r")) == NULL)
     {
-	log_string("Error: leader.txt not found!");
-	do_leaderclear(NULL, "");
-	return;
+        if(errno==ENOENT){
+            log_string("Error: leader.txt not found!");
+            do_leaderclear(NULL, "");
+            return;
+        }
+        goto failed;
     }
-    leader_board.bestpk_name = fread_string(fp);
-    leader_board.bestpk_number = fread_number(fp);
-    leader_board.worstpk_name = fread_string(fp);
-    leader_board.worstpk_number = fread_number(fp);
-    leader_board.pk_name = fread_string(fp);
-    leader_board.pk_number = fread_number(fp);
-    leader_board.pd_name = fread_string(fp);
-    leader_board.pd_number = fread_number(fp);
-    leader_board.mk_name = fread_string(fp);
-    leader_board.mk_number = fread_number(fp);
-    leader_board.md_name = fread_string(fp);
-    leader_board.md_number = fread_number(fp);
-    leader_board.tt_name = fread_string(fp);
-    leader_board.tt_number = fread_number(fp);
-    leader_board.qc_name = fread_string(fp);
-    leader_board.qc_number = fread_number(fp);
-    fclose(fp);
+    for(i=0;i<8;i++){
+        if(fread_tilde_checked(fp,text,sizeof text)!=FILE_STRING_OK)goto failed;
+        *names[i]=str_dup(text);
+        if(fread_number_checked(fp,numbers[i])!=FILE_NUMBER_OK)goto failed;
+    }
+    if(fread_word_checked(fp,extra,sizeof extra)!=FILE_WORD_EOF)goto failed;
+    if(fclose(fp)!=0){fp=NULL;goto failed;}
+    for(i=0;i<8;i++)free_string(*old_names[i]);
+    leader_board=staged;
+    leaderboard_load_failed=FALSE;
+    return;
+failed:
+    if(fp)fclose(fp);
+    for(i=0;i<8;i++){
+        free_string(*names[i]);
+        if(!*old_names[i])*old_names[i]=str_dup("Noone");
+    }
+    leaderboard_load_failed=TRUE;
+    log_string("load_leaderboard: rejected file; scores preserved, saving disabled until repair/reload or explicit leaderclear");
 }
 
 void save_leaderboard()
 {
     FILE *fp;
+    if(leaderboard_load_failed){
+        log_string("save_leaderboard: rejected file is read-only");
+        return;
+    }
 
     if ((fp = fopen("../area/leader.txt","w")) == NULL)
     {
@@ -851,6 +876,8 @@ long get_ratio(CHAR_DATA *ch)
 
 void do_leaderclear(CHAR_DATA *ch, char *argument )
 {
+    /* This existing explicit reset intentionally replaces the stored scores. */
+    leaderboard_load_failed=FALSE;
     free_string(leader_board.bestpk_name);
     leader_board.bestpk_name = str_dup("Noone");
     leader_board.bestpk_number = 0;
