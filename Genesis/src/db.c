@@ -34,6 +34,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "admin_config.h"
 #include "file_number.h"
 #include "object_numbers.h"
 #include "file_io.h"
@@ -414,6 +415,10 @@ void boot_db( void )
 	load_boards(); /* Load all boards */
 	load_disabled( );
 	load_bans( );
+        if(!admin_configuration_healthy()){
+            log_string("Invalid administrative configuration; repair disabled.txt/ban.txt before startup");
+            exit(1); /* Never start with an unvalidated command/ban policy. */
+        }
         load_leaderboard();
         clan_load_registry();
     }

@@ -1,5 +1,7 @@
 """Counted reversal of the inventory-only structural reader checks."""
 def without_inventory_records_stage(text):
+    from admin_config_source import without_admin_config_stage
+    text=without_admin_config_stage(text)
     marker="/* Publish only a complete record."
     if marker not in text:return text
     def once(new,old):

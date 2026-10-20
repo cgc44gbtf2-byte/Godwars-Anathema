@@ -42,6 +42,7 @@ jobs:
           python3 tests/smoke_inventory.py
           python3 tests/smoke_aux_readers.py
           python3 tests/smoke_aux_writers.py
+          python3 tests/smoke_admin_config.py
       - name: Address and undefined-behavior sanitizers
         env:
           ASAN_OPTIONS: detect_leaks=0:halt_on_error=1
@@ -60,3 +61,4 @@ jobs:
           python3 tests/smoke_inventory.py
           python3 tests/smoke_aux_readers.py
           python3 tests/smoke_aux_writers.py
+          python3 tests/smoke_admin_config.py

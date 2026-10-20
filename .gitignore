@@ -93,6 +93,7 @@ tests/test_file_strings
 tests/test_inventory_records
 tests/test_aux_readers
 tests/test_aux_writers
+tests/test_admin_config
 bootstrap-backups/
 __pycache__/
 *.py[cod]

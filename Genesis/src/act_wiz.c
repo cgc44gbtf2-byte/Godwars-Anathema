@@ -33,6 +33,7 @@
 #include <time.h>
 #include <unistd.h> /* unlink() */
 #include "merc.h"
+#include "admin_config.h"
 #include "progress_metrics.h"
 #include "restart.h"
 
@@ -2099,7 +2100,6 @@ BAN_DATA *		ban_list;
 
 void do_ban( CHAR_DATA *ch, char *argument )
 {
-    char buf[MAX_STRING_LENGTH];
     char arg[MAX_INPUT_LENGTH];
     BAN_DATA *pban;
 
@@ -2110,16 +2110,19 @@ void do_ban( CHAR_DATA *ch, char *argument )
 
     if ( arg[0] == '\0' )
     {
-	strcpy( buf, "Banned sites:\n\r" );
+send_to_char( "Banned sites:\n\r", ch );
 	for ( pban = ban_list; pban != NULL; pban = pban->next )
 	{
-	    strcat( buf, pban->name );
-	    strcat( buf, "\n\r" );
+    send_to_char( pban->name, ch );
+    send_to_char( "\n\r", ch );
 	}
-	send_to_char( buf, ch );
 	return;
     }
 
+    if(!admin_bans_ready()){
+        send_to_char("Ban configuration is read-only until repaired and reloaded.\n\r",ch);
+        return;
+    }
     for ( pban = ban_list; pban != NULL; pban = pban->next )
     {
 	if ( !str_cmp( arg, pban->name ) )
@@ -2129,6 +2132,10 @@ void do_ban( CHAR_DATA *ch, char *argument )
 	}
     }
 
+    if(!admin_ban_can_add(arg)){
+        send_to_char("Ban policy limit reached or invalid hostname; no change.\n\r",ch);
+        return;
+    }
     if ( ban_free == NULL )
     {
 	pban		= alloc_perm( sizeof(*pban) );
@@ -2163,6 +2170,10 @@ void do_allow( CHAR_DATA *ch, char *argument )
 	return;
     }
 
+    if(!admin_bans_ready()){
+        send_to_char("Ban configuration is read-only until repaired and reloaded.\n\r",ch);
+        return;
+    }
     prev = NULL;
     for ( curr = ban_list; curr != NULL; prev = curr, curr = curr->next )
     {

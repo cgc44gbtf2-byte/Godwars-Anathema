@@ -35,6 +35,7 @@
 #include <unistd.h> /* unlink() */
 #include "merc.h"
 #include "file_io.h"
+#include "admin_config.h"
 
 
 
@@ -3316,7 +3317,7 @@ disable <command> - toggles disable status of command
    {
       long i;
       DISABLED_DATA *p,*q;
-      char buf[100];
+      char buf[2*MAX_INPUT_LENGTH+128];
    
       if (IS_NPC(ch))
       {
@@ -3337,12 +3338,16 @@ disable <command> - toggles disable status of command
       
          for (p = disabled_first; p; p = p->next)
          {
-            sprintf (buf, "%-12s %5li %-12s\n\r",p->command->name,p->level, p->disabled_by);
+            snprintf (buf, sizeof buf, "%-12s %5li %-12s\n\r",p->command->name,p->level, p->disabled_by);
             send_to_char (buf,ch);
          }
          return;
       }
    
+      if(!admin_disabled_ready()){
+         send_to_char("Disabled-command configuration is read-only until repaired and reloaded.\n\r",ch);
+         return;
+      }
         /* command given */
    
         /* First check if it is one of the disabled commands */
@@ -3407,6 +3412,10 @@ disable <command> - toggles disable status of command
       
                 /* Disable the command */
       
+         if(!admin_disabled_can_add(&cmd_table[i],ch->name,get_trust(ch))){
+            send_to_char("Disabled-command policy limit reached or invalid record; no change.\n\r",ch);
+            return;
+         }
          p = alloc_mem (sizeof(DISABLED_DATA));
       
          p->command = &cmd_table[i];
@@ -3435,59 +3444,17 @@ disable <command> - toggles disable status of command
       return FALSE;
    }
 
-/* Load disabled commands */
-   void load_disabled()
-   {
-      FILE *fp;
-      DISABLED_DATA *p;
-      char *name;
-      long i;
-   
-      disabled_first = NULL;
-   
-      fp = fopen (DISABLED_FILE, "r");
-   
-      if (!fp) /* No disabled file.. no disabled commands : */
-         return;
-   
-      name = fread_word (fp);
-   
-      while (str_cmp(name, END_MARKER)) /* as long as name is NOT END_MARKER :) */
-      {
-                /* Find the command in the table */
-         for (i = 0; cmd_table[i].name[0] ; i++)
-            if (!str_cmp(cmd_table[i].name, name))
-               break;
-      
-         if (!cmd_table[i].name[0]) /* command does not exist? */
-         {
-            bug ("Skipping uknown command in " DISABLED_FILE " file.",0);
-            fread_number(fp); /* level */
-            fread_word(fp); /* disabled_by */
-         }
-         else /* add new disabled command */
-         {
-            p = alloc_mem(sizeof(DISABLED_DATA));
-            p->command = &cmd_table[i];
-            p->level = fread_number(fp);
-            p->disabled_by = str_dup(fread_word(fp));
-            p->next = disabled_first;
-         
-            disabled_first = p;
-         
-         }
-      
-         name = fread_word(fp);
-      }
-   
-      fclose (fp);
-   }
+/* Administrative readers live in admin_config.c. */
 
 /* Save disabled commands */
    void save_disabled()
    {
       FILE *fp;
       DISABLED_DATA *p;
+      if(!admin_disabled_ready()){
+         log_string("save_disabled: rejected configuration is read-only");
+         return;
+      }
    
       if (!disabled_first) /* delete file if no commands are disabled */
       {
@@ -3511,47 +3478,16 @@ disable <command> - toggles disable status of command
       fclose (fp);
    }
 
-   void load_bans() {
-      FILE *fp;
-      BAN_DATA *ban_last;
-   
-      ban_last = NULL;
-      fp = fopen ("ban.txt", "r");
-   
-      if (!fp) 
-         return;
-   
-      for ( ; ; ) {
-         BAN_DATA *p;
-         if (feof(fp))  {
-            fclose(fp);
-            return;}
-      
-         p = alloc_mem(sizeof(BAN_DATA));
-         p->name = str_dup(fread_word(fp));
-         fread_to_eol(fp);
-         if (ban_list == NULL)
-            ban_list = p;
-         else
-            ban_last->next = p;
-         ban_last = p;
-      }
-   /*
-   
-        while (str_cmp(name, END_MARKER)) {
-                p = alloc_mem(sizeof(BAN_DATA));
-                p->name = name;
-                p->next = ban_first;
-                ban_first = p;
-                name = fread_word(fp);}
-   
-        fclose(fp);*/
-   }
+   /* Ban reader lives in admin_config.c. */
 
    void save_bans(void)
    {
       FILE *fp;
       BAN_DATA *p;
+      if(!admin_bans_ready()){
+         log_string("save_bans: rejected configuration is read-only");
+         return;
+      }
    
       if (!ban_list)       {
          unlink ("ban.txt");
