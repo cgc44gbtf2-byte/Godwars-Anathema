@@ -80,6 +80,7 @@ tests/test_hybrid_guardian
 tests/test_guardian_lifecycle
 tests/test_hybrid_monk_training
 tests/test_hybrid_aura
+tests/test_message_format
 bootstrap-backups/
 __pycache__/
 *.py[cod]

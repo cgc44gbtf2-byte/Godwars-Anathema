@@ -137,6 +137,9 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   Learned secondary Mantra 2 also grants `readaura <target>` for characters
   or carried objects. It uses the free Monk source independently of the
   original class's powers; ordinary non-hybrid aura-reading rules stay intact.
+  Shared combat, social and equipment messages now safely clip oversized text
+  and handle missing descriptions; ordinary wording is unchanged.
+  See [message-formatting limits](docs/MESSAGES.md).
   A separate object-factory fix prevents crafted items from freeing mutable
   names, descriptions and spell messages still owned by staff-edited templates.
   The info page also shows a read-only numeric checklist: 50,000 max HP/mana,

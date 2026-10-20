@@ -33,6 +33,45 @@
 #include <time.h>
 #include "merc.h"
 
+/* Reserve newline, carriage return and NUL in every shared message buffer.
+ * Arguments retain the existing token-specific pointer-type contract. */
+static void message_append(char **point, const char *limit, const char *text)
+{
+    if (text == NULL) text = " <@@@> ";
+    while (*point < limit && *text != '\0') *(*point)++ = *text++;
+}
+
+static void message_finish(char *buf, char **point, const char *limit)
+{
+    /* A clipped colour prefix must not consume the appended newline.
+     * Paired ## escapes are complete literal hashes and must be retained. */
+    if (*point == limit)
+    {
+        char *p = *point;
+        while (p > buf && p[-1] == '#') --p;
+        if (((size_t)(*point - p) & 1u) != 0) --*point;
+    }
+    *(*point)++ = '\n';
+    *(*point)++ = '\r';
+    **point = '\0';
+}
+
+static const char *message_person(CHAR_DATA *person, CHAR_DATA *observer)
+{
+    const char *name;
+    if (person == NULL || (!IS_NPC(person) && person->pcdata == NULL))
+        return "someone";
+    name = PERS(person, observer);
+    return name != NULL ? name : "someone";
+}
+
+static const char *message_object(OBJ_DATA *obj, CHAR_DATA *observer)
+{
+    if (obj == NULL || !can_see_obj(observer, obj)) return "something";
+    if (obj->chobj != NULL && obj->chobj == observer) return "you";
+    return obj->short_descr != NULL ? obj->short_descr : "something";
+}
+
 
 /*
  * The primary output interface for formatted output.
@@ -57,6 +96,8 @@ void act( const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2,
     char *point;
     bool is_fam;
     bool is_ok;
+    bool had_fam_vision = FALSE;
+    const char *limit = buf + sizeof(buf) - 3;
 
     /*
      * Discard null and zero-length messages.
@@ -64,7 +105,8 @@ void act( const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2,
     if (format == NULL || format[0] == '\0') return;
     /* Full player loads can own equipped items before entering a room.
      * Removing those items during failed-login cleanup has no room audience. */
-    if (ch == NULL || ch->in_room == NULL) return;
+    if (ch == NULL || ch->in_room == NULL ||
+        (!IS_NPC(ch) && ch->pcdata == NULL)) return;
 
     to = ch->in_room->people;
     if (type == TO_VICT)
@@ -81,6 +123,7 @@ void act( const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2,
     {
 	is_fam = FALSE;
 	to_old = to;
+	if (!IS_NPC(to) && to->pcdata == NULL) continue;
 
 	if (type == TO_CHAR && to != ch) continue;
 	if (type == TO_VICT && (to != vch || to == ch)) continue;
@@ -89,11 +132,13 @@ void act( const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2,
 
 	if (to->desc == NULL && IS_NPC(to) && (wizard = to->wizard) != NULL)
 	{
-	    if (!IS_NPC(wizard) && (familiar=wizard->pcdata->familiar) != NULL && familiar == to)
+	    if (!IS_NPC(wizard) && wizard->pcdata != NULL &&
+                (familiar=wizard->pcdata->familiar) != NULL && familiar == to)
 	    {
 		if (to->in_room == ch->in_room && wizard->in_room != to->in_room)
 		{
 		    to = wizard;
+		    had_fam_vision = IS_EXTRA(to, EXTRA_CAN_SEE) != 0;
 		    SET_BIT(to->extra, EXTRA_CAN_SEE);
 		    is_fam = TRUE;
 		}
@@ -104,7 +149,7 @@ void act( const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2,
 	{
 	    if (is_fam) 
 	    {
-		REMOVE_BIT(to->extra, EXTRA_CAN_SEE);
+		if (!had_fam_vision) REMOVE_BIT(to->extra, EXTRA_CAN_SEE);
 		to = to_old;
 	    }
 	    continue;
@@ -123,7 +168,7 @@ void act( const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2,
 	    {
 		if (is_fam) 
 		{
-		    REMOVE_BIT(to->extra, EXTRA_CAN_SEE);
+		    if (!had_fam_vision) REMOVE_BIT(to->extra, EXTRA_CAN_SEE);
 		    to = to_old;
 		}
 		continue;
@@ -132,7 +177,7 @@ void act( const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2,
 
 	point = buf;
 	str = format;
-	while (*str != '\0')
+	while (*str != '\0' && point < limit)
 	{
 	    if (*str != '$')
 	    {
@@ -140,6 +185,11 @@ void act( const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2,
 		continue;
 	    }
 	    str++;
+	    if (*str == '\0')
+	    {
+		message_append(&point, limit, "$");
+		break;
+	    }
 
 	    if (arg2 == NULL && *str >= 'A' && *str <= 'Z')
 	    {
@@ -156,21 +206,17 @@ void act( const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2,
 		/* Thx alex for 't' idea */
 		    case 't':	i = (char *) arg1;			break;
 		    case 'T':	i = (char *) arg2;          		break;
-		    case 'n':	i = PERS(ch, to);			break;
-		    case 'N':	i = PERS(vch, to);			break;
+		    case 'n':	i = message_person(ch, to);		break;
+		    case 'N':	i = message_person(vch, to);		break;
 		    case 'e':	i = he_she  [URANGE(0, ch  ->sex, 2)];	break;
 		    case 'E':	i = he_she  [URANGE(0, vch ->sex, 2)];	break;
 		    case 'm':	i = him_her [URANGE(0, ch  ->sex, 2)];	break;
 		    case 'M':	i = him_her [URANGE(0, vch ->sex, 2)];	break;
 		    case 's':	i = his_her [URANGE(0, ch  ->sex, 2)];	break;
 		    case 'S':	i = his_her [URANGE(0, vch ->sex, 2)];	break;
-		    case 'p':	i = can_see_obj(to, obj1) ?
-				 ((obj1->chobj != NULL && obj1->chobj == to) ?
-				 "you" : obj1->short_descr) : "something";
+		    case 'p':	i = message_object(obj1, to);
 				break;
-		    case 'P':	i = can_see_obj(to, obj2) ?
-				 ((obj2->chobj != NULL && obj2->chobj == to) ?
-				 "you" : obj2->short_descr) : "something";
+		    case 'P':	i = message_object(obj2, to);
 				break;
 		    case 'd':	if (arg2 == NULL || ((char *) arg2)[0] == '\0')
 				    i = "door";
@@ -184,12 +230,10 @@ void act( const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2,
 	    }
 
 	    str++;
-	    while ((*point = *i ) != '\0')
-		++point, ++i;
+	    message_append(&point, limit, i);
 	}
 
-	*point++ = '\n';
-	*point++ = '\r';
+	message_finish(buf, &point, limit);
 
 	if (is_fam)
 	{
@@ -197,7 +241,7 @@ void act( const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2,
 		stc("[ ", to);
 	    else
 	    {
-		REMOVE_BIT(to->extra, EXTRA_CAN_SEE);
+		if (!had_fam_vision) REMOVE_BIT(to->extra, EXTRA_CAN_SEE);
 		to = to_old;
 		continue;
 	    }
@@ -208,7 +252,7 @@ void act( const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2,
 
 	if (is_fam)
 	{
-	    REMOVE_BIT(to->extra, EXTRA_CAN_SEE);
+	    if (!had_fam_vision) REMOVE_BIT(to->extra, EXTRA_CAN_SEE);
 	    to = to_old;
 	}
     }
@@ -230,11 +274,14 @@ void act2( const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2
     char *point;
     char buf[MSL];
     bool is_ok;
+    const char *limit = buf + sizeof(buf) - 3;
 
     /*
      * Discard null and zero-length messages.
      */
     if (format == NULL || format[0] == '\0') return;
+    if (ch == NULL || ch->in_room == NULL ||
+        (!IS_NPC(ch) && ch->pcdata == NULL)) return;
 
     to = ch->in_room->people;
     if (type == TO_VICT)
@@ -249,6 +296,7 @@ void act2( const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2
 
     for ( ; to != NULL; to = to->next_in_room)
     {
+	if (!IS_NPC(to) && to->pcdata == NULL) continue;
 	if (type == TO_CHAR && to != ch) continue;
 	if (type == TO_VICT && (to != vch || to == ch)) continue;
 	if (type == TO_ROOM && to == ch) continue;
@@ -271,7 +319,7 @@ void act2( const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2
 
 	point = buf;
 	str = format;
-	while (*str != '\0')
+	while (*str != '\0' && point < limit)
 	{
 	    if (*str != '$')
 	    {
@@ -279,6 +327,11 @@ void act2( const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2
 		continue;
 	    }
 	    str++;
+	    if (*str == '\0')
+	    {
+		message_append(&point, limit, "$");
+		break;
+	    }
 
 	    if (arg2 == NULL && *str >= 'A' && *str <= 'Z') i = " <@@@> ";
 	    else
@@ -286,10 +339,10 @@ void act2( const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2
 		switch (*str)
 		{
 		    default:	i = " "; break;
-		    case 'n':	if (ch != NULL) i = PERS(ch,  to);
+		    case 'n':	if (ch != NULL) i = message_person(ch, to);
 				else i = " ";
 				break;
-		    case 'N':	if (vch != NULL) i = PERS(vch,  to);
+		    case 'N':	if (vch != NULL) i = message_person(vch, to);
 				else i = " ";
 				break;
 		    case 'e':	if (ch != NULL) i = he_she[URANGE(0, ch->sex, 2)];
@@ -312,17 +365,13 @@ void act2( const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2
 				break;
 		    case 'p':	if (obj1 != NULL)
 				{
-				    i = can_see_obj(to, obj1) ?
-				     ((obj1->chobj != NULL && obj1->chobj == to) ?
-				      "you" : obj1->short_descr) : "something";
+				    i = message_object(obj1, to);
 				}
 				else i = " ";
 				break;
 		    case 'P':	if (obj2 != NULL)
 				{
-				    i = can_see_obj(to, obj2) ?
-				     ((obj2->chobj != NULL && obj2->chobj == to) ?
-				     "you" : obj2->short_descr) : "something";
+				    i = message_object(obj2, to);
 				}
 				else i = " ";
 				break;
@@ -330,12 +379,10 @@ void act2( const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2
 	    }
 		
 	    str++;
-	    while ((*point = *i) != '\0')
-		++point, ++i;
+	    message_append(&point, limit, i);
 	}
 
-	*point++ = '\n';
-	*point++ = '\r';
+	message_finish(buf, &point, limit);
 	buf[0] = UPPER(buf[0]);
 	write_to_buffer(to->desc, buf, point - buf);
     }
@@ -359,17 +406,20 @@ void kavitem( const char *format, CHAR_DATA *ch, const void *arg1, const void *a
     const char *i;
     char *point;
     bool is_ok;
+    const char *limit = buf + sizeof(buf) - 3;
 
     /*
      * Discard null and zero-length messages.
      */
     if ( format == NULL || format[0] == '\0' )
 	return;
+    if (ch == NULL || ch->in_room == NULL ||
+        (!IS_NPC(ch) && ch->pcdata == NULL)) return;
 
     to = ch->in_room->people;
     if ( type == TO_VICT )
     {
-	if ( vch == NULL )
+	if ( vch == NULL || vch->in_room == NULL )
 	{
 	    bug( "Act: null vch with TO_VICT.", 0 );
 	    return;
@@ -379,6 +429,7 @@ void kavitem( const char *format, CHAR_DATA *ch, const void *arg1, const void *a
     
     for ( ; to != NULL; to = to->next_in_room )
     {
+	if (!IS_NPC(to) && to->pcdata == NULL) continue;
 	if ( to->desc == NULL || !IS_AWAKE(to) )
 	    continue;
 
@@ -413,7 +464,7 @@ void kavitem( const char *format, CHAR_DATA *ch, const void *arg1, const void *a
 
 	point	= buf;
 	str	= format;
-	while ( *str != '\0' )
+	while ( *str != '\0' && point < limit )
 	{
 	    if ( *str != '$' )
 	    {
@@ -421,6 +472,11 @@ void kavitem( const char *format, CHAR_DATA *ch, const void *arg1, const void *a
 		continue;
 	    }
 	    ++str;
+	    if (*str == '\0')
+	    {
+		message_append(&point, limit, "$");
+		break;
+	    }
 
 	    if ( arg2 == NULL && *str >= 'A' && *str <= 'Z' )
 		i = "";
@@ -429,20 +485,20 @@ void kavitem( const char *format, CHAR_DATA *ch, const void *arg1, const void *a
 		switch ( *str )
 		{
 		default:  i = "";					break;
-		case 'n': i = PERS( ch,  to  );				break;
+		case 'n': i = message_person(ch, to);			break;
 		case 'e': i = he_she  [URANGE(0, ch  ->sex, 2)];	break;
 		case 'm': i = him_her [URANGE(0, ch  ->sex, 2)];	break;
 		case 's': i = his_her [URANGE(0, ch  ->sex, 2)];	break;
 		case 'p':
-		    i = can_see_obj( to, obj1 )
-			    ? ( (obj1->chobj != NULL && obj1->chobj == to)
-			    ? "you" : obj1->short_descr)
-			    : "something";
+		    i = message_object(obj1, to);
 		    break;
 
 		case 'o':
-		    if (obj1 != NULL) sprintf(kav,"%s's",obj1->short_descr);
-		    i = can_see_obj( to, obj1 )
+		    snprintf(kav, sizeof(kav), "%.*s's",
+                        (int)sizeof(kav) - 3,
+                        obj1 != NULL && obj1->short_descr != NULL ?
+                        obj1->short_descr : "something");
+		    i = obj1 != NULL && can_see_obj( to, obj1 )
 			    ? ( (obj1->chobj != NULL && obj1->chobj == to)
 			    ? "your" : kav)
 			    : "something's";
@@ -452,12 +508,10 @@ void kavitem( const char *format, CHAR_DATA *ch, const void *arg1, const void *a
 	    }
 		
 	    ++str;
-	    while ( ( *point = *i ) != '\0' )
-		++point, ++i;
+	    message_append(&point, limit, i);
 	}
 
-	*point++ = '\n';
-	*point++ = '\r';
+	message_finish(buf, &point, limit);
 	buf[0]   = UPPER(buf[0]);
         if (to->desc && (to->desc->connected == CON_PLAYING))
 	    write_to_buffer( to->desc, buf, point - buf );

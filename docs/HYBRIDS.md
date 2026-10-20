@@ -1098,6 +1098,8 @@ handles missing/oversized NPC descriptions without passing them through the
 legacy message expander. Long aura labels are clipped with their NPC suffix
 preserved; observers get a generic description. This is not a repair of
 other shared message-formatting callers, which still need a separate audit.
+The shared `act`/`act2`/`kavitem` layer has since been bounded; see
+[message formatting](MESSAGES.md) for coverage and remaining callers.
 
 The real-engine suite retains **960 native** snapshots and compares
 **15,552 paired** parent/order/focus/rank/target/mana cases,90 rejected-record
