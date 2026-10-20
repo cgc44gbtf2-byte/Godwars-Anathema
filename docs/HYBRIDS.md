@@ -3,9 +3,10 @@
 ## Colors, help and approved book policy
 
 Class labels follow **HELP CLASS**, not a separate autoclass palette. Dragon
-retains its default color. Hybrid names combine two color segments, with the
-split/order selected by a stable hash of canonical name and ID, never gameplay
-RNG. Names/IDs used by commands and saved records are unchanged.
+retains its default color. Each hybrid has its own fixed, distinct letter-color
+motif using both parents' colors, with the original parent leading in scoped
+views. No hash or gameplay RNG chooses the pattern. Names/IDs used by commands
+and saved records are unchanged.
 
 `help hybrid` / `help selfbrid` provide the full45-pair catalog, grouped into
 ten original-parent sections of nine. Each hybrid appears under both eligible
@@ -39,7 +40,7 @@ configured; only the approved book-chain budget is reduced.
 Native color getters and interpreter level gates are unchanged. `chant` already
 accepts all classes at its native tier; no new casting-permission route is needed.
 Dedicated color-training and material-creation routes are described below;
-vision and player conversion still need integration.
+player conversion still needs integration.
 Native actors without a hybrid record keep the original10-page
 limit. No schema or handoff changes. Full secondary Sorcerer command integration
 remains pending; no PvP balance claim follows from page-prefix replays.
@@ -66,8 +67,8 @@ or cross-player trade guarantee. Actual full/short player-file reloads verify
 saved materials, owner, zero prices, primal and hybrid records; they do not
 prove crash/powercut behavior. Native `chant` was already available at its
 command tier to all classes: this stage does not add casting permission.
-Writing/finishing pages and enchantment use the scoped adapters below; vision
-ownership and other class crafting still need their own adapters.
+Writing/finishing pages, enchantment and vision use the scoped adapters below;
+Other class powers and crafting still need their own adapters.
 No playable hybrid conversion is enabled.
 
 ### Secondary Sorcerer page writing and finishing (existing records only)
@@ -101,7 +102,7 @@ ordinary player-save timing, not an atomic inventory/trade transaction or a
 crash/powercut guarantee. Full and short player-file reload tests cover completed
 pages, hybrid records and resources; only full loads restore inventory.
 
-This does not enable hybrid conversion or vision, teacher/social
+This does not enable hybrid conversion, teacher/social
 roles, other class trainers or live transformation/fusion handlers. No file-based
 world help is replaced: existing custom helps still take priority.
 
@@ -140,8 +141,59 @@ player-save timing, not an atomic transfer or powercut guarantee. Full/short
 reload tests preserve owner, record, resources, enchantment marker and the
 permanent bonuses. The native object-affect file format stores duration,
 modifier and location, restoring type=-1 and bitvector=0; this stage preserves
-that format rather than adding a migration. Vision ownership and full live
+that format rather than adding a migration. Full live
 hybrid conversion/forms remain pending; no PvP balance claim is made.
+
+### Fixed hybrid-name color motifs
+
+Each of the 45 hybrids now has its own fixed, distinct visible letter pattern,
+not a random split or one shared alternating pattern. Its eight-letter motif
+repeats across alphabetic characters; spaces keep the preceding color without
+advancing the motif. Only the two parents' existing `help class` colors are used.
+The original parent leads in `selfbrid list/info` and each parent-class help
+section. Viewing the opposite original-parent order swaps the two colors, not
+the motif. A standalone hybrid help topic uses your class when it is a parent,
+otherwise the registry's canonical first parent. Patterns consume no RNG and
+never alter the plain name, roster, eligibility, powers, prices or saved data.
+
+### Vision ownership and legacy migration
+
+`vision` is now available to a validated secondary Sorcerer, and remains
+available to original Sorcerers. There is no new fee, color-rank grant or class
+projection. Native command tier/position rules and NPC rejection remain.
+The command retains its native enable/fade messages.
+
+Sorcerer holy sight, shadow sight and night sight now have separate source bits
+in the existing saved `Extra` field, instead of overwriting the shared legacy
+`act`, `affected_by` and `vampaff` flags. Effective visibility, looking/scanning,
+eye displays and relevant sight-dependent effects combine the sources. Native
+provider toggles still operate on their own raw flags, so a grant gained or
+removed while vision is active is not accidentally consumed when it fades.
+Hostile holy-sight removal strips both raw and Sorcerer holy sight, but retains
+the other two components. Using `vision` again restores holy sight as before.
+Death and broad staff affect resets also expire the owned shadow component,
+matching the legacy clearing of `affected_by`; holy/night components remain.
+Resetting a class clears the source bits through existing Extra reset behavior.
+Invalid/unrelated secondary records cannot activate these new sources.
+
+**Migration limitation:** legacy raw flags have no reliable provider provenance
+and are not guessed or cleared. When practical, original Sorcerers should turn
+their old `vision` off **before upgrading** and verify the fade message, then
+enable the new version afterward. Already upgraded or offline legacy saves with
+unattributed flags need staff review; the new toggle intentionally does not
+strip them. If their independent raw sight remains on, fading the new source
+will not make them blind or remove that legacy sight. This is conservative
+preservation, not an automatic ownership migration.
+
+Source bits use ordinary player-save timing. Both full/short player loaders and
+actual executable copyover preserve the existing Extra field; no new file
+syntax is added. Record4/save epoch3/handoff2 remain unchanged. An old binary
+ignores the new bits, so do not rely on this sight during binary rollback.
+Full conversion/forms/other secondary powers and PvP balance remain pending.
+Custom world help files still take priority; this is generated help, not an
+automatic live-world help replacement.
+
+### Native material-factory ownership audit
 
 The recipe audit also reproduced a native item-factory ownership defect:
 objects directly borrowed mutable OLC template strings. Crafting renamed

@@ -200,28 +200,7 @@ void do_sorccreate( CHAR_DATA *ch, char *argument )
 
 void do_vision( CHAR_DATA *ch, char *argument )
 {
-    if (!IS_SORCERER(ch))
-    {
-	stc("Huh?\n\r", ch);
-	return;
-    }
-
-    if (!IS_SET(ch->act, PLR_HOLYLIGHT))
-    {
-	SET_BIT(ch->act, PLR_HOLYLIGHT);
-	SET_BIT(ch->affected_by, AFF_SHADOWSIGHT);
-	SET_BIT(ch->vampaff, VAM_NIGHTSIGHT);
-	stc("You manipulate magical fields about yourself to enhance your vision.\n\r", ch);
-    }
-    else
-    {
-	REMOVE_BIT(ch->act, PLR_HOLYLIGHT);
-	REMOVE_BIT(ch->affected_by, AFF_SHADOWSIGHT);
-	REMOVE_BIT(ch->vampaff, VAM_NIGHTSIGHT);
-	stc("You allow your magically enhanced vision to fade.\n\r", ch);
-    }
-
-    return;
+    sorcerer_vision_toggle(ch);
 }
 
 

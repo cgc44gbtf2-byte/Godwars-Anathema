@@ -582,9 +582,9 @@ void mageupkeep(CHAR_DATA *ch)
     stc("                               #C(< #cMage Powers #C>)#n\n\r", ch);
     stc("--------------------------------------------------------------------------------\n\r", ch);
      
-    if (IS_SET(ch->act, PLR_HOLYLIGHT)) stc("Your mental control makes you more aware of your surroundings.\n\r",ch);
-    if (IS_AFFECTED(ch, AFF_SHADOWSIGHT)) stc("You can locate nearby spirits.\n\r", ch);
-    if (IS_VAMPAFF(ch, VAM_NIGHTSIGHT)) stc("Your mastery of energy allows you to sense heat patterns in the dark.\n\r", ch);
+    if (effective_holylight(ch)) stc("Your mental control makes you more aware of your surroundings.\n\r",ch);
+    if (effective_shadowsight(ch)) stc("You can locate nearby spirits.\n\r", ch);
+    if (effective_nightsight(ch)) stc("Your mastery of energy allows you to sense heat patterns in the dark.\n\r", ch);
 
     if (ch->spheres[MLIF] >= 4)
     {

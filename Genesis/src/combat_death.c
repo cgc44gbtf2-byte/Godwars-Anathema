@@ -283,6 +283,7 @@ void raw_kill( CHAR_DATA *victim, CHAR_DATA *ch )
     victim->itemaffect	 = 0;
     victim->blood[0]	 = victim->blood[1];
     victim->affected_by	 = 0;
+    strip_shadowsight(victim);
     victim->armor	 = 0;
     victim->position	 = POS_RESTING;
     victim->hit		 = UMAX(1, victim->hit);
@@ -331,6 +332,7 @@ void behead( CHAR_DATA *victim, CHAR_DATA *ch )
     victim->itemaffect	 = 0;
     victim->blood[0]     = victim->blood[1];
     victim->affected_by	 = 0;
+    strip_shadowsight(victim);
     victim->armor	 = 0;
     victim->position	 = POS_STANDING;
     victim->hit		 = 1;

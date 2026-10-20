@@ -105,23 +105,104 @@ const char *hybrid_parent_color(long parent)
     }
 }
 
-int hybrid_display_name(const HYBRID_DEFINITION *hybrid, char *out, size_t size)
+/* Fixed, distinct letter motifs; 0 = original parent, 1 = second parent.
+ * Spaces retain the preceding color and do not advance the motif. */
+static const char *const color_patterns[] = {
+    "00000001", /* 1: Umbral Drake */
+    "01000001", /* 2: Primal Tempest */
+    "00100001", /* 3: Wyrmblade */
+    "01100001", /* 4: Astral Dragon */
+    "00010001", /* 5: Draconic Ascetic */
+    "01010001", /* 6: Phantom Wyrm */
+    "00110001", /* 7: Runebound Dragon */
+    "01110001", /* 8: Bloodwyrm */
+    "00001001", /* 9: Dire Wyrm */
+    "01001001", /* 10: Venomweaver */
+    "00101001", /* 11: Gloomblade */
+    "01101001", /* 12: Shadow Arcanist */
+    "00011001", /* 13: Spider Sage */
+    "01011001", /* 14: Nightfang */
+    "00111001", /* 15: Web Hexer */
+    "01111001", /* 16: Bloodshade */
+    "00000101", /* 17: Moonstalker */
+    "01000101", /* 18: Stormforged */
+    "00100101", /* 19: Primal Arcanist */
+    "01100101", /* 20: Elemental Fist */
+    "00010101", /* 21: Gale Shadow */
+    "01010101", /* 22: Chaos Conduit */
+    "00110101", /* 23: Crimson Tempest */
+    "01110101", /* 24: Stormfang */
+    "00001101", /* 25: Spellblade */
+    "01001101", /* 26: Iron Disciple */
+    "00101101", /* 27: Silent Blade */
+    "01101101", /* 28: Runebreaker */
+    "00011101", /* 29: Crimson Duelist */
+    "01011101", /* 30: Fangblade */
+    "00111101", /* 31: Astral Adept */
+    "01111101", /* 32: Riftstalker */
+    "00000011", /* 33: Grand Thaumaturge */
+    "01000011", /* 34: Night Arcanist */
+    "00100011", /* 35: Lunar Invoker */
+    "01100011", /* 36: Shadow Disciple */
+    "00010011", /* 37: Mystic Channeler */
+    "01010011", /* 38: Blood Ascetic */
+    "00110011", /* 39: Spirit Claw */
+    "01110011", /* 40: Spellshade */
+    "00001011", /* 41: Night Reaver */
+    "01001011", /* 42: Ghostfang */
+    "00101011", /* 43: Blood Thaumaturge */
+    "01101011", /* 44: Hexfang */
+    "00011011", /* 45: Bloodmoon Revenant */
+};
+_Static_assert(sizeof(color_patterns)/sizeof(color_patterns[0]) ==
+               sizeof(roster)/sizeof(roster[0]), "Every hybrid needs a color motif");
+
+int hybrid_display_name_for_parent(const HYBRID_DEFINITION *hybrid, long parent,
+                                   char *out, size_t size)
 {
     if (!out || !size) return 0;
     out[0] = '\0';
-    if (!hybrid || hybrid_by_id(hybrid->id) != hybrid) return 0;
+    if (!hybrid || hybrid_by_id(hybrid->id) != hybrid ||
+        !hybrid_has_parent(hybrid, parent)) return 0;
     size_t length = strlen(hybrid->name);
-    if (length < 2) return 0;
-    uint32_t hash = UINT32_C(2166136261) ^ (uint32_t)hybrid->id;
-    for (size_t i = 0; i < length; i++)
-        hash = (hash ^ (unsigned char)hybrid->name[i]) * UINT32_C(16777619);
-    size_t split = 1 + hash % (length - 1);
-    const char *first = hybrid_parent_color(hybrid->parents[hash & 1]);
-    const char *second = hybrid_parent_color(hybrid->parents[(hash & 1) ^ 1]);
-    int n = snprintf(out, size, "%s%.*s%s%s#n", first, (int)split,
-                     hybrid->name, second, hybrid->name + split);
-    if (n < 0 || (size_t)n >= size) { out[0] = '\0'; return 0; }
+    if (length < 2 || length > (SIZE_MAX-5)/3) return 0;
+    const char *pattern = color_patterns[hybrid->id-1];
+    const char *colors[] = {hybrid_parent_color(parent),
+        hybrid_parent_color(hybrid->parents[0] == parent ?
+                            hybrid->parents[1] : hybrid->parents[0])};
+    /* All HELP CLASS color codes are two bytes. Preflight before any write. */
+    size_t letters = 0, needed = length+5;
+    char previous = '0';
+    for (size_t i = 0; i < length; i++) {
+        if (!isalpha((unsigned char)hybrid->name[i])) continue;
+        char color = pattern[letters++ % 8];
+        if (color != previous) needed += 2;
+        previous = color;
+    }
+    if (size < needed) return 0;
+    size_t used = 2;
+    memcpy(out, colors[0], 2);
+    letters = 0;
+    previous = '0';
+    for (size_t i = 0; i < length; i++) {
+        if (isalpha((unsigned char)hybrid->name[i])) {
+            char color = pattern[letters++ % 8];
+            if (color != previous) {
+                memcpy(out+used, colors[color-'0'], 2);
+                used += 2;
+            }
+            previous = color;
+        }
+        out[used++] = hybrid->name[i];
+    }
+    memcpy(out+used, "#n", 3);
     return 1;
+}
+
+int hybrid_display_name(const HYBRID_DEFINITION *hybrid, char *out, size_t size)
+{
+    return hybrid_display_name_for_parent(hybrid, hybrid ? hybrid->parents[0] : 0,
+                                          out, size);
 }
 
 int hybrid_has_parent(const HYBRID_DEFINITION *hybrid, long parent)

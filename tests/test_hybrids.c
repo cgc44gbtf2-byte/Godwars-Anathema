@@ -2,6 +2,7 @@
  * Deliberately no player save, conversion, economy or power activation. */
 #include <sys/types.h>
 #include <assert.h>
+#include <ctype.h>
 #include <limits.h>
 #include <stdio.h>
 #include <string.h>
@@ -118,8 +119,31 @@ static void preview(char *argument)
     plain(output);
 }
 
+static void color_signature(const char *display, const HYBRID_DEFINITION *h,
+                            long parent, char *signature)
+{
+    char first=hybrid_parent_color(parent)[1];
+    char second=hybrid_parent_color(h->parents[0]==parent?h->parents[1]:h->parents[0])[1];
+    size_t letters=0;char active=0;
+    for(const char *p=display;*p;){
+        if(*p=='#'){
+            active=p[1];assert(active&&(active==first||active==second||
+                                       (active=='n'&&!p[2])));p+=2;
+        }else{
+            if(isalpha((unsigned char)*p)){
+                assert(active==first||active==second);
+                signature[letters++]=active==first?'0':'1';
+            }
+            ++p;
+        }
+    }
+    signature[letters]='\0';
+    assert(letters&&signature[0]=='0'&&strchr(signature,'1'));
+}
+
 static void cosmetics(void)
 {
+    char signatures[45][128];
     for (size_t i = 0; i < hybrid_count(); i++) {
         const HYBRID_DEFINITION *h = hybrid_at(i);
         char first[128], again[128], clean[128];
@@ -130,14 +154,13 @@ static void cosmetics(void)
         assert(hybrid_display_name(h, again, sizeof(again)));
         assert(!strcmp(first, again));
         assert(number_range(1, 1000000) == next);
-        char *second = strchr(first + 2, '#');
-        assert(second && second > first + 2);
-        assert(first[1] != second[1]);
-        assert(first[1] == hybrid_parent_color(h->parents[0])[1] ||
-               first[1] == hybrid_parent_color(h->parents[1])[1]);
-        assert(second[1] == hybrid_parent_color(h->parents[0])[1] ||
-               second[1] == hybrid_parent_color(h->parents[1])[1]);
-        assert(!strcmp(strchr(second + 2, '#'), "#n"));
+        assert(!strcmp(first+strlen(first)-2,"#n"));
+        color_signature(first,h,h->parents[0],signatures[i]);
+        for(size_t j=0;j<i;j++)assert(strcmp(signatures[i],signatures[j]));
+        assert(hybrid_display_name_for_parent(h,h->parents[1],again,sizeof(again)));
+        char reverse[128];color_signature(again,h,h->parents[1],reverse);
+        assert(!strcmp(signatures[i],reverse));
+        assert(!hybrid_display_name_for_parent(h,CLASS_NONE,again,sizeof(again))&&!again[0]);
         strcpy(clean, first);
         plain(clean);
         assert(!strcmp(clean, h->name));

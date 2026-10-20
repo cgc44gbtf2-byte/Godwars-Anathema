@@ -286,14 +286,15 @@ static void remove_directory(const char *name)
 
 int main(int argc,char **argv)
 {
-    if(argc==3 && !strcmp(argv[1],"--seed")) {
+    if(argc==3 && (!strcmp(argv[1],"--seed") || !strcmp(argv[1],"--seed-vision"))) {
         assert(chdir(argv[2])==0); globals();
         CHAR_DATA *ch=player("Restarter",FALSE);
         ch->class = CLASS_NINJA;
+        long second = !strcmp(argv[1],"--seed-vision") ? CLASS_SORCERER : CLASS_WEREWOLF;
         const HYBRID_DEFINITION *hybrid = NULL;
         for (size_t i = 0; i < hybrid_count(); ++i)
             if (hybrid_has_parent(hybrid_at(i), CLASS_NINJA) &&
-                hybrid_has_parent(hybrid_at(i), CLASS_WEREWOLF)) {
+                hybrid_has_parent(hybrid_at(i), second)) {
                 hybrid = hybrid_at(i); break;
             }
         HYBRID_STATE secondary;

@@ -3,6 +3,7 @@ import hashlib
 import json
 import unittest
 from test_class_layout import ROOT, SRC, make_values
+from test_hybrid_vision_catalog import without_hostile_sight_adapter
 
 
 def blob(text):
@@ -12,7 +13,7 @@ def blob(text):
 
 class HybridHealingCatalog(unittest.TestCase):
     def test_only_sunbath_permission_changes_after_arithmetic_fix(self):
-        text=(SRC/"classes/elemental/elemental.c").read_text()
+        text=without_hostile_sight_adapter((SRC/"classes/elemental/elemental.c").read_text())
         self.assertEqual(text.count('#include "classes/hybrid/access.h"\n'),1)
         self.assertEqual(text.count("hybrid_power_parent("),1)
         self.assertEqual(text.count("hybrid_power_rank("),1)
@@ -23,7 +24,7 @@ class HybridHealingCatalog(unittest.TestCase):
         self.assertEqual(blob(restored),"f0ae81c799c5fa1488226dfb148a13f71b15db0a")
 
     def test_native_fix_contains_no_other_handler_changes(self):
-        text=(SRC/"classes/elemental/elemental.c").read_text().replace(
+        text=without_hostile_sight_adapter((SRC/"classes/elemental/elemental.c").read_text()).replace(
             '#include "classes/hybrid/access.h"\n',"").replace(
             "hybrid_power_parent(ch,CLASS_ELEM)","IS_ELEM(ch)").replace(
             "hybrid_power_rank(ch,CLASS_ELEM,HYBRID_TRAIN_ELEMENT,ELEM_SUN)",
@@ -93,7 +94,7 @@ class HybridHealingCatalog(unittest.TestCase):
         self.assertIn('assert(number_argument("",empty)==0&&empty[0]',tests)
 
     def test_touch_permissions_only_restore_fixed_native_module(self):
-        text=(SRC/"classes/monk/monk.c").read_text()
+        text=without_hostile_sight_adapter((SRC/"classes/monk/monk.c").read_text())
         self.assertEqual(text.count('#include "classes/hybrid/access.h"\n'),1)
         self.assertEqual(text.count("hybrid_power_parent("),1)
         self.assertEqual(text.count("hybrid_power_rank("),1)

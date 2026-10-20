@@ -102,6 +102,12 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   with no new fee. Artifacts stay excluded, and worn gear must be unequipped.
   The shared `cast 'enchant weapon'` spell also requires the caster's own claim;
   its native spell costs, bonuses and exclusions are otherwise unchanged.
+  `vision` now works for validated secondary Sorcerers and keeps its own saved
+  sight sources. Turning it off no longer erases another power's sight.
+  Legacy raw sight flags are preserved, not automatically reassigned; see the
+  vision migration notes in `docs/HYBRIDS.md` before updating active Sorcerers.
+  Every hybrid name also has its own fixed color motif using both parents'
+  `help class` colors; the original parent's color leads in scoped listings.
   A separate object-factory fix prevents crafted items from freeing mutable
   names, descriptions and spell messages still owned by staff-edited templates.
   The info page also shows a read-only numeric checklist: 50,000 max HP/mana,

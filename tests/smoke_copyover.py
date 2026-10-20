@@ -10,6 +10,7 @@ from world_fixture import stage_world
 from gmcp_probe import GMCPProbe
 
 repo = pathlib.Path(__file__).resolve().parents[1]
+vision_mode = "--vision" in sys.argv[1:]
 
 
 def until(client, needle, timeout=25, trace=None, ready=None):
@@ -39,7 +40,7 @@ with tempfile.TemporaryDirectory(prefix="anathema-copyover-") as directory:
         (runtime / name).mkdir(mode=0o700)
     (runtime / "src").symlink_to(repo / "Genesis/src", target_is_directory=True)
     stage_world(repo, runtime)
-    subprocess.run([str(repo / "tests/test_restart"), "--seed",
+    subprocess.run([str(repo / "tests/test_restart"), "--seed-vision" if vision_mode else "--seed",
                     str(runtime / "area")], check=True)
     original_player = (runtime / "player/Restarter").read_bytes()
     hybrid_line = next(line for line in original_player.splitlines()
@@ -78,6 +79,9 @@ with tempfile.TemporaryDirectory(prefix="anathema-copyover-") as directory:
             assert not gmcp.records, "Vitals leaked before entering the game"
             staff.sendall(b"n\n")
             until(staff, b"Welcome to Godwars", trace=gmcp.feed)
+            if vision_mode:
+                staff.sendall(b"vision\n")
+                until(staff, b"enhance your vision", trace=gmcp.feed)
             staff.sendall(b"save\n")
             until(staff, b"Saved.", trace=gmcp.feed,
                   ready=lambda: {"Char.Vitals", "Anathema.Vitals"} <= {
@@ -133,6 +137,15 @@ with tempfile.TemporaryDirectory(prefix="anathema-copyover-") as directory:
             assert (runtime / "player/Rejected").read_bytes() == rejected_player
             updated_player = (runtime / "player/Restarter").read_bytes()
             assert hybrid_line in updated_player.splitlines(), "Copyover lost hybrid storage"
+            if vision_mode:
+                source_mask = 268435456 | 536870912 | 1073741824
+                saved_extra = int(next(line.split()[1] for line in updated_player.splitlines()
+                                      if line.startswith(b"Extra ")))
+                assert saved_extra & source_mask == source_mask, "Copyover lost owned vision sources"
+                staff.sendall(b"vision\n")
+                until(staff, b"enhanced vision to fade", trace=gmcp.feed)
+                staff.sendall(b"vision\n")
+                until(staff, b"enhance your vision", trace=gmcp.feed)
             staff.sendall(b"shutdown\n")
             assert process.wait(timeout=15) == 0, "Checked shutdown did not exit cleanly"
         except Exception:

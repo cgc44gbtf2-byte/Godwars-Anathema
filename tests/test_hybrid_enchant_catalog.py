@@ -3,6 +3,7 @@ import hashlib
 import re
 import unittest
 from test_class_layout import ROOT, SRC, make_values
+from test_hybrid_vision_catalog import without_sorcerer_vision_adapter
 
 OWNERSHIP_GUARD="""    /* The creator and current carrier are not proof of ownership. Use the
      * existing claim/grant owner, with exact case-insensitive player matching.
@@ -17,6 +18,7 @@ OWNERSHIP_GUARD="""    /* The creator and current carrier are not proof of owner
 """
 
 def without_sorcerer_enchant_adapter(text):
+    text=without_sorcerer_vision_adapter(text)
     start=text.index("void do_enchant(")
     end=text.index("\nvoid do_write(",start)
     body=text[start:end];gate="hybrid_power_parent(ch, CLASS_SORCERER)"

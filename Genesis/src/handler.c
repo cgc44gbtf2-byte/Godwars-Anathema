@@ -2033,7 +2033,7 @@ bool can_see( CHAR_DATA *ch, CHAR_DATA *victim )
     if (!IS_NPC(victim) && IS_VAMPAFF(victim, VAM_EARTHMELDED)) return FALSE;
     if (IS_AFFECTED(victim, AFF_KAKUSU) && !IS_NINJA(ch)) return FALSE;
     if (IS_AFFECTED(ch, AFF_SHADOWPLANE) != IS_AFFECTED(victim, AFF_SHADOWPLANE)
-     && !IS_AFFECTED(ch, AFF_SHADOWSIGHT) && !IS_VAMPAFF(ch, VAM_SPIRITEYES))
+     && !effective_shadowsight(ch) && !IS_VAMPAFF(ch, VAM_SPIRITEYES))
         return FALSE;
     if (IS_MORE(victim, MORE_SPIRIT) && !IS_VAMPAFF(ch, VAM_SPIRITEYES)) return FALSE;
     if (IS_ITEMAFF(victim,ITEMA_BLISSFUL)) return FALSE;
@@ -2070,10 +2070,10 @@ bool can_see( CHAR_DATA *ch, CHAR_DATA *victim )
 	else return FALSE;
     }
 
-    if (!IS_NPC(ch) && IS_SET(ch->act, PLR_HOLYLIGHT)) return TRUE;
-    if (IS_AFFECTED(ch, AFF_BLIND) && !IS_AFFECTED(ch, AFF_SHADOWSIGHT))
+    if (!IS_NPC(ch) && effective_holylight(ch)) return TRUE;
+    if (IS_AFFECTED(ch, AFF_BLIND) && !effective_shadowsight(ch))
 	return FALSE;
-    if (room_is_dark(ch->in_room) && !IS_AFFECTED(ch, AFF_INFRARED) && !IS_VAMPAFF(ch, VAM_NIGHTSIGHT))
+    if (room_is_dark(ch->in_room) && !IS_AFFECTED(ch, AFF_INFRARED) && !effective_nightsight(ch))
 	return FALSE;
     if (IS_AFFECTED(victim, AFF_HIDE))
 	return FALSE;
@@ -2089,7 +2089,7 @@ bool can_see( CHAR_DATA *ch, CHAR_DATA *victim )
 bool can_see_obj( CHAR_DATA *ch, OBJ_DATA *obj )
 {
     if (obj->carried_by == ch) return TRUE;
-    if ( !IS_NPC(ch) && IS_SET(ch->act, PLR_HOLYLIGHT) )
+    if ( !IS_NPC(ch) && effective_holylight(ch) )
 	return TRUE;
 
     if ( IS_ITEMAFF(ch, ITEMA_VISION) )
@@ -2097,13 +2097,13 @@ bool can_see_obj( CHAR_DATA *ch, OBJ_DATA *obj )
 
     if (( IS_SET(obj->extra_flags, ITEM_SHADOWPLANE)
     &&   obj->carried_by == NULL)
-    &&   !IS_AFFECTED(ch, AFF_SHADOWSIGHT)
+    &&   !effective_shadowsight(ch)
     &&   !IS_AFFECTED(ch, AFF_SHADOWPLANE))
 	return FALSE;
 
     if (( !IS_SET(obj->extra_flags, ITEM_SHADOWPLANE)
     &&   obj->carried_by == NULL)
-    &&   !IS_AFFECTED(ch, AFF_SHADOWSIGHT)
+    &&   !effective_shadowsight(ch)
     &&   IS_AFFECTED(ch, AFF_SHADOWPLANE))
 	return FALSE;
 
@@ -2113,14 +2113,14 @@ bool can_see_obj( CHAR_DATA *ch, OBJ_DATA *obj )
     if ( IS_EXTRA(ch, BLINDFOLDED) )
 	return FALSE;
 
-    if ( IS_AFFECTED( ch, AFF_BLIND ) && !IS_AFFECTED(ch, AFF_SHADOWSIGHT) )
+    if ( IS_AFFECTED( ch, AFF_BLIND ) && !effective_shadowsight(ch) )
 	return FALSE;
 
     if ( obj->item_type == ITEM_LIGHT && obj->value[2] != 0 )
 	return TRUE;
 
     if ( room_is_dark( ch->in_room ) && !IS_AFFECTED(ch, AFF_INFRARED) 
-	&& !IS_VAMPAFF(ch, VAM_NIGHTSIGHT) )
+	&& !effective_nightsight(ch) )
 	return FALSE;
 
     if ( !IS_NPC(ch) && IS_MORE(ch, MORE_HEAD) &&

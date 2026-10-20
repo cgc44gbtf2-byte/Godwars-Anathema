@@ -23,7 +23,7 @@ static void parent_rows(CHAR_DATA *ch, long parent)
     for (size_t i = 0; i < hybrid_count(); i++) {
         const HYBRID_DEFINITION *h = hybrid_at(i);
         if (!hybrid_has_parent(h, parent)) continue;
-        if (!hybrid_display_name(h, display, sizeof(display))) return;
+        if (!hybrid_display_name_for_parent(h, parent, display, sizeof(display))) return;
         long other = h->parents[0] == parent ? h->parents[1] : h->parents[0];
         snprintf(line, sizeof(line), "  help %s  (Parent 2: %s%s#n)\n\r",
                  display, hybrid_parent_color(other), hybrid_parent_name(other));
@@ -90,13 +90,15 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
                      "titles and spell-page lines, then the native end.<color>. "
                      "Writing grants no color ranks. Enchant only gear claimed "
                      "in your own name: +5 hitroll/+5 damroll, once, no fee; "
-                     "artifacts excluded. Vision remains unavailable through "
-                     "this adapter.\n\r",ch);
+                     "artifacts excluded. Vision is free and source-owned: "
+                     "toggling it preserves other sight grants; legacy raw "
+                     "flags require review before migration.\n\r",ch);
         return 1;
     }
     const HYBRID_DEFINITION *h = hybrid_by_name(argument);
     if (!h) return 0;
-    if (!hybrid_display_name(h, display, sizeof(display))) return 0;
+    long parent = hybrid_has_parent(h, ch->class) ? ch->class : h->parents[0];
+    if (!hybrid_display_name_for_parent(h, parent, display, sizeof(display))) return 0;
     snprintf(line, sizeof(line), "%s - planned hybrid [%ld]\n\r", display, h->id);
     send_to_char(line, ch);
     snprintf(line, sizeof(line), "Parents: %s%s#n + %s%s#n. Either can be Parent 1.\n\r",

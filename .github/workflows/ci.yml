@@ -34,6 +34,7 @@ jobs:
         run: |
           python3 tests/smoke_shutdown.py
           python3 tests/smoke_copyover.py
+          python3 tests/smoke_copyover.py --vision
           python3 tests/smoke_owner.py
       - name: Address and undefined-behavior sanitizers
         env:
@@ -45,4 +46,5 @@ jobs:
           make -j2 CFLAGS="-std=gnu17 -DMERC -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer" LDFLAGS="-fsanitize=address,undefined"
           python3 tests/smoke_shutdown.py
           python3 tests/smoke_copyover.py
+          python3 tests/smoke_copyover.py --vision
           python3 tests/smoke_owner.py

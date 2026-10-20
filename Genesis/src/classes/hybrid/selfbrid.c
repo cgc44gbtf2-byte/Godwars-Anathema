@@ -33,7 +33,7 @@ void do_selfbrid(CHAR_DATA *ch, char *argument)
             hybrid = hybrid_at(i);
             if (!hybrid_has_parent(hybrid, ch->class)) continue;
             choices++;
-            if (!hybrid_display_name(hybrid, display, sizeof(display))) return;
+            if (!hybrid_display_name_for_parent(hybrid, ch->class, display, sizeof(display))) return;
             int padding = strlen(hybrid->name) < 21 ? 21 - (int)strlen(hybrid->name) : 0;
             snprintf(line, sizeof(line), "%3ld  %s%*s %s%s#n + %s%s#n\n\r",
                      hybrid->id, display, padding, "",
@@ -62,7 +62,7 @@ void do_selfbrid(CHAR_DATA *ch, char *argument)
                      "Use selfbrid list.\n\r", ch);
         return;
     }
-    if (!hybrid_display_name(hybrid, display, sizeof(display))) return;
+    if (!hybrid_display_name_for_parent(hybrid, ch->class, display, sizeof(display))) return;
     snprintf(line, sizeof(line), "[%ld] %s: %s%s#n + %s%s#n\n\r",
              hybrid->id, display,
              hybrid_parent_color(hybrid->parents[0]),

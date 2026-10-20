@@ -1711,13 +1711,13 @@ void do_upkeep( CHAR_DATA *ch, char *argument )
 	    send_to_char("You have your Fangs extended.\n\r",ch);
     	if (IS_VAMPAFF(ch,VAM_CLAWS) )
 	    send_to_char("You have your Claws extended.\n\r",ch);
-    	if (IS_VAMPAFF(ch,VAM_NIGHTSIGHT) )
+    if (effective_nightsight(ch) )
 	    send_to_char("You are using Gleam of Red Eyes.\n\r",ch);
     	if (IS_VAMPAFF(ch,VAM_SPIRITEYES) )
 	    send_to_char("You are using Spirit Eyes.\n\r",ch);
-    	if (IS_AFFECTED(ch,AFF_SHADOWSIGHT) )
+    if (effective_shadowsight(ch) )
 	    send_to_char("You are using Umbral Vision.\n\r",ch);
-    	if (IS_SET(ch->act,PLR_HOLYLIGHT) )
+    if (effective_holylight(ch) )
 	    send_to_char("You are using Heightened Senses.\n\r",ch);
 	if (IS_MORE(ch,MORE_HELIOS) )
 	    send_to_char("Your hands are engulfed in burning flames.\n\r",ch);
@@ -1779,13 +1779,13 @@ void do_upkeep( CHAR_DATA *ch, char *argument )
 	    send_to_char("You have your Fangs extended.\n\r",ch);
     	if (IS_VAMPAFF(ch,VAM_CLAWS) )
 	    send_to_char("You have your Claws extended.\n\r",ch);
-    	if (IS_VAMPAFF(ch,VAM_NIGHTSIGHT) )
+    if (effective_nightsight(ch) )
 	    send_to_char("You are using Eyes of the Cat.\n\r",ch);
     	if (IS_VAMPAFF(ch,VAM_SPIRITEYES) )
 	    send_to_char("You are using Scent from Beyond.\n\r",ch);
-    	if (IS_AFFECTED(ch,AFF_SHADOWSIGHT) )
+    if (effective_shadowsight(ch) )
 	    send_to_char("You are using Umbral Vision.\n\r",ch);
-    	if (IS_SET(ch->act,PLR_HOLYLIGHT) )
+    if (effective_holylight(ch) )
 	    send_to_char("You are using Heightened Senses.\n\r",ch);
 	if (IS_MORE(ch,MORE_HELIOS))
 	    send_to_char("Your hands are engulfed in burning flames.\n\rYour body is immune to fire.\n\r",ch);
@@ -1847,7 +1847,7 @@ void do_upkeep( CHAR_DATA *ch, char *argument )
    	   stc("Enemies seem slower and easier to strike.\n\r",ch);
    	if (ch->pcdata->powers[ELEM_TIME] > 4)
    	   stc("You feel quicker and more able to dodge.\n\r",ch);
-   	if ( IS_SET(ch->act, PLR_HOLYLIGHT) )
+   if ( effective_holylight(ch) )
 	   stc("You are able to see what mortal eyes cannot.\n\r",ch);
    	if (IS_MORE(ch, MORE_SHIELDED) )
 	   stc("You are keeping your strength and your location hidden from prying eyes.\n\r",ch);
@@ -3318,7 +3318,7 @@ void do_serenity( CHAR_DATA *ch, char *argument )
     act("$n takes a deep breath and forces back $s inner beast.",victim,NULL,NULL,TO_ROOM);
     victim->pcdata->wolf = 0;
     if (IS_WEREWOLF(victim)) do_unwerewolf(victim,"");
-    if (IS_VAMPAFF(victim, VAM_NIGHTSIGHT) && !IS_POLYAFF(victim, POLY_ZULO)) 
+    if (effective_nightsight(victim) && !IS_POLYAFF(victim, POLY_ZULO))
 	do_nightsight(victim,"");
     if (IS_VAMPAFF(victim, VAM_FANGS) && !IS_POLYAFF(victim, POLY_ZULO)) 
 	do_fangs(victim,"");

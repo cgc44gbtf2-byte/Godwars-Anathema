@@ -3,6 +3,7 @@ import hashlib
 import re
 import unittest
 from test_class_layout import ROOT, SRC, make_values
+from test_hybrid_vision_catalog import without_vision_info_adapter
 from test_hybrid_creation_catalog import without_sorcerer_creation_adapter
 
 
@@ -58,7 +59,9 @@ class HybridBooksCatalog(unittest.TestCase):
             "act_info.c": "9510008085cc695c0f58a563d62415b3c18cb8cd",
             "interp.c": "ccb0125d4264a8a5447618c29a9240ec674d2eb4",
         }.items():
-            self.assertEqual(blob((SRC / path).read_bytes()), expected)
+            data=(SRC/path).read_bytes()
+            if path=="act_info.c":data=without_vision_info_adapter(data.decode()).encode()
+            self.assertEqual(blob(data), expected)
 
     def test_color_adapter_is_page_scoped_and_uses_valid_earned_bank(self):
         adapter = (SRC / "classes/hybrid/books.c").read_text().split(

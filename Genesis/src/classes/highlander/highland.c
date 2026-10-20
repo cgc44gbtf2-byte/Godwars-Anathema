@@ -259,7 +259,7 @@ return;
 
     if (!IS_NPC(victim))
     {
-	if (IS_SET(victim->act, PLR_HOLYLIGHT)) REMOVE_BIT(victim->act, PLR_HOLYLIGHT);
+	if (effective_holylight(victim)) strip_holylight(victim);
 	else
 	{
 /*	    stc("Your blade flash has no affect.\n\r",ch);

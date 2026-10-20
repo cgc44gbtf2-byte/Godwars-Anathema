@@ -11,7 +11,7 @@ EXPECTED = {
     "vampire": ("disc", "vampire", "presence", "beast", "state",
                 "obfuscate", "dominate", "chimerstry"),
     "werewolf": ("werewolf", "wwbreed", "wwauspice", "wwtribe", "instincts"),
-    "sorcerer": ("sorcerer",),
+    "sorcerer": ("sorcerer", "vision"),
     "drow": ("drow",),
     "highlander": ("highland",),
     "mage": ("mage",),
@@ -47,7 +47,7 @@ class ClassLayoutChecks(unittest.TestCase):
         expected = {f"classes/{family}/{stem}.c"
                     for family, stems in EXPECTED.items() for stem in stems}
         selected = manifest()
-        self.assertEqual(len(selected), 37)
+        self.assertEqual(len(selected), 38)
         self.assertEqual(len(selected), len(set(selected)))
         self.assertEqual(set(selected), expected)
         self.assertEqual(

@@ -104,7 +104,7 @@ void do_spydirection( CHAR_DATA *ch, char *argument )
 	send_to_char("   Too foggy to tell.\n\r",ch);
 	return;
     }
-    if (room_is_dark(to_room) && !IS_VAMPAFF(ch, VAM_NIGHTSIGHT))
+    if (room_is_dark(to_room) && !effective_nightsight(ch))
     {
 	send_to_char("   Too dark to tell.\n\r",ch);
 	return;

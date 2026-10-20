@@ -1292,6 +1292,10 @@ extern CHAR_DATA Score_ch;      /* Score_ch */
 #define EXTRA_ILLUSION	       33554432 /* Mob is really just an illusion */
 
 #define EXTRA_INVIS_EMAIL     134217728 /* Cannot see email via finger */
+#define EXTRA_SORC_HOLY       268435456L
+#define EXTRA_SORC_SHADOW     536870912L
+#define EXTRA_SORC_NIGHT      1073741824L
+#define EXTRA_SORC_VISION     (EXTRA_SORC_HOLY | EXTRA_SORC_SHADOW | EXTRA_SORC_NIGHT)
 
 /*
  * MORE bits for players. (KaVir)
@@ -3446,6 +3450,14 @@ long	get_container_flags	args( ( char *arg ) );		/* OLC */
 char *	get_flags_container	args( ( long arg ) );		/* OLC */
 long	get_liquid_type		args( ( char *arg ) );		/* OLC */
 char *	get_type_liquid		args( ( long arg ) );		/* OLC */
+
+/* Effective read-only sight. Providers still toggle their own raw flags. */
+int effective_holylight(const CHAR_DATA *ch);
+int effective_shadowsight(const CHAR_DATA *ch);
+int effective_nightsight(const CHAR_DATA *ch);
+void sorcerer_vision_toggle(CHAR_DATA *ch);
+void strip_holylight(CHAR_DATA *ch);
+void strip_shadowsight(CHAR_DATA *ch);
 
 #undef	CD
 #undef	MID

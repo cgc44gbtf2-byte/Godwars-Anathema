@@ -1105,7 +1105,7 @@ void do_dominator( CHAR_DATA *ch, char *argument )
 	ch->pcdata->wolf += steal;
 	if (victim->pcdata->wolf <= 0)
 	{
-	    if (IS_VAMPAFF(victim, VAM_NIGHTSIGHT) && !IS_POLYAFF(victim, POLY_ZULO))
+    if (effective_nightsight(victim) && !IS_POLYAFF(victim, POLY_ZULO))
         	do_nightsight(victim,"");
 	    if (IS_VAMPAFF(victim, VAM_FANGS) && !IS_POLYAFF(victim, POLY_ZULO))
 		do_fangs(victim,"");

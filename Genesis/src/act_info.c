@@ -968,8 +968,8 @@ void show_char_to_char_1( CHAR_DATA *victim, CHAR_DATA *ch )
 	    act("$N has a long tail hanging from $S backside.", ch, NULL, victim, TO_CHAR);
     }
 
-    if (IS_WEREWOLF(victim) && IS_VAMPAFF(victim, VAM_NIGHTSIGHT)) act("$N's eyes are glowing bright green.",ch,NULL,victim,TO_CHAR);
-    else if (IS_AFFECTED(victim, AFF_INFRARED) || IS_VAMPAFF(victim, VAM_NIGHTSIGHT)) act("$N's eyes are glowing bright red.",ch,NULL,victim,TO_CHAR);
+    if (IS_WEREWOLF(victim) && effective_nightsight(victim)) act("$N's eyes are glowing bright green.",ch,NULL,victim,TO_CHAR);
+    else if (IS_AFFECTED(victim, AFF_INFRARED) || effective_nightsight(victim)) act("$N's eyes are glowing bright red.",ch,NULL,victim,TO_CHAR);
 
     if (IS_VAMPAFF(victim, VAM_FANGS)) act("$N has a pair of long, pointed fangs.",ch,NULL,victim,TO_CHAR);
     if (IS_AFFECTED(victim, AFF_FLYING)) 
@@ -1068,7 +1068,7 @@ void show_char_to_char( CHAR_DATA *list, CHAR_DATA *ch )
 	    if ( !IS_NPC(rch)
 	    && ( IS_SET(rch->act, PLR_WIZINVIS)
 	    ||   IS_ITEMAFF(rch, ITEMA_VANISH) )
-	    &&   !IS_SET(ch->act, PLR_HOLYLIGHT)
+	    &&   !effective_holylight(ch)
 	    &&   !IS_ITEMAFF(ch, ITEMA_VISION) )
 		continue;
 	}
@@ -1083,9 +1083,9 @@ void show_char_to_char( CHAR_DATA *list, CHAR_DATA *ch )
 	if ( can_see( ch, rch ) )
 	    show_char_to_char_0( rch, ch );
 	else if ( room_is_dark( ch->in_room )
-	&&      ( IS_AFFECTED(rch, AFF_INFRARED) || IS_VAMPAFF(rch, VAM_NIGHTSIGHT)) )
+	&&      ( IS_AFFECTED(rch, AFF_INFRARED) || effective_nightsight(rch)) )
 	{
-	    if (IS_WEREWOLF(rch) && IS_VAMPAFF(rch, VAM_NIGHTSIGHT))
+	    if (IS_WEREWOLF(rch) && effective_nightsight(rch))
 		send_to_char( "You see glowing green eyes watching YOU!\n\r", ch );
 	    else
 		send_to_char( "You see glowing red eyes watching YOU!\n\r", ch );
@@ -1099,7 +1099,7 @@ void show_char_to_char( CHAR_DATA *list, CHAR_DATA *ch )
 
 bool check_blind( CHAR_DATA *ch )
 {
-    if ( !IS_NPC(ch) && IS_SET(ch->act, PLR_HOLYLIGHT) 
+    if ( !IS_NPC(ch) && effective_holylight(ch) 
        && !IS_EXTRA(ch, BLINDFOLDED) )
 	return TRUE;
 
@@ -1112,7 +1112,7 @@ bool check_blind( CHAR_DATA *ch )
 	return FALSE;
     }
 
-    if ( IS_AFFECTED(ch, AFF_BLIND) && !IS_AFFECTED(ch, AFF_SHADOWSIGHT))
+    if ( IS_AFFECTED(ch, AFF_BLIND) && !effective_shadowsight(ch))
     {
 	send_to_char( "You can't see a thing!\n\r", ch );
 	return FALSE;
@@ -1195,9 +1195,9 @@ void do_look( CHAR_DATA *ch, char *argument )
     }
 
     if ( !IS_NPC(ch)
-    &&   !IS_SET(ch->act, PLR_HOLYLIGHT)
+    &&   !effective_holylight(ch)
     &&   !IS_ITEMAFF(ch, ITEMA_VISION)
-    &&   !IS_VAMPAFF(ch, VAM_NIGHTSIGHT)
+    &&   !effective_nightsight(ch)
     &&   !IS_AFFECTED(ch, AFF_SHADOWPLANE)
     &&   !(ch->in_room != NULL && ch->in_room->vnum == ROOM_VNUM_IN_OBJECT
     &&   !IS_NPC(ch) && ch->pcdata->chobj != NULL
@@ -1222,15 +1222,15 @@ void do_look( CHAR_DATA *ch, char *argument )
 	if (ch->in_room != NULL && ch->in_room->vnum == ROOM_VNUM_IN_OBJECT
 	&& !IS_NPC(ch) && ch->pcdata->chobj != NULL && ch->pcdata->chobj->in_obj != NULL)
 	    act( "$p",ch,ch->pcdata->chobj->in_obj,NULL,TO_CHAR);
-    	else if ( IS_AFFECTED(ch, AFF_SHADOWPLANE) && !IS_AFFECTED(ch,AFF_SHADOWSIGHT))
+    	else if ( IS_AFFECTED(ch, AFF_SHADOWPLANE) && !effective_shadowsight(ch))
 	    send_to_char( "The Umbra\n\r", ch );
-        else if ( IS_AFFECTED(ch, AFF_SHADOWPLANE) && !IS_AFFECTED(ch, AFF_DEEPUMBRA) && IS_AFFECTED(ch,AFF_SHADOWSIGHT))
+        else if ( IS_AFFECTED(ch, AFF_SHADOWPLANE) && !IS_AFFECTED(ch, AFF_DEEPUMBRA) && effective_shadowsight(ch))
 	{
 	    if (IS_BUI(ch)) sprintf(buf, "#g%s#n (Umbra) #l[#c%li#l]#n\n\r", ch->in_room->name, ch->in_room->vnum);
 	    else sprintf(buf, "#g%s#n (Umbra)\n\r", ch->in_room->name);
 	    send_to_char( buf, ch );
 	}
-	else if ( IS_AFFECTED(ch, AFF_SHADOWPLANE) && IS_AFFECTED(ch, AFF_DEEPUMBRA) && IS_AFFECTED(ch,AFF_SHADOWSIGHT))
+	else if ( IS_AFFECTED(ch, AFF_SHADOWPLANE) && IS_AFFECTED(ch, AFF_DEEPUMBRA) && effective_shadowsight(ch))
 	{
             if (IS_BUI(ch)) sprintf(buf, "#g%s#n (Deep Umbra) #l[#c%li#l]#n\n\r", ch->in_room->name, ch->in_room->vnum);
             else sprintf(buf, "#g%s#n (Deep Umbra)\n\r", ch->in_room->name);
@@ -1253,7 +1253,7 @@ void do_look( CHAR_DATA *ch, char *argument )
 	    act( "You are inside $p.",ch,ch->pcdata->chobj->in_obj,NULL,TO_CHAR);
 	    show_list_to_char( ch->pcdata->chobj->in_obj->contains, ch, FALSE, FALSE );
 	}
-	else if ( (arg1[0] == '\0' || !str_cmp( arg1, "auto" ) ) && IS_AFFECTED(ch, AFF_SHADOWPLANE) && !IS_AFFECTED(ch,AFF_SHADOWSIGHT))
+	else if ( (arg1[0] == '\0' || !str_cmp( arg1, "auto" ) ) && IS_AFFECTED(ch, AFF_SHADOWPLANE) && !effective_shadowsight(ch))
 	    send_to_char( "You are standing in complete darkness.\n\r", ch );
         
         else if ( ( !IS_NPC(ch) && !IS_SET(ch->act, PLR_BRIEF) ) &&
@@ -1656,7 +1656,7 @@ void do_exits( CHAR_DATA *ch, char *argument )
 		    sprintf(buf + strlen(buf), "#y%-5s #r-#n %s #0[#7%li#0]#n\n\r", capitalize(dir_name[door]), pexit->to_room->name, pexit->to_room->vnum);
 		else if (IS_SET(world_affects, WORLD_FOG) && IS_OUTSIDE(ch))
 		    sprintf(buf + strlen(buf), "#y%-5s #r-#n Too foggy to tell\n\r", capitalize(dir_name[door]));
-		else if (room_is_dark(pexit->to_room) && !IS_VAMPAFF(ch, VAM_NIGHTSIGHT))
+		else if (room_is_dark(pexit->to_room) && !effective_nightsight(ch))
 		    sprintf(buf + strlen(buf), "#y%-5s #r-#n Too dark to tell\n\r", capitalize(dir_name[door]));
 		else
 		    sprintf(buf + strlen(buf), "#y%-5s #r-#n %s\n\r", capitalize(dir_name[door]), pexit->to_room->name);

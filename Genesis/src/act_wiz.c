@@ -4150,6 +4150,7 @@ void do_mclear( CHAR_DATA *ch, char *argument )
     else if (IS_AFFECTED(victim, AFF_POLYMORPH))	victim->affected_by = AFF_POLYMORPH;
     else if (IS_AFFECTED(victim, AFF_ETHEREAL))		victim->affected_by = AFF_ETHEREAL;
     else						victim->affected_by = 0;
+    strip_shadowsight(victim);
 
     victim->hit			= UMAX(1, victim->hit);
     victim->mana		= UMAX(1, victim->mana);
@@ -4206,6 +4207,7 @@ void do_clearstats( CHAR_DATA *ch, char *argument )
     	ch->affected_by	 = AFF_ETHEREAL;
     else
     	ch->affected_by	 = 0;
+    strip_shadowsight(ch);
     ch->armor		 = 0;
     ch->hit		 = UMAX( 1, ch->hit  );
     ch->mana		 = UMAX( 1, ch->mana );

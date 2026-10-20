@@ -3,6 +3,7 @@ import hashlib
 import re
 import unittest
 from test_class_layout import ROOT, SRC, make_values
+from test_hybrid_vision_catalog import without_vision_info_adapter
 
 
 class HybridReadinessCatalog(unittest.TestCase):
@@ -85,12 +86,29 @@ class HybridReadinessCatalog(unittest.TestCase):
         self.assertNotRegex(registry, r"\b(?:number_range|number_percent|rand|srand)\s*\(")
         self.assertIn("hybrid_display_name", registry)
 
+    def test_each_hybrid_has_its_own_visible_fixed_pattern(self):
+        registry=(SRC/"classes/hybrid/registry.c").read_text()
+        motifs=re.findall(r'^\s*"([01]{8})", /\* (\d+): ([^*]+) \*/',registry,re.M)
+        self.assertEqual(len(motifs),45)
+        self.assertEqual([int(i) for _,i,_ in motifs],list(range(1,46)))
+        visible=["".join(pattern[i%8] for i in range(sum(c.isalpha() for c in name)))
+                 for pattern,_,name in motifs]
+        self.assertEqual(len(set(visible)),45)
+        for pattern in visible:self.assertTrue(pattern.startswith("0") and "1" in pattern)
+        self.assertNotIn("uint32_t hash",registry)
+        for path in ("selfbrid.c","help.c"):
+            self.assertIn("hybrid_display_name_for_parent", (SRC/"classes/hybrid"/path).read_text())
+        test=(ROOT/"tests/test_hybrids.c").read_text()
+        for token in ("color_signature","strcmp(signatures[i],signatures[j])",
+                      "strcmp(signatures[i],reverse)"):
+            self.assertIn(token,test)
+
     def test_help_does_not_rewrite_world_or_existing_topics(self):
         text = (SRC / "classes/hybrid/help.c").read_text()
         self.assertNotRegex(text, r"\b(?:fopen|fwrite|rename|free_string|str_dup|"
                             r"alloc_perm|number_range|WAIT_STATE|SET_BIT)\s*\(")
         self.assertNotRegex(text, r"(?:pHelp->|help_first\s*=|help_last\s*=)")
-        native = (SRC / "act_info.c").read_text()
+        native = without_vision_info_adapter((SRC / "act_info.c").read_text())
         native = native.replace('#include "classes/hybrid/hybrid.h"\n', "")
         native = native.replace("hybrid_help_parent_links(ch, pHelp->keyword);\n", "")
         native = native.replace("    if (hybrid_help_topic(ch, argall)) return;\n", "")

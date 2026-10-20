@@ -996,7 +996,7 @@ void do_solarflash(CHAR_DATA *ch, char *argument)
 
     	if (!IS_NPC(victim))
     	{
-           if (IS_SET(victim->act, PLR_HOLYLIGHT)) REMOVE_BIT(victim->act, PLR_HOLYLIGHT);
+           if (effective_holylight(victim)) strip_holylight(victim);
            else
            {
             	stc("The light breaks your concentration and your supernatural vision dims.\n\r",victim);
