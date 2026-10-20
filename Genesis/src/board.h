@@ -42,7 +42,7 @@ struct board_data
 	/* Non-constant data */
 		
 	NOTE_DATA *note_first; /* pointer to board's first note */
-	bool changed; /* currently unused */
+bool changed; /* Dirty snapshot awaiting a successful durable save. */
 bool load_failed; /* rejected disk snapshot: read-only until repaired/reloaded */
 		
 };

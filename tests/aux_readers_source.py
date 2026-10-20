@@ -11,6 +11,8 @@ OLD_LEADER = (
 )
 
 def without_aux_readers_stage(text):
+    from aux_writers_source import without_aux_writers_stage
+    text=without_aux_writers_stage(text)
     if "static bool leaderboard_load_failed;" not in text:
         return text
     start=text.index("void load_leaderboard()")

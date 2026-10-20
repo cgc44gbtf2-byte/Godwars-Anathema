@@ -32,6 +32,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "auxiliary_save.h"
 #include "classes/hybrid/resources.h"
 
 
@@ -1538,6 +1539,8 @@ void update_handler( void )
 	char_update();
     }
 
+    save_notes();
+    retry_leaderboard_save();
     tail_chain();
     return;
 }

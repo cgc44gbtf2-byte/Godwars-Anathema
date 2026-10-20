@@ -31,6 +31,14 @@
 #include "file_number.h"
 #include "file_string.h"
 #include "file_word.h"
+#include "atomic_save.h"
+#include <limits.h>
+
+static time_t notes_retry_after;
+static time_t note_retry_time(void)
+{
+    return current_time > LONG_MAX-30 ? LONG_MAX : current_time+30;
+}
 
 
 /*
@@ -130,9 +138,21 @@ NOTE_DATA *new_note ()
 	return note;
 }
 
-/* append this note to the given file */
-static void append_note (FILE *fp, NOTE_DATA *note)
+static bool note_fields_valid(const NOTE_DATA *note)
 {
+        const char *fields[]={note->sender,note->date,note->to_list,
+                              note->subject,note->text};
+        for(unsigned i=0;i<5;i++)
+            if(!fields[i] || strchr(fields[i],'~')
+                || strlen(fields[i]) >= (i==4 ? MAX_NOTE_TEXT+1 : MAX_INPUT_LENGTH)){
+                return FALSE;
+            }
+        return TRUE;
+}
+/* Write exactly the legacy representation, but only complete loadable fields. */
+static int append_note (FILE *fp, NOTE_DATA *note)
+{
+        if(!note_fields_valid(note)){errno=EINVAL;return -1;}
 	fprintf (fp, "Sender  %s~\n", note->sender);
 	fprintf (fp, "Date    %s~\n", note->date);
 	fprintf (fp, "Stamp   %ld\n", note->date_stamp);
@@ -140,16 +160,44 @@ static void append_note (FILE *fp, NOTE_DATA *note)
 	fprintf (fp, "To      %s~\n", note->to_list);
 	fprintf (fp, "Subject %s~\n", note->subject);
 	fprintf (fp, "Text\n%s~\n\n", note->text);
+        return ferror(fp) ? -1 : 0;
 }
 
+struct board_snapshot {
+    BOARD_DATA *board;
+    NOTE_DATA *extra;
+};
+static int write_board_snapshot(FILE *fp,void *context)
+{
+    struct board_snapshot *snapshot=context;
+    for(NOTE_DATA *n=snapshot->board->note_first;n;n=n->next)
+        if(append_note(fp,n)!=0)return -1;
+    return snapshot->extra ? append_note(fp,snapshot->extra) : 0;
+}
+static enum atomic_save_result commit_board(BOARD_DATA *board,NOTE_DATA *extra)
+{
+    struct board_snapshot snapshot={board,extra};
+    struct atomic_save_error error;
+    enum atomic_save_result result=atomic_save(NOTE_DIR,board->short_name,
+        write_board_snapshot,&snapshot,&error);
+    if(result!=ATOMIC_SAVE_OK){
+        char message[512];
+        snprintf(message,sizeof message,"Board save %s: %s (error %d; cleanup %d)",
+            board->short_name,error.stage?error.stage:"unknown",error.number,error.cleanup_number);
+        bug(message,0);
+        notes_retry_after=note_retry_time();
+    }
+    return result;
+}
 
 
 /* Save a note in a given board */
 bool finish_note (BOARD_DATA *board, NOTE_DATA *note)
 {
-	FILE *fp;
-	NOTE_DATA *p;
-	char filename[200];
+	NOTE_DATA *p,*tail=NULL;
+        long old_stamp;
+        enum atomic_save_result result;
+        if(!board || !note || note->next)return FALSE;
 	if (board->load_failed)
 	{
 		bug ("finish_note: rejected board is read-only", 0);
@@ -158,38 +206,24 @@ bool finish_note (BOARD_DATA *board, NOTE_DATA *note)
 	
 	/* The following is done in order to generate unique date_stamps */
 
-	if (last_note_stamp >= current_time)
-		note->date_stamp = ++last_note_stamp;
-	else
-	{
-	    note->date_stamp = current_time;
-	    last_note_stamp = current_time;
-	}
-	
-	if (board->note_first) /* are there any notes in there now? */
-	{
-		for (p = board->note_first; p->next; p = p->next )
-			; /* empty */
-		
-		p->next = note;
-	}
-	else /* nope. empty list. */
-		board->note_first = note;
-
-	/* append note to note file */		
-	
-	sprintf (filename, "%s%s", NOTE_DIR, board->short_name);
-	
-	fp = fopen (filename, "a");
-	if (!fp)
-	{
-		bug ("Could not open one of the note files in append mode",0);
-		board->changed = TRUE; /* set it to TRUE hope it will be OK later? */
-		return TRUE;
-	}
-	
-	append_note (fp, note);
-	fclose (fp);
+        for(p=board->note_first;p;p=p->next){
+            if(p==note)return FALSE;
+            tail=p;
+        }
+        if(last_note_stamp>=current_time && last_note_stamp==LONG_MAX)return FALSE;
+        old_stamp=note->date_stamp;
+        note->date_stamp=last_note_stamp>=current_time ? last_note_stamp+1 : current_time;
+        result=commit_board(board,note);
+        if(result==ATOMIC_SAVE_FAILED){
+            note->date_stamp=old_stamp;
+            return FALSE; /* Caller still owns the complete draft. */
+        }
+        /* Rename already happened, including UNCERTAIN: accept exactly once.
+         * Returning failure here would invite a duplicate post. */
+        last_note_stamp=note->date_stamp;
+        if(tail)tail->next=note;
+        else board->note_first=note;
+        board->changed=result!=ATOMIC_SAVE_OK;
 	return TRUE;
 }
 
@@ -252,30 +286,12 @@ static NOTE_DATA* find_note (CHAR_DATA *ch, BOARD_DATA *board, long num)
 }
 
 /* save a single board */
-static void save_board (BOARD_DATA *board)
+static bool save_board (BOARD_DATA *board)
 {
-	FILE *fp;
-	char filename[200];
-	char buf[200];
-	NOTE_DATA *note;
 	if (board->load_failed)
-		return; /* Never replace a rejected file with a partial/empty snapshot. */
-	
-	sprintf (filename, "%s%s", NOTE_DIR, board->short_name);
-	
-	fp = fopen (filename, "w");
-	if (!fp)
-	{
-		sprintf (buf, "Error writing to: %s", filename);
-		bug (buf, 0);
-	}
-	else
-	{
-		for (note = board->note_first; note ; note = note->next)
-			append_note (fp, note);
-			
-		fclose (fp);
-	}
+		return FALSE; /* Never replace a rejected file with a partial/empty snapshot. */
+        board->changed=commit_board(board,NULL)!=ATOMIC_SAVE_OK;
+        return !board->changed;
 }
 
 /* Show one not to a character */
@@ -319,6 +335,8 @@ send_to_char(chunk,ch);part+=length;
 void save_notes ()
 {
 	long i;
+if(current_time<notes_retry_after)return;
+notes_retry_after=0;
 	 
 	for (i = 0; i < MAX_BOARD; i++)
 		if (boards[i].changed) /* only save changed boards */
@@ -634,9 +652,10 @@ static void do_nremove (CHAR_DATA *ch, char *argument)
 	
 	unlink_note (ch->pcdata->board,p);
 	free_note (p);
-	send_to_char ("Note removed!\n\r",ch);
-	
-	save_board(ch->pcdata->board); /* save the board */
+if(save_board(ch->pcdata->board))
+send_to_char ("Note removed!\n\r",ch);
+else
+send_to_char ("Note removed from memory; disk save is pending.\n\r",ch);
 }
 
 
@@ -864,7 +883,20 @@ void make_note (const char* board_name, const char *sender, const char *to, cons
 	note->date = str_dup (strtime);
 	
 if (!finish_note (board, note))
-free_note (note);
+{
+    /* Automatic notices have no editor to retain the draft. Keep valid notices
+     * in RAM for bounded periodic save retries, just as failed appends formerly
+     * remained visible in memory. Quarantined/corrupt boards stay read-only. */
+    if(!board->load_failed && note_fields_valid(note)
+        && !(last_note_stamp>=current_time && last_note_stamp==LONG_MAX)){
+        NOTE_DATA **tail=&board->note_first;
+        while(*tail)tail=&(*tail)->next;
+        note->date_stamp=last_note_stamp>=current_time ? last_note_stamp+1 : current_time;
+        last_note_stamp=note->date_stamp;
+        *tail=note;board->changed=TRUE;
+        bug("Automatic board notice retained in memory; disk save pending",0);
+    }else free_note (note);
+}
 	
 }
 
@@ -1161,11 +1193,12 @@ void handle_con_note_finish (DESCRIPTOR_DATA *d, char * argument)
 		case 'p': /* post note */
 if (!finish_note (ch->pcdata->board, ch->pcdata->in_progress))
 {
-write_to_buffer (d, "This board is read-only. Your draft has been kept; continue or forget it.\n\r",0);
+write_to_buffer (d, "The note could not be saved. Your draft has been kept; continue or forget it.\n\r",0);
 write_to_buffer (d, szFinishPrompt, 0);
 break;
 }
-			write_to_buffer (d, "Note posted.\n\r",0);
+write_to_buffer (d, ch->pcdata->board->changed ?
+    "Note posted; disk sync retry is pending.\n\r" : "Note posted.\n\r",0);
 			d->connected = CON_PLAYING;
 			for (d = descriptor_list; d != NULL; d = d->next)
 				if (d->connected == CON_PLAYING/* && is_note_to(d->character,ch->pcdata->in_progress)*/)

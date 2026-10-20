@@ -13,10 +13,14 @@
 #include "file_number.h"
 #include "file_string.h"
 #include "file_word.h"
+#include "atomic_save.h"
+#include <limits.h>
 #include <unistd.h>
 
 LEADER_BOARD leader_board;
 static bool leaderboard_load_failed;
+static bool leaderboard_save_pending;
+static time_t leaderboard_retry_after;
 
 void do_expmod( CHAR_DATA *ch, char *argument )
 {
@@ -681,6 +685,8 @@ void load_leaderboard()
     for(i=0;i<8;i++)free_string(*old_names[i]);
     leader_board=staged;
     leaderboard_load_failed=FALSE;
+    leaderboard_save_pending=FALSE;
+    leaderboard_retry_after=0;
     return;
 failed:
     if(fp)fclose(fp);
@@ -692,38 +698,47 @@ failed:
     log_string("load_leaderboard: rejected file; scores preserved, saving disabled until repair/reload or explicit leaderclear");
 }
 
-void save_leaderboard()
+/* Atomic leaderboard writer scope. */
+static int write_leaderboard(FILE *fp,void *context)
 {
-    FILE *fp;
-    if(leaderboard_load_failed){
-        log_string("save_leaderboard: rejected file is read-only");
-        return;
+    LEADER_BOARD *board=context;
+    const char *names[]={board->bestpk_name,board->worstpk_name,board->pk_name,
+        board->pd_name,board->mk_name,board->md_name,board->tt_name,board->qc_name};
+    const long numbers[]={board->bestpk_number,board->worstpk_number,board->pk_number,
+        board->pd_number,board->mk_number,board->md_number,board->tt_number,board->qc_number};
+    for(unsigned i=0;i<8;i++){
+        if(!names[i] || strchr(names[i],'~') || strlen(names[i])>=MAX_INPUT_LENGTH){
+            errno=EINVAL;
+            return -1;
+        }
+        if(fprintf(fp,"%s~\n%li\n",names[i],numbers[i])<0)return -1;
     }
-
-    if ((fp = fopen("../area/leader.txt","w")) == NULL)
-    {
-	log_string("Error writing to leader.txt");
-	return;
-    }
-    fprintf(fp, "%s~\n", leader_board.bestpk_name);
-    fprintf(fp, "%li\n", leader_board.bestpk_number);
-    fprintf(fp, "%s~\n", leader_board.worstpk_name);
-    fprintf(fp, "%li\n", leader_board.worstpk_number);
-    fprintf(fp, "%s~\n", leader_board.pk_name);
-    fprintf(fp, "%li\n", leader_board.pk_number);
-    fprintf(fp, "%s~\n", leader_board.pd_name);
-    fprintf(fp, "%li\n", leader_board.pd_number);
-    fprintf(fp, "%s~\n", leader_board.mk_name);
-    fprintf(fp, "%li\n", leader_board.mk_number);
-    fprintf(fp, "%s~\n", leader_board.md_name);
-    fprintf(fp, "%li\n", leader_board.md_number);
-    fprintf(fp, "%s~\n", leader_board.tt_name);
-    fprintf(fp, "%li\n", leader_board.tt_number);
-    fprintf(fp, "%s~\n", leader_board.qc_name);
-    fprintf(fp, "%li\n", leader_board.qc_number);
-    fclose (fp);
+    return 0;
 }
 
+void save_leaderboard()
+{
+    struct atomic_save_error error;
+    enum atomic_save_result result;
+    if(leaderboard_load_failed)return;
+    result=atomic_save_leaderboard("../area",write_leaderboard,&leader_board,&error);
+    leaderboard_save_pending=result!=ATOMIC_SAVE_OK;
+    if(leaderboard_save_pending){
+        char message[512];
+        leaderboard_retry_after=current_time>LONG_MAX-30 ? LONG_MAX : current_time+30;
+        snprintf(message,sizeof message,"Leaderboard save: %s (error %d; cleanup %d)",
+            error.stage?error.stage:"unknown",error.number,error.cleanup_number);
+        log_string(message);
+    }
+}
+
+void retry_leaderboard_save(void)
+{
+    if(leaderboard_save_pending && !leaderboard_load_failed
+        && current_time>=leaderboard_retry_after)
+        save_leaderboard();
+}
+/* End atomic leaderboard writer scope. */
 void do_leader( CHAR_DATA *ch, char *argument )
 {
     char buf[MSL];
@@ -844,7 +859,8 @@ leader_board.tt_number = hours;
 	leader_board.tt_name = str_dup(ch->name);
 	changed = TRUE;
     }
-    if (changed) save_leaderboard();
+    if (changed && (!leaderboard_save_pending || current_time>=leaderboard_retry_after))
+        save_leaderboard();
     return;
 }
 
@@ -903,7 +919,9 @@ void do_leaderclear(CHAR_DATA *ch, char *argument )
     leader_board.tt_name = str_dup("Noone");
     leader_board.tt_number = 0;
     save_leaderboard();
-    if (ch != NULL) stc("Leader board cleared.\n\r", ch);
+    if (ch != NULL) stc(leaderboard_save_pending ?
+        "Leader board reset in memory; disk save is pending.\n\r" :
+        "Leader board cleared.\n\r", ch);
     return;
 }
 

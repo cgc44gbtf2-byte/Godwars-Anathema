@@ -77,6 +77,8 @@ def without_cloak_death_stage(text):
                         "\tvictim->hit = victim->max_hit * .2;")
 
 def without_favour_dawn_stage(text):
+    from aux_writers_source import without_aux_writers_update
+    text=without_aux_writers_update(text)
     return replace_once(text,"            monk_favour_sunrise();",NATIVE_DAWN)
 
 class MonkBuffCatalog(unittest.TestCase):

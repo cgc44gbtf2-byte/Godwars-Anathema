@@ -172,3 +172,9 @@ enum atomic_save_result atomic_save_copyover(const char *directory,
 {
     return atomic_save_named(directory,"copyover.data",writer,context,error,1);
 }
+
+enum atomic_save_result atomic_save_leaderboard(const char *directory,
+    atomic_save_writer writer, void *context, struct atomic_save_error *error)
+{
+    return atomic_save_named(directory,"leader.txt",writer,context,error,1);
+}
