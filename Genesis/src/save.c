@@ -36,6 +36,7 @@
 #include "file_number.h"
 #include "file_io.h"
 #include "file_word.h"
+#include "file_string.h"
 #include <errno.h>
 #include "atomic_save.h"
 #include "classes/hybrid/player.h"
@@ -631,6 +632,24 @@ static char *saved_word(FILE *fp, bool *ok)
     if (!*ok) { word[0]='\0'; return word; }
     if (fread_word_checked(fp,word,sizeof word)!=FILE_WORD_OK) *ok=FALSE;
     return word;
+}
+
+static char *saved_string(FILE *fp,bool *ok)
+{
+    char *value=NULL;
+    if(!*ok)return str_empty;
+    if(fread_string_checked(fp,&value)!=FILE_STRING_OK){
+        *ok=FALSE;return str_empty;
+    }
+    return value;
+}
+
+static char *finger_string(FILE *fp,bool *ok,char *old)
+{
+    char *value=saved_string(fp,ok);
+    if(!*ok)return old;
+    free_string(old);
+    return value;
 }
 
 bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
@@ -1294,6 +1313,7 @@ static long saved_number(FILE *fp, bool *ok)
 }
 #define fread_number(fp) saved_number((fp),&numbers_ok)
 #define fread_word(fp) saved_word((fp),&numbers_ok)
+#define fread_string(fp) saved_string((fp),&numbers_ok)
 
 /* Keep the persisted format intact.  Older files may use -1 as the
  * inactive stance marker; only invalid indexes and impossible training
@@ -1888,6 +1908,9 @@ ch->in_room = get_room_index(vnum);
 		if ( isalpha(ch->pcdata->title[0])
 		||   isdigit(ch->pcdata->title[0]) )
 		{
+    if(strlen(ch->pcdata->title)>=sizeof buf-1){
+        numbers_ok=FALSE;fMatch=TRUE;break;
+    }
 		    sprintf( buf, " %s", ch->pcdata->title );
 		    free_string( ch->pcdata->title );
 		    ch->pcdata->title = str_dup( buf );
@@ -2334,7 +2357,7 @@ void do_finger( CHAR_DATA *ch, char *argument )
     char *f_lasttime	= str_empty;
     long   f_extra	= 0;
     long   f_sex	= 0;
-    char *f_createtime	= 0;
+    char *f_createtime	= str_empty;
     long   f_level	= 0;
     long   f_status	= 0;
     char *f_marriage	= str_empty;
@@ -2409,22 +2432,22 @@ file_reserve_open();
 		    break;
 
 		case 'C':
-		    KEY( "Createtime",	f_createtime,		fread_string( fp ) );
+		    KEY( "Createtime",	f_createtime,		finger_string(fp,&numbers_ok,f_createtime) );
 		    break;
 
 		case 'E':
-		    KEY( "Email",	f_email,		fread_string( fp ) );
+		    KEY( "Email",	f_email,		finger_string(fp,&numbers_ok,f_email) );
 		    if ( !str_cmp( word, "End" ) ) drop_out = TRUE;
 		    KEY( "Extra",	f_extra,		fread_number( fp ) );
 		    break;
 
 		case 'M':
-		    KEY( "Marriage",	f_marriage,		fread_string( fp ) );
+		    KEY( "Marriage",	f_marriage,		finger_string(fp,&numbers_ok,f_marriage) );
 		    break;
 
 		case 'L':
-		    KEY( "Lasthost",	f_lasthost,		fread_string( fp ) );
-		    KEY( "Lasttime",	f_lasttime,		fread_string( fp ) );
+		    KEY( "Lasthost",	f_lasthost,		finger_string(fp,&numbers_ok,f_lasthost) );
+		    KEY( "Lasttime",	f_lasttime,		finger_string(fp,&numbers_ok,f_lasttime) );
 		    KEY( "Level",	f_level,		fread_number( fp ) );
 		    break;
 
@@ -2449,11 +2472,12 @@ file_reserve_open();
 		case 'T':
 		    if ( !str_cmp( word, "Title" ) )
 		    {
-			f_title = fread_string( fp );
+			f_title = finger_string(fp,&numbers_ok,f_title);
+            if(!numbers_ok){fMatch=TRUE;break;}
 			if ( isalpha(ch->pcdata->title[0])
 			||   isdigit(ch->pcdata->title[0]) )
 			{
-			    sprintf( buf, " %s", f_title );
+			    snprintf( buf, sizeof buf, " %s", f_title );
 			    free_string( f_title );
 			    f_title = str_dup( buf );
 			}
@@ -2471,6 +2495,7 @@ file_reserve_open();
     send_to_char("Their playerfile could not be opened.\n\r",ch);
     return;
 	}
+if(!drop_out) numbers_ok=FALSE;
 if(ferror(fp)) numbers_ok=FALSE;
 if(fclose(fp)!=0) numbers_ok=FALSE;
 file_reserve_open();
@@ -2482,17 +2507,17 @@ file_reserve_open();
         return;
     }
     send_to_char("#l--------------------------------------------------------------------------------#n\n\r",ch);
-    sprintf( buf, "%s%s%s.\n\r", f_name, drop_out ? " ": "", f_title );
+    snprintf( buf, sizeof buf, "%s%s%s.\n\r", f_name, drop_out ? " ": "", f_title );
     send_to_char( buf, ch );
     send_to_char("#l--------------------------------------------------------------------------------#n\n\r",ch);
     if (IS_IMM(ch))
     {
-    	sprintf( buf, "Last connected from %s at %s.\n\r", f_lasthost, f_lasttime );
+    	snprintf( buf, sizeof buf, "Last connected from %s at %s.\n\r", f_lasthost, f_lasttime );
 	send_to_char( buf, ch );
     }
     else if ( f_level < LEV_IMM )
     {
-        sprintf( buf, "Last connected at %s.\n\r", f_lasttime );
+        snprintf( buf, sizeof buf, "Last connected at %s.\n\r", f_lasttime );
         send_to_char( buf, ch );
     }
     else send_to_char("You may not see the last time a god connected.\n\r",ch);
@@ -2500,7 +2525,7 @@ file_reserve_open();
     sprintf( buf, "Sex: %s. ", 
 	f_sex == SEX_MALE ? "Male" : f_sex == SEX_FEMALE ? "Female" : "None");
     send_to_char( buf, ch );
-    sprintf(buf, "Create Time: %s.\n\r", f_createtime);
+    snprintf(buf, sizeof buf, "Create Time: %s.\n\r", f_createtime);
     stc(buf, ch);
 
     if (f_sex == SEX_MALE) stc("He ", ch);
@@ -2567,8 +2592,8 @@ file_reserve_open();
 	if (f_sex == SEX_MALE) stc("He ", ch);
 	else if (f_sex == SEX_FEMALE) stc("She ", ch);
 	else stc("It ", ch);
-	if (IS_SET(f_extra, EXTRA_MARRIED)) sprintf(buf,"is married to %s.\n\r",f_marriage);
-	else sprintf(buf,"is engaged to %s.\n\r",f_marriage);
+	if (IS_SET(f_extra, EXTRA_MARRIED)) snprintf(buf,sizeof buf,"is married to %s.\n\r",f_marriage);
+	else snprintf(buf,sizeof buf,"is engaged to %s.\n\r",f_marriage);
 	send_to_char(buf,ch);
     }
     sprintf(buf,"Player kills: %li, Player Deaths: %li.\n\r", f_pkill, f_pdeath);
@@ -2578,11 +2603,16 @@ file_reserve_open();
     send_to_char("#l--------------------------------------------------------------------------------#n\n\r",ch);
     if (strlen(f_email) > 2 && (!IS_SET(f_extra, EXTRA_INVIS_EMAIL) || IS_IMM(ch)))
     {
-	sprintf(buf,"Email: %s\n\r", f_email);
+	snprintf(buf,sizeof buf,"Email: %s\n\r", f_email);
 	send_to_char(buf, ch);
 	send_to_char("#l--------------------------------------------------------------------------------#n\n\r",ch);
+    }
+    if(victim==NULL){
+        free_string(f_title);free_string(f_lasthost);free_string(f_lasttime);
+        free_string(f_createtime);free_string(f_marriage);free_string(f_email);
     }
     return;
 }
 #undef fread_number
 #undef fread_word
+#undef fread_string

@@ -89,6 +89,7 @@ tests/test_progress_metrics
 tests/test_file_numbers
 tests/test_reader_fields
 tests/test_file_words
+tests/test_file_strings
 bootstrap-backups/
 __pycache__/
 *.py[cod]

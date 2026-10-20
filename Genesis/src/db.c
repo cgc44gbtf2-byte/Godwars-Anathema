@@ -38,6 +38,7 @@
 #include "object_numbers.h"
 #include "file_io.h"
 #include "file_word.h"
+#include "file_string.h"
 
 #if !defined(macintosh)
 extern	long	_filbuf		args( (FILE *) );
@@ -2316,6 +2317,42 @@ switch (c)
 	    }
 	}
     }
+}
+
+/* Session records use checked input. Reuse interned boot strings where the
+ * old reader would, but do not put incomplete reads into the shared pool. */
+enum file_string_status fread_string_checked(FILE *fp,char **out)
+{
+    char text[MAX_STRING_LENGTH], *node, *previous;
+    size_t length;
+    long bucket;
+    enum file_string_status status;
+    if(out)*out=NULL;
+    if(!out)return FILE_STRING_FORMAT;
+    status=fread_tilde_checked(fp,text,sizeof text);
+    if(status!=FILE_STRING_OK)return status;
+    if(!text[0]){*out=str_empty;return FILE_STRING_OK;}
+    length=strlen(text);
+    bucket=UMIN(MAX_KEY_HASH-1,sizeof(char *)+length);
+    for(node=string_hash[bucket];node;node=previous){
+        memcpy(&previous,node,sizeof previous);
+        if(text[0]==node[sizeof(char *)]&&!strcmp(text,node+sizeof(char *))){
+            *out=node+sizeof(char *);return FILE_STRING_OK;
+        }
+    }
+    if(fBootDb){
+        size_t bytes=sizeof(char *)+length+1;
+        if(!string_space||!top_string||
+           bytes>MAX_STRING-(size_t)(top_string-string_space))
+            return FILE_STRING_LIMIT;
+        node=top_string;top_string+=bytes;
+        memcpy(node,&string_hash[bucket],sizeof(char *));
+        memcpy(node+sizeof(char *),text,length+1);
+        string_hash[bucket]=node;
+        nAllocString++;sAllocString+=bytes;
+        *out=node+sizeof(char *);
+    }else *out=str_dup(text);
+    return FILE_STRING_OK;
 }
 
 

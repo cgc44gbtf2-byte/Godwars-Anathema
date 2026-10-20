@@ -1,4 +1,5 @@
 """Counted reversal of only the checked-word stage; old pins stay unchanged."""
+from string_readers_source import without_string_readers_stage
 def once(text,new,old,count=1):
     assert text.count(new)==count,(repr(new[:90]),text.count(new),count)
     return text.replace(new,old)
@@ -81,6 +82,7 @@ static char *saved_word(FILE *fp, bool *ok)
 
 """
 def without_word_readers_stage(text):
+    text=without_string_readers_stage(text)
     if '#include "file_word.h"\n' not in text:return text
     text=once(text,'#include "file_word.h"\n','')
     if 'char *fread_word( FILE *fp )' in text:

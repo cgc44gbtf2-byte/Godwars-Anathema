@@ -156,6 +156,7 @@ static void live_words(void)
     assert(strstr(desc.outbuf,"could not be read safely"));
 }
 #endif
+#ifndef FILE_WORDS_FIXTURE_ONLY
 int main(int argc,char **argv)
 {
     fixture_begin();
@@ -173,3 +174,4 @@ int main(int argc,char **argv)
     room_index_hash[ROOM_VNUM_TEMPLE%MAX_KEY_HASH]=NULL;
     obj_index_hash[900%MAX_KEY_HASH]=NULL;sandbox_end();return 0;
 }
+#endif
