@@ -114,6 +114,10 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
                      "path; selfbrid monk mantra gain buys one rank for "
                      "10 x next rank primal. Chosen cap8, others4. Native "
                      "monklearn is unchanged; conversion/forms remain disabled.\n\r", ch);
+        send_to_char("Learned secondary Mantra2 enables readaura (Mantra2; free), "
+                     "including carried-object identification. The Monk grant "
+                     "does not require the original class's aura-reading power. "
+                     "Shield and Scry are not added by this adapter.\n\r", ch);
         send_to_char("Existing records: secondary Monk Stun Fist needs Tech 7 on the full Tech path; "
                      "other paths cap Tech at4. Costs5000 mana, with1-second interruption, "
                      "2-second caster recovery and shared6-second target immunity. "

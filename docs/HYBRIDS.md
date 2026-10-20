@@ -1074,6 +1074,41 @@ on the full Mantra path; training alone never turns it on.
 Record4/save epoch3/handoff2 are unchanged. Generated help is updated, but
 custom world helps keep priority; no live help-file import is performed.
 
+### Secondary Monk Read Aura (existing records only)
+
+`readaura <target>` now accepts learned secondary **Mantra2**, on any legal
+full-path choice (including the other paths' normal cap4). It reads a character
+in the same room or identifies a carried object. This is the **free Monk source**:
+it does not need the original parent's Auspex, Glass Walkers, Sora, Dragon,
+Drow or Mage aura power, and Mage originals do not pay the Mage-only500 mana
+when using a qualified Monk grant. Werewolf originals can use the Monk source
+to identify carried objects and read characters despite native Cybersenses'
+Werewolf-only restrictions. Existing Homid5 warning stealth is retained.
+
+Original Monks keep their full native access. Without a qualified Monk grant,
+all native class/item checks, resource costs, failure messages and restrictions
+remain unchanged. Fake-condition displays and existing guardian warnings
+remain intact; this is read-only and does not alter an item's owner or enchants.
+Untrained/rejected secondary records grant nothing, while original-class
+access continues independently. Native class macros/getters, training,
+command tier and save formats remain unchanged.
+
+A separate safety repair rejects invalid actor context before lookups and
+handles missing/oversized NPC descriptions without passing them through the
+legacy message expander. Long aura labels are clipped with their NPC suffix
+preserved; observers get a generic description. This is not a repair of
+other shared message-formatting callers, which still need a separate audit.
+
+The real-engine suite retains **960 native** snapshots and compares
+**15,552 paired** parent/order/focus/rank/target/mana cases,90 rejected-record
+and original-access cases,12 independent native/Monk overlaps and
+**72 full/short** loaded characters. Six pre-existing crash boundaries were
+reproduced locally before the safety repair and pass afterward.
+Shield, Scry, heightened senses, Invite Beast, Chimera and other unfinished
+secondary adapters remain separate work. No conversion or live hybrid forms
+are enabled; no world/help import is performed and custom world helps keep
+priority.
+
 ## Numeric readiness preview — no conversion
 
 The player list is filtered to the nine hybrids containing the current

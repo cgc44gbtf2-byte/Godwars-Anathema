@@ -134,6 +134,9 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   `confirm` to save that free choice. `selfbrid monk mantra gain` buys one rank
   for 10 × next rank primal. Choose Mantra, Art or Tech: full cap 8, others 4.
   Native `monklearn` is unchanged; this does not enable conversion or forms.
+  Learned secondary Mantra 2 also grants `readaura <target>` for characters
+  or carried objects. It uses the free Monk source independently of the
+  original class's powers; ordinary non-hybrid aura-reading rules stay intact.
   A separate object-factory fix prevents crafted items from freeing mutable
   names, descriptions and spell messages still owned by staff-edited templates.
   The info page also shows a read-only numeric checklist: 50,000 max HP/mana,
