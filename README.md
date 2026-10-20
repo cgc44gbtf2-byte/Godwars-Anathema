@@ -126,6 +126,9 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   Mantra path. It is a free warning toggle—not a summoned pet—and does not
   stack with existing Vampire/Werewolf access. Existing guardians can be
   dismissed even after their enabling class or training is removed.
+  Guardians now expire automatically when no supported grant remains, including
+  after loading an older save. Regaining training does not turn them back on:
+  use `spiritguardian` again.
   A separate object-factory fix prevents crafted items from freeing mutable
   names, descriptions and spell messages still owned by staff-edited templates.
   The info page also shows a read-only numeric checklist: 50,000 max HP/mana,

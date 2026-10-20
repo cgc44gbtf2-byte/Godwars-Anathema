@@ -1009,9 +1009,27 @@ learned banks, mana and the actor list stay intact. This is not a PvP balance
 test. The four old context/stuck-dismissal failures were reproduced before
 the native repair, separately from the adapter.
 
-The flag still uses native persistence; this stage does not add automatic revocation
-or provenance migration for legacy saved guardians. Dismissal is available
-after training loss, but staff-edited stale flags still need review.
+Guardian lifecycle reconciliation now supplies **automatic revocation** when no
+supported grant remains. On the **next main-loop pulse**, before input, an
+ineligible player's toggle clears silently, including link-dead, editing and
+switched originals. Another valid native or learned secondary-Monk grant keeps
+the same single toggle active; ranks are never combined. NPC prototype flags
+are not modified. Qualifying for the power does not automatically reactivate
+an expired guardian: the player must issue `spiritguardian` again.
+
+Both player loaders reconcile after class/training and the optional hybrid
+record are validated. Older or staff-edited flags without a current grant clear
+on load. A **pure save** projection masks unsupported guardians from disk without
+mutating the live actor during a successful or failed write. No timestamps,
+costs, new record fields or save/handoff epoch change are added. This is
+not a provenance migration: the flag's historical source is not guessed;
+current supported grants determine whether it may remain active.
+
+Lifecycle tests reproduce four old pulse/save/full/short-loader failures, then
+compare 2,970 command/eligibility cases, 11,880 connection-state pulses, 20,790
+pure projections, 32 rejected-record/native-grant combinations and **630 full/short**
+loads, including legacy flags forcibly retained on disk. No other flags,
+learned banks or resources are changed.
 No conversion, Monk focus/trainer UI, clan-role expansion or live forms
 are enabled. Record4/save epoch3/handoff2 remain unchanged. Generated help is
 updated; custom world helps keep priority and no live help import is performed.

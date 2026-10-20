@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <time.h>
 #include "merc.h"
+#include "guardian.h"
 
 /* Callback arguments are untrusted pointers until found in a live room list. */
 bool combat_character_in_room(ROOM_INDEX_DATA *room, CHAR_DATA *ch)
@@ -45,6 +46,7 @@ void combat_status_update(void)
 
     for (ch = char_list; ch != NULL; ch = ch->next)
     {
+        guardian_reconcile(ch);
         if (ch->combat_pause > 0) --ch->combat_pause;
         if (ch->stun_immunity > 0) --ch->stun_immunity;
         if (ch->highland_guard > 0) --ch->highland_guard;

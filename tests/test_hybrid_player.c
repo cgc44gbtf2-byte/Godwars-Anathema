@@ -119,8 +119,8 @@ static void all_pairs(void)
             assert(!hybrid_player_attach(ch, &state));
             assert(ch->class == before.class && ch->vampgen == 4 &&
                    ch->pcdata->powers[2] == 7 && ch->pcdata->quest == 50000);
-            /* Existing More serialization, not a new hybrid save field. */
-            ch->more=MORE_FAVOUR|MORE_CLOAK|MORE_GUARDIAN;
+            /* Unrelated More serialization, not a guardian eligibility test. */
+            ch->more=MORE_FAVOUR|MORE_CLOAK|MORE_BRISTLES;
             assert(monk_favour_grant(ch, &time_info));
             assert(save_char_obj_checked(ch));
             assert(save_char_obj_backup_checked(ch));
@@ -137,7 +137,7 @@ static void all_pairs(void)
                                     load_char_obj(&shell, "Newfixture"));
                 ch = shell.character;
                 assert(!ch->pcdata->player_load_failed && ch->pcdata->hybrid_present);
-                assert(ch->more==(MORE_FAVOUR|MORE_CLOAK|MORE_GUARDIAN));
+                assert(ch->more==(MORE_FAVOUR|MORE_CLOAK|MORE_BRISTLES));
                 equal_state(&state, &ch->pcdata->hybrid);
                 assert(ch->class == before.class && ch->gold == 123456 &&
                        ch->max_hit == 50000 && ch->max_mana == 51000 &&
@@ -252,7 +252,7 @@ static void corruptions(void)
 
 static void favour_expiry(void)
 {
-    const long keep=MORE_CLOAK|MORE_GUARDIAN;
+    const long keep=MORE_CLOAK|MORE_BRISTLES;
     for(int short_load=0;short_load<2;short_load++)
     for(int expired=0;expired<2;expired++){
         time_info.hour=5;time_info.day=34;time_info.month=16;time_info.year=1300;

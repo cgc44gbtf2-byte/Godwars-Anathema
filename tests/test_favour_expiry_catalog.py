@@ -29,6 +29,8 @@ def without_favour_metadata_merc(text):
                      "    long                favour_until;\n","")
 
 def without_favour_metadata_save(text):
+    from test_guardian_lifecycle_catalog import without_guardian_lifecycle_save
+    text=without_guardian_lifecycle_save(text)
     text=once(text,'#include "classes/monk/favour.h"\n',"")
     text=once(text,'    fprintf( fp, "More         %li\\n",monk_favour_saved_more(ch, &time_info));\n'
                    '    monk_favour_write(fp, ch, &time_info);',

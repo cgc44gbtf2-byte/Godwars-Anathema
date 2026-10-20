@@ -4,6 +4,7 @@ import json
 import re
 import unittest
 from test_class_layout import ROOT,SRC,make_values
+from test_guardian_lifecycle_catalog import without_guardian_lifecycle_save
 
 def once(text,old,new):
     assert text.count(old)==1,repr(old)
@@ -53,7 +54,9 @@ class CelestialCatalog(unittest.TestCase):
                          ("interp.c","ccb0125d4264a8a5447618c29a9240ec674d2eb4"),
                          ("act_info.c","a3831d41ddd053a65c2e06567e913c8db8a90f5c"),
                          ("save.c","1f3317263a45d1a886db411d4c0a52a5bba92909")):
-            self.assertEqual(blob((SRC/path).read_text()),sha)
+            text=(SRC/path).read_text()
+            if path=="save.c":text=without_guardian_lifecycle_save(text)
+            self.assertEqual(blob(text),sha)
         self.assertEqual(json.loads((ROOT/"deploy/update_compat.json").read_text()),
                          {"schema":1,"save_epoch":3,"handoff":2})
 

@@ -141,8 +141,8 @@ class MonkBuffCatalog(unittest.TestCase):
                          "get_damcap(actors)==cap+100","actors[0].hit==0"):
             self.assertIn(fragment,test)
         load=(ROOT/"tests/test_hybrid_player.c").read_text()
-        self.assertIn("ch->more=MORE_FAVOUR|MORE_CLOAK|MORE_GUARDIAN;",load)
-        self.assertIn("ch->more==(MORE_FAVOUR|MORE_CLOAK|MORE_GUARDIAN)",load)
+        self.assertIn("ch->more=MORE_FAVOUR|MORE_CLOAK|MORE_BRISTLES;",load)
+        self.assertIn("ch->more==(MORE_FAVOUR|MORE_CLOAK|MORE_BRISTLES)",load)
 
     def test_only_owned_flags_are_cleared(self):
         text=without_favour_metadata_monk((SRC/"classes/monk/monk.c").read_text())

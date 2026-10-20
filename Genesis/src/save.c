@@ -36,6 +36,7 @@
 #include "atomic_save.h"
 #include "classes/hybrid/player.h"
 #include "classes/monk/favour.h"
+#include "guardian.h"
 
 #if !defined(macintosh)
 extern	long	_filbuf		args( (FILE *) );
@@ -299,7 +300,8 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
     fprintf( fp, "Act          %li\n",  ch->act			);
     /* Descriptor ownership is runtime-only; keep the live switch untouched. */
     fprintf( fp, "Extra        %li\n",  ch->extra & ~EXTRA_SWITCH);
-    fprintf( fp, "More         %li\n",monk_favour_saved_more(ch, &time_info));
+    fprintf( fp, "More         %li\n",
+        guardian_saved_more(ch, monk_favour_saved_more(ch, &time_info)));
     monk_favour_write(fp, ch, &time_info);
     fprintf( fp, "Xtra         %li\n",  ch->xtra		);
     fprintf( fp, "AffectedBy   %li\n",	ch->affected_by		);
@@ -1521,6 +1523,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
                 REMOVE_BIT(ch->extra,EXTRA_SWITCH);
                 normalize_combat_training(ch);
                 monk_favour_reconcile(ch, &time_info);
+                guardian_reconcile(ch);
                 return;
             }
 	    KEY( "Exp",		ch->exp,		fread_number( fp ) );
