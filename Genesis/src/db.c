@@ -37,6 +37,7 @@
 #include "file_number.h"
 #include "object_numbers.h"
 #include "file_io.h"
+#include "file_word.h"
 
 #if !defined(macintosh)
 extern	long	_filbuf		args( (FILE *) );
@@ -2351,56 +2352,9 @@ void fread_to_eol( FILE *fp )
 char *fread_word( FILE *fp )
 {
     static char word[MAX_INPUT_LENGTH];
-    char *pword;
-    int cEnd, c;
-
-    do
-    {
-	cEnd = getc( fp );
-    }
-    while ( isspace( cEnd ) );
-
-    if (cEnd == EOF)
-    {
-        word[0] = '\0';
-        return word;
-    }
-
-    if ( cEnd == '\'' || cEnd == '"' )
-    {
-	pword   = word;
-    }
-    else
-    {
-	word[0] = cEnd;
-	pword   = word+1;
-	cEnd    = ' ';
-    }
-
-    for ( ; pword < word + MAX_INPUT_LENGTH; pword++ )
-    {
-c = getc(fp);
-if (c == EOF)
-{
-    if (cEnd != ' ')
-    {
-        bug("Fread_word: unterminated quote.", 0);
-        exit(1);
-    }
-    *pword = '\0';
-    return word;
-}
-*pword = (char)c;
-if ( cEnd == ' ' ? isspace(c) : c == cEnd )
-	{
-	    if ( cEnd == ' ' )
-		ungetc( *pword, fp );
-	    *pword = '\0';
-	    return word;
-	}
-    }
-
-    bug( "Fread_word: word too long.", 0 );
+    enum file_word_status status=fread_word_checked(fp,word,sizeof word);
+    if (status==FILE_WORD_OK || status==FILE_WORD_EOF) return word;
+    bug( "Fread_word: invalid, overlong or unreadable word.", 0 );
     exit( 1 );
     return NULL;
 }

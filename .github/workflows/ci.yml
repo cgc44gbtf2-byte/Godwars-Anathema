@@ -37,6 +37,7 @@ jobs:
           python3 tests/smoke_copyover.py --vision
           python3 tests/smoke_owner.py
           python3 tests/smoke_numbers.py
+          python3 tests/smoke_words.py
       - name: Address and undefined-behavior sanitizers
         env:
           ASAN_OPTIONS: detect_leaks=0:halt_on_error=1
@@ -50,3 +51,4 @@ jobs:
           python3 tests/smoke_copyover.py --vision
           python3 tests/smoke_owner.py
           python3 tests/smoke_numbers.py
+          python3 tests/smoke_words.py

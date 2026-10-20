@@ -138,7 +138,11 @@ static void extreme_fields(void)
         assert(object_cost_bounded(factors[a],factors[b],factors[c])==
                model_cost(factors[a],factors[b],factors[c]));
     object_fixture(ITEM_TRASH,900);
-    player_fixture("End\n#O\n900 20000 0 -1 42 0 0 0 0 0 0 0 0");
+    /* Tiny #O records have no End keyword; match fwrite_obj's real format. */
+    FILE *tiny=fopen("../player/Numfixture","w");assert(tiny);
+    assert(fputs("#PLAYER\nName Numfixture~\nLevel 2\nEnd\n"
+                 "#O\n900 20000 0 -1 42 0 0 0 0 0 0 0 0\n#END\n",tiny)>=0);
+    assert(fclose(tiny)==0);
     CHAR_DATA *ch=read_player(0);
     assert(!ch->pcdata->player_load_failed&&ch->carrying&&ch->carrying->level==20000&&ch->carrying->cost==42);
     drop_player(ch);assert(!object_list&&!index_data.count);

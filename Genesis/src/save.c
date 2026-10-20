@@ -35,6 +35,7 @@
 #include "merc.h"
 #include "file_number.h"
 #include "file_io.h"
+#include "file_word.h"
 #include <errno.h>
 #include "atomic_save.h"
 #include "classes/hybrid/player.h"
@@ -623,6 +624,15 @@ void fwrite_obj( CHAR_DATA *ch, OBJ_DATA *obj, FILE *fp, long iNest )
 /*
  * Load a char and inventory into a new ch structure.
  */
+/* Session reads must never use the boot parser's process-exit policy. */
+static char *saved_word(FILE *fp, bool *ok)
+{
+    static char word[MAX_INPUT_LENGTH];
+    if (!*ok) { word[0]='\0'; return word; }
+    if (fread_word_checked(fp,word,sizeof word)!=FILE_WORD_OK) *ok=FALSE;
+    return word;
+}
+
 bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
 {
     static PC_DATA pcdata_zero;
@@ -904,11 +914,14 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
 
 	    if ( letter != '#' )
 	    {
+                ch->pcdata->player_load_failed=1;
 		bug( "Load_char_obj: # not found.", 0 );
 		break;
 	    }
 
-	    word = fread_word( fp );
+            bool section_ok=TRUE;
+            word=saved_word(fp,&section_ok);
+            if (!section_ok) { ch->pcdata->player_load_failed=1; break; }
     if      ( !str_cmp( word, "PLAYER" ) ) {
         fread_char(ch, fp);
         if (ch->pcdata->player_load_failed) break;
@@ -918,6 +931,7 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
 	    else if ( !str_cmp( word, "END"    ) ) break;
 	    else
 	    {
+                ch->pcdata->player_load_failed=1;
 		bug( "Load_char_obj: bad section.", 0 );
 		break;
 	    }
@@ -1219,11 +1233,14 @@ bool load_char_short( DESCRIPTOR_DATA *d, char *name )
 
 	    if ( letter != '#' )
 	    {
+                ch->pcdata->player_load_failed=1;
 		bug( "Load_char_obj: # not found.", 0 );
 		break;
 	    }
 
-	    word = fread_word( fp );
+            bool section_ok=TRUE;
+            word=saved_word(fp,&section_ok);
+            if (!section_ok) { ch->pcdata->player_load_failed=1; break; }
     if      ( !str_cmp( word, "PLAYER" ) ) {
         fread_char(ch, fp);
         if (ch->pcdata->player_load_failed) break;
@@ -1233,6 +1250,7 @@ bool load_char_short( DESCRIPTOR_DATA *d, char *name )
 	    else if ( !str_cmp( word, "END"    ) ) break;
 	    else
 	    {
+                ch->pcdata->player_load_failed=1;
 		bug( "Load_char_obj: bad section.", 0 );
 		break;
 	    }
@@ -1275,6 +1293,7 @@ static long saved_number(FILE *fp, bool *ok)
     return number;
 }
 #define fread_number(fp) saved_number((fp),&numbers_ok)
+#define fread_word(fp) saved_word((fp),&numbers_ok)
 
 /* Keep the persisted format intact.  Older files may use -1 as the
  * inactive stance marker; only invalid indexes and impossible training
@@ -1310,7 +1329,8 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
     for ( ; ; )
     {
 if (!numbers_ok) { ch->pcdata->player_load_failed=1; return; }
-	word   = feof( fp ) ? "End" : fread_word( fp );
+        word=fread_word(fp);
+        if (!numbers_ok) { continue; }
 	fMatch = FALSE;
 
 	switch ( UPPER(word[0]) )
@@ -2006,7 +2026,8 @@ void fread_obj( CHAR_DATA *ch, FILE *fp )
 if (!numbers_ok) {
     ch->pcdata->player_load_failed=1;discard_saved_object(obj);return;
 }
-	word   = feof( fp ) ? "End" : fread_word( fp );
+        word=fread_word(fp);
+        if (!numbers_ok) { continue; }
 	fMatch = FALSE;
 
 	switch ( UPPER(word[0]) )
@@ -2375,7 +2396,8 @@ file_reserve_open();
 
     while ( !drop_out && numbers_ok )
 	    {
-		word   = feof( fp ) ? "End" : fread_word( fp );
+        word=fread_word(fp);
+        if (!numbers_ok) { continue; }
 		fMatch = FALSE;
 
 		switch ( UPPER(word[0]) )
@@ -2563,3 +2585,4 @@ file_reserve_open();
     return;
 }
 #undef fread_number
+#undef fread_word

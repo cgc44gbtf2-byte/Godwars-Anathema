@@ -3,11 +3,14 @@
 Older source pins still compare their original modules, not a refreshed SHA.
 Each replacement is counted so an unreviewed neighboring edit fails closed.
 """
+from word_readers_source import without_word_readers_stage
+
 def once(text, new, old, count=1):
     assert text.count(new)==count,(repr(new[:100]),text.count(new),count)
     return text.replace(new,old)
 
 def without_reader_fields_stage(text):
+    text=without_word_readers_stage(text)
     if '#include "file_io.h"\n' not in text:return text
     text=once(text,'#include "file_io.h"\n','')
     if 'OBJ_DATA *create_object(' in text:
