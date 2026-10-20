@@ -122,6 +122,10 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   Secondary Monks with learned Mantra 7 on their full Mantra path can use
   `celestial <target>` for 1,500 mana. Existing destination restrictions and
   player summon consent remain; insufficient mana never moves the caster.
+  `spiritguardian` also supports learned secondary Mantra 6 on the full
+  Mantra path. It is a free warning toggle—not a summoned pet—and does not
+  stack with existing Vampire/Werewolf access. Existing guardians can be
+  dismissed even after their enabling class or training is removed.
   A separate object-factory fix prevents crafted items from freeing mutable
   names, descriptions and spell messages still owned by staff-edited templates.
   The info page also shows a read-only numeric checklist: 50,000 max HP/mana,

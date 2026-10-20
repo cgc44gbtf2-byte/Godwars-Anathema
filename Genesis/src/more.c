@@ -32,6 +32,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "classes/hybrid/access.h"
 
 
 void do_mindblast( CHAR_DATA *ch, char *argument )
@@ -2236,23 +2237,27 @@ void do_spiritguardian( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    if (!IS_VAMPIRE(ch) && !IS_WEREWOLF(ch) && !IS_MONK(ch))
+    const bool monk_parent = hybrid_power_parent(ch, CLASS_MONK);
+    const long mantra = monk_parent
+        ? hybrid_power_rank(ch, CLASS_MONK, HYBRID_TRAIN_MONK, MONK_MANTRA) : 0;
+    const bool monk_ready = mantra >= 6;
+    if (!IS_VAMPIRE(ch) && !IS_WEREWOLF(ch) && !monk_parent)
     {
 	stc("Huh?\n\r",ch);
 	return;
     }
 
-    if (IS_VAMPIRE(ch) && get_disc(ch,DISC_NECROMANCY) < 4)
+    if (IS_VAMPIRE(ch) && get_disc(ch,DISC_NECROMANCY) < 4 && !monk_ready)
     {
 	stc("You require level 4 Necromancy to summon your Spirit Guardian.\n\r", ch);
 	return;
     }
-    else if (IS_WEREWOLF(ch) && get_tribe(ch,TRIBE_CHILDREN_OF_GAIA) < 4)
+    else if (IS_WEREWOLF(ch) && get_tribe(ch,TRIBE_CHILDREN_OF_GAIA) < 4 && !monk_ready)
     {
 	stc("You require a Children of Gaia of 4 to summon your Spirit Guardian.\n\r", ch);
 	return;
     }
-    else if (IS_MONK(ch) && get_monk(ch, MONK_MANTRA) < 6)
+    else if (!IS_VAMPIRE(ch) && !IS_WEREWOLF(ch) && !monk_ready)
     {
 	stc("You need Mantra 6 for Spirit Guardian.\n\r", ch);
 	return;

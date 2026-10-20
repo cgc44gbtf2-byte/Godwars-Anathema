@@ -979,6 +979,43 @@ rank retention, with owned banks unchanged.
 This remains backend access for audited existing powers, not playable
 hybrid conversion. Save epoch3, record4 and copyover handoff2 are unchanged.
 
+### Secondary Monk Spirit Guardian
+
+`spiritguardian` is the existing **warning toggle**, not a pet, an extra
+attacker or a transformation. A validated secondary Monk needs learned
+Mantra6 on the full Mantra path; other secondary paths cap at4 and cannot
+activate it, even if a migrated raw rank is higher. Original Monks retain
+their normal ranks and access.
+
+Activation accepts either an existing native grant or the new learned
+secondary-Monk grant. Original Vampire Necromancy4 and original Werewolf
+Children of Gaia4 remain sufficient, independently of secondary training.
+The ranks are never added. One native `MORE_GUARDIAN` toggle supplies the
+existing warnings; having two eligible parents grants no second guardian,
+extra warning or stronger effect. Secondary Vampire/Werewolf power adapters
+are not added by this Monk stage.
+
+Native costs and timing remain: **zero mana**, no new random roll or recovery,
+and the existing standing/minimum-level interpreter entry. Ignored command
+arguments remain ignored. Invalid secondary records cannot activate it.
+As a separate native safety repair, valid player actors can dismiss an active
+guardian even after class/training loss or record rejection; doing so only
+removes the toggle. Missing actors/data are rejected without a crash.
+
+Tests preserve240 valid native snapshots, compare **4,860 paired** commands
+plus **5,184 overlap** replays, check10 invalid states, exercise9 real Read Aura
+warning consumers and **90 full/short** player loads. Unrelated flags, class,
+learned banks, mana and the actor list stay intact. This is not a PvP balance
+test. The four old context/stuck-dismissal failures were reproduced before
+the native repair, separately from the adapter.
+
+The flag still uses native persistence; this stage does not add automatic revocation
+or provenance migration for legacy saved guardians. Dismissal is available
+after training loss, but staff-edited stale flags still need review.
+No conversion, Monk focus/trainer UI, clan-role expansion or live forms
+are enabled. Record4/save epoch3/handoff2 remain unchanged. Generated help is
+updated; custom world helps keep priority and no live help import is performed.
+
 ## Numeric readiness preview — no conversion
 
 The player list is filtered to the nine hybrids containing the current

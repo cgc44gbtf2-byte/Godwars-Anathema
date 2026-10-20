@@ -124,6 +124,10 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
         send_to_char("Secondary Monk travel: celestial (7; 1500 mana) needs full "
                      "Mantra and learned rank. Native destination restrictions and "
                      "player summon consent remain. Conversion/forms are not enabled.\n\r", ch);
+        send_to_char("Secondary Monk spiritguardian (6; no mana cost) needs full "
+                     "Mantra and learned rank. One shared warning toggle, not a pet; "
+                     "native Vampire/Werewolf access does not stack. Active guardians "
+                     "can be dismissed after training loss.\n\r", ch);
     }
     long pages = hybrid_book_chain_policy(h);
     if (pages) {
