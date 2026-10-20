@@ -8,6 +8,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "progress_metrics.h"
 #include <unistd.h>
 
 LEADER_BOARD leader_board;
@@ -750,23 +751,28 @@ void do_leader( CHAR_DATA *ch, char *argument )
     return;
 }
 
+/* Checked leaderboard metrics scope: leave other counters/eligibility alone. */
 void check_leaderboard( CHAR_DATA *ch, char *argument )
 {
     bool changed = FALSE;
+    long ratio, hours;
+    bool have_ratio, have_hours;
     char *imm = "Akuma Chaos Dude Shane Corruption"; /* Only needed for Imp+ */
 
-    if (IS_NPC(ch)) return;
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL || ch->name == NULL) return;
     if (is_name(ch->name, imm) || IS_BUI(ch)) return; 
-    if (get_ratio(ch) > leader_board.bestpk_number)
+    have_ratio = get_ratio_checked(ch, &ratio);
+    have_hours = get_hours_checked(ch, &hours);
+    if (have_ratio && ratio > leader_board.bestpk_number)
     {
-	leader_board.bestpk_number = get_ratio(ch);
+leader_board.bestpk_number = ratio;
 	free_string(leader_board.bestpk_name);
 	leader_board.bestpk_name = str_dup(ch->name);
 	changed = TRUE;
     }
-    if (get_ratio(ch) < leader_board.worstpk_number)
+    if (have_ratio && ratio < leader_board.worstpk_number)
     {
-	leader_board.worstpk_number = get_ratio(ch);
+leader_board.worstpk_number = ratio;
 	free_string(leader_board.worstpk_name);
 	leader_board.worstpk_name = str_dup(ch->name);
 	changed = TRUE;
@@ -806,9 +812,9 @@ void check_leaderboard( CHAR_DATA *ch, char *argument )
 	leader_board.qc_name = str_dup(ch->name);
 	changed = TRUE;
     }
-    if (get_hours(ch) > leader_board.tt_number)
+    if (have_hours && hours > leader_board.tt_number)
     {
-	leader_board.tt_number = get_hours(ch);
+leader_board.tt_number = hours;
 	free_string(leader_board.tt_name);
 	leader_board.tt_name = str_dup(ch->name);
 	changed = TRUE;
@@ -817,13 +823,29 @@ void check_leaderboard( CHAR_DATA *ch, char *argument )
     return;
 }
 
+/* Shared PK-score metrics scope: preserve legacy operation order/rounding. */
+bool get_ratio_checked(CHAR_DATA *ch, long *ratio)
+{
+    long sum, denominator, numerator, result;
+    if (ch == NULL || ratio == NULL) return FALSE;
+    if (IS_NPC(ch)) { *ratio = 0; return TRUE; }
+    if (ch->pdeath == 0) {
+        if (__builtin_mul_overflow(100L, ch->pkill, &result)) return FALSE;
+    } else {
+        if (__builtin_add_overflow(ch->pkill, ch->pdeath, &sum) || sum == 0 ||
+            __builtin_mul_overflow(sum, sum, &denominator) ||
+            __builtin_mul_overflow(100L, ch->pkill, &numerator) ||
+            __builtin_mul_overflow(numerator, ch->pkill, &numerator) ||
+            __builtin_mul_overflow(ch->pkill, numerator / denominator, &result)) return FALSE;
+    }
+    *ratio = result;
+    return TRUE;
+}
+
 long get_ratio(CHAR_DATA *ch)
 {
-    long ratio;
-
-    if (IS_NPC(ch)) ratio = 0;
-    else if (ch->pdeath == 0) ratio = 100 * ch->pkill;
-    else ratio = ch->pkill * ((100 * ch->pkill * ch->pkill) / ((ch->pkill + ch->pdeath) * (ch->pkill + ch->pdeath)));
+    long ratio = 0;
+    (void)get_ratio_checked(ch, &ratio);
     return ratio;
 }
 

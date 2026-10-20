@@ -23,10 +23,8 @@ class CharacterScoreCatalog(unittest.TestCase):
 
     def test_local_legacy_arithmetic_order_is_checked(self):
         source=(SRC/"act_info.c").read_text().split("/* Character score scope:",1)[1].split("void do_score(",1)[0]
-        for token in ("__builtin_sub_overflow","__builtin_add_overflow",
-                      "__builtin_mul_overflow(sum, sum","100L, ch->pkill",
-                      "numerator, ch->pkill","numerator / denominator","sum == 0",
-                      "seconds / 3600","elapsed, 0L"):
+        for token in ("return get_hours_checked(ch, hours)",
+                      "return get_ratio_checked(ch, ratio)"):
             self.assertIn(token,source)
         self.assertNotIn("ch->pkill =",source)
         self.assertNotIn("ch->played =",source)

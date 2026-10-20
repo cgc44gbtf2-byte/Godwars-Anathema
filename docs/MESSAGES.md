@@ -87,9 +87,8 @@ with explicit fallbacks for missing strings and safe returns for missing
 character/PC contexts. It retains object-form delegation. Play-time and PK-score
 calculations retain the legacy operation order and integer division, but show
 `unavailable` if an intermediate overflows or the PK denominator is zero.
-This is display-only validation: it does not repair saved fields, alter
-training/stats, change other combat metric formulas, or change other callers
-of the shared `get_hours` and `get_ratio` helpers.
+This does not repair saved fields, alter training/stats or change combat metric
+formulas. Score delegates its arithmetic checks to the shared APIs below.
 
 The real-engine suite pins **4,224** unchanged native score snapshots across all
 classes, status/staff ranges, beast thresholds, conditions and ANSI settings.
@@ -97,6 +96,28 @@ It also checks 196 PK and **2,744** timing combinations against independent
 wide-integer oracles, 13 boundaries, colour clipping and both object-form
 delegation flags. Older whole-info pins mask only this separately characterized
 report; all other commands and combat metric implementations stay pinned.
+
+## Shared progress metrics
+
+The checked play-time and PK-score APIs preserve legacy arithmetic order,
+division and representable results. Failure leaves the output parameter alone.
+Login eligibility newly enables PK only for a valid age at the unchanged
+threshold; invalid timing never grants it or removes an existing flag.
+Leaderboard updates skip only invalid derived metrics and retain unrelated counters.
+Staff inspection and covenant scores display `unavailable` instead of a bogus zero.
+Legacy `get_hours`/`get_ratio` wrappers remain for compatibility and return zero on failure;
+all in-tree policy/display callers use checked results, not that ambiguous fallback.
+
+The real-engine suite pins **3,200** unchanged helper, staff, covenant, login-age
+and leaderboard snapshots. Independent wide-integer checks cover 196 PK and
+2,744 timing combinations, including failure-output preservation, repeated
+eligibility checks, independent leaderboard updates and ordinary file reloads.
+All leaderboard test writes use private temporary directories.
+
+This is not a world-file parser or arbitrary corrupt-stat repair. The legacy
+numeric parser still needs a separate boundary audit; extreme integer file
+loads and leaderboard write/crash durability are not newly guaranteed here.
+Other combat metrics still require valid in-range stats and class inputs.
 
 This is not a whole-codebase formatting audit. Other commands that build
 their own strings still require review. Callers must supply live,

@@ -33,6 +33,7 @@
 #include <time.h>
 #include <unistd.h> /* unlink() */
 #include "merc.h"
+#include "progress_metrics.h"
 #include "restart.h"
 
 #include <ctype.h>
@@ -1168,8 +1169,17 @@ void do_mstat( CHAR_DATA *ch, char *argument )
 	stc(buf, ch);
     }
 
-    sprintf(buf, "Hours: %li.  Played: %li.  Timer: %li.  Act: %li.\n\r",
-	get_hours(victim), (long) victim->played, victim->timer, victim->act);
+    /* Checked staff hours scope. */
+    {
+        char hours_text[32];
+        long hours;
+        if (get_hours_checked(victim, &hours))
+            snprintf(hours_text, sizeof hours_text, "%li", hours);
+        else strcpy(hours_text, "unavailable");
+        sprintf(buf, "Hours: %s.  Played: %li.  Timer: %li.  Act: %li.\n\r",
+            hours_text, (long) victim->played, victim->timer, victim->act);
+    }
+    /* Checked staff hours scope end. */
     stc(buf, ch);
 
     sprintf(buf, "Master: %s.  Leader: %s.  Affected by: %s.\n\r",

@@ -32,6 +32,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "progress_metrics.h"
 #include "classes/hybrid/access.h"
 
 
@@ -2417,12 +2418,21 @@ void do_covenant( CHAR_DATA *ch, char *argument )
 		if ( str_cmp(ch->pcdata->cov_time,gch->pcdata->cov_time) ) continue;
 		if ( !str_cmp(ch->pcdata->covenant,gch->pcdata->covenant) )
 		{
-		    sprintf( buf,
-		    "[%-16s] [%8s] [%-6li] [%-6li] [   %-3li  ] [   %-4li   ]\n\r",
+    /* Checked covenant score scope. */
+    {
+    char ratio_text[32];
+    long ratio;
+    if (get_ratio_checked(gch, &ratio))
+        snprintf(ratio_text, sizeof ratio_text, "%li", ratio);
+    else strcpy(ratio_text, "unavailable");
+    sprintf( buf,
+    "[%-16s] [%8s] [%-6li] [%-6li] [   %-3li  ] [   %-4s   ]\n\r",
 			capitalize( gch->name ),
 			IS_MORE(gch, MORE_LEADER) ? " Leader " : 
 			IS_MORE(gch, MORE_CHAMPION) ? "Champion" : " Member ",
-			gch->hit, gch->mana, gch->status, get_ratio(gch));
+gch->hit, gch->mana, gch->status, ratio_text);
+    }
+    /* Checked covenant score scope end. */
 			send_to_char( buf, ch );
 		}
 	    }

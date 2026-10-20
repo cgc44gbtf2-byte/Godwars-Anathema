@@ -3,6 +3,7 @@ import hashlib
 import json
 import unittest
 from test_class_layout import ROOT,SRC,make_values
+from progress_metrics_source import without_progress_metrics_stage
 
 def once(text,old,new):
     assert text.count(old)==1,repr(old)
@@ -27,10 +28,10 @@ class GuardianLifecycleCatalog(unittest.TestCase):
         text=once(text,'#include "guardian.h"\n',"")
         text=once(text,"        guardian_reconcile(ch);\n","")
         self.assertEqual(blob(text),"2c7f2f2e6583abe95ddbbdfca2373e9e63e03112")
-        for path,sha in (("more.c","c44eb80fd4a319117ee12f749fe889f66f4329c5"),
-                         ("comm.c","e880af206f10a4cf2512e6011ed15095e8d8a0f7"),
+        for path,sha in (("more.c","94245671b79931e1749010e1779411d42f9bea83"),
+                         ("comm.c","925a22782183ae8e9269197b5504b4505d1962ae"),
                          ("merc.h","b843f157662ab181daabe913d74685f1c8bc75e6")):
-            self.assertEqual(blob((SRC/path).read_text()),sha)
+            self.assertEqual(blob(without_progress_metrics_stage((SRC/path).read_text())),sha)
 
     def test_current_grants_only_no_rank_addition_or_auto_activation(self):
         text=(SRC/"guardian.c").read_text()

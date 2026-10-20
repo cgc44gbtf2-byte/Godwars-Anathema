@@ -32,6 +32,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "progress_metrics.h"
 
 
 
@@ -60,9 +61,33 @@ long get_trust( CHAR_DATA *ch )
 /*
  * Retrieve a character's age.
  */
+/* Shared played-time metrics scope: checked arithmetic, explicit eligibility. */
+bool get_hours_checked(CHAR_DATA *ch, long *hours)
+{
+    time_t elapsed;
+    long elapsed_seconds, seconds;
+    if (ch == NULL || hours == NULL) return FALSE;
+    if (__builtin_sub_overflow(current_time, ch->logon, &elapsed) ||
+        __builtin_add_overflow(elapsed, 0L, &elapsed_seconds) ||
+        __builtin_add_overflow(ch->played, elapsed_seconds, &seconds)) return FALSE;
+    *hours = seconds / 3600;
+    return TRUE;
+}
+
 long get_hours( CHAR_DATA *ch )
 {
-    return ( ch->played + (long) (current_time - ch->logon) ) / 3600;
+    long hours = 0;
+    (void)get_hours_checked(ch, &hours);
+    return hours; /* Compatibility only; policy/display callers use checked API. */
+}
+
+bool grant_age_pk(CHAR_DATA *ch)
+{
+    long hours;
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL || CAN_PK(ch) ||
+        !get_hours_checked(ch, &hours) || hours < AGE_PK) return FALSE;
+    SET_BIT(ch->pcdata->flag, FLAG_PK);
+    return TRUE;
 }
 
 

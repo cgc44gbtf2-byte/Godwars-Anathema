@@ -1,5 +1,7 @@
 """Mask only the independently characterized character-score report."""
+from progress_metrics_source import without_progress_metrics_stage
 def without_character_score_stage(text):
+    text=without_progress_metrics_stage(text)
     marker="/* Character score scope:"
     start=text.index(marker) if marker in text else text.index("void do_score(")
     stop=text.rfind("\n",start,text.index("day_name",start))+1

@@ -6,12 +6,14 @@ import unittest
 from test_class_layout import ROOT,SRC,make_values
 from test_guardian_lifecycle_catalog import without_guardian_lifecycle_save
 from item_info_source import without_item_info_stage
+from progress_metrics_source import without_progress_metrics_stage
 
 def once(text,old,new):
     assert text.count(old)==1,repr(old)
     return text.replace(old,new,1)
 
 def blob(text):
+    text=without_progress_metrics_stage(text)
     if "void obj_score(" in text:text=without_item_info_stage(text)
     data=text.encode()
     return hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest()
@@ -49,7 +51,7 @@ class CelestialCatalog(unittest.TestCase):
         self.assertEqual(blob(without_celestial_stage((SRC/"classes/monk/monk.c").read_text())),
                          "c573750215f15c21be34346aa1afeff2a3918aec")
         self.assertEqual(blob(without_celestial_visibility_stage((SRC/"handler.c").read_text())),
-                         "7d464a83a9236ee1d16446a67fdb8b21224c4440")
+                         "cd73ac2703176871b2e07bbbecc5c2914a53c4eb")
 
     def test_no_macro_getter_interpreter_or_save_changes(self):
         for path,sha in (("merc.h","b843f157662ab181daabe913d74685f1c8bc75e6"),

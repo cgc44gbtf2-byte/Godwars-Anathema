@@ -35,6 +35,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "progress_metrics.h"
 #include "classes/hybrid/passives.h"
 #include "classes/hybrid/hybrid.h"
 
@@ -1727,27 +1728,12 @@ static void character_report(char *buf, const char *format, ...)
 
 static bool character_hours(CHAR_DATA *ch, long *hours)
 {
-    time_t elapsed;
-    long elapsed_seconds, seconds;
-    /* Retain the legacy integer formula only when its intermediates fit. */
-    if (__builtin_sub_overflow(current_time, ch->logon, &elapsed) ||
-        __builtin_add_overflow(elapsed, 0L, &elapsed_seconds) ||
-        __builtin_add_overflow(ch->played, elapsed_seconds, &seconds)) return FALSE;
-    *hours = seconds / 3600;
-    return TRUE;
+    return get_hours_checked(ch, hours);
 }
 
 static bool character_pk_score(CHAR_DATA *ch, long *ratio)
 {
-    long sum, denominator, numerator;
-    if (ch->pdeath == 0)
-        return !__builtin_mul_overflow(100L, ch->pkill, ratio);
-    /* Preserve the old division order/rounding; reject undefined intermediates. */
-    if (__builtin_add_overflow(ch->pkill, ch->pdeath, &sum) || sum == 0 ||
-        __builtin_mul_overflow(sum, sum, &denominator) ||
-        __builtin_mul_overflow(100L, ch->pkill, &numerator) ||
-        __builtin_mul_overflow(numerator, ch->pkill, &numerator)) return FALSE;
-    return !__builtin_mul_overflow(ch->pkill, numerator / denominator, ratio);
+    return get_ratio_checked(ch, ratio);
 }
 
 void do_score( CHAR_DATA *ch, char *argument )

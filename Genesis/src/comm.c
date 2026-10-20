@@ -58,6 +58,7 @@
 #include <crypt.h>
 
 #include "merc.h"
+#include "progress_metrics.h"
 #include "telnet_input.h"
 #include "gmcp.h"
 #include "restart.h"
@@ -2367,11 +2368,12 @@ write_to_buffer(d, "\n\rWelcome to Godwars: Anathema.\n\r", 0);
 	if (IS_WEREWOLF(ch)) ch->vampgen = (7 - ch->pcdata->rank);
 	if (IS_HIGHLANDER(ch) && ch->vampgen == 0) ch->vampgen = 2;
 
-	if (!CAN_PK(ch) && get_hours(ch) >= AGE_PK)
+/* Checked login age scope. */
+if (grant_age_pk(ch))
 	{
-	    SET_BIT(ch->pcdata->flag, FLAG_PK);
 	    stc("You are no longer a newbie, and can now be attacked by other players.\n\r", ch);
 	}
+/* Checked login age scope end. */
 
 	if (ch->level < LEV_SLE)
 	{

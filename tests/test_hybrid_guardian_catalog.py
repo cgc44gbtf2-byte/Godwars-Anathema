@@ -46,6 +46,8 @@ def without_guardian_stage(text):
     return text[:start]+body+text[end:]
 
 def blob(text):
+    from progress_metrics_source import without_progress_metrics_stage
+    text=without_progress_metrics_stage(text)
     if "void obj_score(" in text:text=without_item_info_stage(text)
     b=text.encode()
     return hashlib.sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest()
@@ -53,7 +55,7 @@ def blob(text):
 class GuardianCatalog(unittest.TestCase):
     def test_whole_module_restores_exact_base(self):
         self.assertEqual(blob(without_guardian_stage((SRC/"more.c").read_text())),
-                         "30fd54d167213e22ebff09f7246bea1c8c2889d0")
+                         "903ad14ae6d4c6de1a90bf25cb9134191f3cc18b")
 
     def test_macro_getters_consumers_serializers_and_interpreter_unchanged(self):
         for path,sha in (("merc.h","b843f157662ab181daabe913d74685f1c8bc75e6"),

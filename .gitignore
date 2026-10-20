@@ -85,6 +85,7 @@ tests/test_identify
 tests/test_item_inspection
 tests/test_room_display
 tests/test_character_score
+tests/test_progress_metrics
 bootstrap-backups/
 __pycache__/
 *.py[cod]

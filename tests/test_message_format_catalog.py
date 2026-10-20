@@ -4,6 +4,7 @@ import re
 import unittest
 from test_class_layout import ROOT,SRC,make_values
 from identify_source import without_identify_stage
+from progress_metrics_source import without_progress_metrics_stage
 
 class MessageFormatCatalog(unittest.TestCase):
     def test_shared_limit_and_completion_used_by_all_dialects(self):
@@ -34,8 +35,8 @@ class MessageFormatCatalog(unittest.TestCase):
         self.assertNotIn('sprintf(kav,"%s',source)
 
     def test_native_apis_and_other_formatting_callers_unchanged(self):
-        expected={"handler.c":"5661917ea1caf18177e2cb5c1e4dd6c300475500",
-                  "comm.c":"e880af206f10a4cf2512e6011ed15095e8d8a0f7",
+        expected={"handler.c":"9c2ee576804e8ce3dc58f300f3262aae957e47e1",
+                  "comm.c":"925a22782183ae8e9269197b5504b4505d1962ae",
                   "magic.c":"ff6670721b45989e1e24b8c337f4e8ad766a8b18",
                   "clan.c":"89d083ddce8367e98e58cec721cf290d9da105b2",
                   "merc.h":"b843f157662ab181daabe913d74685f1c8bc75e6",
@@ -43,6 +44,7 @@ class MessageFormatCatalog(unittest.TestCase):
         for path,sha in expected.items():
             b=(SRC/path).read_bytes()
             if path=="magic.c": b=without_identify_stage(b.decode()).encode()
+            if path in ("handler.c","comm.c"): b=without_progress_metrics_stage(b.decode()).encode()
             self.assertEqual(hashlib.sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest(),sha)
         source=(SRC/"core.c").read_text()
         self.assertEqual(re.findall(r"^void (\w+)\(",source,re.M),["act","act2","kavitem"])

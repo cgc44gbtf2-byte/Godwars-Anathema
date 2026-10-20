@@ -147,6 +147,8 @@ use a separate host timer and a private webhook; setup does not restart the MUD.
   handles missing item prototypes and invalid liquid references without crashing.
   Character `score` safely clips long identity text and reports unavailable
   play time/PK score when their saved arithmetic cannot be evaluated safely.
+  Login PK-age checks and derived leaderboard scores now reject invalid
+  arithmetic; staff and covenant displays show unavailable metrics explicitly.
   See [message-formatting limits](docs/MESSAGES.md).
   A separate object-factory fix prevents crafted items from freeing mutable
   names, descriptions and spell messages still owned by staff-edited templates.

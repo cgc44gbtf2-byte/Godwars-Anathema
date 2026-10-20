@@ -7,6 +7,7 @@ from test_hybrid_monk_buffs_catalog import without_cloak_death_stage
 from test_hybrid_stun_catalog import without_hybrid_stun_adapter
 from test_hybrid_celestial_catalog import without_celestial_visibility_stage
 from item_info_source import without_item_info_stage
+from progress_metrics_source import without_progress_metrics_stage
 
 NEW_VISION="""void do_vision( CHAR_DATA *ch, char *argument )
 {
@@ -60,10 +61,10 @@ def without_vision_info_adapter(text):
                         "if ( IS_AFFECTED(ch, AFF_BLIND) && !IS_AFFECTED(ch, AFF_SHADOWSIGHT))")
 
 NATIVE_READERS={
-    "handler.c":"c44c59c1d7db88fb090fcc221ee0962d66367cae51ff59954d59edf920031c0e",
+    "handler.c":"31630afce94a32cd6d092d3e88b307e65edae58978103096d02794acbb86cb71",
     "act_info.c":"9329784bc5c9ee2aaa28a45a586120cceac85a4e7a5953479a29885f597cbfa4",
     "kav_info.c":"7033361ae7f06dee67bb381072d513cc252f5f3125b770a86d74a94e885920bc",
-    "random.c":"b4e5b7721b560e6a2fc256ccf9ab08697c21c7e8c75e5a4631661993d75dd072",
+    "random.c":"fd82898394fbd0e08dc6df57c8769f215f488b1feb94c1f26c307412865e64b6",
     "clan.c":"9a416f47b1ef3de879819cd9ba1007a87f053fa7fc5641855e384bfe143d5803",
     "classes/werewolf/wwtribe.c":"4f33bcb209a2b9806b131914cdea03d7cdd9d15c250bae891ac0deb3b47ad42b",
     "classes/highlander/highland.c":"487dfa0e94c7c69dd5ad4c627c3ab8587aafd9c8e29ce9c57763ac785416cad6",
@@ -72,6 +73,7 @@ NATIVE_READERS={
     "classes/elemental/elemental.c":"da8474d2063b020b76afbf96269b889388bacf4c359ddc40c470c58f20232583",
 }
 def native_reader_tokens(text):
+    text=without_progress_metrics_stage(text)
     if "void obj_score(" in text:text=without_item_info_stage(text)
     if "void do_readaura(" in text:
         from aura_source import without_aura_stage
@@ -145,8 +147,9 @@ class HybridVisionCatalog(unittest.TestCase):
 
     def test_broad_resets_only_add_shadow_source_cleanup(self):
         for path,sha,count in (("combat_death.c","72ef15ef3b963af036544d58777669b686ec752a",2),
-                               ("act_wiz.c","0950ea07266c99236164467c60d9d1225d371ff4",2)):
+                               ("act_wiz.c","3f8804e378d7e184e024378964aa4fb87b848b39",2)):
             text=(SRC/path).read_text()
+            text=without_progress_metrics_stage(text)
             if path=="combat_death.c":text=without_cloak_death_stage(text)
             native,n=re.subn(r"^    strip_shadowsight\((?:ch|victim)\);\n","",text,flags=re.M)
             self.assertEqual(n,count)
