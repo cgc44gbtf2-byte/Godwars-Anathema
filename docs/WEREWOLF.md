@@ -82,8 +82,9 @@ an accidental duplicate grant. Shared commands such as `heighten`, `scry`,
 `nightsight` and `readaura` are shared entry points, not extra power copies.
 No powers, ranks, prices or combat bonuses were removed by this help audit.
 
-Other legacy gift descriptions still need a full source-by-source help review;
-this patch does not certify every old passive or command description.
+All 105 gift slots now have a source-review classification; see
+[the gift audit](WEREWOLF_GIFT_AUDIT.md) for evidence and remaining gaps.
+Source review is not a claim that every command is safe in every combat state.
 Binary updates preserve live area files. These are bundled help corrections,
 not an automatic replacement of a server's customized `class.hlp`: review and
 merge the help changes separately before reloading the live world.

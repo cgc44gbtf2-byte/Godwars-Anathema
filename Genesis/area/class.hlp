@@ -808,8 +808,12 @@ Garou Commands
  Wwgifts   - Shows a list of all the gifts you have available.
  Wwpowers  - Lists all the commands (NOT powers) available to you.
 
-Wwpowers lists active commands, not every passive bonus. An <auto> marker
+Wwpowers lists registered gift commands, not every passive bonus. Registration
+alone does not prove a command works; Disquiet is currently a stub. An <auto> marker
 in a gift help entry means a passive effect, not a command to type.
+An <upgrade> modifies an existing command, not a second automatic action.
+Stub, disabled, unavailable, unimplemented and unverified entries are not
+advertised as working powers. See the individual gift tree's help.
 Secondary-parent hybrid training uses its own focus/cap rules.
 
 Related Helps: Class, Ranks, Shift, Breeds, Auspices, and Tribes.
@@ -860,21 +864,21 @@ Related Helps: Auspices, Tribes, 'help <breed name>', and Werewolf.
 ~
 
 0 Homid~
-1: Master of Fire - Allows fire damage to be healed more easily. <masteroffire>
-2: Jam Technology - Causes your opponents weapon not to work. <jamtech>
-3: Assimilation - Prevents attacks from mobiles. <assimilation>
-4: Reshape Object - Changes the shape of objects. <reshape>
-5: Spirit Ward - A powerful mental shield. <spiritward>
+1: Persuasion - Toggle an aura that can deter lower-level mobile attackers. <persuasion>
+2: Jam Technology - Attempts to unequip a target's wielded item. <jamtech>
+3: Reshape Object - Edits carried item names, keywords or glow/hum; ownership restrictions apply. <reshapeobject>
+4: Disquiet - Registered command, but its handler has no gameplay effect. <stub: disquiet>
+5: Spirit Ward - Toggles aura shielding against inspection. <spiritward>
 
 Related Helps: Breeds, and Werewolf.
 ~
 
 0 Metis~
 1: Primal Anger - Increased rage through pain. <primalanger>
-2: Burrow - Burrows into the earth. <burrow>
+2: Burrow - Toggles earthmelding; cannot activate while fighting. <burrow>
 3: Eyes of the Cat - Enhanced sight allows vision in the dark. <nightsight>
-4: Gift of the Porcupine - Bristles sprout and prevent embrace. <porcupine>
-5: Totem Gift - Summons your tribal totem. <totemgift>
+4: Gift of the Porcupine - Toggles protective bristles in native war-form. <porcupine>
+5: Totem Gift - No working command is implemented. <unimplemented>
 
 Related Helps: Breeds, and Werewolf.
 ~
@@ -882,9 +886,9 @@ Related Helps: Breeds, and Werewolf.
 0 Lupus~
 1: Heightened Senses - Raises sensitivity of all senses. <heighten>
 2: Sense Prey - Allows you to locate your quarry. <scry>
-3: Catfeet - Improves balance. <auto>
-4: Sense the Unnatural - Allows you to scry through shield. <auto>
-5: Elemental Gift - Calls the elemental spirits forth. <elemental>
+3: Catfeet - Adds avoidance and can resist a Highlander's sweep. <auto>
+4: Beast Life - Toggles animal affinity, or beckons an animal by name. <beastlife>
+5: Elemental Gift - Attacks with fire, water, earth or air; not a summoned pet. <elemental>
 
 Related Helps: Breeds, and Werewolf.
 ~
@@ -900,51 +904,51 @@ Related Helps: Breeds, Tribes, 'help <auspice name>', and Werewolf.
 ~
 
 0 Ragabash~
-1: Blur of the Milky Eye - Makes Garou hard to see and hit. <blur>
+1: Blur of the Milky Eye - Toggles a concealment flag; no direct avoidance bonus. <blur>
 2: Blissful Ignorance - Hides the Garou from sight. <blissful>
-3: Scent of Running Water - Makes Garou impossible to track. <auto>
+3: Scent of Running Water - Suppresses ordinary movement tracks. <auto>
 4: Whelp Body - Weakens your opponent. <whelp>
-5: Luna's Blessing - Renders you immune to Silver. <auto>
+5: Luna's Blessing - Prevents the extra silver damage-cap bonus against Werewolves. <auto>
 
 Related Helps: Auspices, and Werewolf.
 ~
 
 0 Theurge~
 1: Mother's Touch - Heals others in need. <mother>
-2: Grandmother's Touch - Allows Mother's Touch to be used on yourself. <auto>
+2: Grandmother's Touch - Allows Mother to target yourself; not a separate automatic heal. <upgrade: mother>
 3: Pulse of the Invisible - Gives sight into the Umbra. <pulse>
-4: Grasp the Beyond - Forces people into the Umbra. <grasp>
-5: Feral Lobotomy - Attacks the mind. <lobotomy>
+4: Grasp the Beyond - Pulls a non-fighting room target with you into the Umbra. <grasp>
+5: Feral Lobotomy - Drains a room target's mana and may provoke retaliation. <lobotomy>
 
 Related Helps: Auspices, and Werewolf.
 ~
 
 0 Philodox~
 1: Resist Pain - Wolf has no hit/dam penalty for damage. <auto>
-2: Strength of Purpose - Increases the Garou's resolve. <auto/not in>
-3: Weak Arm - Careful examination reveals strengths and weaknesses. <auto>
+2: Strength of Purpose - Reveals some Vampire disguise identities while looking. <auto>
+3: Weak Arm - Adds 100 damage cap and improves avoidance breaking. <auto>
 4: Wall of Granite - Summons a wall of granite to block an exit. <wallgranite>
-5: Geas - Takes control over the actions of others. <geas>
+5: Geas - Charms an eligible mobile, not another player. <geas>
 
 Related Helps: Auspices, and Werewolf.
 ~
 
 0 Galliard~
 1: Call of the Wyld - Tells all wolves of danger. <wyld>
-2: Distractions - Causes opponent to lose concentration while fighting. <auto>
-3: Call of the Wyrm - Baits a creature of the Wyrm out of hiding. <wyrmcall>
-4: Song of Rage - Causes victim to fly into a rage. <songofrage>
-5: Bridge Walker - Attempts to make a moon bridge. <bridgewalk>
+2: Distractions - No dedicated passive effect was located in current source. <unverified>
+3: Call of the Wyrm - Forces eligible players in the room to reveal their beast. <wyrmcall>
+4: Song of Rage - Provokes a target's rage or berserk behavior. <songofrage>
+5: Bridge Walker - Travels toward a target; failure can send you to a random room. <bridgewalk>
 
 Related Helps: Auspices, and Werewolf.
 ~
 
 0 Ahroun~
-1: Razor Claws - Sharpens your claws. <razorclaws>
-2: Spirit of the Fray - Allows lightning quick movement. <auto>
-3: Silver Claws - Turns claws silver for extra damage to other wolves. <auto>
-4: Stoking Fury's Furnace - Increases rage speed. <auto>
-5: Kiss of Helios - Invokes the power of the sun. <helios>
+1: Razor Claws - No separate rank-1 claw-damage bonus was verified; claws are a native command. <unverified>
+2: Spirit of the Fray - Improves combat initiative, not room movement speed. <auto>
+3: Silver Claws - Extended claws gain a silver damage-cap bonus against vulnerable wolves. <auto>
+4: Stoking Fury's Furnace - Accelerates rage gained during combat updates. <auto>
+5: Kiss of Helios - Toggles flaming hands and room light; fire protection varies by attack handler. <helios>
 
 Related Helps: Auspices, and Werewolf.
 ~
@@ -970,49 +974,49 @@ Related Helps: Breeds, Auspices, 'help <tribe name>', and Werewolf.
 
 0 'Black Furies'~
 1: Breath of the Wyld - Heals many people. <breathwyld>
-2: Coup de Grace - Charge into combat for extra power. <auto>
-3: Visceral Agony - Claws cause poison. <auto>
-4: Body Wrack - Causes immense pain. <bodywrack>
-5: Wyld Warp - Summons a group of chaotic Wyld-spirits. <wyldwarp>
+2: Curse of Aeolus - Toggles outdoor fog, subject to its weather cooldown. <aeolus>
+3: Visceral Agony - Natural-style attacks can apply poison. <auto>
+4: Coup de Grace - Opening kill attacks against standing targets gain a second attack sequence. <auto>
+5: Body Wrack - Pain attack against a target in the room. <bodywrack>
 
 Related Helps: Tribes, and Werewolf.
 ~
 
 0 'Bone Gnawers'~
-1: Resist Toxin - Provides immunity to poison. <auto>
-2: Odious Aroma - Penalizes attackers. <auto>
+1: Resist Toxin - Blocks the standard poison spell; not a universal toxin guarantee. <auto>
+2: Odious Aroma - Adds soak equal to 30 times the tribe rating. <auto>
 3: Friend in Need - Gives away rage. <friend>
 4: Infest - Summons a horde of Vermin. <infest>
-5: Survivor - All attacks deal less damage. <auto>
+5: Survivor - No separate rank-5 effect located; the existing tribe-based soak still scales. <unverified>
 
 Related Helps: Tribes, and Werewolf.
 ~
 
 0 'Children of Gaia'~
 1: Calm - Allows a quick calming of rage. <calm>
-2: Dazzle - Stuns your opponent. <dazzle>
-3: Spirit Friend - Summons a spirit to guide you. <spiritguardian>
-4: Strike the Air - +Avoid, -Break? <striketheair>
-5: Halo of Sun - A halo of pure Sunlight surrounds you. <halosun>
+2: Strike the Air - Adds avoidance and armor modifiers. <auto>
+3: Dazzle - Stops a fighting target and stuns them, subject to target checks. <dazzle>
+4: Spirit Guardian - Toggles a warning against detected hostile powers; not a pet. <spiritguardian>
+5: Halo of Sun - Toggles a sunlight halo that boosts the damage cap against Vampires. <halosun>
 
 Related Helps: Tribes, and Werewolf.
 ~
 
 0 Fianna~
 1: Faerie Light - Creates a ball of light. <faerielight>
-2: Howl of the Banshee - Makes all run in fright. <howlbanshee>
-3: Faerie Kin - Summons a random Fae spirit. <faeriekin>
-4: Balor's Gaze - Causes pain in target. <balorsgaze>
-5: Gift of the Spriggan - Makes you enormous. <spriggan>
+2: Howl of the Banshee - Delays susceptible room targets; fleeing also requires Fianna 5. <howlbanshee>
+3: Form Illusion - Creates an illusion using the selected appearance. <formillusion>
+4: Clone Object - Creates an illusionary copy of an eligible item. <cloneobject>
+5: Balor's Gaze - Inflicts pain on a player target. <balorsgaze>
 
 Related Helps: Tribes, and Werewolf.
 ~
 
 0 'Get of Fenris'~
 1: Visage of Fenris - Adds 100 to the Werewolf damage cap. <auto>
-2: Halt the Coward's Flight - Prevents retreat. <auto>
-3: Might of Thor - Increases damage. <thor>
-4: Scream of Gaia - Stuns everyone. <scream>
+2: Halt the Coward's Flight - Chance to block fleeing scales with tribe rating, starting at rank 1. <auto>
+3: Acid Blood - Feeding on your blood can burn the feeder. <auto>
+4: Scream of Gaia - No working command is implemented. <unimplemented>
 5: Hero's Stand - Prevents punch/hurl. <auto>
 
 Related Helps: Tribes, and Werewolf.
@@ -1020,20 +1024,20 @@ Related Helps: Tribes, and Werewolf.
 
 0 'Glass Walkers'~
 1: Diagnostics - Closely examines an object. <diagnostics>
-2: Cybersenses - Technologically enhances senses. <readaura>
-3: Power Surge - Electrocutes opponents. <surge>
-4: Doppleganger - Takes on appearance of another. <doppleganger>
+2: Cybersenses - Reads a visible target's aura; not a senses toggle. <readaura>
+3: Power Surge - Attacks eligible targets in the room. <surge>
+4: Doppleganger - Copies another character's appearance, not their combat powers. <doppleganger>
 5: Summon Net Spider - Summons a net spider. <summonnetspider>
 
 Related Helps: Tribes, and Werewolf.
 ~
 
 0 'Red Talons'~
-1: Iron Claws - Lets you parry with claws. <auto>
-2: Steel Claws - Lets you parry with claws better. <auto>
-3: Gorge - Increases max rage. <auto>
-4: Quicksand - Slows down entire room. <quicksand>
-5: Curse of Lycaon - Curses target into wolf form. <lycaon>
+1: Iron Claws - No rank-specific claw-parry effect was located in current combat code. <unverified>
+2: Steel Claws - No additional rank-specific claw-parry effect was verified. <unverified>
+3: Gorge - Raises the normal combat rage ceiling by 50. <auto>
+4: Quicksand - Handler is a disabled stub; it does not slow a room. <disabled>
+5: Curse of Lycaon - Handler is a disabled stub; it does not transform targets. <disabled>
 
 Related Helps: Tribes, and Werewolf.
 ~
@@ -1049,41 +1053,43 @@ Related Helps: Tribes, and Werewolf.
 ~
 
 0 'Silent Striders'~
-1: Silence - Makes the Garou's footsteps silent. <auto>
-2: Speed of Thought - Increased speed. <auto>
-3: Messenger's Fortitude - Reduced damage. <auto>
-4: Speed Beyond Thought - Increased speed. <auto>
-5: Reach the Umbra - Pulls people out of Umbra. <reach>
+1: Speed of Thought - Improves combat initiative. <auto>
+2: Messenger's Fortitude - Upkeep claims resistance, but no dedicated damage modifier was located. <unverified>
+3: Speed Beyond Thought - Adds a further combat initiative improvement. <auto>
+4: Unassigned Silent Strider Gift - No separate rank-4 power was located. <unimplemented>
+5: Reach the Umbra - A legacy handler exists, but no player command is registered. <unavailable>
 
 Related Helps: Tribes, and Werewolf.
 ~
 
 0 'Silver Fangs'~
-1: Falcon's Grasp - Renders you immune to disarm. <auto>
-2: Lambent Flame - Makes Garou hard to hit. <auto>
-3: Wrath of Gaia - Forces servants of the Wyrm to flee. <wrath>
-4: Mastery - Compels obedience in other Garou. <mastery>
-5: Luna's Avenger - Transformation into living Silver. <avenger>
+1: Falcon's Grasp - No rank-specific disarm immunity was verified. <unverified>
+2: Lambent Flame - No dedicated rank-2 avoidance effect was located. <unverified>
+3: Wrath of Gaia - A legacy handler exists, but no player command is registered. <unavailable>
+4: Shield - Toggles aura shielding against inspection. <shield>
+5: Mastery - A legacy handler exists, but no player command is registered. <unavailable>
+
+The old Luna's Avenger description does not provide an implemented body form.
 
 Related Helps: Tribes, and Werewolf.
 ~
 
 0 Uktena~
-1: Shroud - Summons a ball of darkness. <shroud>
-2: Spirit of the Fish - Grants water breathing. <auto>
-3: Spirit of the Bird - Grants flight. <auto>
-4: Invisibility - Renders you invisible. <invisibility>
-5: Fetish Doll - Creates a Voodoo doll. <fetish>
+1: Shroud - Toggles magical room darkness; this rating also permits sight in that darkness. <shroudnight>
+2: Spirit of the Fish - Permits underwater movement without breathing equipment. <auto>
+3: Spirit of the Bird - No rank-3 flight-granting effect was located in current source. <unverified>
+4: Invisibility - A legacy handler exists, but no player command is registered. <unavailable>
+5: Fetish Doll - Creates a doll for a valid reciprocal head/owner target. <fetishdoll>
 
 Related Helps: Tribes, and Werewolf.
 ~
 
 0 Wendigos~
 1: Camouflage - Hides the user from sight. <camouflage>
-2: Cutting Wind - Blasts opponents with cold wind. <cutting>
+2: Cutting Wind - Attacks a room target with a chance to stun; not typed cold damage. <cutting>
 3: Bloody Feast - Consumes corpses for strength. <bloodyfeast>
-4: Heart of Ice - Makes you immune to the cold. <auto>
-5: Invoke the Spirits of the Storm - Complete weather mastery. <invoke>
+4: Heart of Ice - Blocks the standard frost-breath spell; not universal cold immunity. <auto>
+5: Invoke the Spirits of the Storm - Controls fog, rain or lightning outdoors with a cooldown. <invoke>
 
 Related Helps: Tribes, and Werewolf.
 ~
@@ -1091,9 +1097,9 @@ Related Helps: Tribes, and Werewolf.
 0 Stargazers~
 1: Falling Touch - Stuns opponent. <falling>
 2: Inner Strength - Increases hit/dam. <auto>
-3: Clarity - Allows sight through Obfuscate. <auto>
+3: Clarity - Sees through Obfuscate up to the tribe rating; the check is not exclusive to rank 3. <auto>
 4: Preternatural Awareness - Makes the Garou hard to hit. <auto>
-5: Circular Attack - Redirects attacks back at your opponent. <auto>
+5: Circular Attack - A one-in-eight damage-path check can redirect the incoming attack. <auto>
 
 Related Helps: Tribes, and Werewolf.
 ~

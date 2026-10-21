@@ -135,6 +135,7 @@ check-layout:
 	python3 tests/test_hybrid_mastery_catalog.py
 	python3 tests/test_hybrid_scry_catalog.py
 	python3 tests/test_werewolf_commands_catalog.py
+	python3 tests/test_werewolf_help_catalog.py
 	python3 tests/test_hybrid_books_catalog.py
 	python3 tests/test_hybrid_colors_catalog.py
 	python3 tests/test_hybrid_creation_catalog.py
