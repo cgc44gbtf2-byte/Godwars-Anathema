@@ -53,7 +53,7 @@ class HybridAccessCatalog(unittest.TestCase):
         self.assertIn('AnathemaHybrid 4 ',text)
         import json
         compat=json.loads((ROOT/"deploy/update_compat.json").read_text())
-        self.assertEqual(compat["save_epoch"],3)
+        self.assertEqual(compat["save_epoch"],4)
         self.assertEqual(compat["handoff"],2)
 
 

@@ -7,7 +7,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <limits.h>
 #include "merc.h"
+#include "guardian.h"
+#include "../hybrid/player.h"
 
 void do_persuasion( CHAR_DATA *ch, char *argument )
 {
@@ -231,20 +234,108 @@ void do_reshape( CHAR_DATA *ch, char *argument )
 
 void do_disquiet( CHAR_DATA *ch, char *argument )
 {
-    if (!IS_WEREWOLF(ch))
+    char target[MAX_INPUT_LENGTH], extra[MAX_INPUT_LENGTH];
+    CHAR_DATA *victim;
+    AFFECT_DATA effect = {0};
+    long rank, penalty;
+    int sn;
+
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL ||
+        ch->in_room == NULL || !hybrid_player_save_valid(ch))
+        return;
+    if (!IS_WEREWOLF(ch) || ch->level < LEV_AWA)
     {
 	stc("Huh?\n\r", ch);
 	return;
     }
 
-    if (get_breed(ch, BREED_HOMID) < 4)
+    rank = get_breed(ch, BREED_HOMID);
+    if (rank < 4)
     {
 	stc("You require the level 4 Homid power to use Disquiet.\n\r", ch);
 	return;
     }
 
-    stc("Gutted!\n\r", ch);
-    return;
+    if (argument == NULL) argument = "";
+    argument = one_argument(argument, target);
+    one_argument(argument, extra);
+    if (target[0] == '\0' || extra[0] != '\0')
+    {
+        stc("Syntax: disquiet <target>.\n\r", ch);
+        return;
+    }
+    victim = get_char_room(ch, target);
+    if (victim == NULL || victim == ch)
+    {
+        stc("Choose another person in this room.\n\r", ch);
+        return;
+    }
+    if ((!IS_NPC(victim) && (victim->pcdata == NULL ||
+         victim->level < LEV_AWA || get_trust(victim) > LEV_AWA ||
+         !CAN_PK(ch) || !CAN_PK(victim))) ||
+        victim->hit <= 0 || victim->position <= POS_STUNNED ||
+        IS_SET(ch->in_room->room_flags, ROOM_SAFE) || is_safe(ch, victim))
+    {
+        stc("You cannot use Disquiet on that target.\n\r", ch);
+        return;
+    }
+    sn = skill_lookup("disquiet");
+    if (sn <= 0 || sn >= MAX_SKILL)
+    {
+        stc("Disquiet is unavailable; please inform staff.\n\r", ch);
+        return;
+    }
+    if (is_affected(victim, sn))
+    {
+        stc("They are already affected by Disquiet.\n\r", ch);
+        return;
+    }
+    penalty = rank * 5; /* get_breed bounds native Homid to five. */
+    if (victim->hitroll < LONG_MIN + penalty ||
+        victim->damroll < LONG_MIN + penalty)
+    {
+        stc("Their combat statistics cannot safely accept Disquiet.\n\r", ch);
+        return;
+    }
+
+    /* A resisted hostile attempt still incurs the normal three-second wait.
+     * Use the existing Presence resistance pool, without charming or ordering. */
+    WAIT_STATE(ch, 12);
+    if (!IS_NPC(victim) && victim->pcdata->resist[WILL_PRESENCE] <= 0 &&
+        IS_WILLPOWER(victim, RES_PRESENCE) &&
+        victim->pcdata->willpower[0] >= 10)
+    {
+        victim->pcdata->willpower[0] -= 10;
+        victim->pcdata->resist[WILL_PRESENCE] = 60;
+        if (!IS_WILLPOWER(victim, RES_TOGGLE))
+            REMOVE_BIT(victim->pcdata->resist[0], RES_PRESENCE);
+        stc("You spend ten willpower to resist Disquiet.\n\r", victim);
+    }
+    if (!IS_NPC(victim) && victim->pcdata->resist[WILL_PRESENCE] > 0)
+    {
+        stc("They resist your attempt to unsettle them.\n\r", ch);
+        if (IS_MORE(victim, MORE_GUARDIAN) && guardian_eligible(victim))
+        {
+            guardian_message(victim);
+            act("$n tried to use Disquiet on you.", ch, NULL, victim, TO_VICT);
+        }
+        return;
+    }
+
+    effect.type = sn;
+    effect.duration = rank;
+    effect.modifier = -penalty;
+    effect.location = APPLY_HITROLL;
+    affect_to_char(victim, &effect);
+    effect.location = APPLY_DAMROLL;
+    affect_to_char(victim, &effect);
+    act("You unsettle $N, weakening $S accuracy and attacks.", ch, NULL, victim, TO_CHAR);
+    act("$n's unsettling gaze weakens your accuracy and attacks.", ch, NULL, victim, TO_VICT);
+    if (!IS_NPC(victim) && IS_MORE(victim, MORE_GUARDIAN) && guardian_eligible(victim))
+    {
+        guardian_message(victim);
+        act("$n used Disquiet on you.", ch, NULL, victim, TO_VICT);
+    }
 }
 
 void do_spiritward( CHAR_DATA *ch, char *argument )

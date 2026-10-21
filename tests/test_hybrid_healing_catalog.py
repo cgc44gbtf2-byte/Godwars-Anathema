@@ -78,7 +78,7 @@ class HybridHealingCatalog(unittest.TestCase):
         preview=(SRC/"classes/hybrid/selfbrid.c").read_text()
         self.assertNotIn("hybrid_player_attach(",preview)
         compat=json.loads((ROOT/"deploy/update_compat.json").read_text())
-        self.assertEqual(compat["save_epoch"],3)
+        self.assertEqual(compat["save_epoch"],4)
         self.assertEqual(compat["handoff"],2)
 
     def test_no_new_permission_mocks_in_legacy_tests(self):

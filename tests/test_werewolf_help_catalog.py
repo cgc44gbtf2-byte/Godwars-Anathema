@@ -70,10 +70,10 @@ class WerewolfHelpCatalog(unittest.TestCase):
             "auto","unverified","unimplemented","unavailable","disabled"} else
             x["tag"].split(":")[0] if ":" in x["tag"] else "command"
             for x in rows.values())
-        self.assertEqual(kinds,{"command":57,"auto":28,"unverified":9,
-            "unimplemented":3,"unavailable":4,"disabled":2,"stub":1,"upgrade":1})
+        self.assertEqual(kinds,{"command":58,"auto":28,"unverified":9,
+            "unimplemented":3,"unavailable":4,"disabled":2,"upgrade":1})
 
-    def test_57_commands_and_stub_match_menu_at_exact_tree_and_rank(self):
+    def test_58_commands_match_menu_at_exact_tree_and_rank(self):
         text=(SRC/"classes/werewolf/werewolf.c").read_text().split(
             "void do_wwpowers(",1)[1].split("void do_gifts(",1)[0]
         menu={}
@@ -89,7 +89,6 @@ class WerewolfHelpCatalog(unittest.TestCase):
         rows=catalog()
         actual={k:v["tag"] for k,v in rows.items() if re.fullmatch(r"[a-z]+",v["tag"])
                 and v["tag"] not in {"auto","unverified","unimplemented","unavailable","disabled"}}
-        actual[("Homid",4)]=rows[("Homid",4)]["tag"].removeprefix("stub: ")
         self.assertEqual(actual,menu)
         self.assertEqual(len(set(actual.values())),58)
         bindings=dict(re.findall(r'\{\s*"([^"]+)"\s*,\s*(do_\w+)',
@@ -117,11 +116,11 @@ class WerewolfHelpCatalog(unittest.TestCase):
         for fn in list(UNAVAILABLE.values())+list(DISABLED.values()):
             self.assertIn("void "+fn+"(",source)
             self.assertNotIn(fn,handlers)
-        stub=(SRC/"classes/werewolf/wwbreed.c").read_text().split(
+        restored=(SRC/"classes/werewolf/wwbreed.c").read_text().split(
             "void do_disquiet(",1)[1].split("void do_spiritward(",1)[0]
-        self.assertIn('stc("Gutted!',stub)
-        for action in ("SET_BIT","REMOVE_BIT","damage(","affect_to_char(","ch->primal -="):
-            self.assertNotIn(action,stub)
+        self.assertNotIn('stc("Gutted!',restored)
+        self.assertEqual(rows[("Homid",4)]["tag"],"disquiet")
+        self.assertEqual(restored.count("affect_to_char(victim, &effect)"),2)
 
     def test_grandmother_is_an_upgrade_not_an_extra_auto_heal(self):
         row=catalog()[("Theurge",2)]

@@ -62,7 +62,7 @@ class CelestialCatalog(unittest.TestCase):
             if path=="save.c":text=without_guardian_lifecycle_save(text)
             self.assertEqual(blob(text),sha)
         self.assertEqual(json.loads((ROOT/"deploy/update_compat.json").read_text()),
-                         {"schema":1,"save_epoch":3,"handoff":2})
+                         {"schema":1,"save_epoch":4,"handoff":2})
 
     def test_rank_cost_and_native_destination_policy(self):
         body=(SRC/"classes/monk/monk.c").read_text().split("void do_celestial(",1)[1].split(

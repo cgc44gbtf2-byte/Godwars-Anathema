@@ -33,7 +33,7 @@ class HybridStunCatalog(unittest.TestCase):
             self.assertEqual(actual.strip(),value)
         self.assertRegex(header,r"#define IS_MONK\(ch\)\s+\(\(ch\)->class == CLASS_MONK && !IS_NPC\(ch\)\)")
         compat=json.loads((ROOT/"deploy/update_compat.json").read_text())
-        self.assertEqual((compat["save_epoch"],compat["handoff"]),(3,2))
+        self.assertEqual((compat["save_epoch"],compat["handoff"]),(4,2))
 
     def test_targets_immunity_counter_and_charge_order_stay_native(self):
         body=(SRC/"classes/monk/monk.c").read_text().split("void do_stunfist(",1)[1].split("void do_chimera(",1)[0]

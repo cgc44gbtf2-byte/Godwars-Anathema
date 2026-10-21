@@ -118,7 +118,7 @@ class MonkBuffCatalog(unittest.TestCase):
 
     def test_saved_format_and_forms_unchanged(self):
         compat=json.loads((ROOT/"deploy/update_compat.json").read_text())
-        self.assertEqual((compat["save_epoch"],compat["handoff"]),(3,2))
+        self.assertEqual((compat["save_epoch"],compat["handoff"]),(4,2))
         source=(SRC/"classes/monk/monk.c").read_text()
         self.assertNotIn("hybrid_forms_",source)
 

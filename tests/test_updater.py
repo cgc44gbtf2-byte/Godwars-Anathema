@@ -30,7 +30,7 @@ def make_archive(extra=(), compat=None, makefile=None):
         ("root/Genesis/src/classes/modules.mk", b"CLASS_MODULE_SOURCES =\n"),
         ("root/Genesis/src/comm.c", b"/* fixture */\n"),
         ("root/deploy/update_compat.json", json.dumps(
-            compat or {"schema": 1, "save_epoch": 3, "handoff": 2}).encode()),
+            compat or {"schema": 1, "save_epoch": 4, "handoff": 2}).encode()),
         ("root/Genesis/player/Oldaccount", b"NOT TO BE EXTRACTED"),
     ]
     data = io.BytesIO()
@@ -56,7 +56,7 @@ class ArchiveTests(unittest.TestCase):
 
     def test_only_source_is_written(self):
         compat, names = self.extract(make_archive())
-        self.assertEqual(compat["save_epoch"], 3)
+        self.assertEqual(compat["save_epoch"], 4)
         self.assertIn("classes/modules.mk", names)
         self.assertIn("comm.c", names)
         self.assertFalse(any("player" in p or "Oldaccount" in p for p in names))
@@ -85,7 +85,11 @@ class ArchiveTests(unittest.TestCase):
 
     def test_future_epoch_rejected(self):
         with self.assertRaises(u.UpdateError):
-            self.extract(make_archive(compat={"schema": 1, "save_epoch": 4, "handoff": 2}))
+            self.extract(make_archive(compat={"schema": 1, "save_epoch": 5, "handoff": 2}))
+
+    def test_pre_disquiet_epoch_target_rejected(self):
+        with self.assertRaises(u.UpdateError):
+            self.extract(make_archive(compat={"schema": 1, "save_epoch": 3, "handoff": 2}))
 
     def test_legacy_target_rejected(self):
         with self.assertRaises(u.UpdateError):
@@ -452,6 +456,9 @@ class DeployTests(unittest.TestCase):
         self.lock = mock.patch.object(u, "update_lock")
         self.lock_mock = self.lock.start()
         self.addCleanup(self.lock.stop)
+        # The normal transaction matrix exercises same-epoch recovery.
+        # Explicit upgrade/adoption cases below replace/remove this record.
+        u.write_record(u.binary_record(OLD))
 
     def command(self, *args):
         if args[:2] == ("systemctl", "stop"):
@@ -469,6 +476,7 @@ class DeployTests(unittest.TestCase):
         return u.deploy(NEW, u.binary_record(NEW, HEAD), mode, adopt=adopt)
 
     def test_first_use_requires_adoption(self):
+        self.record.unlink()
         with self.assertRaises(u.UpdateError):
             self.install(adopt=False)
         self.assertEqual(self.binary.read_bytes(), OLD)
@@ -524,13 +532,13 @@ class DeployTests(unittest.TestCase):
     def test_forward_epoch_upgrade(self):
         u.write_record(dict(u.binary_record(OLD), save_epoch=1))
         self.install()
-        self.assertEqual(json.loads(self.record.read_text())["save_epoch"], 3)
+        self.assertEqual(json.loads(self.record.read_text())["save_epoch"], 4)
         self.assertEqual(self.binary.read_bytes(), NEW)
 
     def test_forward_build_epoch_upgrade(self):
         u.write_record(dict(u.binary_record(OLD), save_epoch=2))
         self.install()
-        self.assertEqual(json.loads(self.record.read_text())["save_epoch"], 3)
+        self.assertEqual(json.loads(self.record.read_text())["save_epoch"], 4)
         self.assertEqual(self.binary.read_bytes(), NEW)
 
     def test_build_epoch_downgrade_rejected(self):
@@ -676,11 +684,54 @@ class DeployTests(unittest.TestCase):
             self.install()
 
     def test_preview_never_builds_or_mutates_host(self):
+        self.record.unlink()
         with mock.patch.object(u, "checked_release", return_value=(HEAD, [1, 2])), \
              mock.patch.object(u, "build", side_effect=AssertionError("must not build")):
             u.main([])
         self.assertEqual(self.binary.read_bytes(), OLD)
         self.assertFalse(self.record.exists())
+
+    def test_preview_preserves_existing_release_record(self):
+        before=self.record.read_bytes()
+        with mock.patch.object(u, "checked_release", return_value=(HEAD, [1, 2])), \
+             mock.patch.object(u, "build", side_effect=AssertionError("must not build")):
+            u.main([])
+        self.assertEqual(self.record.read_bytes(),before)
+        self.assertEqual(self.binary.read_bytes(),OLD)
+
+    def test_forward_disquiet_epoch_restart_and_copyover(self):
+        for mode in ("restart","copyover"):
+            with self.subTest(mode=mode):
+                self.binary.write_bytes(OLD);self.running=OLD;self.online=True
+                u.write_record(dict(u.binary_record(OLD),save_epoch=3))
+                self.install(mode)
+                current=json.loads(self.record.read_text())
+                self.assertEqual(current["save_epoch"],4)
+                self.assertEqual(current["status"],"staged" if mode=="copyover" else "active")
+                self.assertEqual(self.running,OLD if mode=="copyover" else NEW)
+
+    def test_disquiet_epoch_downgrade_changes_nothing(self):
+        before=self.record.read_bytes()
+        with self.assertRaisesRegex(u.UpdateError,"Unsafe save-epoch downgrade"):
+            u.deploy(NEW,dict(u.binary_record(NEW),save_epoch=3),"restart")
+        self.assertEqual(self.record.read_bytes(),before)
+        self.assertEqual(self.binary.read_bytes(),OLD)
+        self.run_mock.assert_not_called()
+
+    def test_failed_disquiet_upgrade_does_not_restart_old_reader(self):
+        u.write_record(dict(u.binary_record(OLD),save_epoch=3));self.fail_new=True
+        with self.assertRaisesRegex(u.UpdateError,"save-epoch upgrade"):
+            self.install()
+        self.assertFalse(self.online)
+        self.assertEqual(self.binary.read_bytes(),NEW)
+
+    def test_unknown_adoption_does_not_claim_disquiet_support(self):
+        self.assertEqual(u.binary_record(OLD,adopted=True)["save_epoch"],3)
+        self.record.unlink();self.fail_new=True
+        with self.assertRaisesRegex(u.UpdateError,"save-epoch upgrade"):
+            self.install()
+        self.assertFalse(self.online)
+        self.assertEqual(self.binary.read_bytes(),NEW)
 
     def test_branch_movement_blocks_install(self):
         with mock.patch.object(u, "checked_release", return_value=(HEAD, [1, 2])), \

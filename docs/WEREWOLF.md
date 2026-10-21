@@ -85,6 +85,22 @@ No powers, ranks, prices or combat bonuses were removed by this help audit.
 All 105 gift slots now have a source-review classification; see
 [the gift audit](WEREWOLF_GIFT_AUDIT.md) for evidence and remaining gaps.
 Source review is not a claim that every command is safe in every combat state.
+
+## Disquiet
+
+Use `disquiet <target>` with Homid 4. It lowers hitroll and damroll by
+`5 × Homid rank` each with standard affect duration 4 or 5.
+Normal zero-duration cleanup occurs on the following affect update.
+It cannot stack or refresh an active Disquiet. There is no new mana/primal
+charge; success or Presence resistance imposes a three-second caster wait.
+Only eligible NPCs or PK-enabled players may be targeted; safe rooms, staff,
+self and normal combat protections are respected. Presence resistance can
+consume ten willpower under the existing resistance-toggle policy.
+
+The effect is saved, expires through ordinary affect ticks, and can be
+removed through normal dispelling. Offline time does not age it. This does
+not grant secondary-parent Werewolf access. See `deploy/UPDATING.md` before
+updating: save epoch 4 blocks unsafe rollback to older effect readers.
 Binary updates preserve live area files. These are bundled help corrections,
 not an automatic replacement of a server's customized `class.hlp`: review and
 merge the help changes separately before reloading the live world.

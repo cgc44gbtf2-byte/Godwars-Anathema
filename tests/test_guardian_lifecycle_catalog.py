@@ -69,7 +69,7 @@ class GuardianLifecycleCatalog(unittest.TestCase):
         comm=(SRC/"comm.c").read_text()
         self.assertLess(comm.index("combat_status_update();"),comm.index("read_from_descriptor( d )"))
         self.assertEqual(json.loads((ROOT/"deploy/update_compat.json").read_text()),
-                         {"schema":1,"save_epoch":3,"handoff":2})
+                         {"schema":1,"save_epoch":4,"handoff":2})
 
     def test_real_engine_matrix_persistence_and_sanitizer_linkage(self):
         text=(ROOT/"tests/test_guardian_lifecycle.c").read_text()

@@ -69,6 +69,7 @@ TESTS += tests/test_note_editor
 TESTS += tests/test_hybrid_mastery
 TESTS += tests/test_hybrid_scry
 TESTS += tests/test_werewolf_commands
+TESTS += tests/test_disquiet
 # Real validators/effective access for older isolated native fixtures too.
 # Never replace hybrid access with permissive stubs just to satisfy linking.
 HYBRID_ACCESS_SOURCES = $(addprefix Genesis/src/classes/hybrid/,registry.c state.c player.c build.c progression.c specialization.c access.c passives.c books.c) Genesis/src/classes/sorcerer/vision.c Genesis/src/classes/monk/favour.c Genesis/src/guardian.c
@@ -136,6 +137,7 @@ check-layout:
 	python3 tests/test_hybrid_scry_catalog.py
 	python3 tests/test_werewolf_commands_catalog.py
 	python3 tests/test_werewolf_help_catalog.py
+	python3 tests/test_disquiet_catalog.py
 	python3 tests/test_hybrid_books_catalog.py
 	python3 tests/test_hybrid_colors_catalog.py
 	python3 tests/test_hybrid_creation_catalog.py
@@ -232,6 +234,9 @@ tests/test_hybrid_scry: tests/test_hybrid_scry.c tests/test_hybrid_aura.c $(ENGI
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_werewolf_commands: tests/test_werewolf_commands.c tests/test_hybrid_aura.c $(ENGINE_OBJECTS)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
+tests/test_disquiet: tests/test_disquiet.c tests/test_hybrid_aura.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_hybrid_books: tests/test_hybrid_books.c $(ENGINE_OBJECTS)

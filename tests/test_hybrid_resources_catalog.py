@@ -57,7 +57,7 @@ class HybridResourceCatalog(unittest.TestCase):
 
     def test_existing_wire_epochs_remain(self):
         compat=json.loads((ROOT/"deploy/update_compat.json").read_text())
-        self.assertEqual(compat["save_epoch"],3)
+        self.assertEqual(compat["save_epoch"],4)
         self.assertEqual(compat["handoff"],2)
         state=(SRC/"classes/hybrid/state.c").read_text()
         self.assertIn('AnathemaHybrid 4',state)

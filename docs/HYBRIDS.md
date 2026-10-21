@@ -1,5 +1,11 @@
 # Hybrid conversion: staged implementation
 
+> Current compatibility: **save epoch 4, hybrid record v4, socket handoff v2**.
+> Disquiet adds a named saved affect; epoch3 references below describe earlier
+> stages, not the current rollback policy. Hybrid record and handoff layouts
+> are unchanged. Follow `deploy/UPDATING.md`: do not downgrade to an epoch3
+> binary after running an epoch4 release.
+
 ## Colors, help and approved book policy
 
 Class labels follow **HELP CLASS**, not a separate autoclass palette. Dragon

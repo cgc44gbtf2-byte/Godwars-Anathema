@@ -64,7 +64,7 @@ class ScryCatalog(unittest.TestCase):
                          "native-dump","load_char_short","save_char_obj_checked"):
             self.assertIn(fragment,fixture)
         self.assertEqual(json.loads((ROOT/"deploy/update_compat.json").read_text()),
-                         {"schema":1,"save_epoch":3,"handoff":2})
+                         {"schema":1,"save_epoch":4,"handoff":2})
 
     def test_safety_documentation(self):
         docs=(ROOT/"docs/HYBRIDS.md").read_text()

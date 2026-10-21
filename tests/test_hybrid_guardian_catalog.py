@@ -68,7 +68,7 @@ class GuardianCatalog(unittest.TestCase):
             if path=="clan.c":text=without_aura_stage(text)
             self.assertEqual(blob(text),sha)
         self.assertEqual(json.loads((ROOT/"deploy/update_compat.json").read_text()),
-                         {"schema":1,"save_epoch":3,"handoff":2})
+                         {"schema":1,"save_epoch":4,"handoff":2})
 
     def test_single_native_toggle_zero_cost_no_new_actors_or_forms(self):
         body=(SRC/"more.c").read_text().split("void do_spiritguardian(",1)[1].split(

@@ -1,26 +1,26 @@
 # Werewolf gift help audit
 
 Scope: the 105 native Werewolf help slots, their command registrations,
-rank gates, passive consumers, and overlap descriptions. This is a help/test
-change: no production C file, training cost, rank cap, save format, power
-permission, or combat calculation changes.
+rank gates, passive consumers, and overlap descriptions. This began as a
+help/test-only change. The Disquiet restoration below is the sole newly
+implemented gift; training costs, rank caps and existing permissions remain
+unchanged. Its saved affect identity advances compatibility to save epoch 4.
 
 ## Status legend
 
 | Marker | Meaning | Slots |
 | --- | --- | ---: |
-| A: command | A registered handler contains gameplay behavior; not a safety certification | 57 |
+| A: command | A registered handler contains gameplay behavior; not a safety certification | 58 |
 | P: auto | A passive has an identified production consumer | 28 |
 | G: upgrade | Modifies an existing command, not an extra automatic action | 1 |
-| S: stub | Registered, but does not implement its advertised gameplay | 1 |
 | V: unverified | No matching dedicated effect located; absence is not proven universally | 9 |
 | U: unimplemented | No separate implemented gift found for that slot | 3 |
 | X: unavailable | Legacy handler exists but is not registered for player commands | 4 |
 | D: disabled | Unregistered legacy handler also explicitly has no gameplay effect | 2 |
 
 `wwpowers` is a command list, not proof that every listed command works.
-Disquiet remains registered but only prints a message. It is marked as a
-stub in help rather than being described as a working power.
+Disquiet was the identified registered stub in the initial audit. It now has
+the explicitly selected hitroll/damroll effect, rather than the EM calm effect.
 
 ## All trees, in rank order
 
@@ -29,7 +29,7 @@ short descriptions and command spellings are in `Genesis/area/class.hlp`.
 
 | Tree | Ranks 1–5 | Principal corrections / evidence |
 | --- | --- | --- |
-| Homid | A A A S A | Persuasion 1, Reshape Object 3, Disquiet stub 4; `wwbreed.c` |
+| Homid | A A A A A | Persuasion 1, Reshape Object 3, restored Disquiet 4; `wwbreed.c` |
 | Metis | A A A A U | Porcupine requires war-form; Totem Gift is not implemented |
 | Lupus | A A P A A | Beast Life 4, not shield-piercing scry; elemental attacks do not summon pets |
 | Ragabash | A A P A P | Ordinary track suppression; silver vulnerability modifier, not universal immunity |
@@ -69,7 +69,7 @@ short descriptions and command spellings are in `Genesis/area/class.hlp`.
 
 Grandmother's Touch uses the same Mother handler and cooldown. It is an upgrade,
 not a second healing trigger. There are 58 unique canonical registered names
-in the gift menu, of which Disquiet is the identified stub.
+in the gift menu, including the restored Disquiet.
 
 Get of Fenris 1, Shadow Lords 1 and Philodox 3 retain their separate +100
 damage-cap contributions. Lupus 3, Children of Gaia 2 and Stargazers 4 retain
@@ -124,8 +124,39 @@ searched paths; the GWLow5 combat consumer is the distinguishing evidence.
 AtD uses a data-driven command registry, so an empty static-table index was
 not treated as proof that its commands are unavailable.
 
-Recommendation: restore Disquiet first with independently written, native-state
-behavior based on the EM reference. Treat Razor Claws as a separate balance
+The initial recommendation was EM-style Disquiet. The selected implementation
+instead uses a hit/damage debuff, independently written for native state.
+Treat Razor Claws as a separate balance
 decision, and postpone new body forms until the form-ownership integration is
 ready. Review licensing/credits and test native/hybrid caps, shared effects,
 safe targets, persistence and cleanup before any foreign-derived behavior ships.
+
+## Selected Disquiet restoration
+
+`disquiet <target>` requires native/original-parent Werewolf Homid 4.
+At Homid 4 it reduces raw hitroll and damroll by 20 each with affect duration 4;
+Homid 5 gives 25 each with duration 5. Standard zero-duration cleanup happens
+on the following affect update, not immediately when the counter reaches zero.
+Existing effects cannot
+be stacked or refreshed, even by another caster. No mana/primal charge was
+added; successful and resisted attempts impose a 12-pulse caster wait.
+
+It permits eligible NPCs and PK-enabled player targets, never self, protected
+staff, dead targets, safe-room targets or targets rejected by the normal
+combat-safety checks. Existing Presence immunity and ten-point willpower
+resistance apply to players; Guardian warnings remain independent.
+The effect does not charm, order, interrupt commands or grant secondary
+Werewolf access. Shared raw-stat arithmetic outside application/removal
+remains a separate engine-wide concern.
+
+This partially overlaps Whelp's Body, not an identical duplicate:
+Whelp also changes armor, uses a different strength/duration and retains its
+existing access rules. Its code is unchanged. Disquiet cannot stack with
+another Disquiet; other existing debuffs retain normal affect stacking.
+
+The two named affects use the standard save/load, dispel and tick-expiry
+paths, preserving their remaining ticks across relog/copyover. Offline time
+does not age ordinary affects. Existing skill indices and object spell slots
+are unchanged; the new affect name is appended in previously unused space.
+Save epoch 4 prevents binary-only rollback to older readers that do not
+understand that name. Handoff version 2 is unchanged.

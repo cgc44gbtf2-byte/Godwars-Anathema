@@ -809,7 +809,7 @@ Garou Commands
  Wwpowers  - Lists all the commands (NOT powers) available to you.
 
 Wwpowers lists registered gift commands, not every passive bonus. Registration
-alone does not prove a command works; Disquiet is currently a stub. An <auto> marker
+alone does not certify target safety or balance. An <auto> marker
 in a gift help entry means a passive effect, not a command to type.
 An <upgrade> modifies an existing command, not a second automatic action.
 Stub, disabled, unavailable, unimplemented and unverified entries are not
@@ -867,7 +867,7 @@ Related Helps: Auspices, Tribes, 'help <breed name>', and Werewolf.
 1: Persuasion - Toggle an aura that can deter lower-level mobile attackers. <persuasion>
 2: Jam Technology - Attempts to unequip a target's wielded item. <jamtech>
 3: Reshape Object - Edits carried item names, keywords or glow/hum; ownership restrictions apply. <reshapeobject>
-4: Disquiet - Registered command, but its handler has no gameplay effect. <stub: disquiet>
+4: Disquiet - Temporarily reduces hitroll and damroll by five times Homid rank; does not stack or refresh. <disquiet>
 5: Spirit Ward - Toggles aura shielding against inspection. <spiritward>
 
 Related Helps: Breeds, and Werewolf.

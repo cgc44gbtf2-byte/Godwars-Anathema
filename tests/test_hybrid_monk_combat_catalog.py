@@ -137,7 +137,7 @@ class MonkCombatCatalog(unittest.TestCase):
 
     def test_persistence_protocol_and_standalone_forms_not_changed(self):
         compat=json.loads((ROOT/"deploy/update_compat.json").read_text())
-        self.assertEqual((compat["save_epoch"],compat["handoff"]),(3,2))
+        self.assertEqual((compat["save_epoch"],compat["handoff"]),(4,2))
         text=(SRC/"classes/monk/monk.c").read_text()
         for name in NAMES:
             a,b=function_span(text,name);body=text[a:b]

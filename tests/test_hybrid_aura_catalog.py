@@ -52,7 +52,7 @@ class AuraCatalog(unittest.TestCase):
                          ("classes/hybrid/training.c","4646c2494470f6427efbba6da69752b32590c2a2")):
             self.assertEqual(blob((SRC/path).read_text()),sha)
         self.assertEqual(json.loads((ROOT/"deploy/update_compat.json").read_text()),
-                         {"schema":1,"save_epoch":3,"handoff":2})
+                         {"schema":1,"save_epoch":4,"handoff":2})
 
     def test_real_dispatch_independent_projection_native_matrix_and_loaders(self):
         self.assertIn("tests/test_hybrid_aura",make_values(ROOT,"TESTS"))

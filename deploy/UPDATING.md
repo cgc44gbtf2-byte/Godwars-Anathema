@@ -137,14 +137,18 @@ staging path promises to leave the current process untouched.
   This is privilege separation, not a complete sandbox for hostile code.
 - Archives are size-limited and source entries are selected explicitly;
   traversal, links and unexpected source artifacts are rejected.
-- The supported declaration is `save_epoch: 3`, `handoff: 2`. This release
-  reads older player files and writes optional v4 hybrid records with build IDs.
-  Installed epoch1/2 metadata can advance to3, but binary-only downgrade to1/2
-  is refused because old loaders may discard those records. Same-epoch
-  rollback remains available. If an epoch1/2→3 restart fails after replacement,
-  the helper stops rather than automatically launching an old binary against
-  possibly updated data; repair with an epoch3-compatible release. An
-  operator-adopted unknown binary is conservatively recorded as epoch3.
+- The supported declaration is `save_epoch: 4`, `handoff: 2`. Named Disquiet
+  affects require the new reader. Installed epoch1/2/3 metadata may advance
+  to4; binary-only downgrade from4 is refused because older readers cannot
+  safely restore those affects. A failed epoch upgrade stops instead of
+  automatically restarting an older reader. Repair with an epoch4-compatible
+  release. Unknown operator-adopted binaries are conservatively tagged3.
+  Handoff2 remains compatible; this is not permission to force a downgrade.
+  Older player files and optional v4 hybrid records remain readable.
+  Same-epoch rollback remains available. On first adoption, the conservative
+  epoch3 tag deliberately prevents automatic recovery to the unknown binary
+  after the epoch4 executable has run. The helper does not edit live player
+  files to erase new affects for a downgrade.
   Future
   save-format, copyover-format, dependency or service changes need a reviewed
   migration, not blindly changing these numbers. The declaration cannot

@@ -91,7 +91,7 @@ class WerewolfCommandsCatalog(unittest.TestCase):
                      "shift werewolf","shift human","LONG_MIN","LONG_MAX"):
             self.assertIn(item,test)
         self.assertEqual(json.loads((ROOT/"deploy/update_compat.json").read_text()),
-                         {"schema":1,"save_epoch":3,"handoff":2})
+                         {"schema":1,"save_epoch":4,"handoff":2})
 
     def test_documented_native_and_hybrid_prices(self):
         docs=(ROOT/"docs/WEREWOLF.md").read_text()

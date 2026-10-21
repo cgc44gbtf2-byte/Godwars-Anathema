@@ -871,4 +871,12 @@ const	struct	skill_type	skill_table	[MAX_SKILL]	=
          "blood potency",     "Your concentrated blood returns to normal."
     },
 
+    /* Append only: existing skill indices and object spell slots stay fixed.
+     * This is an affect identity, not a learnable/castable spell. */
+    {    "disquiet",          99,
+         spell_null,          TAR_IGNORE,            POS_STANDING,
+         NULL,                SLOT(0),               0, 12,
+         "Disquiet",          "Your confidence and combat focus return."
+    },
+
 };

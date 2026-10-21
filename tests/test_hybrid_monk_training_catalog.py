@@ -34,7 +34,7 @@ class MonkTrainingCatalog(unittest.TestCase):
                          ("save.c","3655e4f99b37b0d5165e58dc73d78c00b47564fc")):
             self.assertEqual(blob((SRC/path).read_text()),sha)
         self.assertEqual(json.loads((ROOT/"deploy/update_compat.json").read_text()),
-                         {"schema":1,"save_epoch":3,"handoff":2})
+                         {"schema":1,"save_epoch":4,"handoff":2})
 
     def test_exact_secondary_route_bounded_input_explicit_gain_and_confirmation(self):
         text=(SRC/"classes/hybrid/monk_training.c").read_text()

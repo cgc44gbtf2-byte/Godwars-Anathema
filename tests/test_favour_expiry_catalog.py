@@ -55,7 +55,7 @@ class FavourExpiryCatalog(unittest.TestCase):
         self.assertIn('if (!str_cmp(word, "*AnathemaFavor"))',branch)
         self.assertIn("else fread_to_eol( fp );",branch)
         compat=json.loads((ROOT/"deploy/update_compat.json").read_text())
-        self.assertEqual((compat["save_epoch"],compat["handoff"]),(3,2))
+        self.assertEqual((compat["save_epoch"],compat["handoff"]),(4,2))
         self.assertIn("monk_favour_reconcile(ch, &time_info);",text)
 
     def test_parser_is_bounded_and_only_clears_favor(self):
