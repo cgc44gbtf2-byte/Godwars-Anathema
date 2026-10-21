@@ -304,7 +304,7 @@ static void commands(void)
             assert(strstr(output, "second parent starts untrained"));
             assert(strstr(output, "Master/Elite"));
             assert(strstr(output, "not a final eligibility check"));
-            assert(strstr(output, "Class/build power mastery and safe conversion"));
+    assert(strstr(output, "Class/build power mastery is reported separately"));
         }
     }
     fresh(CLASS_VAMPIRE | CLASS_WEREWOLF);

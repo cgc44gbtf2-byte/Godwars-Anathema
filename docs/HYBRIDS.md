@@ -1151,3 +1151,55 @@ The original character and bank data remain intact. No report claims that
 other powers/forms/trainers are fully wired or that conversion is enabled.
 Record4/save epoch3/handoff2 remain unchanged. Help reorganization stays
 deferred, using werewolf help as a layout reference with a safe live-data import.
+
+## Original-class mastery preview
+
+`selfbrid info <full hybrid name>` now combines numeric training, original-class
+mastery and the **50,000 QP** balance into a read-only prerequisite preview.
+“Requirements met” is **not conversion authorization**. No conversion, payment,
+automatic training, normalization, saving or form change occurs. Existing hybrid
+records and rejected player data block a new-conversion preview.
+
+Original-parent requirements use raw native training, never the secondary
+“one full branch, remaining branches rounded-up half” limits:
+
+| Original class | Permanent mastery checked |
+|---|---|
+| Vampire | Basic, selected clan and unlocked disciplines; native caps 7 clan / 5 other, clanless 6, Thaumaturgy always 5 |
+| Werewolf | All 3 breed, 5 auspice and 13 tribe gift trees: selected gift in each family 5, others 4; native advancement rank 4 |
+| Sorcerer | All six colors at 5 |
+| Drow | All 17 prayer-granted unlocks and speed 4 |
+| Highlander | Weaponry, Attack, Defense and Powers at 6 |
+| Mage | All nine spheres: three selected branches 5, others 4; Arete 10 |
+| Dragon | All 13 learnable skills, chosen native color, Wyrm age |
+| Ninja | Sora, Chikyu and Ningenno at 10 |
+| Monk | Techniques, Mantras and Arts at 8 |
+| Elementalist | Choose a focus: focused element 10, opposite 6, other six elements 8 |
+
+Complete original build choices first: three distinct Mage spheres, three distinct
+standard Vampire clan disciplines, all three Werewolf gift choices, and an
+Elementalist focus. Caitiff/Panders use their native clanless caps instead of a
+three-discipline clan bonus. Custom social clan names do not replace or grant
+selected power branches. Optional locked Vampire rank0 powers are **unavailable
+disciplines**, exempt until taught/unlocked; rank -1 means known but untrained.
+Basic and selected clan disciplines cannot be skipped by zeroing their ranks.
+Reserved/disabled discipline slots are not trainable requirements; nonzero data
+there needs staff review. This adds no teaching command or unlock.
+
+Wyrm is the native age trainer's last attainable age, not the staff-only Ancient Wyrm.
+Invalid choices, duplicate branches, negative/over-cap ranks and unknown unlock
+bits require review rather than silently counting as mastered. Ordinary unfinished
+choices/training are reported as missing. Do not repair a save by blindly setting
+every storage slot to a maximum: arrays also hold unrelated timers/resources.
+
+Current HP/mana, blood, DP, ki, primal, quintessence, exp, active claws/fangs,
+temporary forms and active Drow globe/Dragon wings/horns flags are not permanent
+mastery requirements. Max HP/mana must still each be at least 50,000; the five base
+stats, stances, weapon proficiencies and currently trainable styles retain the
+existing numeric rules. Gear is neither inspected nor granted. No new generic
+spell or resource-pool grinding requirement is introduced.
+
+Native trainers, original power access, secondary caps, book limits, inventory,
+Record4/save epoch3/handoff2 are unchanged. Safe actor-state validation and an
+atomic paid conversion with rollback/retry handling remain future work; a green
+preview must not be used as an authorization token or bypass a fresh check.

@@ -143,6 +143,6 @@ void hybrid_readiness_show(CHAR_DATA *ch)
     }
     send_to_char("Base stats exclude gear/form bonuses. Rank values above native caps "
                  "need review; nothing was normalized.\n\r"
-                 "Class/build power mastery and safe conversion are still pending. "
+                 "Class/build power mastery is reported separately; safe conversion is still pending. "
                  "Conversion remains disabled.\n\r", ch);
 }

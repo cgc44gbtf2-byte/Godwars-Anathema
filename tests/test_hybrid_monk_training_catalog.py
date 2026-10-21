@@ -17,6 +17,8 @@ def blob(text):
 class MonkTrainingCatalog(unittest.TestCase):
     def test_preview_restores_exact_previous_source(self):
         text=(SRC/"classes/hybrid/selfbrid.c").read_text()
+        text=once(text,'#include "mastery.h"\n',"")
+        text=once(text,"    hybrid_mastery_show(ch);\n","")
         text=once(text,'#include "monk_training.h"\n',"")
         text=once(text,"    if (hybrid_monk_training_command(ch, argument)) return;\n","")
         text=once(text,"/* List/info remain read-only. Explicit colors/monk subcommands train only an",

@@ -172,7 +172,7 @@ static void preview(void)
     output[descriptor.outtop] = '\0';
     assert(strstr(output, "Numeric prerequisites: 27/27"));
     assert(strstr(output, "not conversion eligibility"));
-    assert(strstr(output, "Class/build power mastery and safe conversion"));
+    assert(strstr(output, "Class/build power mastery is reported separately"));
     assert(strstr(output, "conversion is not enabled"));
     assert(!memcmp(&before, &actor, sizeof(actor)));
     assert(!memcmp(&pc_before, &player, sizeof(player)));

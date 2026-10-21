@@ -73,7 +73,7 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
                      "retained, second parent untrained.\n\r"
                      "Required: max original class/build powers, base stats, stances, "
                      "weapons and trainable styles; at least50k max HP/mana.\n\r"
-                     "Numeric checks exist; power mastery and safe conversion remain "
+                     "Numeric and original-class mastery previews exist; safe conversion remains "
                      "pending. Secondary ranked trees: one full branch, others rounded-up "
                      "half, within native caps. Branchless parents keep normal ability "
                      "rosters, not free learning.\n\r"

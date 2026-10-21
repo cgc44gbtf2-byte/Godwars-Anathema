@@ -27,6 +27,7 @@ CLASS_MODULE_SOURCES = \
   classes/hybrid/registry.c \
   classes/hybrid/selfbrid.c \
   classes/hybrid/readiness.c \
+  classes/hybrid/mastery.c \
   classes/hybrid/help.c \
   classes/hybrid/books.c \
   classes/hybrid/colors.c \

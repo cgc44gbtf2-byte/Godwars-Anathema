@@ -7,6 +7,7 @@
 #include "../../merc.h"
 #include "hybrid.h"
 #include "readiness.h"
+#include "mastery.h"
 #include "colors.h"
 #include "monk_training.h"
 
@@ -88,4 +89,5 @@ void do_selfbrid(CHAR_DATA *ch, char *argument)
                  "No equipment, training, currency or character data was changed.\n\r",
                  ch);
     hybrid_readiness_show(ch);
+    hybrid_mastery_show(ch);
 }
