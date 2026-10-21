@@ -8,6 +8,8 @@ from test_hybrid_stun_catalog import without_hybrid_stun_adapter
 
 
 def blob(text):
+    from werewolf_source import without_werewolf_stage
+    text=without_werewolf_stage(text)
     data=text.encode()
     return hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest()
 

@@ -271,7 +271,8 @@ static void native_trainers(void)
     for(long i=0;i<5;i++)native_lesson(do_gifts,auspices[i],&player.auspice[i],i==0?5:4);
     for(long i=0;i<13;i++)native_lesson(do_gifts,tribes[i],&player.tribes[i],i==0?5:4);
     do_advance(&actor,"");assert(player.rank==4);
-    player.rank=3;player.score[SCORE_NUM_QUEST]=100000;actor.mkill=100000;
+    player.rank=3;player.score[SCORE_NUM_QUEST]=0;actor.mkill=3000;
+    actor.exp=3000000;
     do_advance(&actor,"");assert(player.rank==4);is_ready();
     prepared(CLASS_MAGE,0);
     actor.exp=5000000;do_arete(&actor,"");assert(actor.arete==10&&actor.exp==5000000);

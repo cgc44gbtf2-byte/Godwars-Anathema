@@ -300,7 +300,13 @@ static void compare_special(CHAR_DATA *ch,HYBRID_LESSON_REQUEST r,const char *co
     case HYBRID_LESSON_ARETE:do_arete(&native,arg);
         assert(native.arete==q.state.secondary_progression.arete);break;
     case HYBRID_LESSON_WOLF_RANK:do_advance(&native,arg);
-        assert(pc.rank==q.state.secondary_progression.wolf_rank);break;
+        assert(pc.rank==q.state.secondary_progression.wolf_rank);
+        /* This comparison actor is a nonhybrid: the actual secondary pays
+         * double native primal/XP and needs double native cumulative kills. */
+        assert(ch->primal-native.primal==q.primal_cost/2);
+        assert(ch->exp-native.exp==q.experience_cost/2);
+        native.primal=q.primal;native.exp=q.experience;
+        break;
     case HYBRID_LESSON_DROW_POWER:case HYBRID_LESSON_DROW_SPEED:
         do_prayer(&native,arg);
         assert(!memcmp(pc.drow,q.state.secondary_progression.drow,sizeof(pc.drow)));break;
@@ -332,7 +338,7 @@ static void special_lessons(void)
     commit(ch,r);reload(ch);release(ch);
     ch=fresh(CLASS_WEREWOLF);r=request(ch,HYBRID_LESSON_WOLF_RANK,0,0,0);
     assert(quote(ch,r,&q)==HYBRID_LESSON_PREREQUISITE);
-    ch->mkill=3000;ch->pcdata->score[SCORE_NUM_QUEST]=60;
+    ch->mkill=6000;ch->pcdata->score[SCORE_NUM_QUEST]=0;
     for(int n=1;n<4;++n){compare_special(ch,r,"");commit(ch,r);}
     assert(quote(ch,r,&q)==HYBRID_LESSON_AT_CAP);release(ch);
     ch=fresh(CLASS_DROW);

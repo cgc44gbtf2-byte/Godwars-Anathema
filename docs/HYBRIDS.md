@@ -1212,6 +1212,12 @@ Original-parent requirements use raw native training, never the secondary
 | Monk | Techniques, Mantras and Arts at 8 |
 | Elementalist | Choose a focus: focused element 10, opposite 6, other six elements 8 |
 
+Werewolf advancement now costs primal and XP, not completed quests. Any hybrid
+with a Werewolf parent pays double the normal primal/XP prices and needs double
+the cumulative monster kills, including when Werewolf is the original parent.
+The rank-4 cap and normal gift caps are unchanged. See [Werewolf commands and
+advancement](WEREWOLF.md) for the exact rank table and Shift compatibility rules.
+
 Complete original build choices first: three distinct Mage spheres, three distinct
 standard Vampire clan disciplines, all three Werewolf gift choices, and an
 Elementalist focus. Caitiff/Panders use their native clanless caps instead of a

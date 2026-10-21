@@ -19,6 +19,8 @@ GRANT=('    /* A learned Monk source is free and independent of the original cla
        '        HYBRID_TRAIN_MONK, MONK_MANTRA) >= 2;\n\n')
 
 def without_scry_stage(text):
+    from werewolf_source import without_werewolf_stage
+    text=without_werewolf_stage(text)
     start=text.index("void do_scry(");end=text.index("\nvoid do_readaura(",start)
     body=text[start:end]
     if GRANT in body:

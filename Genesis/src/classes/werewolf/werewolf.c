@@ -32,6 +32,8 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "advancement.h"
+#include "classes/hybrid/player.h"
 
 /* Local functions */
 
@@ -42,15 +44,16 @@ char *	gift_tribe_name		args( ( int gift_no ) );
 void do_advance( CHAR_DATA *ch, char *argument )
 {
     char buf[MIL];
-    int rank, qdone, mkills;
+    long rank, primal, experience, kills;
+    int hybrid;
 
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL) return;
+    if (argument == NULL) argument = "";
     if (!IS_WEREWOLF(ch))
     {
 	stc("Huh?\n\r", ch);
 	return;
     }
-
-    if (ch->pcdata->rank < 1) ch->pcdata->rank = 1;
 
     rank = ch->pcdata->rank;
 
@@ -60,24 +63,47 @@ void do_advance( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    qdone = rank * 20;
-
-    if (ch->pcdata->score[SCORE_NUM_QUEST] < qdone)
+    hybrid = ch->pcdata->hybrid_present != 0;
+    if (!hybrid_player_save_valid(ch) ||
+        !werewolf_advancement_price(rank, hybrid, &primal, &experience, &kills))
     {
-	sprintf(buf,"You need to complete %i quests to advance a rank.\n\r", qdone);
-	stc(buf, ch);
+        stc("Your advancement data needs staff review.\n\r", ch);
 	return;
     }
 
-    mkills = rank * 1000;
-
-    if (ch->mkill < mkills)
+    if (!str_cmp(argument, "info"))
     {
-        sprintf(buf,"You need to kill %i monsters to advance a rank.\n\r", mkills);
+        snprintf(buf, sizeof(buf),
+            "Rank %ld: %ld primal, %ld experience, %ld total monster kills%s.\n\r",
+            rank + 1, primal, experience, kills,
+            hybrid ? " (hybrid: all requirements doubled)" : "");
+        stc(buf,ch);
+        return;
+    }
+    if (argument[0])
+    {
+        stc("Syntax: advance [info]\n\r",ch);
+        return;
+    }
+
+    if (ch->mkill < kills)
+    {
+        snprintf(buf, sizeof(buf),
+            "You need %ld total monster kills to advance a rank.\n\r", kills);
         stc(buf, ch);
         return;
     }
 
+    if (ch->primal < primal || ch->exp < experience)
+    {
+        snprintf(buf, sizeof(buf),
+            "Advancing to rank %ld costs %ld primal and %ld experience.\n\r",
+            rank + 1, primal, experience);
+        stc(buf, ch);
+        return;
+    }
+    ch->primal -= primal;
+    ch->exp -= experience;
     stc("You advance a rank!\n\r", ch);
     ch->pcdata->rank++;
     return;
@@ -89,6 +115,7 @@ void do_wwpowers( CHAR_DATA *ch, char *argument )
     int sn;
     bool any_powers = FALSE;
 
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL) return;
     if (!IS_WEREWOLF(ch))
     {
 	stc("Huh?\n\r", ch);
@@ -109,9 +136,9 @@ void do_wwpowers( CHAR_DATA *ch, char *argument )
     {
 	strcpy(buf, "Homid: Persuasion");
 	if (get_breed(ch, BREED_HOMID) >= 2) strcat(buf, " Jamtech");
-	if (get_breed(ch, BREED_HOMID) >= 3) strcat(buf, " Reshape");
+	if (get_breed(ch, BREED_HOMID) >= 3) strcat(buf, " Reshapeobject");
 	if (get_breed(ch, BREED_HOMID) >= 4) strcat(buf, " Disquiet");
-	if (get_breed(ch, BREED_HOMID) >= 5) strcat(buf, " Ward");
+	if (get_breed(ch, BREED_HOMID) >= 5) strcat(buf, " Spiritward");
 	strcat(buf, ".\n\r");
 	stc(buf, ch);
     }
@@ -121,7 +148,7 @@ void do_wwpowers( CHAR_DATA *ch, char *argument )
 	if (get_breed(ch, BREED_METIS) >= 2) strcat(buf, " Burrow");
 	if (get_breed(ch, BREED_METIS) >= 3) strcat(buf, " Nightsight");
 	if (get_breed(ch, BREED_METIS) >= 4) strcat(buf, " Porcupine");
-	if (get_breed(ch, BREED_METIS) >= 5) strcat(buf, " Totemgift");
+	if (get_breed(ch, BREED_METIS) >= 5) strcat(buf, " Totemgift[unimplemented]");
 	strcat(buf, ".\n\r");
 	stc(buf, ch);
     }
@@ -178,16 +205,16 @@ void do_wwpowers( CHAR_DATA *ch, char *argument )
     if (get_tribe(ch, TRIBE_BLACK_FURIES) >= 1)
     {
 	strcpy(buf, "Black Furies: Breathwyld");
-	if (get_auspice(ch, TRIBE_BLACK_FURIES) >= 2) strcat(buf, " Aeolus");
-	if (get_auspice(ch, TRIBE_BLACK_FURIES) >= 4) strcat(buf, " Bodywrack");
+	if (get_tribe(ch, TRIBE_BLACK_FURIES) >= 2) strcat(buf, " Aeolus");
+	if (get_tribe(ch, TRIBE_BLACK_FURIES) >= 5) strcat(buf, " Bodywrack");
 	strcat(buf, ".\n\r");
 	stc(buf, ch);
     }
     if (get_tribe(ch, TRIBE_BONE_GNAWERS) >= 1)
     {
 	strcpy(buf, "Bone Gnawers:");
-	if (get_auspice(ch, TRIBE_BLACK_FURIES) >= 3) strcat(buf, " Friend");
-	if (get_auspice(ch, TRIBE_BLACK_FURIES) >= 4) strcat(buf, " Infest");
+	if (get_tribe(ch, TRIBE_BONE_GNAWERS) >= 3) strcat(buf, " Friend");
+	if (get_tribe(ch, TRIBE_BONE_GNAWERS) >= 4) strcat(buf, " Infest");
 	strcat(buf, ".\n\r");
 	stc(buf, ch);
     }
@@ -195,8 +222,8 @@ void do_wwpowers( CHAR_DATA *ch, char *argument )
     {
 	strcpy(buf, "Children of Gaia: Calm");
 	if (get_tribe(ch, TRIBE_CHILDREN_OF_GAIA) >= 3) strcat(buf, " Dazzle");
-	if (get_tribe(ch, TRIBE_CHILDREN_OF_GAIA) >= 4) strcat(buf, " Spiritfriend");
-	if (get_tribe(ch, TRIBE_CHILDREN_OF_GAIA) >= 5) strcat(buf, " Halo");
+if (get_tribe(ch, TRIBE_CHILDREN_OF_GAIA) >= 4) strcat(buf, " Spiritguardian");
+if (get_tribe(ch, TRIBE_CHILDREN_OF_GAIA) >= 5) strcat(buf, " Halosun");
 	strcat(buf, ".\n\r");
 	stc(buf, ch);
     }
@@ -204,7 +231,7 @@ void do_wwpowers( CHAR_DATA *ch, char *argument )
     {
 	strcpy(buf, "Fianna: Faerielight");
 	if (get_tribe(ch, TRIBE_FIANNA) >= 2) strcat(buf, " Howlbanshee");
-	if (get_tribe(ch, TRIBE_FIANNA) >= 3) strcat(buf, " Illusionaryform");
+if (get_tribe(ch, TRIBE_FIANNA) >= 3) strcat(buf, " Formillusion");
 	if (get_tribe(ch, TRIBE_FIANNA) >= 4) strcat(buf, " Cloneobject");
 	if (get_tribe(ch, TRIBE_FIANNA) >= 5) strcat(buf, " Balorsgaze");
 	strcat(buf, ".\n\r");
@@ -213,7 +240,7 @@ void do_wwpowers( CHAR_DATA *ch, char *argument )
     if (get_tribe(ch, TRIBE_GET_OF_FENRIS) >= 1)
     {
 	strcpy(buf, "Get of Fenris:");
-	if (get_tribe(ch, TRIBE_GET_OF_FENRIS) >= 4) strcat(buf, " Scream");
+if (get_tribe(ch, TRIBE_GET_OF_FENRIS) >= 4) strcat(buf, " Scream[unimplemented]");
 	strcat(buf, ".\n\r");
 	stc(buf, ch);
     }
@@ -238,8 +265,8 @@ if (get_tribe(ch, TRIBE_RED_TALONS) >= 5) strcat(buf, " Lycaon[disabled]");
     if (get_tribe(ch, TRIBE_SHADOW_LORDS) >= 1)
     {
 	strcpy(buf, "Shadow Lords:");
-	if (get_tribe(ch, TRIBE_SHADOW_LORDS) >= 2) strcat(buf, " Clap");
-	if (get_tribe(ch, TRIBE_SHADOW_LORDS) >= 3) strcat(buf, " Paralyz");
+	if (get_tribe(ch, TRIBE_SHADOW_LORDS) >= 2) strcat(buf, " Clapthunder");
+	if (get_tribe(ch, TRIBE_SHADOW_LORDS) >= 3) strcat(buf, " Paralyzingstare");
 	if (get_tribe(ch, TRIBE_SHADOW_LORDS) >= 4) strcat(buf, " Dominator");
 	if (get_tribe(ch, TRIBE_SHADOW_LORDS) >= 5) strcat(buf, " Obedience");
 	strcat(buf, ".\n\r");
@@ -248,16 +275,16 @@ if (get_tribe(ch, TRIBE_RED_TALONS) >= 5) strcat(buf, " Lycaon[disabled]");
     if (get_tribe(ch, TRIBE_SILENT_STRIDERS) >= 1)
     {
 	strcpy(buf, "Silent Striders:");
-	if (get_tribe(ch, TRIBE_SILENT_STRIDERS) >= 5) strcat(buf, " Reach");
+if (get_tribe(ch, TRIBE_SILENT_STRIDERS) >= 5) strcat(buf, " Reach[unavailable]");
 	strcat(buf, ".\n\r");
 	stc(buf, ch);
     }
     if (get_tribe(ch, TRIBE_SILVER_FANGS) >= 1)
     {
 	strcpy(buf, "Silver Fangs:");
-	if (get_tribe(ch, TRIBE_SILVER_FANGS) >= 3) strcat(buf, " Wrath");
+if (get_tribe(ch, TRIBE_SILVER_FANGS) >= 3) strcat(buf, " Wrath[unavailable]");
 	if (get_tribe(ch, TRIBE_SILVER_FANGS) >= 4) strcat(buf, " Shield");
-	if (get_tribe(ch, TRIBE_SILVER_FANGS) >= 5) strcat(buf, " Mastery");
+if (get_tribe(ch, TRIBE_SILVER_FANGS) >= 5) strcat(buf, " Mastery[unavailable]");
 	strcat(buf, ".\n\r");
 	stc(buf, ch);
     }
@@ -269,8 +296,8 @@ if (get_tribe(ch, TRIBE_RED_TALONS) >= 5) strcat(buf, " Lycaon[disabled]");
     }
     if (get_tribe(ch, TRIBE_UKTENA) >= 1)
     {
-	strcpy(buf, "Uktena: Shroud");
-	if (get_tribe(ch, TRIBE_UKTENA) >= 4) strcat(buf, " Invisibility");
+	strcpy(buf, "Uktena: Shroudnight");
+if (get_tribe(ch, TRIBE_UKTENA) >= 4) strcat(buf, " Invisibility[unavailable]");
 	if (get_tribe(ch, TRIBE_UKTENA) >= 5) strcat(buf, " Fetishdoll");
 	strcat(buf, ".\n\r");
 	stc(buf, ch);
@@ -294,8 +321,11 @@ void do_gifts( CHAR_DATA *ch, char *argument )
     char arg[MIL];
     char buf[MIL];
     char disc[25];
-    int improve, imp_cost, sn, col, gt, gift, ww_max;
+    int improve, imp_cost, sn, col, gt, ww_max;
+    long gift;
 
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL) return;
+    if (argument == NULL) argument = "";
     one_argument(argument, arg);
 
     if (!IS_WEREWOLF(ch))
@@ -415,6 +445,11 @@ void do_gifts( CHAR_DATA *ch, char *argument )
     if (ch->pcdata->tgift[gt] == improve) ww_max = 5;
     else ww_max = 4;
 
+    if (gift < 0 || gift > 5)
+    {
+        stc("That gift rating needs staff review.\n\r", ch);
+        return;
+    }
     if (gift >= ww_max)
     {
 	stc("You are unable to improve your ability in that gift any further.\n\r", ch);
@@ -451,7 +486,14 @@ void do_tribegifts( CHAR_DATA *ch, char *argument )
     char buf[MIL];
     int improve, sn, col, gtype;
 
-    strcpy(arg, argument);
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL) return;
+    if (argument == NULL) argument = "";
+    if (strlen(argument) >= sizeof(arg))
+    {
+        stc("That gift name is too long.\n\r", ch);
+        return;
+    }
+    snprintf(arg, sizeof(arg), "%s", argument);
 
     if (!IS_WEREWOLF(ch))
     {

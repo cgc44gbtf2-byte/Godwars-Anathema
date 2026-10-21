@@ -2733,6 +2733,7 @@ DECLARE_DO_FUN(	do_wear		);
 DECLARE_DO_FUN(	do_wearaffect	);
 DECLARE_DO_FUN(	do_weather	);
 DECLARE_DO_FUN(	do_werewolf	);
+DECLARE_DO_FUN( do_shift );
 DECLARE_DO_FUN(	do_west		);
 DECLARE_DO_FUN( do_whelp	);
 DECLARE_DO_FUN(	do_where	);

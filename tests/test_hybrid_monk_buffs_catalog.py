@@ -26,6 +26,8 @@ NATIVE_DAWN="""            for ( d = descriptor_list; d != NULL; d = d->next )
             }"""
 
 def blob(text):
+    from werewolf_source import without_werewolf_stage
+    text=without_werewolf_stage(text)
     b=text.encode()
     return hashlib.sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest()
 

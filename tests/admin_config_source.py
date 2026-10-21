@@ -12,6 +12,8 @@ def once(text,new,old,count=1):
     assert text.count(new)==count,(new[:90],text.count(new),count)
     return text.replace(new,old)
 def without_admin_config_stage(text):
+    from werewolf_source import without_werewolf_stage
+    text=without_werewolf_stage(text)
     from admin_saves_source import without_admin_saves_stage
     text=without_admin_saves_stage(text)
     if '#include "admin_config.h"\n' not in text:return text

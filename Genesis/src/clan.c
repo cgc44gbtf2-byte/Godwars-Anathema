@@ -32,6 +32,7 @@
 #include <string.h>
 #include <time.h>
 #include <malloc.h>
+#include <limits.h>
 #include "merc.h"
 #include "file_io.h"
 #include "classes/hybrid/access.h"
@@ -1890,10 +1891,13 @@ void do_werewolf( CHAR_DATA *ch, char *argument )
     char       arg[MAX_INPUT_LENGTH];
     CHAR_DATA *vch;
     CHAR_DATA *vch_next;
-    argument = one_argument( argument, arg );
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL ||
+        ch->in_room == NULL) return;
+    argument = one_argument( argument != NULL ? argument : "", arg );
 
     if (!IS_WEREWOLF(ch)) return;
     if (IS_SET(ch->act, PLR_WOLFMAN)) return;
+    if (ch->pcdata->wolf < 0 || ch->pcdata->wolf > LONG_MAX - 25) return;
 
     if (IS_POLYAFF(ch, POLY_MASK)) do_doppleganger(ch, "self");
 
@@ -1930,7 +1934,8 @@ void do_werewolf( CHAR_DATA *ch, char *argument )
     SET_BIT(ch->affected_by, AFF_POLYMORPH);
     SET_BIT(ch->vampaff, VAM_DISGUISED);
 
-    sprintf(buf,"#oA huge werewolf#n[#0%s#n]", ch->name);
+    snprintf(buf,sizeof(buf),"#oA huge werewolf#n[#0%s#n]",
+        ch->name != NULL ? ch->name : "Unknown");
     free_string(ch->morph);
     ch->morph = str_dup(buf);
     ch->pcdata->wolf += 25;
@@ -1976,7 +1981,8 @@ void do_unwerewolf( CHAR_DATA *ch, char *argument )
 {
     char       arg[MAX_INPUT_LENGTH];
 
-    argument = one_argument( argument, arg );
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL) return;
+    argument = one_argument( argument != NULL ? argument : "", arg );
 
     if (IS_NPC(ch)) return;
     if (!IS_WEREWOLF(ch)) return;
@@ -2157,7 +2163,12 @@ void do_flex( CHAR_DATA *ch, char *argument )
 
 void do_calm( CHAR_DATA *ch, char *argument )
 {
-    if (IS_NPC(ch)) return;
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL) return;
+    if (IS_WEREWOLF(ch) && ch->pcdata->wolf < 0)
+    {
+        send_to_char("Your rage needs staff review.\n\r", ch);
+        return;
+    }
 
     if (!IS_WEREWOLF(ch) && !IS_NINJA(ch))
     {

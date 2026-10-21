@@ -10,6 +10,8 @@ def once(text,old,new):
     return text.replace(old,new,1)
 
 def blob(text):
+    from werewolf_source import without_werewolf_stage
+    text=without_werewolf_stage(text)
     data=text.encode()
     return hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest()
 

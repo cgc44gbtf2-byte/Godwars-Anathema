@@ -7,6 +7,7 @@
 #include "build.h"
 #include "player.h"
 #include "training.h"
+#include "../werewolf/advancement.h"
 
 struct unlock { long flag, cost, age; };
 static int valid_discipline(long value)
@@ -149,9 +150,13 @@ enum hybrid_lesson_result hybrid_training_prepare(const CHAR_DATA *ch,
     case HYBRID_LESSON_WOLF_RANK:
         if(r->parent!=CLASS_WEREWOLF)return HYBRID_LESSON_INVALID;
         if(p->wolf_rank>=4)return HYBRID_LESSON_AT_CAP;
-        if(p->wolf_rank<1||ch->mkill<p->wolf_rank*1000||
-           ch->pcdata->score[SCORE_NUM_QUEST]<p->wolf_rank*20)
-            return HYBRID_LESSON_PREREQUISITE;
+        {
+            long kills;
+            if(!werewolf_advancement_price(p->wolf_rank,1,
+                &lesson.primal_cost,&lesson.experience_cost,&kills) ||
+                ch->mkill<kills)
+                return HYBRID_LESSON_PREREQUISITE;
+        }
         ++p->wolf_rank;break;
     case HYBRID_LESSON_DROW_SPEED:
         if(r->parent!=CLASS_DROW)return HYBRID_LESSON_INVALID;

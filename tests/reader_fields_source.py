@@ -10,6 +10,8 @@ def once(text, new, old, count=1):
     return text.replace(new,old)
 
 def without_reader_fields_stage(text):
+    from werewolf_source import without_werewolf_stage
+    text=without_werewolf_stage(text)
     if "void do_scry(" in text:
         from scry_source import without_scry_stage
         text=without_scry_stage(text)

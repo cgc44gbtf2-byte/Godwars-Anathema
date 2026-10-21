@@ -25,6 +25,8 @@
 /* Werewolf-only entry points; transformation and Calm remain shared code. */
 #include <sys/types.h>
 #include <stdio.h>
+#include <limits.h>
+#include <string.h>
 #include <time.h>
 #include "merc.h"
 
@@ -32,7 +34,8 @@ void do_shadowsight( CHAR_DATA *ch, char *argument )
 {
     char      arg [MAX_INPUT_LENGTH];
 
-    argument = one_argument( argument, arg );
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL) return;
+    argument = one_argument( argument != NULL ? argument : "", arg );
 
     if (IS_NPC(ch)) return;
     if (!IS_WEREWOLF(ch))
@@ -53,7 +56,8 @@ void do_shadowsight( CHAR_DATA *ch, char *argument )
 
 void do_rage( CHAR_DATA *ch, char *argument )
 {
-    if (IS_NPC(ch)) return;
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL ||
+        ch->in_room == NULL) return;
 
     if (!IS_WEREWOLF(ch))
     {
@@ -61,6 +65,11 @@ void do_rage( CHAR_DATA *ch, char *argument )
 	return;
     }
 
+    if (ch->pcdata->wolf < 0 || ch->pcdata->wolf > LONG_MAX - 50)
+    {
+        send_to_char("Your rage needs staff review.\n\r", ch);
+        return;
+    }
     if (!IS_SET(ch->act, PLR_WOLFMAN) || ch->pcdata->wolf < 300)
     {
 	send_to_char("You start snarling angrilly.\n\r",ch);
@@ -72,4 +81,55 @@ void do_rage( CHAR_DATA *ch, char *argument )
     }
     send_to_char("But you are already in a rage!\n\r",ch);
     return;
+}
+
+/* Compatibility command, not a second transformation system. Rage may need
+ * several uses before reaching 100 and still has its native hostile effects.
+ * Returning human uses Calm, including Gaia1, posture and recovery rules. */
+void do_shift( CHAR_DATA *ch, char *argument )
+{
+    char arg[MAX_INPUT_LENGTH], extra[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
+    int human;
+
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL ||
+        ch->in_room == NULL) return;
+    if (!IS_WEREWOLF(ch))
+    {
+        send_to_char("Huh?\n\r", ch);
+        return;
+    }
+    argument = one_argument(argument != NULL ? argument : "", arg);
+    one_argument(argument, extra);
+    if (extra[0] ||
+        (arg[0] && str_cmp(arg,"human") && str_cmp(arg,"homid") &&
+         str_cmp(arg,"werewolf") && str_cmp(arg,"wolf") && str_cmp(arg,"crinos")))
+    {
+        send_to_char("Syntax: shift [werewolf|human]. Uses Rage/Calm, not new forms.\n\r",ch);
+        return;
+    }
+    human = arg[0] ? (!str_cmp(arg,"human") || !str_cmp(arg,"homid"))
+                  : IS_SET(ch->act,PLR_WOLFMAN);
+    if (human)
+    {
+        if (!IS_SET(ch->act,PLR_WOLFMAN) && ch->pcdata->wolf == 0)
+            send_to_char("You are already human.\n\r",ch);
+        else if (ch->position < POS_STANDING)
+            send_to_char("You must stop fighting and stand before using Calm.\n\r",ch);
+        else
+            do_calm(ch,"");
+    }
+    else if (IS_SET(ch->act,PLR_WOLFMAN))
+        send_to_char("You are already in werewolf form.\n\r",ch);
+    else
+    {
+        do_rage(ch,"");
+        if (!IS_SET(ch->act,PLR_WOLFMAN) &&
+            ch->pcdata->wolf >= 0 && ch->pcdata->wolf < 100)
+        {
+            snprintf(buf,sizeof(buf),
+                "Rage: %ld/100. Use shift werewolf again to build toward transformation.\n\r",
+                ch->pcdata->wolf);
+            send_to_char(buf,ch);
+        }
+    }
 }

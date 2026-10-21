@@ -478,6 +478,7 @@
    { "shadowbody",	do_shadowbody,	POS_STANDING,	 LEV_AWA,  LOG_NORMAL	},
    { "shadowstep",	do_shadowstep,	POS_STANDING,	 LEV_AWA,  LOG_NORMAL	},
    { "shield",		do_shield,	POS_SITTING,	 LEV_AWA,  LOG_NORMAL	},
+   { "shift", do_shift, POS_FIGHTING, LEV_AWA, LOG_NORMAL },
    { "shroudnight",	do_shroudnight,	POS_STANDING,	 LEV_AWA,  LOG_NORMAL	},
    { "silence",		do_silence,	POS_DEAD,	 LEV_IMM,  LOG_ALWAYS	},
    { "silencedeath",	do_silencedeath,POS_STANDING,	 LEV_AWA,  LOG_NORMAL	},

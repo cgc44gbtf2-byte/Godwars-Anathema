@@ -46,6 +46,8 @@ class HybridMasteryCatalog(unittest.TestCase):
         }
         for path, expected in hashes.items():
             data = (SRC / path).read_bytes()
+            from werewolf_source import without_werewolf_stage
+            data = without_werewolf_stage(data.decode()).encode()
             if path == "clan.c":
                 from scry_source import without_scry_stage
                 data = without_scry_stage(data.decode()).encode()

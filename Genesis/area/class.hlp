@@ -649,8 +649,8 @@ writing a page follows:
 
 sorccreate page              // Creates your page
 wear pen                     // Wears the pen so you can write with it
-write page title <blah>      // Titles the page for easy reference
-write page line <blah>       // Writes a line to the page, repeated MANY times
+write page title <text>      // Titles the page for easy reference
+write page line <text>       // Writes a line to the page, repeated MANY times
 c 'insert page' page book    // Puts the page into a book, ready to be used
 
 Titles can be anything you want, they are only used for reference.  Lines on
@@ -797,45 +797,56 @@ vampires) at every opportunity.
 
 Garou Commands
  Howl      - A special channel that only werewolves can understand.
- Advance   - Raises Garou ranks.
- Gnosis    - Raises your permanent Gnosis.  Used to power gifts.  Opposite of
-            Rage.  Represents a Wolf's spiritual energies.
- Rage      - Raises your permanent Rage.  Used to power gifts.  Opposite of
-            Gnosis.  Represents a Wolf's primal Beast.
- Shift     - Allows you to change your form.
- Tribegift - Selects your chosen gifts.  These gifts raise to 5 instead of 3.
- Wwarmor   - Wolf EQ each piece costs 400 qps, 100 primal.
+ Advance   - Buys one Garou rank with primal and XP; see help ranks.
+ Advance info - Shows the next rank's price and cumulative monster kills.
+ Rage      - Builds rage toward the native Werewolf transformation.
+ Shift     - Uses the existing Rage/Calm transformation; see help shift.
+ Calm      - Reduces rage; requires Children of Gaia 1 and standing.
+ Tribegifts - Selects original-class Breed, Auspice and Tribe gifts.
+             Selected native gifts cap at 5; other native gifts cap at 4.
+ Wwarmor   - Creates class equipment; use the command for available pieces.
  Wwgifts   - Shows a list of all the gifts you have available.
  Wwpowers  - Lists all the commands (NOT powers) available to you.
- Wwupkeep  - Lists all active powers.
+
+Wwpowers lists active commands, not every passive bonus. An <auto> marker
+in a gift help entry means a passive effect, not a command to type.
+Secondary-parent hybrid training uses its own focus/cap rules.
 
 Related Helps: Class, Ranks, Shift, Breeds, Auspices, and Tribes.
 ~
 
 0 Shift~
-Werewolves naturally have the ability to shift from man to wolf, and anywhere
-in between.  Each form has its own advantages and disadvantages.  In addition
-to the listed statistical differences, certain gifts can only be used in some
-of the forms.
+Shift uses the existing native Werewolf war-form mechanics:
 
-Homid  - Human.  No effect.
-Glabro - Near-Human.  +200 damcap, +100 soak.
-Crinos - Wolf-man.  +400 damcap, +1 speed, +150 soak.
-Hispo  - Near-Wolf.  +300 damcap, +2 speed, +150 soak.
-Lupus  - Wolf.  +200 damcap, +2 speed, +100 soak.
+ shift                         Builds rage, or tries to calm a current war-form.
+ shift werewolf|wolf|crinos     Uses rage to enter the native war-form.
+ shift human|homid              Uses calm to return toward human form.
+
+Rage builds toward the 100-rage transformation threshold; several uses may be
+needed. Calm requires Children of Gaia 1 and standing, and may also take
+several uses. Existing waits, combat effects and natural reversion still apply.
+
+Glabro, Hispo and a separate Lupus body form are not implemented Shift options.
+This command does not unlock secondary-parent or fused hybrid forms.
 
 Related Helps: Werewolf, and Breeds.
 ~
 
 0 Ranks~
-Garou can advance through 5 ranks.  Garou start at rank 1, and through the 
-advance command can raise themselves to rank 4.  Rank 5 is a Leadership type
-position, and requires a Challenge(help challenge) to attain.  The ranks are,
-in order, Cliath, Fostern, Adren, Athro, and Elder.  Ranks 1 through 4 all
-give a myriad of small bonuses to help you in combat.
+Garou start at rank 1. Advance buys one rank at a time, up to rank 4:
 
-In order to attain to each rank, you must have a Gnosis and Rage of 50 +
-(10 * current rank) and (500 * current rank) mobkills.
+ Rank     Primal       XP          Cumulative monster kills
+ 1 -> 2     100     1,000,000               1,000
+ 2 -> 3     200     2,000,000               2,000
+ 3 -> 4     300     3,000,000               3,000
+
+A hybrid with either Werewolf parent requires double every number above:
+200/400/600 primal, 2/4/6 million XP, and 2,000/4,000/6,000 kills.
+Kills are cumulative prerequisites, not spent. Quests and quest points are
+not required or spent. Rank 5 cannot be purchased with advance.
+
+Use advance info to check your next rank. Save after native advancement;
+it uses ordinary player-save timing.
 
 Related Helps: Werewolf.
 ~
@@ -998,7 +1009,7 @@ Related Helps: Tribes, and Werewolf.
 ~
 
 0 'Get of Fenris'~
-1: Visage of Fenris - .<blah>
+1: Visage of Fenris - Adds 100 to the Werewolf damage cap. <auto>
 2: Halt the Coward's Flight - Prevents retreat. <auto>
 3: Might of Thor - Increases damage. <thor>
 4: Scream of Gaia - Stuns everyone. <scream>
@@ -1028,10 +1039,10 @@ Related Helps: Tribes, and Werewolf.
 ~
 
 0 'Shadow Lords'~
-1: Fatal Flaw - Exploits weaknesses to increase damage. <auto>
-2: Clap of Thunder - A thunder clap stuns foes. <auto>
-3: Paralyzing Stare - Prevents opponents from reacting. <paralyze>
-4: Open Wounds - Blah. <auto>
+1: Fatal Flaw - Adds 100 to the Werewolf damage cap. <auto>
+2: Clap of Thunder - Damages eligible foes in the room; may stun. <clapthunder>
+3: Paralyzing Stare - Prevents opponents from reacting. <paralyzingstare>
+4: Strength of the Dominator - Draws rage from a Werewolf or raging Vampire. <dominator>
 5: Obedience - Forces others to obey you. <obedience>
 
 Related Helps: Tribes, and Werewolf.

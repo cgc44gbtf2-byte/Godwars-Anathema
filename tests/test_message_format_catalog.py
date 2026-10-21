@@ -43,6 +43,8 @@ class MessageFormatCatalog(unittest.TestCase):
                   "interp.c":"ccb0125d4264a8a5447618c29a9240ec674d2eb4"}
         for path,sha in expected.items():
             b=(SRC/path).read_bytes()
+            from werewolf_source import without_werewolf_stage
+            b=without_werewolf_stage(b.decode()).encode()
             if path=="magic.c": b=without_identify_stage(b.decode()).encode()
             if path in ("handler.c","comm.c"): b=without_progress_metrics_stage(b.decode()).encode()
             if path in ("clan.c","interp.c"):
