@@ -1116,6 +1116,13 @@ void handle_con_note_text (DESCRIPTOR_DATA *d, char * argument)
 
 	/* First, check for EndOfNote marker */
 
+/* Check byte capacity before copying or replacing the owned draft. */
+if (strlen(argument) >= sizeof buf)
+{
+write_to_buffer (d, "Too long line rejected. Your draft has been kept.\n\r", 0);
+return;
+}
+/* End input capacity guard. */
 	strcpy (buf, argument);
 	if ((!str_cmp(buf, "~")) || (!str_cmp(buf, "END")))
 	{
@@ -1138,6 +1145,19 @@ void handle_con_note_text (DESCRIPTOR_DATA *d, char * argument)
 	
 	/* Not end of note. Copy current text into temp buffer, add new line, and copy back */
 
+/* The file format and buffer limit count bytes, including colour codes and CRLF.
+ * Reject only the new line; do not destroy already accepted text. */
+{
+size_t used = ch->pcdata->in_progress->text ?
+    strlen(ch->pcdata->in_progress->text) : 0;
+size_t added = strlen(buf);
+if (used > MAX_NOTE_TEXT || added + 2 > MAX_NOTE_TEXT - used)
+{
+write_to_buffer (d, "Note too long! Your draft has been kept; end or shorten the new line.\n\r", 0);
+return;
+}
+}
+/* End draft capacity guard. */
 	/* How would the system react to strcpy( , NULL) ? */		
 	if (ch->pcdata->in_progress->text)
 	{
@@ -1148,16 +1168,7 @@ void handle_con_note_text (DESCRIPTOR_DATA *d, char * argument)
 	else
 		strcpy (letter, "");
 		
-	/* Check for overflow */
-	
-	if ((strlen2(letter) + strlen2(buf)) > MAX_NOTE_TEXT)
-	{ /* Note too long, take appropriate steps */
-		write_to_buffer (d, "Note too long!\n\r", 0);
-		free_note (ch->pcdata->in_progress);
-		ch->pcdata->in_progress = NULL;			/* important */
-		d->connected = CON_PLAYING;
-		return;
-	}
+/* Capacity was checked before replacing the draft text. */
 	
 	/* Add new line to the buffer */
 	
@@ -1203,6 +1214,14 @@ void handle_con_note_finish (DESCRIPTOR_DATA *d, char * argument)
 			REMOVE_BIT(ch->pcdata->flag,FLAG_AFK);
 			break;
 		case 'p': /* post note */
+/* Revalidate access after an interrupted session or a staff-level change. */
+if (ch->level < ch->pcdata->board->write_level)
+{
+write_to_buffer (d, "You can no longer post on this board. Your draft has been kept; view or forget it.\n\r", 0);
+write_to_buffer (d, szFinishPrompt, 0);
+break;
+}
+/* End posting access recheck. */
 if (!finish_note (ch->pcdata->board, ch->pcdata->in_progress))
 {
 write_to_buffer (d, "The note could not be saved. Your draft has been kept; continue or forget it.\n\r",0);

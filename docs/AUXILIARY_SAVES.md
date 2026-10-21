@@ -51,6 +51,21 @@ inside the signal handler, before closing connections. An unresolved failure
 is logged explicitly, but the requested stop still proceeds. There is one
 attempt per pending destination in that pass, not a shutdown retry loop.
 
+## Unfinished note drafts
+
+Drafts belong to the character until a post is accepted, then belong to the
+board. Link loss keeps the draft in memory while the character remains loaded;
+`note write` resumes body text. As before, reconnecting with no body text starts
+the headers again. `note` cancellation, successful quit, or final character
+removal discards the unpublished draft; none of these auto-post it.
+
+A line that exceeds the note's byte limit is rejected without deleting earlier
+text. The limit includes colour codes and CRLF bytes. Posting rechecks the
+board's write level; failed permission or file replacement keeps the draft.
+
+Drafts are not saved in player files. A crash, forced stop, or removal of the
+character can still lose unfinished text. This is not an offline draft store.
+
 ## Limits
 
 Pending changes and editor drafts remain RAM-only. A crash, SIGKILL, power loss,

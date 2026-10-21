@@ -2047,6 +2047,12 @@ void free_char( CHAR_DATA *ch )
 
     if ( ch->pcdata != NULL )
     {
+/* Release an owned, unpublished draft before recycling PC data. */
+if (ch->pcdata->in_progress) {
+    free_note(ch->pcdata->in_progress);
+    ch->pcdata->in_progress = NULL;
+}
+/* End draft release. */
 	free_string( ch->pcdata->pwd		);
 	free_string( ch->pcdata->bamfin		);
 	free_string( ch->pcdata->bamfout	);

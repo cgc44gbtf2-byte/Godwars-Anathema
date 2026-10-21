@@ -65,6 +65,7 @@ TESTS += tests/test_aux_writers
 TESTS += tests/test_admin_config
 TESTS += tests/test_admin_saves
 TESTS += tests/test_aux_shutdown
+TESTS += tests/test_note_editor
 # Real validators/effective access for older isolated native fixtures too.
 # Never replace hybrid access with permissive stubs just to satisfy linking.
 HYBRID_ACCESS_SOURCES = $(addprefix Genesis/src/classes/hybrid/,registry.c state.c player.c build.c progression.c specialization.c access.c passives.c books.c) Genesis/src/classes/sorcerer/vision.c Genesis/src/classes/monk/favour.c Genesis/src/guardian.c
@@ -159,6 +160,7 @@ check-layout:
 	python3 tests/test_admin_config_catalog.py
 	python3 tests/test_admin_saves_catalog.py
 	python3 tests/test_aux_shutdown_catalog.py
+	python3 tests/test_note_editor_catalog.py
 	python3 tests/test_combat_layout.py
 	python3 tests/test_telnet_layout.py
 	python3 tests/test_gmcp_layout.py
@@ -297,6 +299,9 @@ tests/test_admin_saves: tests/test_admin_saves.c tests/test_admin_config.c tests
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_aux_shutdown: tests/test_aux_shutdown.c tests/test_restart.c $(filter-out tests/stun_engine/restart.o,$(ENGINE_OBJECTS)) tests/restart_engine.o
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(filter-out tests/stun_engine/restart.o,$(ENGINE_OBJECTS)) tests/restart_engine.o $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
+tests/test_note_editor: tests/test_note_editor.c tests/test_restart.c $(filter-out tests/stun_engine/restart.o,$(ENGINE_OBJECTS)) tests/restart_engine.o
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(filter-out tests/stun_engine/restart.o,$(ENGINE_OBJECTS)) tests/restart_engine.o $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_file_words: tests/test_file_words.c tests/test_file_numbers.c tests/test_progress_metrics.c tests/test_identify.c $(ENGINE_OBJECTS)
