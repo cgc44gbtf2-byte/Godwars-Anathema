@@ -107,6 +107,16 @@ merge the help changes separately before reloading the live world.
 
 ## Combat callback safety
 
+### Mother's Touch healing
+
+`mother <target>` retains Theurge 1 access, Theurge 2 for self-healing,
+the shared 15-second healing cooldown, and its existing three-percent-per-rank
+formula. HP arithmetic is bounded at extreme values; nonpositive maximum HP
+is rejected without consuming the cooldown. Native rank clamping is unchanged.
+This repair does not enable secondary-parent Werewolf healing or add costs.
+Eight hundred ordinary native/original-parent cases retain HP, messages,
+cooldowns and RNG; extreme-HP cases are checked separately.
+
 Elemental Gift's earth sequence and Invoke's lightning sequence stop further
 hits if the actor or target is removed, changes rooms or can no longer continue.
 Cutting Wind does not roll for or apply a stun to a removed/moved target.

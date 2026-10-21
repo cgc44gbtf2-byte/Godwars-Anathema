@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <limits.h>
 #include "merc.h"
 
 void do_blur( CHAR_DATA *ch, char *argument )
@@ -140,6 +141,7 @@ void do_mother( CHAR_DATA *ch, char *argument )
     CHAR_DATA *victim;
     char arg[MIL];
     char buf[MSL];
+    long rank;
 
     argument = one_argument(argument, arg);
 
@@ -151,7 +153,8 @@ void do_mother( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    if (get_auspice(ch, AUSPICE_THEURGE) < 1)
+    rank = get_auspice(ch, AUSPICE_THEURGE);
+    if (rank < 1)
     {
 	stc("You require the level 1 Theurge power to use Mother's Touch.\n\r", ch);
 	return;
@@ -185,13 +188,26 @@ void do_mother( CHAR_DATA *ch, char *argument )
 	return;
     }
 
+    if (victim->max_hit <= 0)
+    {
+stc("They cannot be healed in their current state.\n\r", ch);
+return;
+    }
+
     act("You lay your hands upon $N.", ch, NULL, victim, TO_CHAR);
     act("$n's lays $s hands upon $N.", ch, NULL, victim, TO_NOTVICT);
     act("$n's lays $s hands upon you.", ch, NULL, victim, TO_VICT);
     ch->pcdata->obeah = 15;
     if (victim->hit < victim->max_hit)
     {
-	victim->hit += get_auspice(ch, AUSPICE_THEURGE) * victim->max_hit * .03;
+/* Preserve ordinary double rounding without overflowing the integer product
+ * or converting an out-of-range floating result back into hit points. */
+double scaled = victim->max_hit <= LONG_MAX / rank
+    ? (double)(rank * victim->max_hit)
+    : (double)rank * (double)victim->max_hit;
+double healed = (double)victim->hit + scaled * .03;
+victim->hit = healed >= (double)victim->max_hit
+    ? victim->max_hit : (long)healed;
 	update_pos(victim);
 	if (victim->hit >= victim->max_hit)
 	{

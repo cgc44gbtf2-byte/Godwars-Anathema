@@ -74,6 +74,7 @@ TESTS += tests/test_werewolf_combat
 TESTS += tests/test_werewolf_reactions
 TESTS += tests/test_werewolf_room
 TESTS += tests/test_werewolf_galliard
+TESTS += tests/test_werewolf_touch
 # Real validators/effective access for older isolated native fixtures too.
 # Never replace hybrid access with permissive stubs just to satisfy linking.
 HYBRID_ACCESS_SOURCES = $(addprefix Genesis/src/classes/hybrid/,registry.c state.c player.c build.c progression.c specialization.c access.c passives.c books.c) Genesis/src/classes/sorcerer/vision.c Genesis/src/classes/monk/favour.c Genesis/src/guardian.c
@@ -146,6 +147,7 @@ check-layout:
 	python3 tests/test_werewolf_reactions_catalog.py
 	python3 tests/test_werewolf_room_catalog.py
 	python3 tests/test_werewolf_galliard_catalog.py
+	python3 tests/test_werewolf_touch_catalog.py
 	python3 tests/test_server_process.py
 	python3 tests/test_hybrid_books_catalog.py
 	python3 tests/test_hybrid_colors_catalog.py
@@ -367,6 +369,9 @@ tests/room_tribe.o: Genesis/src/classes/werewolf/wwtribe.c $(ENGINE_HEADERS)
 
 tests/test_werewolf_galliard: tests/test_werewolf_galliard.c tests/test_restored_spells.c $(filter-out tests/stun_engine/classes/werewolf/wwauspice.o,$(ENGINE_OBJECTS)) tests/galliard_auspice.o
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(filter-out tests/stun_engine/classes/werewolf/wwauspice.o,$(ENGINE_OBJECTS)) tests/galliard_auspice.o $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
+tests/test_werewolf_touch: tests/test_werewolf_touch.c tests/test_restored_spells.c $(ENGINE_OBJECTS)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/galliard_auspice.o: Genesis/src/classes/werewolf/wwauspice.c $(ENGINE_HEADERS)
 	$(CC) $(TEST_CPPFLAGS) -DMERC -Dget_room_index=werewolf_galliard_room $(CFLAGS) $(TEST_FLAGS) -c $< -o $@
