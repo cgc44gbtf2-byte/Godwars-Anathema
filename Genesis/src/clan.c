@@ -1052,14 +1052,18 @@ void do_scry( CHAR_DATA *ch, char *argument )
     if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL || ch->in_room == NULL) return;
     argument = one_argument( argument != NULL ? argument : "", arg );
 
+    /* A learned Monk source is free and independent of the original class. */
+    const bool monk_ready = hybrid_power_rank(ch, CLASS_MONK,
+        HYBRID_TRAIN_MONK, MONK_MANTRA) >= 2;
+
     if (!IS_VAMPIRE(ch) && !IS_NINJA(ch) && !IS_ITEMAFF(ch, ITEMA_VISION) && !IS_WEREWOLF(ch)
-     && !IS_DROW(ch) && !IS_DRAGON(ch) && !IS_MONK(ch) && !IS_MAGE(ch) && !IS_BUI(ch))
+     && !IS_DROW(ch) && !IS_DRAGON(ch) && !IS_MONK(ch) && !IS_MAGE(ch) && !IS_BUI(ch) && !monk_ready)
     {
 	send_to_char( "Huh?\n\r", ch );
 	return;
     }
 
-    if (!IS_ITEMAFF(ch,ITEMA_VISION))
+    if (!IS_ITEMAFF(ch,ITEMA_VISION) && !monk_ready)
     {
 	if (IS_NINJA(ch) && get_ninja(ch, NINJA_SORA) < 4)
 	{
@@ -1098,7 +1102,7 @@ void do_scry( CHAR_DATA *ch, char *argument )
 	}
     }
 
-    if (IS_MAGE(ch))
+    if (IS_MAGE(ch) && !monk_ready)
     {
         if (ch->mana < 500)
         {

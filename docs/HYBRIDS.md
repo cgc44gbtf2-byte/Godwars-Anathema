@@ -1106,7 +1106,7 @@ The real-engine suite retains **960 native** snapshots and compares
 and original-access cases,12 independent native/Monk overlaps and
 **72 full/short** loaded characters. Six pre-existing crash boundaries were
 reproduced locally before the safety repair and pass afterward.
-Shield, Scry, heightened senses, Invite Beast, Chimera and other unfinished
+Shield, heightened senses, Invite Beast, Chimera and other unfinished
 secondary adapters remain separate work. No conversion or live hybrid forms
 are enabled; no world/help import is performed and custom world helps keep
 priority.
@@ -1124,6 +1124,28 @@ membership, temporary shadow/globe flags and RNG results. Native class/item
 grants, Mage's500-mana policy, shields, staff privacy and guardian warnings
 are unchanged. No conversion or new class permission is enabled by this
 standalone safety repair.
+
+### Secondary Monk Scry
+
+Existing valid records with learned **Mantra2** can use `scry` to survey online
+players or `scry <target>` to view a target's room. This is the **free Monk
+source**: it does not borrow the original class's native Scry training or
+vision item, and a qualified Mage/Monk does not pay the Mage-only500 mana.
+Both parent orders are supported; original Monks keep full native access.
+
+The original class's native/item grants remain independent when the secondary
+rank is untrained, capped below the requirement or rejected. The secondary
+grant adds no shield bypass, staff visibility, remote attacks, free ranks or
+automatic activation. Native Auspex/Lupus survey bypasses and Homid guardian
+warning stealth remain native original-class properties; named-target shield
+and vision-item rules are unchanged. Room membership, shadow/globe flags and
+RNG state are restored exactly as for the native command.
+
+The real-engine suite keeps the **1,440 native** snapshots unchanged and runs
+**23,328 paired** parent/order/focus/rank/target/mana commands,90 rejected-record
+and original-access cases,9 native-grant overlaps and **72 full/short** loads.
+No conversion, new save schema, live hybrid form or world/help import is enabled.
+Shield and the other unfinished secondary powers remain separate work.
 
 ## Numeric readiness preview — no conversion
 

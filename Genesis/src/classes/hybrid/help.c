@@ -117,7 +117,9 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
         send_to_char("Learned secondary Mantra2 enables readaura (Mantra2; free), "
                      "including carried-object identification. The Monk grant "
                      "does not require the original class's aura-reading power. "
-                     "Shield and Scry are not added by this adapter.\n\r", ch);
+                     "It also enables scry (Mantra2; free): survey players or "
+                     "scry a target while retaining native shields, staff privacy "
+                     "and guardian warnings. Shield remains separate work.\n\r", ch);
         send_to_char("Existing records: secondary Monk Stun Fist needs Tech 7 on the full Tech path; "
                      "other paths cap Tech at4. Costs5000 mana, with1-second interruption, "
                      "2-second caster recovery and shared6-second target immunity. "

@@ -186,8 +186,10 @@ int main(int argc,char **argv)
 {
     if(argc==2&&!strcmp(argv[1],"--native-dump")){scry_native(1);return 0;}
     if(argc==3&&!strcmp(argv[1],"--safety")){scry_safety(atoi(argv[2]));return 0;}
-    scry_native(0);
+    scry_native(0);scry_pairs();scry_bad_records();
     for(int i=0;i<9;i++)scry_safety(i);
-    puts("Scry native safety:1440 native snapshots and9 safety boundaries passed.");
+    scry_loaders();
+    puts("Scry:1440 native snapshots,23328 paired commands,90 rejected-record cases,"
+         "9 independent native grants,72 full/short loads and9 safety boundaries passed.");
     return 0;
 }

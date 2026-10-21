@@ -31,6 +31,20 @@ class ScryCatalog(unittest.TestCase):
             self.assertIn(fragment,body)
         self.assertNotIn('sprintf(buf,"%s',body)
 
+    def test_independent_learned_monk_source_only(self):
+        body=self.body()
+        for fragment in ("HYBRID_TRAIN_MONK, MONK_MANTRA) >= 2",
+                         "&& !IS_BUI(ch) && !monk_ready)",
+                         "if (!IS_ITEMAFF(ch,ITEMA_VISION) && !monk_ready)",
+                         "if (IS_MAGE(ch) && !monk_ready)"):
+            self.assertIn(fragment,body)
+        self.assertEqual(body.count("hybrid_power_rank("),1)
+        fixture=(ROOT/"tests/test_hybrid_scry.c").read_text()
+        for fragment in ("scry_pairs();scry_bad_records();","count==23328","count==72",
+                         "bad<5","LONG_MIN","scry_loaders();"):
+            self.assertIn(fragment,fixture)
+        self.assertIn("scry (Mantra2; free)",(SRC/"classes/hybrid/help.c").read_text())
+
     def test_native_privacy_warning_and_remote_state_policies_retained(self):
         body=self.body()
         for fragment in ("d->connected != CON_PLAYING","IS_BUI(victim) && !IS_BUI(ch)",
