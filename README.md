@@ -16,6 +16,7 @@ Recent work includes:
 - Consent-based Vampire teaching and Path of Blood abilities.
 - Highlander Counter, restored Monk attacks and crafted Drow ammunition.
 - Class-power, equipment and resource-cost fixes.
+- Werewolf advancement, shifting and gift-help corrections, plus safer utility commands.
 - Updated damage wording without changing the existing damage thresholds.
 - Safer saves, reconnects, shutdowns, combat messages and item handling.
 - Mudlet/MudForge support, GMCP vitals and an optional Mudlet HUD.
@@ -79,6 +80,7 @@ game service.
 - [Client setup and compatibility](docs/CLIENTS.md)
 - [Optional Mudlet HUD](clients/mudlet/README.md)
 - [Classes, skills and known gaps](deploy/CLASS_AUDIT.md)
+- [Werewolf commands, advancement and known gaps](docs/WEREWOLF.md)
 - [Class gear and consumables](deploy/CLASS_GEAR.md)
 - [Clan management](deploy/CLAN_MANAGEMENT.md)
 - [Hybrid implementation status](docs/HYBRIDS.md)
