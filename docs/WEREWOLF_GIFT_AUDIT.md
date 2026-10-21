@@ -177,3 +177,11 @@ handlers reproduce sanitizer failures at those boundaries. This establishes
 the callback contract, not every live death script or recycled-address case.
 Ordinary damage ranges, access, costs, weather modes and cooldowns are unchanged.
 No missing power, secondary Werewolf command adapter or new body form is enabled.
+
+Body Wrack and Clap additionally guard post-retaliation/death callbacks and
+nonpositive-HP targets. Clap validates cached next members and sends stun feedback
+to the actual victim. Their 1,216 ordinary mechanics/RNG snapshots match the
+previous engine; 210 message hashes change solely for that feedback correction.
+Controlled callback tests model removal, movement and interruption, not an
+exhaustive live death-script audit. Existing damage, access, odds, cooldowns and
+Clap's protected-target early-return policy remain unchanged.

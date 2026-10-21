@@ -102,6 +102,8 @@ tests/test_hybrid_scry
 tests/test_werewolf_commands
 tests/test_disquiet
 tests/test_werewolf_combat
+tests/test_werewolf_reactions
+tests/reaction_tribe.o
 bootstrap-backups/
 __pycache__/
 *.py[cod]

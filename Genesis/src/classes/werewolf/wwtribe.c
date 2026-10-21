@@ -137,6 +137,12 @@ void do_bodywrack( CHAR_DATA *ch, char *argument )
     CHAR_DATA *victim;
     char      arg [MAX_INPUT_LENGTH];
     long damage;
+    ROOM_INDEX_DATA *cast_room;
+
+    if (ch == NULL || argument == NULL || IS_NPC(ch) || ch->pcdata == NULL
+        || ch->hit <= 0 || ch->position < POS_FIGHTING) return;
+    cast_room = ch->in_room;
+    if (!combat_character_in_room(cast_room, ch)) return;
 
     argument = one_argument( argument, arg );
 
@@ -167,6 +173,7 @@ void do_bodywrack( CHAR_DATA *ch, char *argument )
 	return;
     }
 
+    if (!combat_pair_in_room(cast_room, ch, victim)) return;
     if ( is_safe(ch, victim) )
     {
 	if (!IS_NPC(victim) && ch != victim && IS_MORE(victim, MORE_GUARDIAN)
@@ -198,12 +205,12 @@ void do_bodywrack( CHAR_DATA *ch, char *argument )
 	act("$n's body falls limply to the ground.",victim,NULL,NULL,TO_ROOM);
 	group_gain(ch,victim);
 	killperson(ch,victim);
-	WAIT_STATE( ch, 12 );
+if (combat_character_in_room(cast_room, ch)) WAIT_STATE( ch, 12 );
 	return;
     }
     update_pos(victim);
     if (IS_NPC(victim)) do_kill(victim,ch->name);
-    WAIT_STATE( ch, 12 );
+    if (combat_character_in_room(cast_room, ch)) WAIT_STATE( ch, 12 );
     return;
 }
 
@@ -909,6 +916,13 @@ void do_clap( CHAR_DATA *ch, char *argument )
     CHAR_DATA *victim_next;
     long        damage;
     bool       no_dam = FALSE;
+    ROOM_INDEX_DATA *cast_room;
+
+    if (ch == NULL || argument == NULL || ch->hit <= 0
+        || ch->position < POS_FIGHTING
+        || (!IS_NPC(ch) && ch->pcdata == NULL)) return;
+    cast_room = ch->in_room;
+    if (!combat_character_in_room(cast_room, ch)) return;
 
     one_argument( argument, arg );
     if (IS_NPC(ch)) no_dam = TRUE;
@@ -923,11 +937,15 @@ void do_clap( CHAR_DATA *ch, char *argument )
 	act("$n claps $s hands together.",ch,NULL,NULL,TO_ROOM);
 	if (no_dam) return;
 	damage = get_tribe(ch, TRIBE_SHADOW_LORDS) * number_range(50,100);
-	for ( victim = ch->in_room->people; victim; victim = victim_next )
+for ( victim = cast_room->people; victim; victim = victim_next )
 	{
+    if (!combat_character_in_room(cast_room, ch) || ch->hit <= 0
+        || ch->position < POS_FIGHTING
+        || !combat_character_in_room(cast_room, victim)) break;
 	    victim_next = victim->next_in_room;
 
 	    if ( victim == ch ) continue;
+    if (victim->hit <= 0 || victim->position == POS_DEAD) continue;
 	    if (IS_BUI(victim)) continue;
 	    if (is_same_group(ch, victim) ) continue;
 	    if (is_safe(ch,victim))
@@ -964,13 +982,13 @@ void do_clap( CHAR_DATA *ch, char *argument )
 		if (number_range(1,20) <= get_tribe(ch, TRIBE_SHADOW_LORDS) && victim != ch)
 		{
 		    victim->position = POS_STUNNED;
-		    send_to_char("You fall to the ground, stunned!\n\r",ch);
+    send_to_char("You fall to the ground, stunned!\n\r",victim);
 		    act("$n falls to the ground, stunned!",victim,NULL,NULL,TO_ROOM);
 		}
 		else if (IS_NPC(victim)) do_kill(victim,ch->name);
 	    }
 	}
-	WAIT_STATE( ch, 24 );
+if (combat_character_in_room(cast_room, ch)) WAIT_STATE( ch, 24 );
 	return;
     }
     return;

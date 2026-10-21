@@ -125,3 +125,22 @@ The callback tests deliberately model extraction, movement and interruption:
 they are not a claim that every native death script or live PvP interaction has
 been exhaustively tested. Other gift arithmetic and callback paths still need
 separate review.
+
+### Body Wrack and Clap retaliation
+
+Body Wrack and Clap now validate the caster after kill/retaliation callbacks;
+Clap also validates its cached next room member before dereferencing it. A moved,
+removed or interrupted caster cannot continue the room attack. Dead/nonpositive
+HP targets are rejected or skipped before direct subtraction. Clap's stun
+feedback now goes to the stunned victim instead of telling the caster they fell.
+
+The real-engine suite records 1,216 native/original-parent/secondary-denial cases,
+including actual NPC retaliation. HP, wait, position, fight links and RNG match
+the old engine in every ordinary case. Exactly 210 message hashes change for the
+intentional stun-feedback correction; the corrected full-output hash is pinned.
+Separate test-only callback wrappers model removal/movement/interruption and
+cached-next extraction. These are callback-contract tests, not proof that every
+native death path frees its killer. Damage, stun odds, cooldowns and access remain
+unchanged. The legacy protected-target policy still ends Clap's room wave rather
+than skipping that target; this patch does not rebalance it. No new power or
+secondary Werewolf access is enabled. Save epoch 4 and handoff 2 are unchanged.

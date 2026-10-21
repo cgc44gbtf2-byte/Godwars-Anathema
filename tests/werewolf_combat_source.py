@@ -7,6 +7,7 @@ The real-engine suite independently checks the corrected behavior and goldens.
 """
 import hashlib
 import re
+from werewolf_reaction_source import without_werewolf_reaction_stage
 
 EDITS={
     "elemental": (
@@ -64,6 +65,7 @@ EDITS={
 }
 
 def without_werewolf_combat_stage(text):
+    text=without_werewolf_reaction_stage(text)
     for name,(before,after,edits) in EDITS.items():
         match=re.search(r"void do_"+name+r"\(.*?(?=\nvoid do_|\Z)",text,re.S)
         if not match:continue

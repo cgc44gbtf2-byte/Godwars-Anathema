@@ -5,6 +5,7 @@ from pathlib import Path
 import re
 import unittest
 from werewolf_combat_source import without_werewolf_combat_stage
+from werewolf_reaction_source import without_werewolf_reaction_stage
 
 ROOT=Path(__file__).resolve().parents[1]
 SRC=ROOT/"Genesis/src/classes/werewolf"
@@ -36,7 +37,7 @@ class WerewolfCombatCatalog(unittest.TestCase):
             ("wwbreed.c",("elemental",),"746c435b66b8d6ae243061ad2b1c18a86886766e"),
             ("wwtribe.c",("surge","cutting","invoke"),"e41266af1dd59d7525cde5e89b4e98221e8e6a42"),
         ):
-            text=(SRC/file).read_text()
+            text=without_werewolf_reaction_stage((SRC/file).read_text())
             for name in names:text=text.replace(body(text,name),"",1)
             self.assertEqual(blob(text),expected,file)
 
