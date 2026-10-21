@@ -15,7 +15,8 @@ def blob(text):
 
 class AuraCatalog(unittest.TestCase):
     def test_entire_shared_module_restores_exact_previous_source(self):
-        text=(SRC/"clan.c").read_text()
+        from scry_source import without_scry_stage
+        text=without_scry_stage((SRC/"clan.c").read_text())
         self.assertEqual(blob(without_aura_stage(text)),"a5570740eb895b02ff7aa058ed631e153ecbeef3")
         self.assertEqual(text.count("hybrid_power_rank("),1)
 

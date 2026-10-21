@@ -10,6 +10,9 @@ def once(text, new, old, count=1):
     return text.replace(new,old)
 
 def without_reader_fields_stage(text):
+    if "void do_scry(" in text:
+        from scry_source import without_scry_stage
+        text=without_scry_stage(text)
     from aux_readers_source import without_aux_readers_stage
     text=without_aux_readers_stage(text)
     text=without_word_readers_stage(text)

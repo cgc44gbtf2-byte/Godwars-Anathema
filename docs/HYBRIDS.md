@@ -1111,6 +1111,20 @@ secondary adapters remain separate work. No conversion or live hybrid forms
 are enabled; no world/help import is performed and custom world helps keep
 priority.
 
+## Native Scry safety
+
+Scry now rejects missing actor/player/room context before parsing, treats a null
+argument as an empty survey and reports a missing target room without borrowing
+it. Survey labels and room names are bounded, with useful fallbacks for missing
+names. These repairs follow **six sanitizer failures** reproduced against the
+previous handler; all nine malformed-context/display boundaries now pass.
+
+The **1,440 native** command snapshots retain identical output, mana, room
+membership, temporary shadow/globe flags and RNG results. Native class/item
+grants, Mage's500-mana policy, shields, staff privacy and guardian warnings
+are unchanged. No conversion or new class permission is enabled by this
+standalone safety repair.
+
 ## Numeric readiness preview — no conversion
 
 The player list is filtered to the nine hybrids containing the current

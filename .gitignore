@@ -98,6 +98,7 @@ tests/test_admin_saves
 tests/test_aux_shutdown
 tests/test_note_editor
 tests/test_hybrid_mastery
+tests/test_hybrid_scry
 bootstrap-backups/
 __pycache__/
 *.py[cod]

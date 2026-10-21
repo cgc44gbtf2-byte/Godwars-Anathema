@@ -1049,9 +1049,8 @@ void do_scry( CHAR_DATA *ch, char *argument )
     char      buf [MSL];
     bool      found = FALSE;
 
-    argument = one_argument( argument, arg );
-
-    if (IS_NPC(ch)) return;
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL || ch->in_room == NULL) return;
+    argument = one_argument( argument != NULL ? argument : "", arg );
 
     if (!IS_VAMPIRE(ch) && !IS_NINJA(ch) && !IS_ITEMAFF(ch, ITEMA_VISION) && !IS_WEREWOLF(ch)
      && !IS_DROW(ch) && !IS_DRAGON(ch) && !IS_MONK(ch) && !IS_MAGE(ch) && !IS_BUI(ch))
@@ -1122,14 +1121,15 @@ void do_scry( CHAR_DATA *ch, char *argument )
 	    if ( victim == ch ) continue;
 	    if ( !can_see(ch,victim) ) continue;
 	    if ( IS_BUI(victim) && !IS_BUI(ch) ) continue;
-	    if ( IS_AFFECTED(victim, AFF_POLYMORPH) )
-		sprintf(buf,"%s: ", victim->morph);
-	    else
-		sprintf(buf,"%s: ", victim->name);
+	    const char *label = IS_AFFECTED(victim, AFF_POLYMORPH)
+	        ? victim->morph : victim->name;
+	    snprintf(buf, sizeof(buf), "%.*s: ", (int)(sizeof(buf) - sizeof(": ")),
+	             label != NULL ? label : "Someone");
 	    send_to_char(buf,ch);
 	    if (!IS_MORE(victim, MORE_SHIELDED) || IS_IMM(ch) || (IS_VAMPIRE(ch) && get_disc(ch, DISC_AUSPEX) >= 6)
 	     || (IS_WEREWOLF(ch) && get_breed(ch, BREED_LUPUS) == 5))
-		sprintf(buf,"%s.\n\r", victim->in_room->name);
+		snprintf(buf, sizeof(buf), "%.*s.\n\r", (int)(sizeof(buf) - sizeof(".\n\r")),
+		         victim->in_room->name != NULL ? victim->in_room->name : "(unknown)");
 	    else
 		sprintf(buf,"(shielded).\n\r");
 	    send_to_char(buf,ch);
@@ -1139,7 +1139,7 @@ void do_scry( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    if ( ( victim = get_char_world( ch, arg ) ) == NULL )
+    if ( ( victim = get_char_world( ch, arg ) ) == NULL || victim->in_room == NULL )
     {
 	send_to_char( "You are unable to locate them.\n\r", ch );
 	return;
