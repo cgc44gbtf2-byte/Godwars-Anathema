@@ -284,6 +284,7 @@ static void remove_directory(const char *name)
     assert(closedir(dir)==0 && rmdir(name)==0);
 }
 
+#ifndef RESTART_FIXTURE_ONLY
 int main(int argc,char **argv)
 {
     if(argc==3 && (!strcmp(argv[1],"--seed") || !strcmp(argv[1],"--seed-vision"))) {
@@ -331,3 +332,4 @@ int main(int argc,char **argv)
     puts("restart/checkpoint/manifest/descriptor recovery regressions passed");
     return 0;
 }
+#endif

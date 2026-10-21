@@ -15,6 +15,7 @@
 #include <time.h>
 #include "merc.h"
 #include "restart.h"
+#include "auxiliary_save.h"
 #include "atomic_save.h"
 #include "telnet_input.h"
 #include "gmcp.h"
@@ -137,6 +138,12 @@ void restart_copyover(CHAR_DATA *ch)
     if (!restart_listener_valid(control,port) || access(EXE_FILE,X_OK)<0)
         goto aborted;
     if (!player_restart_checkpoint()) goto aborted;
+    /* Copyover auxiliary checkpoint precedes handoff and descriptor changes. */
+    if(!auxiliary_save_checkpoint()){
+        log_string("Copyover paused: board or leaderboard saves remain unconfirmed.");
+        goto aborted;
+    }
+    /* End copyover auxiliary checkpoint. */
     if (!add_flags(h,(int)control) || fpReserve==NULL ||
         !add_flags(h,fileno(fpReserve))) goto aborted;
     for (DESCRIPTOR_DATA *d=descriptor_list; d; d=d->next) {
@@ -207,7 +214,7 @@ aborted:
             log_string("WARNING: failed to restore descriptor flags after cancelled copyover.");
     if (published && unlink(COPYOVER_FILE)<0)
         log_string("WARNING: could not remove cancelled copyover manifest.");
-    stc("Copyover cancelled. Check primary saves, drafts/editors, dirty areas, pending client output, sockets and executable. Sessions remain running.\n\r",ch);
+    stc("Copyover cancelled. Check primary/board/leaderboard saves, drafts/editors, dirty areas, pending client output, sockets and executable. Sessions remain running.\n\r",ch);
     log_string("Copyover cancelled before exec; player sessions retained.");
     free(h);
 }

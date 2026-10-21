@@ -33,11 +33,31 @@ have private mode `0600`. Errors include the failing stage and cleanup status;
 a cleanup error can leave a private `.save-*` temporary file for investigation.
 Do not grant broad permissions to work around a disk/ownership failure.
 
+## Stopping and restarting
+
+Manual shutdown and copyover now force a final pass over dirty boards and the
+pending leaderboard, ignoring the normal retry delay. A failed board does not
+prevent attempts for other dirty boards or the leaderboard. Clean destinations
+are not rewritten, and corrupt/rejected files are not automatically repaired.
+
+If any snapshot is not confirmed durable, including a directory-sync failure
+after rename, manual shutdown/copyover is cancelled. Player sessions remain
+running. Fix the underlying storage/permissions problem and retry; successful
+destinations need not be saved again. Existing player-save, draft/editor and
+unsaved-area checks still apply. The checkpoint does not post editor drafts.
+
+TERM/INT requests perform the same final pass from the normal game loop, never
+inside the signal handler, before closing connections. An unresolved failure
+is logged explicitly, but the requested stop still proceeds. There is one
+attempt per pending destination in that pass, not a shutdown retry loop.
+
 ## Limits
 
-Pending changes and editor drafts remain RAM-only. A crash, copyover, or stop
-before a pending snapshot succeeds can lose those changes. These paths do not
-add a final shutdown flush or a crash-recovery journal. No implementation can
+Pending changes and editor drafts remain RAM-only. A crash, SIGKILL, power loss,
+or a requested TERM/INT stop while storage is still failing can lose unsaved
+changes. There is no crash-recovery journal, cross-file transaction, or automatic
+reposting of drafts. A blocked filesystem operation can delay shutdown; the
+service manager can still enforce its stop timeout. No implementation can
 promise successful persistence through permanently failed storage.
 
 Use one process per runtime directory. External edits or multiple independent

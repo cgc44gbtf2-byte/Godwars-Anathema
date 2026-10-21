@@ -14,6 +14,7 @@
 #include "file_string.h"
 #include "file_word.h"
 #include "atomic_save.h"
+#include "auxiliary_save.h"
 #include <limits.h>
 #include <unistd.h>
 
@@ -739,6 +740,16 @@ void retry_leaderboard_save(void)
         save_leaderboard();
 }
 /* End atomic leaderboard writer scope. */
+/* Forced terminal leaderboard checkpoint. */
+bool flush_leaderboard(void)
+{
+    if(!leaderboard_save_pending)return TRUE;
+    if(leaderboard_load_failed)return FALSE;
+    save_leaderboard();
+    return !leaderboard_save_pending;
+}
+/* End forced terminal leaderboard checkpoint. */
+
 void do_leader( CHAR_DATA *ch, char *argument )
 {
     char buf[MSL];

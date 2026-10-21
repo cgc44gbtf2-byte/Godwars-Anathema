@@ -18,6 +18,8 @@ def restore(text, start, end, name):
     return text[:a] + zlib.decompress(base64.b64decode(OLD[name])).decode() + text[b:]
 
 def without_admin_saves_stage(text):
+    from aux_shutdown_source import without_aux_shutdown_stage
+    text=without_aux_shutdown_stage(text)
     if "/* Atomic disabled-command removal. */" in text:
         text = restore(text, "                /* Atomic disabled-command removal. */\n",
                        "                /* End atomic disabled-command removal. */\n", "remove")

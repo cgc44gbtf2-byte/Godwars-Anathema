@@ -62,6 +62,7 @@
 #include "telnet_input.h"
 #include "gmcp.h"
 #include "restart.h"
+#include "auxiliary_save.h"
 
 
 /*
@@ -783,6 +784,10 @@ static void shutdown_from_signal( void )
     merc_down = TRUE;
     log_string( "Stop signal received: saving loaded players and closing connections." );
     save_shutdown_players();
+    /* Forced terminal auxiliary checkpoint. */
+    if(!auxiliary_save_checkpoint())
+        log_string("WARNING: stopping with unconfirmed board/leaderboard updates; pending changes may be lost.");
+    /* End forced terminal auxiliary checkpoint. */
     while ( descriptor_list != NULL )
     {
         /* Do not generate prompts or wait for queued output during stop. */

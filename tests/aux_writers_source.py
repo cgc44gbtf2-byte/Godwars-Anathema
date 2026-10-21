@@ -16,6 +16,8 @@ def without_aux_writers_update(text):
     return replace_once(text,hook,"")
 
 def without_aux_writers_stage(text):
+    from aux_shutdown_source import without_aux_shutdown_stage
+    text=without_aux_shutdown_stage(text)
     if "/* Atomic leaderboard writer scope. */" not in text:
         return text
     start=text.index("/* Atomic leaderboard writer scope. */")

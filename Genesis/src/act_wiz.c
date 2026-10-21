@@ -36,6 +36,7 @@
 #include "admin_config.h"
 #include "progress_metrics.h"
 #include "restart.h"
+#include "auxiliary_save.h"
 
 #include <ctype.h>
 #include <errno.h>
@@ -1368,6 +1369,12 @@ void do_shutdown( CHAR_DATA *ch, char *argument )
         stc("Shutdown cancelled. Resolve failed primary saves, ineligible players, drafts/editors and unsaved areas first.\n\r",ch);
         return;
     }
+    /* Manual auxiliary checkpoint must finish before shutdown is announced. */
+    if(!auxiliary_save_checkpoint()){
+        stc("Shutdown cancelled: board or leaderboard saves remain unconfirmed. Resolve the disk errors and retry.\n\r",ch);
+        return;
+    }
+    /* End manual auxiliary checkpoint. */
     sprintf(buf, "Shutdown by %s.", ch->name);
     append_file(ch, SHUTDOWN_FILE, buf);
     strcat(buf, "\n\r");

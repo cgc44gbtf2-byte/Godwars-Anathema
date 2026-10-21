@@ -32,6 +32,7 @@
 #include "file_string.h"
 #include "file_word.h"
 #include "atomic_save.h"
+#include "auxiliary_save.h"
 #include <limits.h>
 
 static time_t notes_retry_after;
@@ -342,6 +343,17 @@ notes_retry_after=0;
 		if (boards[i].changed) /* only save changed boards */
 			save_board (&boards[i]);
 }
+
+/* Forced terminal board checkpoint. */
+bool flush_notes(void)
+{
+    bool okay=TRUE;
+    notes_retry_after=0;
+    for(long i=0;i<MAX_BOARD;i++)
+        if(boards[i].changed && !save_board(&boards[i]))okay=FALSE;
+    return okay;
+}
+/* End forced terminal board checkpoint. */
 
 /* Read complete snapshots before publishing or pruning anything. Header limits
  * match runtime input; bodies retain the editor's larger MAX_NOTE_TEXT limit. */
