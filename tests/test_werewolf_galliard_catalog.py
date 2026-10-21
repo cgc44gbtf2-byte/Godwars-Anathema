@@ -61,11 +61,18 @@ class GalliardCatalog(unittest.TestCase):
                       "4096+15901","permissions_and_rank","POS_MORTAL"):
             self.assertIn(token,test)
 
-    def test_compatibility_and_readme_unchanged(self):
+    def test_compatibility_unchanged(self):
         self.assertEqual(json.loads((ROOT/"deploy/update_compat.json").read_text()),
                          {"schema":1,"save_epoch":4,"handoff":2})
-        self.assertEqual(hashlib.sha256((ROOT/"README.md").read_bytes()).hexdigest(),
-                         "7d24e33eb2ca7a7869e249e96201442f1a7be0825ef31cb4aa2254b68bb8fe7d")
+
+    def test_readme_is_brief_and_links_werewolf_guide_without_host_details(self):
+        text=(ROOT/"README.md").read_text()
+        self.assertLessEqual(len(text.splitlines()),120)
+        self.assertIn("Werewolf advancement, shifting and gift-help corrections",text)
+        self.assertIn("(docs/WEREWOLF.md)",text)
+        self.assertTrue((ROOT/"docs/WEREWOLF.md").is_file())
+        self.assertNotRegex(text,r"\b(?:\d{1,3}\.){3}\d{1,3}\b")
+        self.assertNotRegex(text,r"(?i)\bport\s*[:=]?\s*\d+")
 
     def test_documented_sparse_world_limitations(self):
         text=(ROOT/"docs/WEREWOLF.md").read_text()
