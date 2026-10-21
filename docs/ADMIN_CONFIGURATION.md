@@ -32,10 +32,29 @@ merely to bypass the startup check.
 Disabled-command and ban displays are bounded/streamed. Ban nodes use the
 existing recycled pool; old permanent nodes are not incorrectly heap-freed.
 
-## Remaining work
+## Saving and failure handling
 
-This stage fixes reads, reload ownership, display bounds and corrupt-file
-quarantine. Healthy-file `save_disabled` and `save_bans` still use their legacy
-unchecked writes/unlinks and success messages. Atomic configuration writes and
-write-failure acknowledgment are a separate follow-up. No file-format,
-command-trust, class or gameplay changes are introduced for valid native data.
+Valid policies use fixed-name atomic replacement: create a private temporary
+file in the same directory, check serialization/flush/fsync/close, rename, then
+fsync the directory. Empty policies retain the legacy **absent file** format;
+checked unlink plus directory fsync protects this deletion. An already missing
+file also requires directory fsync before confirming a durable empty policy.
+Non-regular targets and symlinks cannot be replaced or deleted.
+As with atomic player/leaderboard saves, the area directory must be owned by
+the server uid and not group/other-writable. New policy files are private (0600).
+
+If an operation fails before rename/unlink, the previous file is kept and
+the modifying command restores its old in-memory list. It does **not** say
+the change succeeded. If rename/unlink succeeds but directory fsync fails,
+the new policy is visible, but power-loss durability is uncertain. The command
+warns the player and pauses further changes to that policy until a validated
+reload/restart. Runtime restrictions still follow the newly visible state.
+
+The open-file reserve is restored on every attempted disk operation, including
+failed ones. File contents and command trust remain unchanged for normal
+successful operations. No gameplay, class, player-save, or handoff schema
+changes are introduced.
+
+These guarantees are for one trusted server process and one local filesystem.
+They do not replace backups, coordinate multiple writers, journal unfinished
+staff actions across crashes, or prove durability under a real power cut.

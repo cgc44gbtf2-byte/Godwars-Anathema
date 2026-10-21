@@ -22,9 +22,11 @@ class AdminConfigCatalog(unittest.TestCase):
             self.assertNotIn(old,text)
     def test_reload_and_write_guards(self):
         text=(SRC/"interp.c").read_text()
-        self.assertLess(text.index("if(!admin_disabled_ready()){",text.index("void save_disabled")),
-                        text.index("unlink (DISABLED_FILE)"))
-        self.assertIn("if(!admin_bans_ready()){",text.split("void save_bans(void)",1)[1])
+        writer=(SRC/"admin_config.c").read_text()
+        self.assertIn("admin_save_disabled()",text.split("void save_disabled()",1)[1])
+        self.assertIn("admin_save_bans()",text.split("void save_bans(void)",1)[1])
+        self.assertIn("if(!disabled_ready || !serializable_disabled())",writer)
+        self.assertIn("if(!bans_ready || !serializable_bans())",writer)
         self.assertEqual((SRC/"act_wiz.c").read_text().count("if(!admin_bans_ready()){"),2)
     def test_startup_checks_both_configs(self):
         text=(SRC/"db.c").read_text().split("load_disabled( );",1)[1]

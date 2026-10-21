@@ -2146,11 +2146,22 @@ send_to_char( "Banned sites:\n\r", ch );
 	ban_free	= ban_free->next;
     }
 
+    /* Atomic ban addition. */
     pban->name	= str_dup( arg );
     pban->next	= ban_list;
     ban_list	= pban;
-    send_to_char( "Ok.\n\r", ch );
-    save_bans( );
+    enum atomic_save_result result=admin_save_bans();
+    if(result==ATOMIC_SAVE_FAILED){
+        ban_list=pban->next;
+        free_string(pban->name);pban->name=NULL;
+        pban->next=ban_free;ban_free=pban;
+        send_to_char("Ban not saved; previous restrictions remain.\n\r",ch);
+        return;
+    }
+    if(result==ATOMIC_SAVE_UNCERTAIN)
+        send_to_char("Ban visible, but disk durability is uncertain. Further policy edits are paused until restart.\n\r",ch);
+    else send_to_char( "Ok.\n\r", ch );
+    /* End atomic ban addition. */
     return;
 }
 
@@ -2179,16 +2190,22 @@ void do_allow( CHAR_DATA *ch, char *argument )
     {
 	if ( !str_cmp( arg, curr->name ) )
 	{
-	    if ( prev == NULL )
-		ban_list   = ban_list->next;
-	    else
-		prev->next = curr->next;
-
-	    free_string( curr->name );
-	    curr->next	= ban_free;
-	    ban_free	= curr;
-	    send_to_char( "Ok.\n\r", ch );
-	    save_bans( );
+	    /* Atomic ban removal. */
+	    BAN_DATA *next=curr->next;
+	    if(prev)prev->next=next;else ban_list=next;
+	    enum atomic_save_result result=admin_save_bans();
+	    if(result==ATOMIC_SAVE_FAILED){
+	        curr->next=next;
+	        if(prev)prev->next=curr;else ban_list=curr;
+	        send_to_char("Ban removal not saved; previous restrictions remain.\n\r",ch);
+	        return;
+	    }
+	    free_string(curr->name);curr->name=NULL;
+	    curr->next=ban_free;ban_free=curr;
+	    if(result==ATOMIC_SAVE_UNCERTAIN)
+	        send_to_char("Ban removed, but disk durability is uncertain. Further policy edits are paused until restart.\n\r",ch);
+	    else send_to_char( "Ok.\n\r", ch );
+	    /* End atomic ban removal. */
 	    return;
 	}
     }

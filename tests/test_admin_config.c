@@ -180,6 +180,7 @@ static void cases(void)
     puts("ADMIN_CONFIG_RELOAD_QUARANTINE_RECOVERY_PASSED");
 }
 #endif
+#ifndef ADMIN_CONFIG_FIXTURE_ONLY
 int main(int argc,char **argv)
 {
     sandbox_begin();metrics_fixture();init_mm();fBootDb=FALSE;
@@ -191,3 +192,4 @@ int main(int argc,char **argv)
     unlink(DISABLED_FILE);unlink("ban.txt");sandbox_end();
     if(argc==1)printf("ADMIN_CONFIG_CHECKS=%u\n",checks);return 0;
 }
+#endif

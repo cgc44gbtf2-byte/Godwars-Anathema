@@ -11,6 +11,7 @@
 #include "admin_config.h"
 #include "file_number.h"
 #include "file_word.h"
+#include "file_io.h"
 
 #define ADMIN_RECORD_LIMIT 1024
 #define ADMIN_FILE_LIMIT 262144
@@ -171,4 +172,85 @@ void load_bans(void)
     }
     BAN_DATA *old=ban_list;ban_list=staged;
     bans_drop(old);bans_ready=TRUE;
+}
+
+/* Atomic policy save implementations. The legacy save_bans/save_disabled
+ * entry points remain thin compatibility wrappers in interp.c. */
+static bool serializable_disabled(void)
+{
+    size_t bytes=4;unsigned records=0;
+    for(DISABLED_DATA *p=disabled_first;p;p=p->next)
+        if(++records>ADMIN_RECORD_LIMIT
+            || !disabled_charge(&bytes,p->command,p->disabled_by,p->level))
+            return FALSE;
+    return TRUE;
+}
+static bool serializable_bans(void)
+{
+    size_t bytes=0;unsigned records=0;
+    for(BAN_DATA *p=ban_list;p;p=p->next)
+        if(++records>ADMIN_RECORD_LIMIT || !field(p->name)
+            || !charge(&bytes,strlen(p->name)+1))return FALSE;
+    return TRUE;
+}
+static int write_disabled(FILE *fp,void *unused)
+{
+    (void)unused;
+    for(DISABLED_DATA *p=disabled_first;p;p=p->next)
+        if(fprintf(fp,"%s %li %s\n",p->command->name,p->level,p->disabled_by)<0)
+            return -1;
+    return fprintf(fp,"END\n")<0?-1:0;
+}
+static int write_bans(FILE *fp,void *unused)
+{
+    (void)unused;
+    for(BAN_DATA *p=ban_list;p;p=p->next)
+        if(fprintf(fp,"%s\n",p->name)<0)return -1;
+    return 0;
+}
+static void report_save(const char *which,enum atomic_save_result result,
+                        const struct atomic_save_error *error)
+{
+    if(result==ATOMIC_SAVE_OK)return;
+    char buf[240];
+    snprintf(buf,sizeof buf,"%s policy save %s at %s (errno %d, cleanup %d)",
+        which,result==ATOMIC_SAVE_UNCERTAIN?"visible but not confirmed durable":"failed",
+        error->stage?error->stage:"validation",error->number,error->cleanup_number);
+    log_string(buf);
+}
+enum atomic_save_result admin_save_disabled(void)
+{
+    struct atomic_save_error error={NULL,0,0};
+    enum atomic_save_result result;
+    if(!disabled_ready || !serializable_disabled()){
+        log_string("Disabled-command policy save refused: invalid or quarantined data");
+        return ATOMIC_SAVE_FAILED;
+    }
+    file_reserve_close();
+    if(disabled_first)
+        result=atomic_save_disabled(".",write_disabled,NULL,&error);
+    else
+        result=atomic_remove_disabled(".",&error);
+    file_reserve_open();
+    if(result==ATOMIC_SAVE_UNCERTAIN)disabled_ready=FALSE;
+    report_save("Disabled-command",result,&error);
+    return result;
+}
+enum atomic_save_result admin_save_bans(void)
+{
+    struct atomic_save_error error={NULL,0,0};
+    enum atomic_save_result result;
+    if(!bans_ready || !serializable_bans()){
+        log_string("Ban policy save refused: invalid or quarantined data");
+        return ATOMIC_SAVE_FAILED;
+    }
+    file_reserve_close();
+    if(ban_list)
+        result=atomic_save_bans(".",write_bans,NULL,&error);
+    else
+        result=atomic_remove_bans(".",&error);
+    file_reserve_open();
+    if(result==ATOMIC_SAVE_UNCERTAIN)bans_ready=FALSE;
+    report_save("Ban",result,&error);
+    return result;
 }

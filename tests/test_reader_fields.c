@@ -204,7 +204,7 @@ static void reader_errors(void)
     assert(fpReserve&&char_exists(nickname)&&fd_count()==before);
     deny_player_read=1;assert(!valid_name(nickname));
     assert(!deny_player_read&&fpReserve&&fd_count()==before);
-    BAN_DATA ban={0};ban.name="Private fixture";ban_list=&ban;
+    BAN_DATA ban={0};ban.name="private.example";ban_list=&ban;
     file_reserve_close();save_bans();ban_list=NULL;
     assert(fpReserve&&fd_count()==before&&unlink("ban.txt")==0);
     file_reserve_close();append_file(&actor,"../area/missing/file","Private fixture");

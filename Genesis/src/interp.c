@@ -3366,20 +3366,24 @@ disable <command> - toggles disable status of command
             return;
          }
       
-                /* Remove */
-      
-         if (disabled_first == p) /* node to be removed == head ? */
-            disabled_first = p->next;
-         else /* Find the node before this one */
-         {
-            for (q = disabled_first; q->next != p; q = q->next); /* empty for */
-            q->next = p->next;
+                /* Atomic disabled-command removal. */
+         q=NULL;
+         if(disabled_first!=p)
+            for(q=disabled_first;q->next!=p;q=q->next); /* validated list */
+         DISABLED_DATA *next=p->next;
+         if(q)q->next=next;else disabled_first=next;
+         enum atomic_save_result result=admin_save_disabled();
+         if(result==ATOMIC_SAVE_FAILED){
+            p->next=next;
+            if(q)q->next=p;else disabled_first=p;
+            send_to_char("Command was not enabled: policy save failed; previous restrictions remain.\n\r",ch);
+            return;
          }
-      
-         free_string (p->disabled_by); /* free name of disabler */
-         free_mem (p,sizeof(DISABLED_DATA)); /* free node */
-         save_disabled(); /* save to disk */
-         send_to_char ("Command enabled.\n\r",ch);
+         free_string(p->disabled_by);free_mem(p,sizeof *p);
+         if(result==ATOMIC_SAVE_UNCERTAIN)
+            send_to_char("Command enabled, but disk durability is uncertain. Further policy edits are paused until restart.\n\r",ch);
+         else send_to_char("Command enabled.\n\r",ch);
+                /* End atomic disabled-command removal. */
       }
       else /* not a disabled command, check if that command exists */
       {
@@ -3416,6 +3420,7 @@ disable <command> - toggles disable status of command
             send_to_char("Disabled-command policy limit reached or invalid record; no change.\n\r",ch);
             return;
          }
+                /* Atomic disabled-command addition. */
          p = alloc_mem (sizeof(DISABLED_DATA));
       
          p->command = &cmd_table[i];
@@ -3424,8 +3429,17 @@ disable <command> - toggles disable status of command
          p->next = disabled_first;
          disabled_first = p; /* add before the current first element */
       
-         send_to_char ("Command disabled.\n\r",ch);
-         save_disabled(); /* save to disk */
+         enum atomic_save_result result=admin_save_disabled();
+         if(result==ATOMIC_SAVE_FAILED){
+            disabled_first=p->next;
+            free_string(p->disabled_by);free_mem(p,sizeof *p);
+            send_to_char("Command was not disabled: policy save failed; previous restrictions remain.\n\r",ch);
+            return;
+         }
+         if(result==ATOMIC_SAVE_UNCERTAIN)
+            send_to_char("Command disabled, but disk durability is uncertain. Further policy edits are paused until restart.\n\r",ch);
+         else send_to_char("Command disabled.\n\r",ch);
+                /* End atomic disabled-command addition. */
       }
    }
 
@@ -3449,60 +3463,12 @@ disable <command> - toggles disable status of command
 /* Save disabled commands */
    void save_disabled()
    {
-      FILE *fp;
-      DISABLED_DATA *p;
-      if(!admin_disabled_ready()){
-         log_string("save_disabled: rejected configuration is read-only");
-         return;
-      }
-   
-      if (!disabled_first) /* delete file if no commands are disabled */
-      {
-         unlink (DISABLED_FILE);
-         return;
-      }
-   
-      fp = fopen (DISABLED_FILE, "w");
-   
-      if (!fp)
-      {
-         bug ("Could not open " DISABLED_FILE " for writing",0);
-         return;
-      }
-   
-      for (p = disabled_first; p ; p = p->next)
-         fprintf (fp, "%s %li %s\n", p->command->name, p->level, p->disabled_by);
-   
-      fprintf (fp, "%s\n",END_MARKER);
-   
-      fclose (fp);
+      (void)admin_save_disabled();
    }
 
    /* Ban reader lives in admin_config.c. */
 
    void save_bans(void)
    {
-      FILE *fp;
-      BAN_DATA *p;
-      if(!admin_bans_ready()){
-         log_string("save_bans: rejected configuration is read-only");
-         return;
-      }
-   
-      if (!ban_list)       {
-         unlink ("ban.txt");
-         return;
-      }
-   
-      file_reserve_close();
-      fp = fopen ("ban.txt", "w");
-   
-      if (!fp) {bug("could not open ban.txt",0);
-         return;}
-   
-      for (p = ban_list; p != NULL; p = p->next) {
-         fprintf(fp, "%s\n", p->name);}
-      fclose(fp);
-      file_reserve_open();
-   
+      (void)admin_save_bans();
    }

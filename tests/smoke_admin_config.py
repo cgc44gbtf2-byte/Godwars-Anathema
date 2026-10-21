@@ -3,6 +3,7 @@ import pathlib
 import secrets
 import signal
 import socket
+import stat
 import subprocess
 import tempfile
 import time
@@ -46,8 +47,14 @@ def scenario(kind):
                 client.sendall(b"authorize\n");until(client,b"highest staff level (7)")
                 client.sendall(b"disable chat\n");until(client,b"Command enabled.")
                 assert not (area/"disabled.txt").exists()
+                client.sendall(b"disable chat\n");until(client,b"Command disabled.")
+                assert (area/"disabled.txt").read_text()=="chat 7 Luto\nEND\n"
+                assert stat.S_IMODE((area/"disabled.txt").stat().st_mode)==0o600
+                client.sendall(b"disable chat\n");until(client,b"Command enabled.")
+                assert not (area/"disabled.txt").exists()
                 client.sendall(b"ban blocked.invalid\n");until(client,b"Ok.")
                 assert (area/"ban.txt").read_text()=="blocked.invalid\n"
+                assert stat.S_IMODE((area/"ban.txt").stat().st_mode)==0o600
                 client.sendall(b"allow blocked.invalid\n");until(client,b"Ok.")
                 assert not (area/"ban.txt").exists()
                 process.send_signal(signal.SIGTERM);process.wait(timeout=25)

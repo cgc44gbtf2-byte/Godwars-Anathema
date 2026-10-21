@@ -178,3 +178,76 @@ enum atomic_save_result atomic_save_leaderboard(const char *directory,
 {
     return atomic_save_named(directory,"leader.txt",writer,context,error,1);
 }
+
+/* Administrative policy fixed-name atomic APIs. */
+enum atomic_save_result atomic_save_bans(const char *directory,
+    atomic_save_writer writer, void *context, struct atomic_save_error *error)
+{
+    return atomic_save_named(directory,"ban.txt",writer,context,error,1);
+}
+
+enum atomic_save_result atomic_save_disabled(const char *directory,
+    atomic_save_writer writer, void *context, struct atomic_save_error *error)
+{
+    return atomic_save_named(directory,"disabled.txt",writer,context,error,1);
+}
+
+static enum atomic_save_result atomic_remove_named(const char *directory,
+    const char *name, struct atomic_save_error *error)
+{
+    struct atomic_save_error local_error={NULL,0,0};
+    struct stat st;
+    int dirfd=-1,saved_errno;
+    const char *stage="arguments";
+    if(!error)error=&local_error;
+    *error=local_error;
+    if(!directory || !*directory || !name || !*name){errno=EINVAL;goto failed;}
+    stage="open directory";
+    /* A trailing slash would bypass O_NOFOLLOW on a symlink directory. */
+    if(strlen(directory)>1 && directory[strlen(directory)-1]=='/'){
+        errno=EINVAL;goto failed;
+    }
+    dirfd=open(directory,O_RDONLY|O_DIRECTORY|O_NOFOLLOW|O_CLOEXEC);
+    if(dirfd<0)goto failed;
+    stage="directory permissions";
+    if(fstat(dirfd,&st)<0)goto failed;
+    if(st.st_uid!=geteuid() || (st.st_mode&(S_IWGRP|S_IWOTH))){
+        errno=EPERM;goto failed;
+    }
+    stage="destination type";
+    if(fstatat(dirfd,name,&st,AT_SYMLINK_NOFOLLOW)!=0){
+        if(errno!=ENOENT)goto failed;
+    }else{
+        if(!S_ISREG(st.st_mode)){errno=EINVAL;goto failed;}
+        stage="unlink";
+        if(FAULT(SAVE_FAULT_REMOVE)||unlinkat(dirfd,name,0)!=0)goto failed;
+    }
+    /* Confirm absence even if a previous deletion was not durably synced. */
+    stage="directory fsync (empty policy visible; durability uncertain)";
+    if(FAULT(SAVE_FAULT_DIRSYNC)||fsync(dirfd)!=0){
+        error->stage=stage;
+        error->number=errno?errno:EIO;
+        close(dirfd);
+        return ATOMIC_SAVE_UNCERTAIN;
+    }
+    close(dirfd);
+    return ATOMIC_SAVE_OK;
+failed:
+    saved_errno=errno?errno:EIO;
+    error->stage=stage;error->number=saved_errno;
+    if(dirfd>=0)close(dirfd);
+    errno=saved_errno;
+    return ATOMIC_SAVE_FAILED;
+}
+
+enum atomic_save_result atomic_remove_bans(const char *directory,
+    struct atomic_save_error *error)
+{
+    return atomic_remove_named(directory,"ban.txt",error);
+}
+
+enum atomic_save_result atomic_remove_disabled(const char *directory,
+    struct atomic_save_error *error)
+{
+    return atomic_remove_named(directory,"disabled.txt",error);
+}
