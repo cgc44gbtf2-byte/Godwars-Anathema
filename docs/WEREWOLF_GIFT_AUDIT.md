@@ -185,3 +185,12 @@ previous engine; 210 message hashes change solely for that feedback correction.
 Controlled callback tests model removal, movement and interruption, not an
 exhaustive live death-script audit. Existing damage, access, odds, cooldowns and
 Clap's protected-target early-return policy remain unchanged.
+
+The remaining Tribe room loops now include checked Breath of the Wyld healing,
+post-flee Banshee membership checks, and post-command Obedience cleanup (both
+single-target and room-wide). Obedience command input and announcements are
+bounded. A further 912 ordinary engine cases pin existing effects, resistance,
+messages and RNG; controlled callback tests cover extraction/movement of caster,
+target and cached next member. No additional gift or secondary-parent permission
+is enabled. Call of the Wyrm and undispatched Wrath of Gaia were inspected and
+left unchanged; this is not a complete audit of their transformation policies.

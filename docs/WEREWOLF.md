@@ -144,3 +144,31 @@ native death path frees its killer. Damage, stun odds, cooldowns and access rema
 unchanged. The legacy protected-target policy still ends Clap's room wave rather
 than skipping that target; this patch does not rebalance it. No new power or
 secondary Werewolf access is enabled. Save epoch 4 and handoff 2 are unchanged.
+
+### Other room-wide effects
+
+Howl of the Banshee and both Obedience paths validate room membership after
+flee/command callbacks. A vanished cached next target ends the wave safely.
+Banshee restores the living caster's temporary autofollow setting even after
+movement; Obedience clears a surviving NPC's temporary commanded flag in its
+new room. Removed characters are not dereferenced during cleanup. An interrupted
+or moved caster cannot continue imposing the room effect.
+
+Breath of the Wyld keeps its healing formula and max-HP cap, with checked
+addition at extreme HP and fail-closed malformed rank arithmetic. Obedience
+rejects oversized command input and bounds its announcement formatting.
+Normal targets, rank gates, cooldowns, immunity/resistance and resource policies
+are unchanged. Secondary-parent Werewolf access is not added.
+
+The real-engine suite pins 912 ordinary native/original-hybrid/secondary-denial
+cases, including messages and RNG. Ten pre-fix failures were reproduced with
+sanitizers (healing/input boundaries and test-only flee/command callbacks).
+These injections establish callback contracts, not a claim that every ordinary
+flee or forced command frees its participants.
+
+Call of the Wyrm and the undispatched Wrath of Gaia were inspected but are
+unchanged: Wyrm's existing visibility/shape toggles are not newly redesigned,
+and Wrath remains unavailable through the command table. Power Surge and Clap
+retain the earlier safeguards and targeting policies. Character-list integrity,
+same-address recycling, broader forced-command authorization and live scripted
+multiplayer interactions still require separate review.

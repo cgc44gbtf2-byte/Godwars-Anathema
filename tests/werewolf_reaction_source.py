@@ -1,6 +1,7 @@
 """Hash-guarded inverse of the two reviewed 8658ffd Werewolf reaction edits."""
 import hashlib
 import re
+from werewolf_room_source import without_werewolf_room_stage
 
 EDITS={
     "bodywrack":(
@@ -19,6 +20,7 @@ EDITS={
 }
 
 def without_werewolf_reaction_stage(text):
+    text=without_werewolf_room_stage(text)
     for name,(before,after,edits) in EDITS.items():
         match=re.search(r"void do_"+name+r"\(.*?(?=\nvoid do_|\Z)",text,re.S)
         if not match:continue

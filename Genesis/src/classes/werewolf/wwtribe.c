@@ -3,6 +3,7 @@
 #else
 #include <sys/types.h>
 #endif
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,9 +14,14 @@ void do_breathwyld( CHAR_DATA *ch, char *argument )
 {
     CHAR_DATA *vch;
     CHAR_DATA *vch_next;
-    int heal;
+    long heal;
 
-    if (IS_NPC(ch)) return;
+    if (ch == NULL || argument == NULL || IS_NPC(ch) || ch->pcdata == NULL
+        || ch->hit <= 0 || ch->position < POS_STANDING
+        || !combat_character_in_room(ch->in_room, ch)) return;
+    /* Keep normal ranks unchanged; malformed arithmetic must not wrap. */
+    if (ch->pcdata->rank < 0 || ch->pcdata->rank > (LONG_MAX - 2000) / 500)
+        return;
 
     if (!IS_WEREWOLF(ch))
     {
@@ -41,7 +47,7 @@ void do_breathwyld( CHAR_DATA *ch, char *argument )
 	act("You instill life in $N.",ch,NULL,vch,TO_CHAR);
 	act("$n instills life in $N.",ch,NULL,vch,TO_NOTVICT);
 	stc("You feel your wounds close.\n\r",vch);
-	vch->hit += heal;
+vch->hit = vch->hit > LONG_MAX - heal ? vch->max_hit : vch->hit + heal;
 	if (vch->hit > vch->max_hit) vch->hit = vch->max_hit;
     }
     WAIT_STATE(ch,12);
@@ -497,9 +503,14 @@ void do_banshee( CHAR_DATA *ch, char *argument )
 {
     CHAR_DATA *ich;
     CHAR_DATA *fch;
+    CHAR_DATA *live;
+    ROOM_INDEX_DATA *cast_room;
     bool follow = FALSE;
 
-    if (IS_NPC(ch)) return;
+    if (ch == NULL || argument == NULL || IS_NPC(ch) || ch->pcdata == NULL
+        || ch->hit <= 0 || ch->position < POS_FIGHTING
+        || !combat_character_in_room(ch->in_room, ch)) return;
+    cast_room = ch->in_room;
 
     if (!IS_WEREWOLF(ch))
     {
@@ -528,8 +539,11 @@ void do_banshee( CHAR_DATA *ch, char *argument )
 	follow = TRUE;
     }
 
-    for (ich = ch->in_room->people; ich != NULL; ich = fch)
+    for (ich = cast_room->people; ich != NULL; ich = fch)
     {
+if (!combat_character_in_room(cast_room, ch) || ch->hit <= 0
+    || ch->position < POS_FIGHTING
+    || !combat_character_in_room(cast_room, ich)) break;
 	fch = ich->next_in_room;
 	if (ich == ch) continue;
 	if (!IS_NPC(ich) && ich->pcdata->resist[WILL_PRESENCE] > 0) continue;
@@ -539,11 +553,20 @@ void do_banshee( CHAR_DATA *ch, char *argument )
 	stc("You are frozen in fear!\n\r", ich);
 	act("$n screams in terror!", ich, NULL, NULL, TO_ROOM);
 	if (ich->position == POS_FIGHTING) do_flee(ich, "");
+/* Flee may move/extract either actor, or a cached next room member. */
+if (!combat_character_in_room(cast_room, ch) || ch->hit <= 0
+    || ch->position < POS_FIGHTING) break;
+if (!combat_character_in_room(cast_room, ich)) continue;
 	if (ich->position == POS_FIGHTING && get_tribe(ch, TRIBE_FIANNA) >= 5) do_flee(ich, "");
     }
 
-    if (follow) SET_BIT(ch->act, PLR_AUTOFOLLOW);
-    WAIT_STATE(ch, 18);
+    /* Restore this temporary flag even if a living caster changed rooms. */
+    for (live = char_list; live != NULL; live = live->next)
+        if (live == ch) {
+            if (follow) SET_BIT(live->act, PLR_AUTOFOLLOW);
+            break;
+        }
+    if (combat_character_in_room(cast_room, ch)) WAIT_STATE(ch, 18);
     return;
 }
 
@@ -1152,8 +1175,18 @@ void do_obedience( CHAR_DATA *ch, char *argument )
     char buf[MAX_STRING_LENGTH];
     CHAR_DATA *victim;
     CHAR_DATA *vch_next;
+    CHAR_DATA *live;
+    ROOM_INDEX_DATA *cast_room;
     long level;
 
+    if (ch == NULL || argument == NULL || IS_NPC(ch) || ch->pcdata == NULL
+        || ch->hit <= 0 || ch->position < POS_SITTING
+        || !combat_character_in_room(ch->in_room, ch)) return;
+    if (strlen(argument) >= sizeof action) {
+        send_to_char("That command is too long.\n\r", ch);
+        return;
+    }
+    cast_room = ch->in_room;
     argument = one_argument( argument, arg );
 
     if (IS_NPC(ch)) return;
@@ -1186,11 +1219,14 @@ void do_obedience( CHAR_DATA *ch, char *argument )
 
     if (!str_cmp(arg,"all"))
     {
-	sprintf( buf, "I command everyone to %s", action );
+snprintf( buf, sizeof buf, "I command everyone to %s", action );
 	do_say(ch,buf);
 	WAIT_STATE(ch,24);
-	for ( victim = ch->in_room->people; victim != NULL; victim = vch_next )
+for ( victim = cast_room->people; victim != NULL; victim = vch_next )
 	{
+    if (!combat_character_in_room(cast_room, ch) || ch->hit <= 0
+        || ch->position < POS_SITTING
+        || !combat_character_in_room(cast_room, victim)) break;
 	    vch_next = victim->next_in_room;
 	    WAIT_STATE(ch,24);
 	    if ( victim == ch ) continue;
@@ -1240,7 +1276,16 @@ void do_obedience( CHAR_DATA *ch, char *argument )
 	    act("You obey $N.",victim,NULL,ch,TO_CHAR);
 	    if (IS_NPC(victim)) SET_BIT(victim->act, ACT_COMMANDED);
 	    interpret( victim, action );
-	    if (IS_NPC(victim)) REMOVE_BIT(victim->act, ACT_COMMANDED);
+    /* Commands can remove/move either participant. Clear the temporary NPC
+     * flag wherever a surviving target moved; never dereference a stale one. */
+    for (live = char_list; live != NULL; live = live->next)
+        if (live == victim) {
+            if (IS_NPC(live)) REMOVE_BIT(live->act, ACT_COMMANDED);
+            break;
+        }
+    if (!combat_character_in_room(cast_room, ch) || ch->hit <= 0
+        || ch->position < POS_SITTING) return;
+    if (!combat_character_in_room(cast_room, victim)) continue;
 	    if (!IS_NPC(victim) && ch != victim && IS_MORE(victim, MORE_GUARDIAN)
 	     && get_breed(ch,BREED_HOMID) < 5)
 	    {
@@ -1280,11 +1325,11 @@ void do_obedience( CHAR_DATA *ch, char *argument )
      }
 
     if (IS_NPC(victim))
-	sprintf( buf, "I command %s to %s", victim->short_descr, action );
+snprintf( buf, sizeof buf, "I command %s to %s", victim->short_descr, action );
     else if (!IS_NPC(victim) && IS_AFFECTED(victim, AFF_POLYMORPH))
-	sprintf( buf, "I command %s to %s", victim->morph, action );
+snprintf( buf, sizeof buf, "I command %s to %s", victim->morph, action );
     else
-	sprintf( buf, "I command %s to %s", victim->name, action );
+snprintf( buf, sizeof buf, "I command %s to %s", victim->name, action );
     do_say(ch,buf);
     WAIT_STATE(ch,24);
 
@@ -1333,7 +1378,14 @@ void do_obedience( CHAR_DATA *ch, char *argument )
     act("You obey $N.",victim,NULL,ch,TO_CHAR);
     if (IS_NPC(victim)) SET_BIT(victim->act, ACT_COMMANDED);
     interpret( victim, action );
-    if (IS_NPC(victim)) REMOVE_BIT(victim->act, ACT_COMMANDED);
+    for (live = char_list; live != NULL; live = live->next)
+        if (live == victim) {
+            if (IS_NPC(live)) REMOVE_BIT(live->act, ACT_COMMANDED);
+            break;
+        }
+    if (!combat_character_in_room(cast_room, ch) || ch->hit <= 0
+        || ch->position < POS_SITTING
+        || !combat_character_in_room(cast_room, victim)) return;
     if (!IS_NPC(victim) && ch != victim && IS_MORE(victim, MORE_GUARDIAN)
      && get_breed(ch,BREED_HOMID) < 5)
     {
