@@ -8,6 +8,7 @@ import tempfile
 import time
 from world_fixture import stage_world
 from gmcp_probe import GMCPProbe
+from server_process import start_server
 
 repo = pathlib.Path(__file__).resolve().parents[1]
 vision_mode = "--vision" in sys.argv[1:]
@@ -48,12 +49,8 @@ with tempfile.TemporaryDirectory(prefix="anathema-copyover-") as directory:
     assert hybrid_line.startswith(b"AnathemaHybrid 4 ")
     rejected_player = b"#PLAYER\nName Rejected~\nAnathemaHybrid 99 1\nEnd\n#END\n"
     (runtime / "player/Rejected").write_bytes(rejected_player)
-    with socket.socket() as reservation:
-        reservation.bind(("127.0.0.1", 0))
-        port = reservation.getsockname()[1]
     with (runtime / "server.log").open("w") as log:
-        process = subprocess.Popen([str(repo / "Genesis/src/merc"), str(port)],
-                                   cwd=runtime / "area", stdout=log, stderr=log)
+        process, port = start_server(repo / "Genesis/src/merc", runtime / "area", log)
         staff = pending = newcomer = None
         try:
             deadline = time.monotonic() + 25

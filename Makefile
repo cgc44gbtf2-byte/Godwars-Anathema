@@ -146,6 +146,7 @@ check-layout:
 	python3 tests/test_werewolf_reactions_catalog.py
 	python3 tests/test_werewolf_room_catalog.py
 	python3 tests/test_werewolf_galliard_catalog.py
+	python3 tests/test_server_process.py
 	python3 tests/test_hybrid_books_catalog.py
 	python3 tests/test_hybrid_colors_catalog.py
 	python3 tests/test_hybrid_creation_catalog.py
