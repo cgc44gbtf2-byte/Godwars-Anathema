@@ -70,6 +70,7 @@ TESTS += tests/test_hybrid_mastery
 TESTS += tests/test_hybrid_scry
 TESTS += tests/test_werewolf_commands
 TESTS += tests/test_disquiet
+TESTS += tests/test_werewolf_combat
 # Real validators/effective access for older isolated native fixtures too.
 # Never replace hybrid access with permissive stubs just to satisfy linking.
 HYBRID_ACCESS_SOURCES = $(addprefix Genesis/src/classes/hybrid/,registry.c state.c player.c build.c progression.c specialization.c access.c passives.c books.c) Genesis/src/classes/sorcerer/vision.c Genesis/src/classes/monk/favour.c Genesis/src/guardian.c
@@ -138,6 +139,7 @@ check-layout:
 	python3 tests/test_werewolf_commands_catalog.py
 	python3 tests/test_werewolf_help_catalog.py
 	python3 tests/test_disquiet_catalog.py
+	python3 tests/test_werewolf_combat_catalog.py
 	python3 tests/test_hybrid_books_catalog.py
 	python3 tests/test_hybrid_colors_catalog.py
 	python3 tests/test_hybrid_creation_catalog.py
@@ -339,6 +341,9 @@ tests/test_hybrid_enchant: tests/test_hybrid_enchant.c $(ENGINE_OBJECTS)
 
 # Separate test objects keep sanitizer flags out of the production executable.
 tests/test_restored_spells: tests/test_restored_spells.c $(filter-out tests/stun_engine/fight.o tests/stun_engine/combat_damage.o,$(ENGINE_OBJECTS)) tests/restored_fight.o tests/restored_damage.o
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(filter-out tests/stun_engine/fight.o tests/stun_engine/combat_damage.o,$(ENGINE_OBJECTS)) tests/restored_fight.o tests/restored_damage.o $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
+tests/test_werewolf_combat: tests/test_werewolf_combat.c tests/test_restored_spells.c $(filter-out tests/stun_engine/fight.o tests/stun_engine/combat_damage.o,$(ENGINE_OBJECTS)) tests/restored_fight.o tests/restored_damage.o
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(filter-out tests/stun_engine/fight.o tests/stun_engine/combat_damage.o,$(ENGINE_OBJECTS)) tests/restored_fight.o tests/restored_damage.o $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/restored_fight.o: Genesis/src/fight.c $(ENGINE_HEADERS)

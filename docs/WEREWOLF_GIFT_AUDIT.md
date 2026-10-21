@@ -160,3 +160,20 @@ does not age ordinary affects. Existing skill indices and object spell slots
 are unchanged; the new affect name is appended in previously unused space.
 Save epoch 4 prevents binary-only rollback to older readers that do not
 understand that name. Handoff version 2 is unchanged.
+
+## Follow-up: native offensive callback boundaries
+
+Elemental Gift, Invoke's lightning, Cutting Wind and Power Surge now validate
+room membership before using callback arguments again. A multi-hit sequence
+ends if its actor/target is removed, moved or unable to continue; a Surge ends
+if its cached next room member disappears. Cutting Wind never rolls/applies its
+follow-up stun after losing the target. Explicit Elemental/Invoke target names
+take precedence over the current opponent; unknown names fail without a hit.
+
+The dedicated full-engine suite captures 1,064 native/original-hybrid and
+secondary-denial snapshots, including messages and RNG. Test-only callback
+injection deliberately frees synthetic NPCs or moves/interrupts actors; the old
+handlers reproduce sanitizer failures at those boundaries. This establishes
+the callback contract, not every live death script or recycled-address case.
+Ordinary damage ranges, access, costs, weather modes and cooldowns are unchanged.
+No missing power, secondary Werewolf command adapter or new body form is enabled.

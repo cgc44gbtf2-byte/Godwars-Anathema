@@ -101,6 +101,7 @@ tests/test_hybrid_mastery
 tests/test_hybrid_scry
 tests/test_werewolf_commands
 tests/test_disquiet
+tests/test_werewolf_combat
 bootstrap-backups/
 __pycache__/
 *.py[cod]

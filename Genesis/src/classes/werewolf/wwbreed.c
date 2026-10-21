@@ -492,9 +492,15 @@ void do_animal( CHAR_DATA *ch, char *argument )
 void do_elemental( CHAR_DATA *ch, char *argument )
 {
     CHAR_DATA *victim;
+    ROOM_INDEX_DATA *cast_room;
     char arg1[MIL];
     char arg2[MIL];
     long dam;
+
+    if (ch == NULL || argument == NULL || IS_NPC(ch) || ch->pcdata == NULL
+        || ch->hit <= 0 || ch->position < POS_FIGHTING) return;
+    cast_room = ch->in_room;
+    if (!combat_character_in_room(cast_room, ch)) return;
 
     argument = one_argument(argument, arg1);
     argument = one_argument(argument, arg2);
@@ -519,13 +525,11 @@ void do_elemental( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    if (arg2[0] == '\0' || (victim = get_char_room(ch, arg2)) == NULL)
+    victim = arg2[0] == '\0' ? ch->fighting : get_char_room(ch, arg2);
+    if (!combat_character_in_room(cast_room, victim))
     {
-	if ((victim = ch->fighting) == NULL)
-	{
-	    stc("They aren't here.\n\r", ch);
-	    return;
-	}
+        stc("They aren't here.\n\r", ch);
+        return;
     }
 
     act("$n begins to howl loudly!", ch, NULL, NULL, TO_ROOM);
@@ -536,7 +540,7 @@ void do_elemental( CHAR_DATA *ch, char *argument )
 	stc("Your flesh is seared off as the elemental spirit of fire engulfs you!\n\r",victim);
 	dam = number_range(1000, 1500);
 	damage(ch, victim, dam, TYPE_HIT, "fire blast");
-	WAIT_STATE(ch, 12);
+	if (combat_character_in_room(cast_room, ch)) WAIT_STATE(ch, 12);
     }
     else if (!str_cmp(arg1, "water"))
     {
@@ -545,22 +549,20 @@ void do_elemental( CHAR_DATA *ch, char *argument )
 	stc("You gag as you breath in the very essence of the elemental spirit of water!\n\r",victim);
 	dam = number_range(1000, 1500);
         damage(ch, victim, dam, TYPE_HIT, "tidal wave");
-        WAIT_STATE(ch, 6);
+        if (combat_character_in_room(cast_room, ch)) WAIT_STATE(ch, 6);
     }
     else if (!str_cmp(arg1, "earth"))
     {
         stc("You call elemental earth to strike down your foes!\n\r", ch);
         act("Boulders pile atop $n as the elemental spirit of earth flexes his might.",victim,NULL,NULL,TO_ROOM);
         stc("You are smashed into a bloody pulp by the elemental spirit of earth!\n\r", victim);
-        dam = number_range(250, 500);
-        damage(ch, victim, dam, TYPE_HIT, "boulder rain");
-        dam = number_range(250, 500);  
-        damage(ch, victim, dam, TYPE_HIT, "boulder rain");
-        dam = number_range(250, 500);  
-        damage(ch, victim, dam, TYPE_HIT, "boulder rain");
-        dam = number_range(250, 500);  
-        damage(ch, victim, dam, TYPE_HIT, "boulder rain");
-        WAIT_STATE(ch, 12);
+        for (int strike = 0; strike < 4; ++strike)
+        {
+            if (strike != 0 && !combat_pair_in_room(cast_room, ch, victim)) break;
+            dam = number_range(250, 500);
+            damage(ch, victim, dam, TYPE_HIT, "boulder rain");
+        }
+        if (combat_character_in_room(cast_room, ch)) WAIT_STATE(ch, 12);
     }
     else if (!str_cmp(arg1, "air"))
     {
@@ -569,7 +571,7 @@ void do_elemental( CHAR_DATA *ch, char *argument )
 	stc("You are cut to the bone by the razor sharp winds of the elemental spirit of air!\n\r",victim);
         dam = number_range(2000, 3000);
         damage(ch, victim, dam, TYPE_HIT, "wind slash");
-        WAIT_STATE(ch, 12);
+        if (combat_character_in_room(cast_room, ch)) WAIT_STATE(ch, 12);
     }
     else stc("The elemental forces ignore you!\n\r",ch);
     return;

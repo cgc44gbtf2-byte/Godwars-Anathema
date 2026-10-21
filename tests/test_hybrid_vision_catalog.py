@@ -8,6 +8,7 @@ from test_hybrid_stun_catalog import without_hybrid_stun_adapter
 from test_hybrid_celestial_catalog import without_celestial_visibility_stage
 from item_info_source import without_item_info_stage
 from progress_metrics_source import without_progress_metrics_stage
+from werewolf_combat_source import without_werewolf_combat_stage
 
 NEW_VISION="""void do_vision( CHAR_DATA *ch, char *argument )
 {
@@ -73,6 +74,7 @@ NATIVE_READERS={
     "classes/elemental/elemental.c":"da8474d2063b020b76afbf96269b889388bacf4c359ddc40c470c58f20232583",
 }
 def native_reader_tokens(text):
+    text=without_werewolf_combat_stage(text)
     text=without_progress_metrics_stage(text)
     if "void obj_score(" in text:text=without_item_info_stage(text)
     if "void do_readaura(" in text:

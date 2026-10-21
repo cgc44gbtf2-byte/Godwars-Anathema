@@ -104,3 +104,24 @@ updating: save epoch 4 blocks unsafe rollback to older effect readers.
 Binary updates preserve live area files. These are bundled help corrections,
 not an automatic replacement of a server's customized `class.hlp`: review and
 merge the help changes separately before reloading the live world.
+
+## Combat callback safety
+
+Elemental Gift's earth sequence and Invoke's lightning sequence stop further
+hits if the actor or target is removed, changes rooms or can no longer continue.
+Cutting Wind does not roll for or apply a stun to a removed/moved target.
+Power Surge validates the actor and cached next room member before continuing;
+it stops safely if a callback removes that cached next member.
+
+An explicit target for Elemental Gift or storm lightning is now honored even
+while fighting someone else. An unknown named target fails rather than silently
+substituting the current opponent. Omitting the target still uses the current
+opponent, provided both characters remain in the same room.
+
+No new gifts, secondary-parent permissions, damage ranges, rank requirements,
+prices or ordinary cooldowns are added. Save epoch 4 and handoff 2 are unchanged.
+Surviving native encounters retain their recorded HP, messages and RNG results.
+The callback tests deliberately model extraction, movement and interruption:
+they are not a claim that every native death script or live PvP interaction has
+been exhaustively tested. Other gift arithmetic and callback paths still need
+separate review.

@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import re
 import unittest
+from werewolf_combat_source import without_werewolf_combat_stage
 
 ROOT=Path(__file__).resolve().parents[1]
 SRC=ROOT/"Genesis/src"
@@ -24,7 +25,8 @@ OLD_DISQUIET=(
 
 class DisquietCatalog(unittest.TestCase):
     def test_all_other_breed_code_byte_identical_to_36b0d014(self):
-        text=(SRC/"classes/werewolf/wwbreed.c").read_text()
+        text=without_werewolf_combat_stage(
+            (SRC/"classes/werewolf/wwbreed.c").read_text())
         for line in ('#include <limits.h>\n','#include "guardian.h"\n',
                      '#include "../hybrid/player.h"\n'):
             self.assertEqual(text.count(line),1)

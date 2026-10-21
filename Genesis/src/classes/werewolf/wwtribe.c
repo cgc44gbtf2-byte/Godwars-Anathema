@@ -630,8 +630,12 @@ void do_surge( CHAR_DATA *ch, char *argument )
 {
     CHAR_DATA *vch;
     CHAR_DATA *vch_next;
+    ROOM_INDEX_DATA *cast_room;
 
-    if (IS_NPC(ch)) return;
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL
+        || ch->hit <= 0 || ch->position < POS_FIGHTING) return;
+    cast_room = ch->in_room;
+    if (!combat_character_in_room(cast_room, ch)) return;
 
     if (!IS_WEREWOLF(ch))
     {
@@ -648,8 +652,12 @@ void do_surge( CHAR_DATA *ch, char *argument )
     stc("You summon forth electricity.\n\r", ch);
     act("$n turns $s palms up and smirks as the air crackles with electricity.", ch, NULL, NULL, TO_ROOM);
 
-    for (vch = ch->in_room->people; vch != NULL; vch = vch_next)
+    for (vch = cast_room->people; vch != NULL; vch = vch_next)
     {
+        /* A hit can remove/move the actor or the cached next room member. */
+        if (!combat_character_in_room(cast_room, ch) || ch->hit <= 0
+            || ch->position < POS_FIGHTING
+            || !combat_character_in_room(cast_room, vch)) break;
 	vch_next = vch->next_in_room;
 	if (vch == ch) continue;
 	if (is_same_group(ch, vch)) continue;
@@ -659,7 +667,7 @@ void do_surge( CHAR_DATA *ch, char *argument )
 	one_hit(ch, vch, TYPE_HIT, "surge");
     }
 
-    WAIT_STATE(ch, 12);
+    if (combat_character_in_room(cast_room, ch)) WAIT_STATE(ch, 12);
     return;
 }
 
@@ -1749,7 +1757,13 @@ void do_camouflage( CHAR_DATA *ch, char *argument )
 void do_cutting( CHAR_DATA *ch, char *argument )
 {
     CHAR_DATA *victim;
+    ROOM_INDEX_DATA *cast_room;
     char arg[MSL];
+
+    if (ch == NULL || argument == NULL || IS_NPC(ch) || ch->pcdata == NULL
+        || ch->hit <= 0 || ch->position < POS_FIGHTING) return;
+    cast_room = ch->in_room;
+    if (!combat_character_in_room(cast_room, ch)) return;
 
     one_argument(argument, arg);
 
@@ -1781,7 +1795,8 @@ void do_cutting( CHAR_DATA *ch, char *argument )
 
     one_hit(ch, victim, TYPE_HIT, "cutting wind");
 
-    if (victim != NULL && number_range(1, (40 - get_tribe(ch, TRIBE_WENDIGOS) * 5)) == 1)
+    if (combat_pair_in_room(cast_room, ch, victim)
+        && number_range(1, (40 - get_tribe(ch, TRIBE_WENDIGOS) * 5)) == 1)
     {
 	act("Your cutting wind blasts $N off $S feet, leaving $M stunned!", ch, NULL, victim, TO_CHAR);
 	act("$n's cutting wind blasts $N off $S feet, leaving $M stunned!", ch, NULL, victim, TO_NOTVICT);
@@ -1791,7 +1806,7 @@ void do_cutting( CHAR_DATA *ch, char *argument )
 	if (victim->position > POS_STUNNED) victim->position = POS_STUNNED;
     }
 
-    WAIT_STATE(ch, 12);
+    if (combat_character_in_room(cast_room, ch)) WAIT_STATE(ch, 12);
     return;
 }
 
@@ -1876,9 +1891,15 @@ void do_invoke( CHAR_DATA *ch, char *argument )
 {
     DESCRIPTOR_DATA *d;
     CHAR_DATA *victim;
+    ROOM_INDEX_DATA *cast_room;
     char arg1[MIL];
     char arg2[MIL];
     char buf[MSL];
+
+    if (ch == NULL || argument == NULL || IS_NPC(ch) || ch->pcdata == NULL
+        || ch->hit <= 0 || ch->position < POS_FIGHTING) return;
+    cast_room = ch->in_room;
+    if (!combat_character_in_room(cast_room, ch)) return;
 
     argument = one_argument(argument, arg1);
     argument = one_argument(argument, arg2);
@@ -1986,7 +2007,8 @@ void do_invoke( CHAR_DATA *ch, char *argument )
 	    stc("Call lightning down on whom?\n\r", ch);
 	    return;
 	}
-	if ((victim = ch->fighting) == NULL && (victim = get_char_room(ch, arg2)) == NULL)
+        victim = arg2[0] == '\0' ? ch->fighting : get_char_room(ch, arg2);
+	if (!combat_character_in_room(cast_room, victim))
 	{
 	    stc("They aren't here.\n\r", ch);
 	    return;
@@ -1995,13 +2017,13 @@ void do_invoke( CHAR_DATA *ch, char *argument )
 	act("You call a bolt of lightning down on $N", ch, NULL, victim, TO_CHAR);
 	act("$n calls a bolt of lightning down on $N", ch, NULL, victim, TO_NOTVICT);
 	act("$n calls a bolt of lightning down on you.", ch, NULL, victim, TO_VICT);
-	dam = number_range(1000, 2000) + (100 * ch->pcdata->rank);
-	damage(ch, victim, dam, TYPE_HIT, "lightning blast");
-	dam = number_range(1000, 2000) + (100 * ch->pcdata->rank);
-	damage(ch, victim, dam, TYPE_HIT, "lightning blast");
-	dam = number_range(1000, 2000) + (100 * ch->pcdata->rank);
-	damage(ch, victim, dam, TYPE_HIT, "lightning blast");
-	ch->pcdata->weather = 10;
+        for (int strike = 0; strike < 3; ++strike)
+        {
+            if (strike != 0 && !combat_pair_in_room(cast_room, ch, victim)) break;
+            dam = number_range(1000, 2000) + (100 * ch->pcdata->rank);
+            damage(ch, victim, dam, TYPE_HIT, "lightning blast");
+        }
+        if (combat_character_in_room(cast_room, ch)) ch->pcdata->weather = 10;
     }
     else stc("Syntax: invoke <fog/rain/lightning>\n\r", ch);
 
