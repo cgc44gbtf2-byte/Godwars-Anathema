@@ -194,3 +194,12 @@ messages and RNG; controlled callback tests cover extraction/movement of caster,
 target and cached next member. No additional gift or secondary-parent permission
 is enabled. Call of the Wyrm and undispatched Wrath of Gaia were inspected and
 left unchanged; this is not a complete audit of their transformation policies.
+
+Galliard utility follow-up: Call of the Wyld now bounds reports and validates
+its room/opponent, while retaining wounded calls and the existing recipients.
+Bridge Walker's fallback is finite even when no world room qualifies; after
+4,096 random misses it scans the original range and either finds a legal landing
+or stays put. Its rank error now correctly says Galliard 5. Eight hundred
+ordinary native/original-parent cases preserve messages and RNG; extremely sparse
+worlds may reach the new deterministic fallback. No access/cost/rank expansion,
+world-file replacement or Wyrm transformation redesign is included.

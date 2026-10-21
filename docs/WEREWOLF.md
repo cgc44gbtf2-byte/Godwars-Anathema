@@ -172,3 +172,24 @@ and Wrath remains unavailable through the command table. Power Surge and Clap
 retain the earlier safeguards and targeting policies. Character-list integrity,
 same-address recycling, broader forced-command authorization and live scripted
 multiplayer interactions still require separate review.
+
+### Galliard communication and travel
+
+Call of the Wyld validates its caller, room and current opponent before
+formatting a bounded report. Wounded callers still work; wolf/builder recipients
+and ordinary messages remain unchanged. Missing names have safe fallbacks.
+
+Bridge Walker correctly identifies its Galliard 5 requirement. It preserves
+the original random destination attempts for the first 4,096 misses, then scans
+the same 15,901 room numbers with the original landing restrictions. An empty
+or wholly restricted world now fails without movement, wait or removing Blissful
+Ignorance. The rare deterministic fallback can change landing distribution in a
+very sparse world; normal target checks and successful/fallback wait policies
+are not redesigned. Oversized destination input is rejected rather than silently
+treated as a different target.
+
+The real-engine tests pin 800 ordinary native/original-parent hybrid cases,
+including room changes, messages, flags and RNG, and cover empty/restricted
+worlds, the last eligible room and bounded lookup failures. No new powers or
+secondary-parent Werewolf access are enabled. Call of the Wyrm's transformation
+policies and undispatched Wrath remain outside this change.

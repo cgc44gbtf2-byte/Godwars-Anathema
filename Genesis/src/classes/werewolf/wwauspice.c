@@ -601,13 +601,9 @@ void do_wyld( CHAR_DATA *ch, char *argument )
     CHAR_DATA *victim;
     char buf [MAX_STRING_LENGTH];
     
-    if (IS_NPC(ch)) return;
-
-    if (!IS_WEREWOLF(ch) && ch->in_room == NULL)
-    {
-	send_to_char("Huh?\n\r",ch);
-	return;
-    }
+    /* Wounded callers are intentional: this command is allowed at POS_DEAD. */
+    if (ch == NULL || argument == NULL || IS_NPC(ch) || ch->pcdata == NULL ||
+        ch->in_room == NULL || !combat_character_in_room(ch->in_room, ch)) return;
 
     if (get_auspice(ch,AUSPICE_GALLIARD) < 1)
     {
@@ -615,41 +611,36 @@ void do_wyld( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    if ( ( victim = ch->fighting ) == NULL && ch->hit > 0 )
+    victim = ch->fighting;
+    if (victim != NULL && !combat_character_in_room(ch->in_room, victim))
+        victim = NULL;
+    if (victim == NULL && ch->hit > 0)
     {
 	send_to_char("You can only call for assistance in times of great need.\n\r",ch);
-	return;
+return;
     }
+
+    /* Format once; world names and NPC descriptions are not fixed-size text. */
+    if (victim != NULL)
+        snprintf(buf, sizeof buf, "CALL OF THE WYLD:[$n is under attack by %s at %s]",
+            (IS_NPC(victim) ? victim->short_descr : victim->name) != NULL
+                ? (IS_NPC(victim) ? victim->short_descr : victim->name) : "someone",
+            ch->in_room->name != NULL ? ch->in_room->name : "somewhere");
+    else
+        snprintf(buf, sizeof buf, "CALL OF THE WYLD:[$n is badly wounded at %s]",
+            ch->in_room->name != NULL ? ch->in_room->name : "somewhere");
 
     for ( d = descriptor_list; d != NULL; d = d->next )
     {
 	if ( d->connected != CON_PLAYING ) continue;
 	if ( (vch = d->character) == NULL ) continue;
 	if ( vch->in_room == NULL) continue;
-	if ( IS_NPC(vch) ) continue;
+if ( IS_NPC(vch) || vch->pcdata == NULL ) continue;
 	if ( vch == ch )
 	    act("You call for assistance!", ch, NULL, argument, TO_CHAR);
 	if (ch != vch && (IS_WEREWOLF(vch) || IS_BUI(vch)))
 	{
-	    if (victim != NULL)
-	    {
-		sprintf(buf,"CALL OF THE WYLD:[$n is under attack by %s at %s]", 
-		    IS_NPC(victim) ? victim->short_descr : victim->name,
-                    ch->in_room->name);
 		act(buf,ch,NULL,vch, TO_VICT);
-	    }
-	    else if (ch->hit < 1)
-	    {
-		sprintf(buf,"CALL OF THE WYLD:[$n is badly wounded at %s]", 
-                    ch->in_room->name);
-		act(buf,ch,NULL,vch, TO_VICT);
-	    }
-	    else
-	    {
-		sprintf(buf,"CALL OF THE WYLD:[$n needs assistance at %s]", 
-                    ch->in_room->name);
-		act(buf,ch,NULL,vch, TO_VICT);
-	    }
 	}
     }
     return;
@@ -773,7 +764,16 @@ void do_bridgewalk (CHAR_DATA *ch, char *argument)
     CHAR_DATA *victim;
     ROOM_INDEX_DATA *pRoomIndex;
     long to_room;
+    int attempt;
      
+    if (ch == NULL || argument == NULL || IS_NPC(ch) || ch->pcdata == NULL ||
+        ch->in_room == NULL || ch->hit <= 0 || ch->position < POS_STANDING ||
+        !combat_character_in_room(ch->in_room, ch)) return;
+    if (strlen(argument) >= sizeof arg)
+    {
+        stc("That destination name is too long.\n\r", ch);
+        return;
+    }
     argument = one_argument( argument, arg );
         
     if (IS_NPC(ch)) return;
@@ -785,7 +785,7 @@ void do_bridgewalk (CHAR_DATA *ch, char *argument)
     }
     if (get_auspice(ch, AUSPICE_GALLIARD) < 5)
     {
-        stc("You require Ragabash 5 to use Bridge Walker.\n\r",ch);
+        stc("You require Galliard 5 to use Bridge Walker.\n\r",ch);
         return;
     }
     if (arg[0] == '\0')
@@ -793,9 +793,6 @@ void do_bridgewalk (CHAR_DATA *ch, char *argument)
         stc( "Who do you wish to Bridge Walk to?\n\r", ch );
         return;
     }
-    if (IS_ITEMAFF(ch,ITEMA_BLISSFUL))
-	do_blissful(ch,"");
-
     if ( ( victim = get_char_world( ch, arg ) ) == NULL || victim->in_room == NULL || 
      victim->level > 1000 || number_range(1,3) == 1 || victim->in_room == ch->in_room ||
      IS_SET(victim->in_room->room_flags, ROOM_SAFE) || 
@@ -804,8 +801,9 @@ void do_bridgewalk (CHAR_DATA *ch, char *argument)
      IS_SET(victim->in_room->room_flags, ROOM_NO_RECALL) || (!IS_NPC(victim) && 
      !IS_EXTRA(victim, EXTRA_SUMMON) ))
     {
-	stc( "A random moon fluctuation disrupts your bridge!\n\r", ch );
-	for ( ; ; )
+/* Preserve ordinary random landings, but never hang an empty/custom world. */
+pRoomIndex = NULL;
+for (attempt = 0; attempt < 4096; ++attempt)
 	{
 	    to_room = number_range( 100, 16000 );
 	    pRoomIndex = get_room_index( to_room );
@@ -814,7 +812,27 @@ void do_bridgewalk (CHAR_DATA *ch, char *argument)
 	     &&   !IS_SET(pRoomIndex->room_flags, ROOM_SOLITARY)
 	     &&   !IS_SET(pRoomIndex->room_flags, ROOM_NO_TELEPORT))
 		break;
+    pRoomIndex = NULL;
+}
+if (pRoomIndex == NULL)
+{
+    for (to_room = 100; to_room <= 16000; ++to_room)
+    {
+        pRoomIndex = get_room_index(to_room);
+        if (pRoomIndex != NULL &&
+            !IS_SET(pRoomIndex->room_flags, ROOM_PRIVATE) &&
+            !IS_SET(pRoomIndex->room_flags, ROOM_SOLITARY) &&
+            !IS_SET(pRoomIndex->room_flags, ROOM_NO_TELEPORT)) break;
+        pRoomIndex = NULL;
+    }
+}
+if (pRoomIndex == NULL)
+{
+    stc("No moon bridge can find a landing. You remain where you are.\n\r", ch);
+    return;
 	}
+if (IS_ITEMAFF(ch,ITEMA_BLISSFUL)) do_blissful(ch,"");
+stc( "A random moon fluctuation disrupts your bridge!\n\r", ch );
 
 	act( "$n slowly fades out of existence.", ch, NULL, NULL, TO_ROOM );
 	char_from_room( ch );
@@ -825,6 +843,7 @@ void do_bridgewalk (CHAR_DATA *ch, char *argument)
 	return;
     }
 
+    if (IS_ITEMAFF(ch,ITEMA_BLISSFUL)) do_blissful(ch,"");
     stc("You create a moon bridge.\n\r", ch);
     act("$n steps into a shaft of moonlight.", ch, NULL, NULL, TO_ROOM);
     char_from_room(ch);

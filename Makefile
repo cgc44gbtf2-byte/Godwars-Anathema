@@ -73,6 +73,7 @@ TESTS += tests/test_disquiet
 TESTS += tests/test_werewolf_combat
 TESTS += tests/test_werewolf_reactions
 TESTS += tests/test_werewolf_room
+TESTS += tests/test_werewolf_galliard
 # Real validators/effective access for older isolated native fixtures too.
 # Never replace hybrid access with permissive stubs just to satisfy linking.
 HYBRID_ACCESS_SOURCES = $(addprefix Genesis/src/classes/hybrid/,registry.c state.c player.c build.c progression.c specialization.c access.c passives.c books.c) Genesis/src/classes/sorcerer/vision.c Genesis/src/classes/monk/favour.c Genesis/src/guardian.c
@@ -144,6 +145,7 @@ check-layout:
 	python3 tests/test_werewolf_combat_catalog.py
 	python3 tests/test_werewolf_reactions_catalog.py
 	python3 tests/test_werewolf_room_catalog.py
+	python3 tests/test_werewolf_galliard_catalog.py
 	python3 tests/test_hybrid_books_catalog.py
 	python3 tests/test_hybrid_colors_catalog.py
 	python3 tests/test_hybrid_creation_catalog.py
@@ -362,6 +364,12 @@ tests/test_werewolf_room: tests/test_werewolf_room.c tests/test_restored_spells.
 tests/room_tribe.o: Genesis/src/classes/werewolf/wwtribe.c $(ENGINE_HEADERS)
 	$(CC) $(TEST_CPPFLAGS) -DMERC -Ddo_flee=werewolf_room_flee -Dinterpret=werewolf_room_interpret $(CFLAGS) $(TEST_FLAGS) -c $< -o $@
 
+tests/test_werewolf_galliard: tests/test_werewolf_galliard.c tests/test_restored_spells.c $(filter-out tests/stun_engine/classes/werewolf/wwauspice.o,$(ENGINE_OBJECTS)) tests/galliard_auspice.o
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(filter-out tests/stun_engine/classes/werewolf/wwauspice.o,$(ENGINE_OBJECTS)) tests/galliard_auspice.o $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
+tests/galliard_auspice.o: Genesis/src/classes/werewolf/wwauspice.c $(ENGINE_HEADERS)
+	$(CC) $(TEST_CPPFLAGS) -DMERC -Dget_room_index=werewolf_galliard_room $(CFLAGS) $(TEST_FLAGS) -c $< -o $@
+
 tests/restored_fight.o: Genesis/src/fight.c $(ENGINE_HEADERS)
 	$(CC) $(TEST_CPPFLAGS) -DMERC -DCOMBAT_CALLBACK_TESTING $(CFLAGS) $(TEST_FLAGS) -c $< -o $@
 
@@ -393,4 +401,4 @@ sanitize:
 clean:
 	rm -f tests/save_info.o tests/restart_engine.o tests/runtime_info.o tests/powers_info.o
 	$(MAKE) -C Genesis/src clean
-	rm -f $(TESTS) tests/buffers_interp.o $(ENGINE_OBJECTS) $(LEGACY_CLASS_OBJECTS) tests/stun_comm.o tests/restored_fight.o tests/restored_damage.o tests/reaction_tribe.o tests/room_tribe.o
+	rm -f $(TESTS) tests/buffers_interp.o $(ENGINE_OBJECTS) $(LEGACY_CLASS_OBJECTS) tests/stun_comm.o tests/restored_fight.o tests/restored_damage.o tests/reaction_tribe.o tests/room_tribe.o tests/galliard_auspice.o
