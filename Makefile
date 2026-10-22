@@ -78,6 +78,7 @@ TESTS += tests/test_werewolf_touch
 TESTS += tests/test_werewolf_forms
 TESTS += tests/test_werewolf_lifecycle
 TESTS += tests/test_werewolf_reversion
+TESTS += tests/test_class_reset
 # Real validators/effective access for older isolated native fixtures too.
 # Never replace hybrid access with permissive stubs just to satisfy linking.
 HYBRID_ACCESS_SOURCES = $(addprefix Genesis/src/classes/hybrid/,registry.c state.c player.c build.c progression.c specialization.c access.c passives.c books.c) Genesis/src/classes/sorcerer/vision.c Genesis/src/classes/monk/favour.c Genesis/src/guardian.c
@@ -154,6 +155,7 @@ check-layout:
 	python3 tests/test_werewolf_forms_catalog.py
 	python3 tests/test_werewolf_lifecycle_catalog.py
 	python3 tests/test_werewolf_reversion_catalog.py
+	python3 tests/test_class_reset_catalog.py
 	python3 tests/test_server_process.py
 	python3 tests/test_hybrid_books_catalog.py
 	python3 tests/test_hybrid_colors_catalog.py
@@ -391,6 +393,12 @@ tests/test_werewolf_lifecycle: tests/test_werewolf_lifecycle.c tests/test_restor
 tests/test_werewolf_reversion: tests/test_werewolf_reversion.c tests/test_restored_spells.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
+tests/test_class_reset: tests/test_class_reset.c tests/test_lifecycle_ownership.c $(filter-out tests/stun_engine/clearclass.o,$(ENGINE_OBJECTS)) tests/reset_clearclass.o
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(filter-out tests/stun_engine/clearclass.o,$(ENGINE_OBJECTS)) tests/reset_clearclass.o $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
+tests/reset_clearclass.o: Genesis/src/clearclass.c $(ENGINE_HEADERS)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) -Dfree_string=class_reset_free_string -c $< -o $@
+
 tests/lifecycle_clan.o: Genesis/src/clan.c $(ENGINE_HEADERS)
 	$(CC) $(TEST_CPPFLAGS) -DMERC -Dmulti_hit=lifecycle_multi_hit $(CFLAGS) $(TEST_FLAGS) -c $< -o $@
 
@@ -428,4 +436,4 @@ sanitize:
 clean:
 	rm -f tests/save_info.o tests/restart_engine.o tests/runtime_info.o tests/powers_info.o
 	$(MAKE) -C Genesis/src clean
-	rm -f $(TESTS) tests/buffers_interp.o $(ENGINE_OBJECTS) $(LEGACY_CLASS_OBJECTS) tests/stun_comm.o tests/restored_fight.o tests/restored_damage.o tests/reaction_tribe.o tests/room_tribe.o tests/galliard_auspice.o tests/forms_auspice.o tests/lifecycle_clan.o
+	rm -f $(TESTS) tests/buffers_interp.o $(ENGINE_OBJECTS) $(LEGACY_CLASS_OBJECTS) tests/stun_comm.o tests/restored_fight.o tests/restored_damage.o tests/reaction_tribe.o tests/room_tribe.o tests/galliard_auspice.o tests/forms_auspice.o tests/lifecycle_clan.o tests/reset_clearclass.o

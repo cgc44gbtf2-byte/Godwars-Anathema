@@ -1,13 +1,16 @@
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "classes/hybrid/player.h"
 
 void do_clearclass( CHAR_DATA *ch, char *argument )
 {
     CHAR_DATA *victim;
     char arg[MAX_INPUT_LENGTH];
 
-    one_argument( argument, arg );
+    if (ch == NULL) return;
+    one_argument( argument != NULL ? argument : "", arg );
 
     if ( arg[0] == '\0' || is_number(arg) )
     {
@@ -22,6 +25,11 @@ void do_clearclass( CHAR_DATA *ch, char *argument )
     if ( IS_NPC(victim) )
     {
         send_to_char( "Not on NPC's.\n\r", ch );
+        return;
+    }
+    if (!hybrid_player_save_valid(victim))
+    {
+        send_to_char("That player's class data needs staff review before a reset.\n\r",ch);
         return;
     }
     if (clan_block_class_change(victim)) return;
@@ -49,13 +57,21 @@ do_mclear(victim, "self");
     victim->pcdata->familiar                = NULL;
     victim->pcdata->propose                 = NULL;
     victim->pcdata->chobj                   = NULL;
+    free_string(victim->pcdata->conding);
     victim->pcdata->conding                 = str_dup( "" );
+    free_string(victim->pcdata->love);
     victim->pcdata->love                    = str_dup( "" );
+    free_string(victim->pcdata->covenant);
     victim->pcdata->covenant                = str_dup( "" );
+    free_string(victim->pcdata->cov_time);
     victim->pcdata->cov_time                = str_dup( "None" );
+    free_string(victim->pcdata->leader);
     victim->pcdata->leader                  = str_dup( "" );
+    free_string(victim->pcdata->vleader);
     victim->pcdata->vleader                 = str_dup( "" );
+    free_string(victim->lord);
     victim->lord                            = str_dup( "" );
+    free_string(victim->clan);
     victim->clan                            = str_dup( "" );
     free_string(victim->morph);
     victim->morph                           = str_dup( "" );
@@ -211,6 +227,9 @@ do_mclear(victim, "self");
     victim->pcdata->classpoints[0]		= 0;
     victim->pcdata->classpoints[1]		= 0;
     victim->class                           = 0;
+    /* No secondary identity can survive its original class being reset. */
+    victim->pcdata->hybrid_present = 0;
+    memset(&victim->pcdata->hybrid,0,sizeof victim->pcdata->hybrid);
     victim->affected_by			    = 0;
     if (!IS_BUI(victim)) victim->level = LEV_AWA;
 

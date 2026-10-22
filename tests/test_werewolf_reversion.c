@@ -93,6 +93,10 @@ static void rank_loss(int mode,int rank,int dead)
 static void clear_form(int mode)
 {
     setup(mode,5,4,0);do_werewolf(chars,"");
+    /* The synthetic spell fixture borrows these literals. Class reset owns
+     * and releases player strings, as the real player loader provides. */
+    players[0].love=str_dup("");
+    players[0].conding=str_dup("");
     SET_BIT(chars[0].act,PLR_AUTOEXIT);
     chars[1].level=LEV_IMP;
     do_clearclass(&chars[1],"caster");

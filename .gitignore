@@ -5,6 +5,8 @@
 /tests/forms_auspice.o
 /tests/test_werewolf_lifecycle
 /tests/test_werewolf_reversion
+/tests/test_class_reset
+/tests/reset_clearclass.o
 /tests/lifecycle_clan.o
 /tests/test_stance_style
 /tests/test_admin_gate
