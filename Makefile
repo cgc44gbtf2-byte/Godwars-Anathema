@@ -76,6 +76,7 @@ TESTS += tests/test_werewolf_room
 TESTS += tests/test_werewolf_galliard
 TESTS += tests/test_werewolf_touch
 TESTS += tests/test_werewolf_forms
+TESTS += tests/test_werewolf_lifecycle
 # Real validators/effective access for older isolated native fixtures too.
 # Never replace hybrid access with permissive stubs just to satisfy linking.
 HYBRID_ACCESS_SOURCES = $(addprefix Genesis/src/classes/hybrid/,registry.c state.c player.c build.c progression.c specialization.c access.c passives.c books.c) Genesis/src/classes/sorcerer/vision.c Genesis/src/classes/monk/favour.c Genesis/src/guardian.c
@@ -150,6 +151,7 @@ check-layout:
 	python3 tests/test_werewolf_galliard_catalog.py
 	python3 tests/test_werewolf_touch_catalog.py
 	python3 tests/test_werewolf_forms_catalog.py
+	python3 tests/test_werewolf_lifecycle_catalog.py
 	python3 tests/test_server_process.py
 	python3 tests/test_hybrid_books_catalog.py
 	python3 tests/test_hybrid_colors_catalog.py
@@ -381,6 +383,12 @@ tests/test_werewolf_forms: tests/test_werewolf_forms.c tests/test_restored_spell
 tests/forms_auspice.o: Genesis/src/classes/werewolf/wwauspice.c $(ENGINE_HEADERS)
 	$(CC) $(TEST_CPPFLAGS) -DMERC -Ddo_majesty=forms_majesty -Ddo_shadowbody=forms_shadowbody -Ddo_change=forms_change -Ddo_werewolf=forms_werewolf -Ddo_beastlike=forms_beastlike -Ddo_berserk=forms_berserk $(CFLAGS) $(TEST_FLAGS) -c $< -o $@
 
+tests/test_werewolf_lifecycle: tests/test_werewolf_lifecycle.c tests/test_restored_spells.c $(filter-out tests/stun_engine/clan.o,$(ENGINE_OBJECTS)) tests/lifecycle_clan.o
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(filter-out tests/stun_engine/clan.o,$(ENGINE_OBJECTS)) tests/lifecycle_clan.o $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
+tests/lifecycle_clan.o: Genesis/src/clan.c $(ENGINE_HEADERS)
+	$(CC) $(TEST_CPPFLAGS) -DMERC -Dmulti_hit=lifecycle_multi_hit $(CFLAGS) $(TEST_FLAGS) -c $< -o $@
+
 tests/galliard_auspice.o: Genesis/src/classes/werewolf/wwauspice.c $(ENGINE_HEADERS)
 	$(CC) $(TEST_CPPFLAGS) -DMERC -Dget_room_index=werewolf_galliard_room $(CFLAGS) $(TEST_FLAGS) -c $< -o $@
 
@@ -415,4 +423,4 @@ sanitize:
 clean:
 	rm -f tests/save_info.o tests/restart_engine.o tests/runtime_info.o tests/powers_info.o
 	$(MAKE) -C Genesis/src clean
-	rm -f $(TESTS) tests/buffers_interp.o $(ENGINE_OBJECTS) $(LEGACY_CLASS_OBJECTS) tests/stun_comm.o tests/restored_fight.o tests/restored_damage.o tests/reaction_tribe.o tests/room_tribe.o tests/galliard_auspice.o tests/forms_auspice.o
+	rm -f $(TESTS) tests/buffers_interp.o $(ENGINE_OBJECTS) $(LEGACY_CLASS_OBJECTS) tests/stun_comm.o tests/restored_fight.o tests/restored_damage.o tests/reaction_tribe.o tests/room_tribe.o tests/galliard_auspice.o tests/forms_auspice.o tests/lifecycle_clan.o

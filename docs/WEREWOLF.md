@@ -130,6 +130,14 @@ retain HP, messages, form flags, wait states and RNG. Controlled callback
 tests reproduce old unsafe boundaries; they do not prove every form
 implementation or live death-script path is safe.
 
+`do_werewolf` now checks each participant and the cached world-list successor
+between its three attack groups. A dead, moved or reverted actor stops;
+a removed or dead target receives no further strikes. Existing form entry,
+reversion, fang/claw ranks and hybrid eligibility remain as before. The 6,080
+ordinary native/primary/secondary-denial entry-and-revert snapshots stay
+unchanged. Synthetic combat extraction does not prove every live mob script
+or same-address recycling case is safe.
+
 Elemental Gift's earth sequence and Invoke's lightning sequence stop further
 hits if the actor or target is removed, changes rooms or can no longer continue.
 Cutting Wind does not roll for or apply a stun to a removed/moved target.

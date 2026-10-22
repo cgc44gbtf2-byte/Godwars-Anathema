@@ -1891,15 +1891,25 @@ void do_werewolf( CHAR_DATA *ch, char *argument )
     char       arg[MAX_INPUT_LENGTH];
     CHAR_DATA *vch;
     CHAR_DATA *vch_next;
+    CHAR_DATA *member;
+    ROOM_INDEX_DATA *room;
+    long strike;
     if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL ||
-        ch->in_room == NULL) return;
+        ch->hit <= 0 || ch->position < POS_FIGHTING ||
+        !combat_character_in_room(ch->in_room, ch)) return;
+    room = ch->in_room;
     argument = one_argument( argument != NULL ? argument : "", arg );
 
     if (!IS_WEREWOLF(ch)) return;
     if (IS_SET(ch->act, PLR_WOLFMAN)) return;
     if (ch->pcdata->wolf < 0 || ch->pcdata->wolf > LONG_MAX - 25) return;
 
-    if (IS_POLYAFF(ch, POLY_MASK)) do_doppleganger(ch, "self");
+    if (IS_POLYAFF(ch, POLY_MASK))
+    {
+        do_doppleganger(ch, "self");
+        if (!combat_character_in_room(room, ch) || ch->hit <= 0 ||
+            ch->position < POS_FIGHTING) return;
+    }
 
     SET_BIT(ch->act, PLR_WOLFMAN);
 
@@ -1947,6 +1957,11 @@ void do_werewolf( CHAR_DATA *ch, char *argument )
 
     for ( vch = char_list; vch != NULL; vch = vch_next )
     {
+	/* A preceding attack may have extracted the cached world member.
+	 * Compare addresses against the live list before reading its fields. */
+	for (member = char_list; member != NULL && member != vch; member = member->next)
+	    ;
+	if (member == NULL) break;
 	vch_next	= vch->next;
 	if ( vch->in_room == NULL )
 	    continue;
@@ -1959,19 +1974,34 @@ void do_werewolf( CHAR_DATA *ch, char *argument )
 	    continue;
 	if (!IS_NPC(vch))
 	{
-	    if (vch->in_room == ch->in_room)
+	    if (vch->in_room == room)
 		act("$n throws back $s head and howls with rage!", ch, NULL, vch, TO_VICT);
-	    else if (vch->in_room->area == ch->in_room->area)
+	    else if (vch->in_room->area == room->area)
 		send_to_char("You hear a fearsome howl close by!\n\r", vch);
 	    else
 		send_to_char("You hear a fearsome howl far off in the distance!\n\r", vch);
 	    if (!CAN_PK(vch)) continue;
 	}
-	if ( vch->in_room == ch->in_room && can_see( ch, vch) )
+	if ( vch->in_room == room && can_see( ch, vch) )
 	{
-	    multi_hit(ch, vch);
-	    multi_hit(ch, vch);
-	    multi_hit(ch, vch);
+	    for (strike = 0; strike < 3; strike++)
+	    {
+		if (!combat_pair_in_room(room, ch, vch) ||
+		    !IS_SET(ch->act, PLR_WOLFMAN) || IS_COMBAT_PAUSED(ch)) break;
+		multi_hit(ch, vch);
+		if (!combat_character_in_room(room, ch)) return;
+		if (ch->hit <= 0 || ch->position < POS_FIGHTING ||
+		    !IS_SET(ch->act, PLR_WOLFMAN) || IS_COMBAT_PAUSED(ch)) return;
+		if (!combat_character_in_room(room, vch) ||
+		    vch->hit <= 0 || vch->position == POS_DEAD) break;
+	    }
+	}
+	/* Do not advance a stale global iterator after a callback. */
+	if (vch_next != NULL)
+	{
+	    for (member = char_list; member != NULL && member != vch_next; member = member->next)
+		;
+	    if (member == NULL) return;
 	}
     }
     return;
