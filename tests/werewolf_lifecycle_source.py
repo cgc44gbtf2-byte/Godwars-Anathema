@@ -17,6 +17,8 @@ EDITS=[
 ]
 
 def without_werewolf_lifecycle_stage(text):
+    from werewolf_reversion_source import without_werewolf_reversion_stage
+    text=without_werewolf_reversion_stage(text)
     match=re.search(r"void do_werewolf\(.*?(?=\nvoid do_|\Z)",text,re.S)
     if match is None:return text
     digest=hashlib.sha256(match[0].encode()).hexdigest()

@@ -138,6 +138,14 @@ ordinary native/primary/secondary-denial entry-and-revert snapshots stay
 unchanged. Synthetic combat extraction does not prove every live mob script
 or same-address recycling case is safe.
 
+Reversion removes Nightsight even when the Metis rank that enabled it has
+since been lost. It retains the ordinary green/red messages and does not
+grant access to a new class. `clearclass` also clears `PLR_WOLFMAN` while
+preserving unrelated player flags, and releases the previous morph string.
+Repeated entry/revert and dead-player cleanup retain 9,120 native snapshots.
+These fixes do not add provenance for pre-existing claw/fang/vision flags,
+automatically repair old saved characters, or enable hybrid forms.
+
 Elemental Gift's earth sequence and Invoke's lightning sequence stop further
 hits if the actor or target is removed, changes rooms or can no longer continue.
 Cutting Wind does not roll for or apply a stun to a removed/moved target.

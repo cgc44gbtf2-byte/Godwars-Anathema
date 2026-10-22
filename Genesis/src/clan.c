@@ -2026,7 +2026,21 @@ void do_unwerewolf( CHAR_DATA *ch, char *argument )
 	REMOVE_BIT(ch->vampaff, VAM_DISGUISED);
     }
 
-    if (IS_VAMPAFF(ch, VAM_NIGHTSIGHT)) do_nightsight(ch, "");
+    /* Cleanup must not require the rank that originally enabled the form. */
+    if (IS_VAMPAFF(ch, VAM_NIGHTSIGHT))
+    {
+if (get_disc(ch, DISC_PROTEAN) < 1)
+{
+    send_to_char("The green glow in your eyes fades.\n\r",ch);
+    act("The green glow in $n's eyes fades.", ch, NULL, NULL, TO_ROOM);
+}
+else
+{
+    send_to_char("The red glow in your eyes fades.\n\r",ch);
+    act("The red glow in $n's eyes fades.", ch, NULL, NULL, TO_ROOM);
+}
+REMOVE_BIT(ch->vampaff, VAM_NIGHTSIGHT);
+    }
 
     if (IS_VAMPAFF(ch,VAM_CLAWS) && !IS_POLYAFF(ch, POLY_ZULO))
     {
