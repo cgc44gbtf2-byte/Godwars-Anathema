@@ -665,6 +665,13 @@ if ( IS_NPC(vch) || vch->pcdata == NULL ) continue;
 void do_wyrmcall( CHAR_DATA *ch, char *argument )
 {
     CHAR_DATA *ich;
+    CHAR_DATA *ich_next;
+    ROOM_INDEX_DATA *room;
+
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL ||
+        ch->hit <= 0 || ch->position < POS_FIGHTING ||
+        !combat_character_in_room(ch->in_room, ch)) return;
+    room = ch->in_room;
 
     if (!IS_WEREWOLF(ch))
     {
@@ -681,9 +688,12 @@ void do_wyrmcall( CHAR_DATA *ch, char *argument )
     stc("You start to howl.\n\r",ch);
     act("$n starts to howl.",ch,NULL,NULL,TO_ROOM);
 
-    for (ich = ch->in_room->people; ich != NULL; ich = ich->next_in_room)
+    for (ich = room->people; ich != NULL; ich = ich_next)
     {
+	if (!combat_character_in_room(room, ich)) break;
+	ich_next = ich->next_in_room;
 	if (IS_NPC(ich)) continue;
+	if (ich->pcdata == NULL || ich->hit <= 0 || ich->position == POS_DEAD) continue;
         if (IS_VAMPIRE(ich) && ich->beast == 0) continue;
 	if (!IS_VAMPIRE(ich) && !IS_DROW(ich)) continue;
     
@@ -698,16 +708,30 @@ void do_wyrmcall( CHAR_DATA *ch, char *argument )
 	if (IS_VAMPIRE(ich))
 	{
 	    if (IS_VAMPAFF(ich,VAM_OBFUSCATE))	REMOVE_BIT(ich->vampaff, VAM_OBFUSCATE);
-	    if (IS_ITEMAFF(ich,ITEMA_PEACE))	do_majesty(ich, "");
-	    if (IS_POLYAFF(ich,POLY_SHADOW))	do_shadowbody(ich, "");
-	    if (IS_POLYAFF(ich,POLY_MIST))	do_change(ich, "human");
+	    if (IS_ITEMAFF(ich,ITEMA_PEACE))
+	    {
+		do_majesty(ich, "");
+		if (!combat_pair_in_room(room, ch, ich)) break;
+	    }
+	    if (IS_POLYAFF(ich,POLY_SHADOW))
+	    {
+		do_shadowbody(ich, "");
+		if (!combat_pair_in_room(room, ch, ich)) break;
+	    }
+	    if (IS_POLYAFF(ich,POLY_MIST))
+	    {
+		do_change(ich, "human");
+		if (!combat_pair_in_room(room, ch, ich)) break;
+	    }
 	}
 	if (IS_DROW(ich))
 	{
 	    if (get_drow(ich, DROW_GLOBE)) REMOVE_BIT(ich->pcdata->drow[DROW_POWERS], DROW_GLOBE);
 	}
+	if (ich_next != NULL && !combat_character_in_room(room, ich_next)) break;
     }
-    WAIT_STATE(ch,8);
+    if (combat_character_in_room(room, ch) &&
+        ch->hit > 0 && ch->position >= POS_FIGHTING) WAIT_STATE(ch,8);
     return;
 }
 
@@ -715,6 +739,12 @@ void do_songrage( CHAR_DATA *ch, char *argument )
 {
     CHAR_DATA *victim;
     char arg[MAX_INPUT_LENGTH];
+    ROOM_INDEX_DATA *room;
+
+    if (ch == NULL || argument == NULL || IS_NPC(ch) || ch->pcdata == NULL ||
+        ch->hit <= 0 || ch->position < POS_FIGHTING ||
+        !combat_character_in_room(ch->in_room, ch)) return;
+    room = ch->in_room;
 
     one_argument( argument, arg );
 
@@ -744,6 +774,8 @@ void do_songrage( CHAR_DATA *ch, char *argument )
 	return;
     }
 
+    if (!combat_pair_in_room(room, ch, victim)) return;
+
     if (is_safe(victim,ch)) return;
 
     stc("You begin to sing the Song of Rage.\n\r",ch);
@@ -760,9 +792,12 @@ void do_songrage( CHAR_DATA *ch, char *argument )
 	    if (victim->beast > 0) 
 	    {
 	    do_beastlike(victim,"");
+	    if (!combat_pair_in_room(room, ch, victim)) return;
 	    stc("You bare your fangs and growl as your inner beast consumes you.\n\r",victim);
 	    act("$n bares $s fangs and growls as $s inner beast consumes $m.",victim,NULL,NULL,TO_ROOM);
-	    victim->pcdata->wolf += number_range(10,20);
+	    long increase = number_range(10,20);
+	    victim->pcdata->wolf = victim->pcdata->wolf > LONG_MAX - increase
+		? LONG_MAX : victim->pcdata->wolf + increase;
 	    }
 	    if(victim->beast == 0)
 		return;
@@ -770,7 +805,8 @@ void do_songrage( CHAR_DATA *ch, char *argument )
 	else do_berserk(victim,"");
     }
     else do_berserk(victim,"");
-    WAIT_STATE(ch,30);
+    if (combat_character_in_room(room, ch) &&
+        ch->hit > 0 && ch->position >= POS_FIGHTING) WAIT_STATE(ch,30);
     return;
 }
 

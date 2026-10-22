@@ -1,7 +1,7 @@
 """Hash-guarded inverse of only the two reviewed Galliard command bodies."""
 import hashlib
 import re
-from werewolf_touch_source import without_werewolf_touch_stage
+from werewolf_forms_source import without_werewolf_forms_stage
 
 EDITS={
     "wyld": (
@@ -38,7 +38,7 @@ EDITS={
 }
 
 def without_werewolf_galliard_stage(text):
-    text=without_werewolf_touch_stage(text)
+    text=without_werewolf_forms_stage(text)
     for name,(before,after,edits) in EDITS.items():
         match=re.search(r"void do_"+name+r"\s*\(.*?(?=\nvoid do_|\Z)",text,re.S)
         if not match:continue

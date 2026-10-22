@@ -117,6 +117,19 @@ This repair does not enable secondary-parent Werewolf healing or add costs.
 Eight hundred ordinary native/original-parent cases retain HP, messages,
 cooldowns and RNG; extreme-HP cases are checked separately.
 
+### Wyrm call and Song of Rage
+
+`wyrmcall` (Galliard 3) and `songofrage <target>` (Galliard 4)
+now stop using a character if a triggered form command removes, moves or
+interrupts them. The howl also stops if its next room member disappears.
+Song of Rage caps an extreme Vampire rage counter rather than overflowing.
+Neither command adds a form, overrides form-removal restrictions, changes
+native rank gates, or grants secondary-parent Werewolves new access.
+The 2,432 ordinary original-parent, native and secondary-denial snapshots
+retain HP, messages, form flags, wait states and RNG. Controlled callback
+tests reproduce old unsafe boundaries; they do not prove every form
+implementation or live death-script path is safe.
+
 Elemental Gift's earth sequence and Invoke's lightning sequence stop further
 hits if the actor or target is removed, changes rooms or can no longer continue.
 Cutting Wind does not roll for or apply a stun to a removed/moved target.
