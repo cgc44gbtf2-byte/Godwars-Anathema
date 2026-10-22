@@ -12,6 +12,9 @@ from server_process import start_server
 
 repo = pathlib.Path(__file__).resolve().parents[1]
 vision_mode = "--vision" in sys.argv[1:]
+# Only the preserved old-executable upgrade harness supplies this flag.
+# Ordinary CI requires aliases both before and after actual exec.
+legacy_before_copyover = "--legacy-before-copyover" in sys.argv[1:]
 
 
 def until(client, needle, timeout=25, trace=None, ready=None):
@@ -33,6 +36,21 @@ def until(client, needle, timeout=25, trace=None, ready=None):
         received += part
         assert len(received) < 2_000_000, "Unexpected unbounded server output"
     return received
+
+
+def validate_vitals(records, legacy=False):
+    snapshots = [value for package, value in records if package == "Char.Vitals"]
+    assert snapshots, "No authenticated vitals received"
+    for vitals in snapshots:
+        keys = {"hp", "maxhp", "mp", "maxmp"}
+        if not legacy:
+            keys |= {"mana", "maxmana"}
+        assert set(vitals) == keys
+        assert all(type(value) is int for value in vitals.values())
+        if not legacy:
+            assert vitals["mana"] == vitals["mp"]
+            assert vitals["maxmana"] == vitals["maxmp"]
+    return snapshots
 
 
 with tempfile.TemporaryDirectory(prefix="anathema-copyover-") as directory:
@@ -84,9 +102,7 @@ with tempfile.TemporaryDirectory(prefix="anathema-copyover-") as directory:
                   ready=lambda: {"Char.Vitals", "Anathema.Vitals"} <= {
                       p for p, _ in gmcp.records})
             assert {"Char.Vitals", "Anathema.Vitals"} <= {p for p, _ in gmcp.records}
-            vitals = next(value for package, value in gmcp.records if package == "Char.Vitals")
-            assert set(vitals) == {"hp", "maxhp", "mp", "maxmp"}
-            assert all(isinstance(value, int) for value in vitals.values())
+            validate_vitals(gmcp.records, legacy=legacy_before_copyover)
             assert not any("Restarter" in str(value) for _, value in gmcp.records)
             pending = socket.create_connection(("127.0.0.1", port), timeout=3)
             until(pending, None)
@@ -121,6 +137,7 @@ with tempfile.TemporaryDirectory(prefix="anathema-copyover-") as directory:
                       p for p, _ in gmcp.records[before_recovery:]})
             assert {"Char.Vitals", "Anathema.Vitals"} <= {
                 p for p, _ in gmcp.records[before_recovery:]}
+            validate_vitals(gmcp.records[before_recovery:])
             pending.settimeout(5)
             try:
                 while pending.recv(65536):

@@ -12,7 +12,7 @@ The server offers Telnet option 201 (`IAC WILL GMCP`). Once the client accepts
 with `IAC DO GMCP`, each snapshot consists of two GMCP subnegotiations:
 
 ```text
-Char.Vitals {"hp":71,"maxhp":100,"mp":33,"maxmp":99}
+Char.Vitals {"hp":71,"maxhp":100,"mp":33,"maxmp":99,"mana":33,"maxmana":99}
 Anathema.Vitals {"available":true,"class":"vampire","blood":{"current":17,"max":50},"ki":null,"quintessence":null,"paradox":null,"class_points":null,"willpower":null}
 ```
 
@@ -21,6 +21,12 @@ fields, not percentages. Negative HP can represent an incapacitated player.
 No movement/stamina stat is invented. Consumers should guard against zero
 maxima and clamp gauge drawings, not modify gameplay values.
 Legacy values outside a client's exact integer range may lose display precision.
+
+`mana` / `maxmana` are exact aliases of `mp` / `maxmp`, supplied for MudForge's
+documented status-widget mappings. Existing Mudlet scripts and the bundled HUD
+keep their original fields. No movement resource, fake maximum or inferred
+percentage is added. Consumers should read the fields they support, not require
+an exact four-key object.
 
 Every custom key is sent in each snapshot. `null` explicitly clears a
 non-applicable resource after class changes, rather than leaving stale data.
@@ -71,9 +77,12 @@ For example, inspect `gmcp.Char.Vitals.hp` and `.maxhp` after the first snapshot
 MudForge exposes GMCP to its widgets/plugins; use these package names and the
 schema above, rather than relying on prompt wording.
 
-Actual GUI versions and MudForge's hosted bridge have not been exercised here.
-No claim is made that every built-in widget automatically supports the custom
-Anathema package. Packet-level tests are not GUI certification.
+MudForge web v2.0.3915 was exercised in headless Chromium against the hosted
+bridge: it reached the public Anathema greeting and login-name prompt without
+authentication. No existing player login or live copyover was performed by that
+probe. Authenticated JSON and actual copyover are independently tested with the
+isolated production executable. This is not full GUI certification, and no claim
+is made that built-in widgets consume every custom Anathema resource.
 
 ## Restart, implementation and tests
 
@@ -99,6 +108,9 @@ protect metadata from becoming staff-client protocol state. Restart tests
 reject partial control output in new, offered, active and disabled GMCP states. Independent
 Python tests decode JSON over every packet split. The production-executable smoke test
 checks pre-login privacy and fresh JSON packets after real exec on the same
-TCP socket, while retaining save-failure and plain-client checks.
+TCP socket, while retaining save-failure and plain-client checks. All recovered
+snapshots must retain both matching mana field pairs. The real-engine suite
+checks 588 class/value combinations, including negative, zero and LONG_MIN/MAX
+values, without changing the original privacy and output-budget guards.
 
 Protocol reference: <https://mudstandards.org/mud/gmcp/>.

@@ -1,4 +1,5 @@
 """GMCP module ownership and independent JSON/wire-probe regressions."""
+import hashlib
 import json
 import unittest
 from gmcp_probe import GMCPProbe
@@ -6,6 +7,33 @@ from test_class_layout import ROOT, SRC, make_values
 
 
 class GMCPChecks(unittest.TestCase):
+    def test_only_alias_fields_change_server_module(self):
+        source=(SRC/"gmcp.c").read_text()
+        added=r'\"maxmp\":%ld,"'+"\n        "+r'"\"mana\":%ld,\"maxmana\":%ld}'
+        old=r'\"maxmp\":%ld}'
+        self.assertEqual(source.count(added),1)
+        previous=source.replace(added,old,1)
+        new_args="255,250,GMCP_OPTION,hp,maxhp,mp,maxmp,mp,maxmp,255,240,"
+        old_args="255,250,GMCP_OPTION,hp,maxhp,mp,maxmp,255,240,"
+        self.assertEqual(previous.count(new_args),1)
+        previous=previous.replace(new_args,old_args,1).encode()
+        self.assertEqual(
+            hashlib.sha1(b"blob "+str(len(previous)).encode()+b"\0"+previous).hexdigest(),
+            "f7a709fc56329a54040fc043ee961c54ebb69a11")
+
+    def test_mana_alias_json_across_every_split(self):
+        for mana,maxmana in ((0,0),(-1,100),(33,99),(-(2**63),2**63-1)):
+            value={"hp":1,"maxhp":100,"mp":mana,"maxmp":maxmana,
+                   "mana":mana,"maxmana":maxmana}
+            wire=self.packet("Char.Vitals",value)
+            for split in range(len(wire)+1):
+                probe=GMCPProbe()
+                probe.feed(wire[:split]);probe.feed(wire[split:])
+                self.assertEqual(probe.records,[("Char.Vitals",value)])
+                data=probe.records[0][1]
+                self.assertEqual(data["mp"],data["mana"])
+                self.assertEqual(data["maxmp"],data["maxmana"])
+
     def packet(self, package="Char.Vitals", value=None):
         value = {"hp": 17, "maxhp": 100} if value is None else value
         raw = json.dumps(value).encode().replace(b"\xff", b"\xff\xff")

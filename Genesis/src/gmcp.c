@@ -124,11 +124,12 @@ bool gmcp_update(DESCRIPTOR_DATA *d)
                      ch->pcdata->willpower[0], ch->pcdata->willpower[1]);
     }
     int count = snprintf(frame, sizeof(frame),
-        "%c%c%cChar.Vitals {\"hp\":%ld,\"maxhp\":%ld,\"mp\":%ld,\"maxmp\":%ld}%c%c"
+        "%c%c%cChar.Vitals {\"hp\":%ld,\"maxhp\":%ld,\"mp\":%ld,\"maxmp\":%ld,"
+        "\"mana\":%ld,\"maxmana\":%ld}%c%c"
         "%c%c%cAnathema.Vitals {\"available\":%s,\"class\":\"%s\","
         "\"blood\":%s,\"ki\":%s,\"quintessence\":%s,\"paradox\":%s,"
         "\"class_points\":%s,\"willpower\":%s}%c%c",
-        255,250,GMCP_OPTION,hp,maxhp,mp,maxmp,255,240,
+        255,250,GMCP_OPTION,hp,maxhp,mp,maxmp,mp,maxmp,255,240,
         255,250,GMCP_OPTION,ch ? "true" : "false",
         ch ? class_name(ch->class) : "none",blood,ki,quint,paradox,points,will,255,240);
     if (count < 0 || (size_t)count >= sizeof(frame)) return FALSE;

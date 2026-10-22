@@ -48,7 +48,28 @@ Automatic mapping is not included; MudForge widgets remain client-specific.
 Client aliases, text triggers and locally scripted interfaces can still use
 ordinary game text. A client advertising extra protocols must not cause
 protocol bytes, terminal names, dimensions or JSON to become game commands.
-No Mudlet package or MudForge plugin is bundled.
+An optional Mudlet HUD is bundled separately; no MudForge plugin is bundled.
+
+## MudForge browser troubleshooting
+
+`Cannot reach bridge server: WebSocket connection failed` concerns the
+browser-to-bridge connection; it does not by itself establish a MUD crash.
+The path is browser → MudForge WebSocket bridge → game TCP/Telnet.
+Do not put the game's Telnet address into a custom WebSocket URL field.
+No WebSocket port needs opening on the MUD host for the hosted bridge.
+
+Refresh the client and reconnect. If it persists, try another network or
+Mudlet/MudForge desktop over the normal direct Telnet connection. Verify the
+installed server separately with `python3 deploy/update.py --verify` over SSH;
+do not kill the game, weaken its firewall or bypass the updater to repair an
+external bridge failure. Avoid deleting world files or resetting all settings.
+
+Enable GMCP for vitals. The status bar can consume `Char.Vitals.hp`, `maxhp`,
+`mana` and `maxmana`; the existing `mp` and `maxmp` aliases remain available.
+Hide the movement gauge: no movement telemetry is advertised. Empty map and
+party widgets are expected until the server implements those packages, not
+evidence of a broken connection. The custom resource package is documented in
+[GMCP.md](GMCP.md).
 
 ## Implementation
 
@@ -112,9 +133,12 @@ It also decodes real GMCP JSON, checks that no vitals arrive during login,
 and verifies reset, renegotiation and fresh snapshots across actual exec.
 The pending-login and new-arrival connections still exercise plain text play.
 
-These are transport-level regression checks. They are **not** recorded GUI
-sessions in real Mudlet or MudForge releases, a live hosted-bridge test, a TLS
-deployment test, a UTF-8 upgrade, or certification of enhanced client features.
+The hosted MudForge web client v2.0.3915 was additionally exercised in headless
+Chromium: its real WebSocket bridge reached Anathema's greeting and login-name
+prompt. No account was created or authenticated. That confirms one connection
+path at the time of the probe, not hosted-bridge uptime or a full authenticated
+GUI/copyover test. TLS deployment, UTF-8 input, automatic mapping and party
+support are not added by these checks.
 
 Smoke-test greetings use a bounded 25-second receive deadline, rather than
 inheriting the short TCP-connect timeout. EOF still fails immediately and

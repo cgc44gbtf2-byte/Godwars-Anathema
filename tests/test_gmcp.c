@@ -97,7 +97,7 @@ static void classes(void)
         assert(gmcp_update(&d) && d.outtop > 0);
         snprintf(expected, sizeof(expected), "\"class\":\"%s\"", names[i]);
         assert(strstr(d.outbuf, expected));
-        assert(strstr(d.outbuf, "Char.Vitals {\"hp\":71,\"maxhp\":100,\"mp\":33,\"maxmp\":99}"));
+        assert(strstr(d.outbuf, "Char.Vitals {\"hp\":71,\"maxhp\":100,\"mp\":33,\"maxmp\":99,\"mana\":33,\"maxmana\":99}"));
         assert(strstr(d.outbuf, "\"available\":true"));
         assert(!strstr(d.outbuf, ch.name) && !strstr(d.outbuf, enemy.name));
         assert(!strstr(d.outbuf, "987654321"));
@@ -128,6 +128,7 @@ static void privacy(void)
     d.original = &enemy;
     assert(gmcp_update(&d) && strstr(d.outbuf, "\"available\":false"));
     assert(strstr(d.outbuf, "\"hp\":0,\"maxhp\":0"));
+    assert(strstr(d.outbuf, "\"mp\":0,\"maxmp\":0,\"mana\":0,\"maxmana\":0"));
     clear_output(); assert(gmcp_update(&d) && d.outtop == 0);
     d.original = NULL; SET_BIT(ch.act, ACT_IS_NPC);
     assert(gmcp_update(&d) && d.outtop == 0);
@@ -167,6 +168,37 @@ static void updates_and_wire(void)
     ch.class = CLASS_VAMPIRE; ch.blood[0] = LONG_MIN; ch.blood[1] = LONG_MAX;
     assert(gmcp_update(&d) && d.outtop < GMCP_CACHE_SIZE);
     assert(d.outtop == (long)strlen(d.outbuf));
+    finish();
+}
+
+/* MudForge's documented status widget uses mana/maxmana. Existing Mudlet
+ * consumers keep mp/maxmp; both pairs must be exact aliases, not new stats. */
+static void mudforge_fields(void)
+{
+    const long values[]={LONG_MIN,-123,-1,0,1,123,LONG_MAX};
+    const long ids[]={CLASS_VAMPIRE,CLASS_WEREWOLF,CLASS_SORCERER,
+        CLASS_HIGHLANDER,CLASS_DROW,CLASS_NINJA,CLASS_DRAGON,CLASS_MAGE,
+        CLASS_MONK,CLASS_ELEM,CLASS_NONE,-1};
+    unsigned cases=0;
+    begin();ack(TRUE);
+    for(unsigned cls=0;cls<12;cls++)for(unsigned a=0;a<7;a++)
+    for(unsigned b=0;b<7;b++) {
+        char expected[512];
+        ch.class=ids[cls];
+        ch.hit=values[a];ch.max_hit=values[b];
+        ch.mana=values[6-a];ch.max_mana=values[6-b];
+        clear_output();
+        assert(gmcp_update(&d));
+        int n=snprintf(expected,sizeof expected,
+            "Char.Vitals {\"hp\":%ld,\"maxhp\":%ld,\"mp\":%ld,\"maxmp\":%ld,"
+            "\"mana\":%ld,\"maxmana\":%ld}",
+            ch.hit,ch.max_hit,ch.mana,ch.max_mana,ch.mana,ch.max_mana);
+        assert(n>0&&(size_t)n<sizeof expected&&strstr(d.outbuf,expected));
+        assert(!strstr(d.outbuf,"\"movement\"")&&!strstr(d.outbuf,"\"maxmove\""));
+        clear_output();assert(gmcp_update(&d)&&d.outtop==0);
+        ++cases;
+    }
+    assert(cases==588);
     finish();
 }
 
@@ -243,8 +275,9 @@ static void snoop_privacy(void)
 
 int main(void)
 {
+    mudforge_fields();
     negotiation(); classes(); privacy(); updates_and_wire();
     payloads_and_recovery(); limits(); snoop_privacy();
-    puts("GMCP negotiation, ten-class self-only snapshots, snoop isolation, cache, wire, recovery and bounds passed");
+    puts("GMCP negotiation, ten-class self-only snapshots, 588 MudForge alias cases, snoop isolation, cache, wire, recovery and bounds passed");
     return 0;
 }
