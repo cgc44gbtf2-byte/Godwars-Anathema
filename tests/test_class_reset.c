@@ -47,7 +47,7 @@ static CHAR_DATA *target(long cls,int level,int married,bool shared)
     strings(victim,shared);
     return victim;
 }
-static void load_reset(void)
+static CHAR_DATA *load_reset(void)
 {
     DESCRIPTOR_DATA shell={0};
     assert(load_char_obj(&shell,"Target"));
@@ -56,6 +56,70 @@ static void load_reset(void)
     assert(loaded->class==0&&!loaded->pcdata->hybrid_present);
     loaded->desc=NULL;loaded->next=char_list;char_list=loaded;
     char_to_room(loaded,&home);
+    return loaded;
+}
+static void assert_empty_banks(CHAR_DATA *ch)
+{
+    for(unsigned i=0;i<sizeof ch->spheres/sizeof ch->spheres[0];i++)
+        assert(ch->spheres[i]==0);
+    for(unsigned i=0;i<sizeof ch->quint/sizeof ch->quint[0];i++)
+        assert(ch->quint[i]==0);
+    for(unsigned i=0;i<sizeof ch->pcdata->colors/sizeof ch->pcdata->colors[0];i++)
+        assert(ch->pcdata->colors[i]==0);
+    for(unsigned i=0;i<sizeof ch->pcdata->absorb/sizeof ch->pcdata->absorb[0];i++)
+        assert(ch->pcdata->absorb[i]==0);
+    assert(ch->arete==0&&ch->paradox==0&&ch->paradox_ward==0);
+    assert(ch->beginners_luck==0&&ch->doublecast_timer==0);
+}
+static void bank_case(long cls,unsigned hybrid,int order)
+{
+    CHAR_DATA *staff=player("Staff");staff->level=LEV_IMP;
+    CHAR_DATA *victim=target(cls,LEV_AWA,0,FALSE);
+    if(hybrid) {
+        const HYBRID_DEFINITION *definition=hybrid_by_id(hybrid);
+        HYBRID_STATE state;
+        victim->class=definition->parents[order];
+        assert(hybrid_secondary_initialize(victim,definition,&state));
+        assert(hybrid_player_attach(victim,&state));
+    }
+    for(unsigned i=0;i<sizeof victim->spheres/sizeof victim->spheres[0];i++)
+        victim->spheres[i]=5;
+    for(unsigned i=0;i<sizeof victim->quint/sizeof victim->quint[0];i++)
+        victim->quint[i]=100+i;
+    for(unsigned i=0;i<sizeof victim->pcdata->colors/sizeof victim->pcdata->colors[0];i++)
+        victim->pcdata->colors[i]=5;
+    for(unsigned i=0;i<sizeof victim->pcdata->absorb/sizeof victim->pcdata->absorb[0];i++)
+        victim->pcdata->absorb[i]=1000+i;
+    victim->arete=10;victim->paradox=20;victim->paradox_ward=5;
+    victim->beginners_luck=4;victim->doublecast_timer=600;
+    /* Victim-targeted effects are independent of personal class ownership. */
+    victim->better_body_timer=17;victim->ephemera_timer=18;
+    victim->slow_timer=19;victim->liquify_timer=20;
+    victim->atoningwinds_timer=21;victim->enrage_timer=22;
+    SET_BIT(victim->xtra,XTRA_BETTER_STR|XTRA_MUTATE_EPHEMERA|
+        XTRA_SLOW|XTRA_LIQUIFY|XTRA_ATONING);
+    long xtra=victim->xtra;
+    assert(save_char_obj_checked(victim));
+    do_clearclass(staff,"Target");
+    assert_empty_banks(victim);
+    assert(victim->better_body_timer==17&&victim->ephemera_timer==18&&
+        victim->slow_timer==19&&victim->liquify_timer==20&&
+        victim->atoningwinds_timer==21&&victim->enrage_timer==22);
+    assert(victim->xtra==xtra);
+    CHAR_DATA *loaded=load_reset();
+    assert_empty_banks(loaded);
+    assert(loaded->gold==1234&&loaded->primal==4321);
+    for(int i=0;i<5;i++)loaded->stats[i]=10;
+    do_autoclass(loaded,"mage hermes");
+    assert(loaded->class==CLASS_MAGE&&loaded->arete==1);
+    for(unsigned i=0;i<9;i++)assert(loaded->spheres[i]==0);
+    do_clearclass(staff,"Target");
+    assert_empty_banks(loaded);
+    for(int i=0;i<5;i++)loaded->stats[i]=10;
+    do_autoclass(loaded,"sorcerer");
+    assert(loaded->class==CLASS_SORCERER);
+    for(unsigned i=0;i<6;i++)assert(loaded->pcdata->colors[i]==0);
+    cleanup();
 }
 static void hybrid_case(unsigned id,int order,bool disk_only)
 {
@@ -177,13 +241,18 @@ int main(int argc,char **argv)
         argc>3?atoi(argv[3]):0,argc>4?atoi(argv[4]):0);
     else if(argc==3&&!strcmp(argv[1],"--strings"))string_case(atoi(argv[2]));
     else if(argc==3&&!strcmp(argv[1],"--invalid"))invalid_record(atoi(argv[2]));
+    else if(argc==3&&!strcmp(argv[1],"--banks"))bank_case(classes[atoi(argv[2])],0,0);
     else {
         native_cases(FALSE);
         for(unsigned id=1;id<=hybrid_count();id++)for(int order=0;order<2;order++)
             hybrid_case(id,order,FALSE);
         string_case(FALSE);string_case(TRUE);invalid_record(0);invalid_record(1);
         effects_case();do_clearclass(NULL,NULL);
+        for(unsigned i=0;i<10;i++)bank_case(classes[i],0,0);
+        for(unsigned id=1;id<=hybrid_count();id++)for(int order=0;order<2;order++)
+            bank_case(0,id,order);
         puts("class reset: 90 hybrid clears/reloads, nine owned/pooled strings, guards, real effects/equipment passed");
+        puts("primary banks: 100 native/hybrid reset-reloads, 200 real class selections; incoming timed effects preserved");
     }
     assert(fclose(fpReserve)==0&&chdir("..")==0);
     remove_saves("player");remove_saves("backup");

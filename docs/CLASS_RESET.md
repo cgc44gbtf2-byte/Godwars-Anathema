@@ -21,5 +21,16 @@ both parent orders. Native reset outcomes retain 240 original snapshots.
 Saving still uses the existing primary/backup retry policy. An I/O failure
 does not roll back the in-memory reset; there is no crash journal or
 multi-file transaction. No live players or saved files are automatically
-reset or migrated. Remaining primary training banks and active class timers
-need separate review; this stage does not introduce new reset policy.
+reset or migrated.
+
+The reset also clears previously omitted Mage spheres, Arete, quintessence,
+paradox/ward, Beginner's Luck charges and Doublecast cooldown; Sorcerer color
+ranks; and the Vampire Absorb Soul snapshot. All slots are cleared even when
+left behind by an older class, and the empty banks are verified after reload.
+Selecting Mage again still grants the normal initial Arete through `autoclass`;
+no class acquisition, training costs or non-reset progression are changed.
+
+Timed effects another caster can place on the target (Better Body, Mutate
+Ephemera, Slow, Liquify Earth, Atoning Winds and Enrage) are not personal
+training. Their timers and flags are deliberately retained by this change.
+Wider form/flag provenance and other class timers still require separate review.

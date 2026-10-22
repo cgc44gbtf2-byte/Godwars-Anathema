@@ -1,5 +1,6 @@
 """Exact inverse of the reviewed reset ownership and hybrid-state edits."""
 import hashlib
+from class_reset_banks_source import without_class_reset_banks
 
 BEFORE="84754f0847dfdce18325f247ece2fe4ea9ff7e9e2e978e8ef9655a39d4961684"
 AFTER="f8788c39c07bee30407c4f47e936558366c82d3bcc40abf4027415e14659f9e4"
@@ -10,6 +11,7 @@ EDITS=[
     (11,13,"    one_argument( argument, arg );\n"),(4,5,""),(1,2,""),
 ]
 def without_class_reset_stage(text):
+    text=without_class_reset_banks(text)
     if "void do_clearclass(" not in text:return text
     digest=hashlib.sha256(text.encode()).hexdigest()
     if digest in (BEFORE,HISTORICAL):return text

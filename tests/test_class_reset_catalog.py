@@ -4,10 +4,31 @@ import json
 from pathlib import Path
 import unittest
 from class_reset_source import without_class_reset_stage
+from class_reset_banks_source import without_class_reset_banks, BEFORE
 
 ROOT=Path(__file__).resolve().parents[1]
 SOURCE=ROOT/"Genesis/src/clearclass.c"
 class ResetCatalog(unittest.TestCase):
+    def test_bank_stage_exact_inverse_and_neighbors(self):
+        text=SOURCE.read_text()
+        self.assertEqual(hashlib.sha256(without_class_reset_banks(text).encode()).hexdigest(),
+                         BEFORE)
+        for old,new in (("victim->arete = 0;","victim->arete = 1;"),
+                        ("victim->home", "victim->level")):
+            altered=text.replace(old,new,1)
+            self.assertNotEqual(altered,text)
+            with self.assertRaises(AssertionError):without_class_reset_stage(altered)
+
+    def test_primary_banks_and_owned_charges_cleared(self):
+        text=SOURCE.read_text()
+        for field in ("spheres","quint","pcdata->colors","pcdata->absorb"):
+            self.assertIn(f"memset(victim->{field},0,sizeof victim->{field});",text)
+        for field in ("arete","paradox","paradox_ward","beginners_luck","doublecast_timer"):
+            self.assertIn(f"victim->{field} = 0;",text)
+        for incoming in ("better_body_timer","ephemera_timer","slow_timer",
+                         "liquify_timer","atoningwinds_timer","enrage_timer"):
+            self.assertNotIn("victim->"+incoming,text)
+
     def test_whole_previous_module_restores(self):
         data=without_class_reset_stage(SOURCE.read_text()).encode()
         self.assertEqual(hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest(),

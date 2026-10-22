@@ -226,6 +226,17 @@ do_mclear(victim, "self");
     victim->pcdata->flag		    = 0;
     victim->pcdata->classpoints[0]		= 0;
     victim->pcdata->classpoints[1]		= 0;
+    /* These primary banks must not outlive the class being cleared.
+     * Absorb belongs to Vampire Absorb Soul, not Sorcerer color training. */
+    memset(victim->spheres,0,sizeof victim->spheres);
+    memset(victim->quint,0,sizeof victim->quint);
+    victim->arete = 0;
+    victim->paradox = 0;
+    victim->paradox_ward = 0;
+    victim->beginners_luck = 0;
+    victim->doublecast_timer = 0;
+    memset(victim->pcdata->colors,0,sizeof victim->pcdata->colors);
+    memset(victim->pcdata->absorb,0,sizeof victim->pcdata->absorb);
     victim->class                           = 0;
     /* No secondary identity can survive its original class being reset. */
     victim->pcdata->hybrid_present = 0;
