@@ -18,6 +18,34 @@ def no_core():
     resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
 
 
+def diagnose_pie(run, binary, launches=50):
+    """Informational probe of a configuration not used by the MUD tests."""
+    result = {"attempts": 0, "unsuccessful": 0, "timeouts": 0}
+    for _ in range(launches):
+        result["attempts"] += 1
+        try:
+            result["unsuccessful"] += run(binary).returncode != 0
+        except subprocess.TimeoutExpired:
+            # One hang establishes the diagnostic result. Do not spend another
+            # 49 deadlines on the known-incompatible configuration.
+            result["timeouts"] += 1
+            break
+    return result
+
+
+def require_startups(run, binary, launches=100):
+    """The configuration actually used for instrumented tests is fail-fast."""
+    for _ in range(launches):
+        result = run(binary)
+        assert result.returncode == 0, result.stderr.decode(errors="replace")
+
+
+def require_detection(run, binary, message, *args):
+    result = run(binary, *args)
+    assert result.returncode != 0 and message in result.stderr, (
+        result.returncode, result.stderr.decode(errors="replace"))
+
+
 def main():
     env = dict(os.environ, ASAN_OPTIONS="detect_leaks=0:halt_on_error=1",
                UBSAN_OPTIONS="halt_on_error=1:print_stacktrace=1")
@@ -41,13 +69,10 @@ def main():
 
         pie = build("pie", ("-fPIE", "-pie"))
         fixed = build("fixed", ("-fno-pie", "-no-pie"))
-        failures = 0
-        for _ in range(50):
-            failures += run(pie).returncode != 0
-        print(f"Diagnostic PIE startup: {failures}/50 unsuccessful launches", flush=True)
-        for _ in range(100):
-            result = run(fixed)
-            assert result.returncode == 0, result.stderr.decode(errors="replace")
+        diagnostic = diagnose_pie(run, pie)
+        print(f"Diagnostic PIE startup (not the MUD test configuration): "
+              f"{diagnostic}", flush=True)
+        require_startups(run, fixed)
         header = subprocess.check_output(["readelf", "-h", str(fixed)], text=True)
         assert "EXEC (Executable file)" in header
         source.write_text(
@@ -59,13 +84,9 @@ def main():
             "}\n"
         )
         invalid = build("invalid_asan", ("-fno-pie", "-no-pie"), "address")
-        result = run(invalid)
-        assert result.returncode != 0 and b"heap-buffer-overflow" in result.stderr, (
-            result.returncode, result.stderr.decode(errors="replace"))
+        require_detection(run, invalid, b"heap-buffer-overflow")
         invalid = build("invalid_ubsan", ("-fno-pie", "-no-pie"), "undefined")
-        result = run(invalid, "ubsan")
-        assert result.returncode != 0 and b"signed integer overflow" in result.stderr, (
-            result.returncode, result.stderr.decode(errors="replace"))
+        require_detection(run, invalid, b"signed integer overflow", "ubsan")
         print("100 configured sanitizer startups passed; ASan and UBSan detect "
               "deliberate violations. No game-test retries or suppressed errors.", flush=True)
 

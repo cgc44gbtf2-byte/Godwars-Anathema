@@ -192,6 +192,7 @@ check-layout:
 	python3 tests/test_combat_layout.py
 	python3 tests/test_telnet_layout.py
 	python3 tests/test_gmcp_layout.py
+	python3 tests/test_sanitizer_startup.py
 	python3 tests/test_mudlet_hud.py
 	python3 tests/test_security_commands.py
 	python3 tests/test_setup.py
