@@ -1,4 +1,4 @@
-# GMCP vitals for Mudlet and MudForge
+# GMCP identity and vitals for Mudlet and MudForge
 
 GMCP is optional. Enable GMCP in your client and reconnect to the operator's
 normal game endpoint. Clients without it retain ordinary text play.
@@ -9,12 +9,21 @@ MudForge still needs its own widget/plugin configuration.
 ## Packages
 
 The server offers Telnet option 201 (`IAC WILL GMCP`). Once the client accepts
-with `IAC DO GMCP`, each snapshot consists of two GMCP subnegotiations:
+with `IAC DO GMCP`, each snapshot consists of three GMCP subnegotiations:
 
 ```text
+Char.Base {"name":"Example","level":2,"class":"vampire"}
 Char.Vitals {"hp":71,"maxhp":100,"mp":33,"maxmp":99,"mana":33,"maxmana":99}
 Anathema.Vitals {"available":true,"class":"vampire","blood":{"current":17,"max":50},"ki":null,"quintessence":null,"paradox":null,"class_points":null,"willpower":null}
 ```
+
+`Char.Base` supplies the authenticated player's name, actual character level
+(not trust, class rank or an invented RPG level), and primary class. It uses the
+same lowercase class labels as `Anathema.Vitals`; it does not infer a hybrid
+label. No race or status-effect list is supplied. Normal names are at most 12
+ASCII letters. For legacy/corrupt data, export is bounded to 64 name bytes;
+quotes, backslashes, control and non-ASCII bytes are JSON-escaped. This does not
+add UTF-8 input support or alter stored names.
 
 All numeric values are signed JSON integers copied from existing gameplay
 fields, not percentages. Negative HP can represent an incapacitated player.
@@ -47,12 +56,14 @@ not an inferred hybrid build. No stats, costs, powers or class eligibility chang
 
 ## Privacy, updates and traffic
 
-- No vitals before entering an authenticated in-game session.
+- No identity or vitals before entering an authenticated in-game session.
 - Only the descriptor's reciprocally attached PC is reported. No opponents,
-  room IDs, character names, passwords, inventory, or another player's data.
+  room IDs, passwords, inventory, or another player's data. Only the player's
+  own name is supplied.
 - Switched/NPC, object/head and detached sessions do not expose body stats.
   A previously active view receives zero standard vitals and
   `"available":false` with null custom resources, rather than stale vitals.
+  `Char.Base` clears to an empty name, level 0 and class `"none"`.
 - In-world note/OLC editors remain authenticated sessions.
 - Snapshots are checked on each existing output-loop tick, including idle
   regeneration, and queued only when their content changes. Text prompts
@@ -65,17 +76,21 @@ not an inferred hybrid build. No stats, costs, powers or class eligibility chang
 - Client GMCP subnegotiations (including Core.Hello/Supports) are safely
   discarded. This is a read-only server-push feed, not a command/query API.
 
-ASCII JSON literals and integers are UTF-8-compatible. GMCP output bypasses
+ASCII JSON with escaped name bytes and integers is UTF-8-compatible. GMCP output bypasses
 ANSI/color expansion and uses the bounded binary-safe socket output queue.
 This does not change legacy ASCII **command input** or add TLS.
 
 ## Client access
 
-Mudlet scripts can read `gmcp.Char.Vitals` and `gmcp.Anathema.Vitals` and react
+Mudlet scripts can read `gmcp.Char.Base`, `gmcp.Char.Vitals` and `gmcp.Anathema.Vitals` and react
 to the corresponding `gmcp.Char.Vitals` / `gmcp.Anathema.Vitals` events.
 For example, inspect `gmcp.Char.Vitals.hp` and `.maxhp` after the first snapshot.
 MudForge exposes GMCP to its widgets/plugins; use these package names and the
 schema above, rather than relying on prompt wording.
+Its **Show Character Info** status-bar setting uses `Char.Base` for the name,
+level and class. Enable it and reconnect after updating. Authenticated game
+telemetry is tested with the production executable; the new identity header's
+appearance in the hosted GUI still needs a logged-in user check.
 
 MudForge web v2.0.3915 was exercised in headless Chromium against the hosted
 bridge: it reached the public Anathema greeting and login-name prompt without
@@ -112,5 +127,10 @@ TCP socket, while retaining save-failure and plain-client checks. All recovered
 snapshots must retain both matching mana field pairs. The real-engine suite
 checks 588 class/value combinations, including negative, zero and LONG_MIN/MAX
 values, without changing the original privacy and output-budget guards.
+Identity tests cover all 255 non-NUL name bytes, null and bounded non-terminated
+names, extreme levels, identity-only changes, privacy clearing and caching.
+The wire smoke independently JSON-decodes actual engine name output byte by
+byte and requires `Char.Base` before and after real copyover. Its explicit
+old-executable upgrade mode permits missing identity only before the exec.
 
 Protocol reference: <https://mudstandards.org/mud/gmcp/>.

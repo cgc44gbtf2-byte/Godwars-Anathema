@@ -40,7 +40,7 @@ Automatic mapping is not included; MudForge widgets remain client-specific.
 | Telnet negotiation, including fragmented packets | Parsed before command input |
 | Password ECHO acknowledgements | Existing WILL/WONT ECHO flow retained |
 | TTYPE, NAWS and other unsupported options | Declined, subnegotiation discarded |
-| GMCP | Optional Char.Vitals and Anathema.Vitals, authenticated self-only snapshots |
+| GMCP | Optional Char.Base, Char.Vitals and Anathema.Vitals, authenticated self-only snapshots |
 | MSDP, MXP and MCCP | Not implemented; unsupported negotiation declined |
 | Party data and automatic room maps | Not supplied by this server |
 | UTF-8 command input | Not added; legacy ASCII canonicalization remains |

@@ -53,6 +53,31 @@ def validate_vitals(records, legacy=False):
     return snapshots
 
 
+def validate_identity(records):
+    snapshots = [value for package, value in records if package == "Char.Base"]
+    assert snapshots, "No authenticated identity received"
+    for data in snapshots:
+        assert set(data) == {"name", "level", "class"}
+        assert data == {"name": "Restarter", "level": 6, "class": "ninja"}
+    return snapshots
+
+
+def validate_engine_identity_bytes():
+    # Decode the actual engine's output independently of its C assertions.
+    raw = subprocess.check_output([str(repo / "tests/test_gmcp"), "--identity-wire"])
+    probe = GMCPProbe()
+    for byte in raw:
+        probe.feed(bytes([byte]))
+    names = [value for package, value in probe.records if package == "Char.Base"]
+    assert len(names) == 255 and len(probe.records) == 765
+    for byte, data in enumerate(names, 1):
+        assert data == {"name": chr(byte), "level": 6, "class": "none"}
+    assert probe.state == 0, "Unterminated Telnet frame"
+
+
+validate_engine_identity_bytes()
+
+
 with tempfile.TemporaryDirectory(prefix="anathema-copyover-") as directory:
     runtime = pathlib.Path(directory)
     for name in ("area", "player", "backup", "notes", "log", "clans"):
@@ -99,11 +124,15 @@ with tempfile.TemporaryDirectory(prefix="anathema-copyover-") as directory:
                 until(staff, b"enhance your vision", trace=gmcp.feed)
             staff.sendall(b"save\n")
             until(staff, b"Saved.", trace=gmcp.feed,
-                  ready=lambda: {"Char.Vitals", "Anathema.Vitals"} <= {
+                  ready=lambda: ({"Char.Vitals", "Anathema.Vitals"} |
+                      (set() if legacy_before_copyover else {"Char.Base"})) <= {
                       p for p, _ in gmcp.records})
             assert {"Char.Vitals", "Anathema.Vitals"} <= {p for p, _ in gmcp.records}
             validate_vitals(gmcp.records, legacy=legacy_before_copyover)
-            assert not any("Restarter" in str(value) for _, value in gmcp.records)
+            if not legacy_before_copyover:
+                validate_identity(gmcp.records)
+            assert not any("Restarter" in str(value) for package, value in gmcp.records
+                           if package != "Char.Base")
             pending = socket.create_connection(("127.0.0.1", port), timeout=3)
             until(pending, None)
 
@@ -133,11 +162,12 @@ with tempfile.TemporaryDirectory(prefix="anathema-copyover-") as directory:
             staff.sendall(b"Forge\nnot-a-command\xff\xf0"
                           b"\xff\xfe\xc9\xff\xfd\xc9save\n")
             until(staff, b"Saved.", trace=gmcp.feed,
-                  ready=lambda: {"Char.Vitals", "Anathema.Vitals"} <= {
+                  ready=lambda: {"Char.Base", "Char.Vitals", "Anathema.Vitals"} <= {
                       p for p, _ in gmcp.records[before_recovery:]})
             assert {"Char.Vitals", "Anathema.Vitals"} <= {
                 p for p, _ in gmcp.records[before_recovery:]}
             validate_vitals(gmcp.records[before_recovery:])
+            validate_identity(gmcp.records[before_recovery:])
             pending.settimeout(5)
             try:
                 while pending.recv(65536):

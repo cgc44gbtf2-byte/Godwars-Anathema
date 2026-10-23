@@ -7,19 +7,46 @@ from test_class_layout import ROOT, SRC, make_values
 
 
 class GMCPChecks(unittest.TestCase):
-    def test_only_alias_fields_change_server_module(self):
+    def test_vitals_and_transport_unchanged(self):
         source=(SRC/"gmcp.c").read_text()
-        added=r'\"maxmp\":%ld,"'+"\n        "+r'"\"mana\":%ld,\"maxmana\":%ld}'
-        old=r'\"maxmp\":%ld}'
-        self.assertEqual(source.count(added),1)
-        previous=source.replace(added,old,1)
-        new_args="255,250,GMCP_OPTION,hp,maxhp,mp,maxmp,mp,maxmp,255,240,"
-        old_args="255,250,GMCP_OPTION,hp,maxhp,mp,maxmp,255,240,"
-        self.assertEqual(previous.count(new_args),1)
-        previous=previous.replace(new_args,old_args,1).encode()
-        self.assertEqual(
-            hashlib.sha1(b"blob "+str(len(previous)).encode()+b"\0"+previous).hexdigest(),
-            "f7a709fc56329a54040fc043ee961c54ebb69a11")
+        start=source.index("/* Normal player names are ASCII letters")
+        end=source.index("bool gmcp_update(",start)
+        source=source[:start]+(
+            "/* Only literals and signed integers enter JSON. No names, room identifiers,\n"
+            " * opponents, secrets or user-provided text need JSON/Telnet escaping here. */\n"
+        )+source[end:]
+        changes = (
+            ("    char name[385];\n", ""),
+            ("    identity_name(name, ch ? ch->name : NULL);\n", ""),
+            ('        "%c%c%cChar.Base {\\"name\\":\\"%s\\",\\"level\\":%ld,\\"class\\":\\"%s\\"}%c%c"\n', ""),
+            ('        255,250,GMCP_OPTION,name,ch ? ch->level : 0L,\n'
+             '        ch ? class_name(ch->class) : "none",255,240,\n', ""),
+        )
+        for new,old in changes:
+            self.assertEqual(source.count(new),1)
+            source=source.replace(new,old,1)
+        data=source.encode()
+        self.assertEqual(hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest(),
+                         "d4a23865b8f9ce270fd02c88493b1744b3967aae")
+
+    def test_identity_uses_existing_privacy_and_bounded_cache(self):
+        source=(SRC/"gmcp.c").read_text()
+        self.assertEqual(source.count("Char.Base "),1)
+        self.assertLess(source.index("if (!descriptor_is_in_game(d))"),
+                        source.index("identity_name(name,"))
+        self.assertIn("i < 64",source)
+        self.assertIn("count >= sizeof(frame)",source)
+        self.assertIn("ch ? ch->level : 0L",source)
+        self.assertIn("ch ? class_name(ch->class)",source)
+
+    def test_identity_json_every_split(self):
+        for name in ('Luto','"\\\n',"\u00ff", "A"*64, ""):
+            value={"name":name,"level":7,"class":"werewolf"}
+            data=self.packet("Char.Base",value)
+            for split in range(len(data)+1):
+                probe=GMCPProbe()
+                probe.feed(data[:split]);probe.feed(data[split:])
+                self.assertEqual(probe.records,[("Char.Base",value)])
 
     def test_mana_alias_json_across_every_split(self):
         for mana,maxmana in ((0,0),(-1,100),(33,99),(-(2**63),2**63-1)):

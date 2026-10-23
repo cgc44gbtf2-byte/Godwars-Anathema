@@ -81,11 +81,33 @@ static const char *class_name(long class)
     }
 }
 
-/* Only literals and signed integers enter JSON. No names, room identifiers,
- * opponents, secrets or user-provided text need JSON/Telnet escaping here. */
+/* Normal player names are ASCII letters, at most 12 bytes. Bound legacy or
+ * damaged names to 64 bytes and escape every non-ASCII/control byte as JSON,
+ * including IAC. No raw player text may become JSON or Telnet framing. */
+static void identity_name(char out[385], const char *name)
+{
+    static const char hex[] = "0123456789abcdef";
+    size_t used = 0;
+    for (size_t i = 0; name != NULL && i < 64 && name[i] != '\0'; ++i) {
+        unsigned char c = (unsigned char)name[i];
+        if (c < 32 || c >= 127) {
+            out[used++] = '\\'; out[used++] = 'u';
+            out[used++] = '0'; out[used++] = '0';
+            out[used++] = hex[c >> 4]; out[used++] = hex[c & 15];
+        } else {
+            if (c == '"' || c == '\\') out[used++] = '\\';
+            out[used++] = (char)c;
+        }
+    }
+    out[used] = '\0';
+}
+
+/* Identity and vitals share the authenticated-self privacy gate and cache.
+ * Class is the existing primary class, never inferred hybrid ancestry. */
 bool gmcp_update(DESCRIPTOR_DATA *d)
 {
     char frame[GMCP_CACHE_SIZE];
+    char name[385];
     char blood[96] = "null", ki[96] = "null", quint[96] = "null";
     char paradox[96] = "null", points[96] = "null", will[96] = "null";
     CHAR_DATA *ch;
@@ -123,12 +145,16 @@ bool gmcp_update(DESCRIPTOR_DATA *d)
             snprintf(will, sizeof(will), "{\"current\":%ld,\"max\":%ld}",
                      ch->pcdata->willpower[0], ch->pcdata->willpower[1]);
     }
+    identity_name(name, ch ? ch->name : NULL);
     int count = snprintf(frame, sizeof(frame),
+        "%c%c%cChar.Base {\"name\":\"%s\",\"level\":%ld,\"class\":\"%s\"}%c%c"
         "%c%c%cChar.Vitals {\"hp\":%ld,\"maxhp\":%ld,\"mp\":%ld,\"maxmp\":%ld,"
         "\"mana\":%ld,\"maxmana\":%ld}%c%c"
         "%c%c%cAnathema.Vitals {\"available\":%s,\"class\":\"%s\","
         "\"blood\":%s,\"ki\":%s,\"quintessence\":%s,\"paradox\":%s,"
         "\"class_points\":%s,\"willpower\":%s}%c%c",
+        255,250,GMCP_OPTION,name,ch ? ch->level : 0L,
+        ch ? class_name(ch->class) : "none",255,240,
         255,250,GMCP_OPTION,hp,maxhp,mp,maxmp,mp,maxmp,255,240,
         255,250,GMCP_OPTION,ch ? "true" : "false",
         ch ? class_name(ch->class) : "none",blood,ki,quint,paradox,points,will,255,240);

@@ -29,7 +29,8 @@ static void begin(void)
     d.outsize = 2000; d.outbuf = alloc_mem(d.outsize);
     d.outbuf[0] = '\0';
     d.connected = CON_PLAYING; d.character = &ch;
-    ch.desc = &d; ch.pcdata = &pc; ch.name = "never-export\"\\\n";
+    ch.desc = &d; ch.pcdata = &pc; ch.name = "Self\"\\\n";
+    ch.level = LEV_IMP;
     ch.hit = 71; ch.max_hit = 100; ch.mana = 33; ch.max_mana = 99;
     ch.fighting = &enemy; enemy.hit = 987654321;
     enemy.name = "private-opponent";
@@ -100,6 +101,7 @@ static void classes(void)
         assert(strstr(d.outbuf, "Char.Vitals {\"hp\":71,\"maxhp\":100,\"mp\":33,\"maxmp\":99,\"mana\":33,\"maxmana\":99}"));
         assert(strstr(d.outbuf, "\"available\":true"));
         assert(!strstr(d.outbuf, ch.name) && !strstr(d.outbuf, enemy.name));
+        assert(strstr(d.outbuf, "Char.Base {\"name\":\"Self\\\"\\\\\\u000a\","));
         assert(!strstr(d.outbuf, "987654321"));
         assert(strstr(d.outbuf, ids[i]==CLASS_VAMPIRE ?
             "\"blood\":{\"current\":17,\"max\":50}" : "\"blood\":null"));
@@ -129,6 +131,7 @@ static void privacy(void)
     assert(gmcp_update(&d) && strstr(d.outbuf, "\"available\":false"));
     assert(strstr(d.outbuf, "\"hp\":0,\"maxhp\":0"));
     assert(strstr(d.outbuf, "\"mp\":0,\"maxmp\":0,\"mana\":0,\"maxmana\":0"));
+    assert(strstr(d.outbuf, "Char.Base {\"name\":\"\",\"level\":0,\"class\":\"none\"}"));
     clear_output(); assert(gmcp_update(&d) && d.outtop == 0);
     d.original = NULL; SET_BIT(ch.act, ACT_IS_NPC);
     assert(gmcp_update(&d) && d.outtop == 0);
@@ -139,6 +142,9 @@ static void privacy(void)
     ch.pcdata = &pc; SET_BIT(ch.more, MORE_HEAD);
     assert(gmcp_update(&d) && d.outtop == 0);
     REMOVE_BIT(ch.more, MORE_HEAD);
+    SET_BIT(ch.extra, EXTRA_OSWITCH);
+    assert(gmcp_update(&d) && d.outtop == 0);
+    REMOVE_BIT(ch.extra, EXTRA_OSWITCH);
     const long editors[] = {CON_NOTE_TO,CON_NOTE_FINISH,CON_AEDITOR,
                            CON_REDITOR,CON_OEDITOR,CON_MEDITOR};
     for (size_t i = 0; i < sizeof(editors)/sizeof(*editors); ++i) {
@@ -253,6 +259,8 @@ static void snoop_privacy(void)
         d.snoop_by=&watcher;
         telnet_snoop_output(&d,wire+cut,size-cut);
         assert(!strstr(watcher.outbuf,"Char.Vitals"));
+        assert(!strstr(watcher.outbuf,"Char.Base"));
+        assert(!strstr(watcher.outbuf,"Self"));
         assert(!strstr(watcher.outbuf,"Anathema.Vitals"));
         assert(!strstr(watcher.outbuf,"\"hp\""));
         assert(!memchr(watcher.outbuf,255,(size_t)watcher.outtop));
@@ -273,11 +281,67 @@ static void snoop_privacy(void)
     finish();
 }
 
-int main(void)
+static void identity(void)
 {
+    char byte[2] = {0,0}, expected[128], long_name[65];
+    begin(); ack(TRUE);
+    for (unsigned c = 1; c <= 255; ++c) {
+        byte[0] = (char)c; ch.name = byte; clear_output();
+        assert(gmcp_update(&d));
+        if (c < 32 || c >= 127)
+            snprintf(expected,sizeof expected,"Char.Base {\"name\":\"\\u%04x\",",c);
+        else if (c == '"' || c == '\\')
+            snprintf(expected,sizeof expected,"Char.Base {\"name\":\"\\%c\",",c);
+        else
+            snprintf(expected,sizeof expected,"Char.Base {\"name\":\"%c\",",c);
+        assert(strstr(d.outbuf,expected));
+        assert(d.outtop < GMCP_CACHE_SIZE && d.outtop == (long)strlen(d.outbuf));
+    }
+    /* Deliberately non-terminated input: the exporter must not read byte 65. */
+    char bounded[64];
+    memset(bounded,255,sizeof bounded); ch.name = bounded;
+    ch.level = LONG_MIN; clear_output();
+    assert(gmcp_update(&d) && strstr(d.outbuf,"\"level\":-"));
+    assert(strstr(d.outbuf,"\\u00ff\\u00ff"));
+    memset(long_name,'A',64); long_name[64]='\0';
+    ch.name = long_name; clear_output(); assert(gmcp_update(&d));
+    assert(strstr(d.outbuf,long_name));
+    ch.name = NULL; ch.level = LONG_MAX; clear_output();
+    assert(gmcp_update(&d) && strstr(d.outbuf,"Char.Base {\"name\":\"\","));
+    clear_output(); assert(gmcp_update(&d) && d.outtop == 0);
+    ch.name = "Luto"; clear_output();
+    assert(gmcp_update(&d) && strstr(d.outbuf,"\"name\":\"Luto\""));
+    clear_output(); --ch.level;
+    assert(gmcp_update(&d) && d.outtop > 0);
+    clear_output(); d.connected = CON_GET_OLD_PASSWORD;
+    assert(gmcp_update(&d) && d.outtop == 0 && d.gmcp_cache[0] == '\0');
+    d.connected = CON_PLAYING;
+    assert(gmcp_update(&d) && strstr(d.outbuf,"\"name\":\"Luto\""));
+    finish();
+}
+
+/* Independent Python JSON decoding can exercise the actual engine output. */
+static void identity_wire(void)
+{
+    char byte[2] = {0,0};
+    begin(); ack(TRUE);
+    for (unsigned c = 1; c <= 255; ++c) {
+        byte[0] = (char)c; ch.name = byte; clear_output();
+        assert(gmcp_update(&d));
+        assert(fwrite(d.outbuf,1,(size_t)d.outtop,stdout) == (size_t)d.outtop);
+    }
+    finish();
+}
+
+int main(int argc, char **argv)
+{
+    if (argc == 2 && !strcmp(argv[1],"--identity-wire")) {
+        identity_wire(); return 0;
+    }
+    identity();
     mudforge_fields();
     negotiation(); classes(); privacy(); updates_and_wire();
     payloads_and_recovery(); limits(); snoop_privacy();
-    puts("GMCP negotiation, ten-class self-only snapshots, 588 MudForge alias cases, snoop isolation, cache, wire, recovery and bounds passed");
+    puts("GMCP identity/255 name bytes, negotiation, ten-class self-only snapshots, 588 MudForge alias cases, snoop isolation, cache, wire, recovery and bounds passed");
     return 0;
 }
