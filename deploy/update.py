@@ -97,8 +97,9 @@ def checked_release():
         listing = api("/actions/runs/" + str(latest["id"]) + "/jobs?per_page=100")
         jobs = listing["jobs"]
         expected = {"regression (debian:12)", "regression (debian:13)",
-                    "regression (ubuntu:22.04)", "regression (ubuntu:24.04)"}
-        require(listing["total_count"] == 4 and len(jobs) == 4 and
+                    "regression (ubuntu:22.04)", "regression (ubuntu:24.04)",
+                    "regression (fedora:43)", "regression (fedora:44)"}
+        require(listing["total_count"] == len(expected) and len(jobs) == len(expected) and
                 {j["name"] for j in jobs} == expected, "Unexpected CI matrix")
         for job in jobs:
             require(job["status"] == "completed" and job["conclusion"] == "success",

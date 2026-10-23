@@ -118,7 +118,8 @@ class CITests(unittest.TestCase):
                           steps=[dict(name=n, status="completed", conclusion="success")
                                  for n in u.REQUIRED]) for name in (
             "regression (debian:12)", "regression (debian:13)",
-            "regression (ubuntu:22.04)", "regression (ubuntu:24.04)")]
+            "regression (ubuntu:22.04)", "regression (ubuntu:24.04)",
+            "regression (fedora:43)", "regression (fedora:44)")]
 
     def api(self, path):
         if path.startswith("/git/ref"):
@@ -131,8 +132,40 @@ class CITests(unittest.TestCase):
         with mock.patch.object(u, "api", side_effect=self.api):
             return u.checked_release()
 
-    def test_all_forty_gates_required(self):
+    def test_all_sixty_gates_required(self):
         self.assertEqual(self.check(), (HEAD, [10, 20]))
+
+    def test_every_distro_gate_must_complete_successfully(self):
+        for job in self.jobs:
+            for step in job["steps"]:
+                with self.subTest(job=job["name"], gate=step["name"]):
+                    step["status"] = "in_progress"
+                    with self.assertRaises(u.UpdateError):
+                        self.check()
+                    step["status"] = "completed"
+                    step["conclusion"] = "failure"
+                    with self.assertRaises(u.UpdateError):
+                        self.check()
+                    step["conclusion"] = "success"
+
+    def test_old_four_distro_matrix_is_not_sufficient(self):
+        self.jobs = self.jobs[:4]
+        with self.assertRaisesRegex(u.UpdateError, "matrix"):
+            self.check()
+
+    def test_missing_or_failed_fedora_is_rejected(self):
+        for name in ("regression (fedora:43)", "regression (fedora:44)"):
+            with self.subTest(name=name):
+                original = self.jobs
+                self.jobs = [j for j in original if j["name"] != name]
+                with self.assertRaises(u.UpdateError):
+                    self.check()
+                self.jobs = original
+                job = next(j for j in self.jobs if j["name"] == name)
+                job["conclusion"] = "failure"
+                with self.assertRaises(u.UpdateError):
+                    self.check()
+                job["conclusion"] = "success"
 
     def test_failed_workflow_rejected(self):
         self.runs[0]["conclusion"] = "failure"

@@ -37,7 +37,7 @@ book limits and remaining work.
 
 ## Install and start
 
-CI targets **Debian 12/13** and **Ubuntu 22.04/24.04**.
+CI targets **Debian 12/13**, **Ubuntu 22.04/24.04** and **Fedora 43/44**.
 Review the [licensing notes](#credits-and-licensing) before running or
 redistributing the game.
 

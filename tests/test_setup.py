@@ -16,6 +16,24 @@ spec.loader.exec_module(setup)
 
 
 class SetupChecks(unittest.TestCase):
+    def test_exact_supported_hosts_and_package_managers(self):
+        for distro, versions, manager in (
+                ("debian", ("12", "13"), "apt-get"),
+                ("ubuntu", ("22.04", "24.04"), "apt-get"),
+                ("fedora", ("43", "44"), "dnf")):
+            for version in versions:
+                with self.subTest(distro=distro, version=version):
+                    commands = setup.host_packages({"ID": distro, "VERSION_ID": version})
+                    self.assertTrue(all(c[0] == manager for c in commands))
+                    self.assertIn("libxcrypt-devel" if manager == "dnf" else "libcrypt-dev",
+                                  commands[-1])
+        for release in ({}, {"ID": "fedora", "VERSION_ID": "rawhide"},
+                        {"ID": "fedora", "VERSION_ID": "42"},
+                        {"ID": "rhel", "VERSION_ID": "9", "ID_LIKE": "fedora"},
+                        {"ID": "ubuntu", "VERSION_ID": "99.04"}):
+            with self.subTest(release=release), self.assertRaisesRegex(ValueError, "Supported"):
+                setup.host_packages(release)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(prefix="anathema-setup-test-")
         self.addCleanup(self.temp.cleanup)
@@ -91,6 +109,15 @@ class SetupChecks(unittest.TestCase):
             setup.install({}, False)
 
     def test_simulated_fresh_install_and_explicit_start(self):
+        self.simulate_install("debian", "12")
+
+    def test_simulated_fedora43_install(self):
+        self.simulate_install("fedora", "43")
+
+    def test_simulated_fedora44_install(self):
+        self.simulate_install("fedora", "44")
+
+    def simulate_install(self, distro, version):
         repo = self.root / "repo"
         (repo / "Genesis/src").mkdir(parents=True)
         (repo / "Genesis/src/Makefile").write_text("# fixture\n")
@@ -115,7 +142,7 @@ class SetupChecks(unittest.TestCase):
         read_text, is_dir = Path.read_text, Path.is_dir
         def read(path, *args, **kwargs):
             if str(path) == "/etc/os-release":
-                return 'ID=debian\nVERSION_ID="12"\n'
+                return f'ID={distro}\nVERSION_ID="{version}"\n'
             return read_text(path, *args, **kwargs)
         def directory(path):
             return True if str(path) == "/run/systemd/system" else is_dir(path)
@@ -138,6 +165,9 @@ class SetupChecks(unittest.TestCase):
             self.assertFalse(list((data / "backup").iterdir()))
             self.assertEqual((data / "src").resolve(), app / "src")
             self.assertEqual(commands[-1], ("systemctl", "enable", "--now", "anathema.service"))
+            package_commands = [c for c in commands if c[0] in ("apt-get", "dnf")]
+            self.assertEqual(tuple(package_commands),
+                             setup.host_packages({"ID": distro, "VERSION_ID": version}))
             before = len(commands)
             with self.assertRaisesRegex(ValueError, "existing"):
                 setup.install({}, True)

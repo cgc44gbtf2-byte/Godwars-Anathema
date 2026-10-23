@@ -15,8 +15,8 @@ python3 deploy/update.py
 ```
 
 The helper pins the remote `Godwars-Anathema` commit and requires both the
-push and pull-request `ci.yml` workflows to pass all eight Debian 12/13 and
-Ubuntu 22.04/24.04 matrix jobs and all 40 required gates. Pending, failed,
+push and pull-request `ci.yml` workflows to pass all twelve Debian 12/13,
+Ubuntu 22.04/24.04 and Fedora 43/44 matrix jobs and all 60 required gates. Pending, failed,
 missing or rate-limited checks block the update. A preview does not compile,
 create users/backups, stop the service or replace files.
 

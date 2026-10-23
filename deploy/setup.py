@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Guided FRESH Debian/Ubuntu install. Preview by default; --apply changes host."""
+"""Guided FRESH Debian/Ubuntu/Fedora install. Preview by default; --apply changes host."""
 import argparse
 import grp
 import os
@@ -19,6 +19,20 @@ HOST = "137.184.145.164"
 PORT = 4000
 LIMIT = 128 * 1024 * 1024
 BUILD_ROOT = Path("/var/tmp")
+
+
+def host_packages(release):
+    """Exact tested releases only; do not infer support from ID_LIKE."""
+    host = release.get("ID"), release.get("VERSION_ID")
+    if host in {("debian", "12"), ("debian", "13"),
+                ("ubuntu", "22.04"), ("ubuntu", "24.04")}:
+        return (("apt-get", "update"),
+                ("apt-get", "install", "-y", "--no-install-recommends",
+                 "build-essential", "libcrypt-dev", "systemd", "ca-certificates"))
+    if host in {("fedora", "43"), ("fedora", "44")}:
+        return (("dnf", "install", "-y", "gcc", "make", "libxcrypt-devel",
+                 "systemd", "ca-certificates", "shadow-utils", "util-linux"),)
+    raise ValueError("Supported hosts: Debian 12/13, Ubuntu 22.04/24.04, Fedora 43/44")
 
 
 def world_files(archive):
@@ -119,10 +133,7 @@ def install(files, start):
         if "=" in line:
             key, value = line.split("=", 1)
             release[key] = value.strip('"')
-    if (release.get("ID"), release.get("VERSION_ID")) not in {
-        ("debian", "12"), ("debian", "13"), ("ubuntu", "22.04"), ("ubuntu", "24.04")
-    }:
-        raise ValueError("Supported hosts: Debian 12/13, Ubuntu 22.04/24.04")
+    packages = host_packages(release)
     fresh_paths((APP, DATA, UNIT))
     trusted_parents()
     for lookup in (pwd.getpwnam, grp.getgrnam):
@@ -136,9 +147,8 @@ def install(files, start):
     source = REPO / "Genesis/src"
     if any(path.is_symlink() for path in source.rglob("*")):
         raise ValueError("Review source symlinks before installation")
-    run("apt-get", "update")
-    run("apt-get", "install", "-y", "--no-install-recommends",
-        "build-essential", "libcrypt-dev", "systemd", "ca-certificates")
+    for command in packages:
+        run(*command)
     run("useradd", "--system", "--user-group", "--no-create-home",
         "--home-dir", str(DATA), "--shell", "/usr/sbin/nologin", "anathema")
     account = pwd.getpwnam("anathema")

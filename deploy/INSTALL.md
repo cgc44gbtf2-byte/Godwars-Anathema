@@ -1,8 +1,8 @@
-# Debian / Ubuntu systemd installation
+# Debian / Ubuntu / Fedora systemd installation
 
 This is an operator-run installation, not an installer script. Review each
 step before executing it on the target host. Nothing here requires the game
-to run as root. Examples use TCP 4000 on Debian 12/13 or Ubuntu 22.04/24.04
+to run as root. Examples use TCP 4000 on Debian 12/13, Ubuntu 22.04/24.04 or Fedora 43/44
 with systemd. Resolve the original Diku/Merc/God Wars licensing and permission
 requirements before operating or redistributing the game; this deployment
 does not grant them.
@@ -81,6 +81,8 @@ private information; do not commit, publish or serve them over HTTP.
 
 From the patched repository root (the directory containing `Genesis/src`):
 
+Debian / Ubuntu:
+
 ```sh
 sudo apt-get update
 sudo apt-get install --no-install-recommends build-essential libcrypt-dev \
@@ -88,6 +90,22 @@ sudo apt-get install --no-install-recommends build-essential libcrypt-dev \
 make -j2
 make test
 ```
+
+Fedora 43/44 (traditional package-based system, not Silverblue/Kinoite):
+
+```sh
+sudo dnf install gcc make libxcrypt-devel git ca-certificates python3 \
+  systemd shadow-utils util-linux luajit libasan libubsan binutils
+make -j2
+make test
+```
+
+The same preview / `--apply --start` helper works on these Fedora releases.
+For a fresh checkout install `git` and `python3` with `dnf` first.
+Use `libxcrypt-devel`, not Debian's `libcrypt-dev` package name. Rawhide,
+Fedora Atomic desktops and RHEL derivatives are not covered by this installer.
+Builds, tests and wire/copyover checks run in distro containers; this does not
+validate a full booted Fedora host, enforcing SELinux or real firewall policy.
 
 Build `Genesis/src`, **not** source/object files or the executable in
 `Genesis.zip`. Use a normal, non-sanitized build for the service. Never enable
@@ -101,7 +119,7 @@ target directories. If any target exists, stop and inspect it; do not remove
 or overwrite it to make these commands succeed.
 
 ```sh
-sudo adduser --system --group --home /var/lib/anathema \
+sudo useradd --system --user-group --home-dir /var/lib/anathema \
   --no-create-home --shell /usr/sbin/nologin anathema
 sudo install -d -o root -g root -m 0755 /opt/anathema \
   /opt/anathema/src /opt/anathema/deploy /var/lib/anathema
@@ -207,6 +225,24 @@ Do not enable/reset a firewall remotely without first preserving SSH access.
 If intentionally offering public plaintext telnet, explicitly accept that
 risk before adding a public TCP 4000 rule; tell users never to reuse passwords.
 Check both host/provider policy and IPv4/IPv6 exposure.
+
+On Fedora with active firewalld, first inspect `sudo firewall-cmd --get-active-zones`.
+Choose the zone actually attached to the game interface; do not assume `public`.
+Only after preserving SSH access and accepting public plaintext game traffic:
+
+```sh
+# Replace GAME_ZONE with that inspected zone. The installer changes no rules.
+sudo firewall-cmd --zone=GAME_ZONE --add-port=4000/tcp
+sudo firewall-cmd --permanent --zone=GAME_ZONE --add-port=4000/tcp
+```
+
+Leave SELinux enabled. Inspect `getenforce`, service logs and
+`sudo ausearch -m AVC,USER_AVC -ts recent` (install `audit` if needed) for denials.
+Review labels with `ls -Zd /opt/anathema /var/lib/anathema` and use `restorecon`
+to restore existing policy labels if necessary. Do not disable SELinux, apply
+blanket booleans, invent a port type, or install unreviewed `audit2allow` output.
+A denial on an enforcing host needs its actual context reviewed; container
+tests cannot prove host SELinux compatibility.
 
 Review the unit, then install it:
 

@@ -15,10 +15,23 @@ jobs:
           - debian:13
           - ubuntu:22.04
           - ubuntu:24.04
+          - fedora:43
+          - fedora:44
     container: ${{ matrix.image }}
     steps:
       - name: Install distro toolchain
-        run: apt-get update && apt-get install -y --no-install-recommends ca-certificates git build-essential libcrypt-dev systemd python3 luajit
+        run: |
+          . /etc/os-release
+          case "$ID" in
+            debian|ubuntu)
+              apt-get update
+              apt-get install -y --no-install-recommends ca-certificates git build-essential libcrypt-dev systemd python3 luajit
+              ;;
+            fedora)
+              dnf install -y ca-certificates git gcc make libxcrypt-devel systemd python3 luajit libasan libubsan binutils shadow-utils util-linux
+              ;;
+            *) echo "Unsupported CI distro: $ID" >&2; exit 1 ;;
+          esac
       - uses: actions/checkout@v4
       - name: Build
         run: make -j2
