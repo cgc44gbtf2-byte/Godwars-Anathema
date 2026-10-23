@@ -7,6 +7,24 @@ from test_class_layout import ROOT, SRC, make_values
 
 
 class GMCPChecks(unittest.TestCase):
+    def test_nonpie_is_only_a_sanitizer_setting(self):
+        source=(ROOT/"Makefile").read_text()
+        recipe=source.split("sanitize:\n",1)[1].split("\nclean:",1)[0]
+        self.assertIn("-fno-pie",recipe)
+        self.assertIn("-no-pie",recipe)
+        self.assertNotIn("-fno-pie",source.split("sanitize:\n",1)[0])
+        self.assertNotIn("-no-pie",(SRC/"Makefile").read_text())
+
+    def test_ci_keeps_checks_and_validates_sanitizer_runtime(self):
+        ci=(ROOT/".github/workflows/ci.yml").read_text()
+        self.assertIn("python3 tests/sanitizer_startup.py",ci)
+        self.assertIn("-fno-pie",ci)
+        self.assertIn('-no-pie"',ci)
+        self.assertIn("make sanitize",ci)
+        self.assertNotIn("continue-on-error",ci)
+        self.assertNotIn("randomize_va_space",ci)
+        self.assertNotIn("mmap_rnd_bits",ci)
+
     def test_vitals_and_transport_unchanged(self):
         source=(SRC/"gmcp.c").read_text()
         start=source.index("/* Normal player names are ASCII letters")

@@ -48,9 +48,11 @@ jobs:
           ASAN_OPTIONS: detect_leaks=0:halt_on_error=1
           UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
         run: |
+          ulimit -c 0
+          python3 tests/sanitizer_startup.py
           make sanitize
           make -C Genesis/src clean
-          make -j2 CFLAGS="-std=gnu17 -DMERC -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer" LDFLAGS="-fsanitize=address,undefined"
+          make -j2 CFLAGS="-std=gnu17 -DMERC -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer -fno-pie" LDFLAGS="-fsanitize=address,undefined -no-pie"
           python3 tests/smoke_shutdown.py
           python3 tests/smoke_copyover.py
           python3 tests/smoke_copyover.py --vision

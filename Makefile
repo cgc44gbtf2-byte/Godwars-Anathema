@@ -431,7 +431,7 @@ tests/restart_engine.o: Genesis/src/restart.c $(ENGINE_HEADERS)
 
 sanitize:
 	$(MAKE) clean
-	$(MAKE) test CFLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer" LDFLAGS="-fsanitize=address,undefined"
+	$(MAKE) test CFLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer -fno-pie" LDFLAGS="-fsanitize=address,undefined -no-pie"
 
 clean:
 	rm -f tests/save_info.o tests/restart_engine.o tests/runtime_info.o tests/powers_info.o

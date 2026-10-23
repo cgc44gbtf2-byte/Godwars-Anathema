@@ -133,4 +133,11 @@ The wire smoke independently JSON-decodes actual engine name output byte by
 byte and requires `Char.Base` before and after real copyover. Its explicit
 old-executable upgrade mode permits missing identity only before the exec.
 
+CI sanitizer binaries use `-fno-pie` / `-no-pie` to avoid old GCC sanitizer
+startup/address-layout conflicts on newer Linux runners. Normal server builds
+keep their platform defaults. A separate startup probe checks 100 configured
+launches and verifies that deliberate ASan/UBSan violations still fail.
+Its PIE probe is diagnostic only; every actual MUD regression remains fail-fast
+and is run once, without changing host ASLR or disabling sanitizer checks.
+
 Protocol reference: <https://mudstandards.org/mud/gmcp/>.
