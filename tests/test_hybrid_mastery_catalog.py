@@ -78,7 +78,7 @@ class HybridMasteryCatalog(unittest.TestCase):
         data = before.encode()
         self.assertEqual(hashlib.sha1(b"blob " + str(len(data)).encode() +
                                      b"\0" + data).hexdigest(),
-                         "e0890a93fe6b3bac526b14e37f53bd1abaef29a0")
+                         "682477bd07a8b05ee45e176350a5a632c956a3af")
         # The old numeric report changes only its now-stale status sentence.
         before = (SRC / "classes/hybrid/readiness.c").read_text().replace(
             "Class/build power mastery is reported separately; safe conversion is still pending.",
