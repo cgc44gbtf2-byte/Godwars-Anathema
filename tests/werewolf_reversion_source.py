@@ -24,6 +24,8 @@ REMOVE_BIT(ch->vampaff, VAM_NIGHTSIGHT);
 OLD='    if (IS_VAMPAFF(ch, VAM_NIGHTSIGHT)) do_nightsight(ch, "");\n'
 
 def without_werewolf_reversion_stage(text):
+    from shield_source import without_shield_stage
+    text=without_shield_stage(text)
     from class_reset_source import without_class_reset_stage
     text=without_class_reset_stage(text)
     match=re.search(r"void do_unwerewolf\(.*?(?=\nvoid do_|\Z)",text,re.S)

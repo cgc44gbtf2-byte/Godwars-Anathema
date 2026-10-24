@@ -1364,11 +1364,17 @@ void do_readaura( CHAR_DATA *ch, char *argument )
 
 void do_shield( CHAR_DATA *ch, char *argument )
 {
-    char      arg [MAX_INPUT_LENGTH];
+    /* This self-only toggle never uses arguments or needs a room. */
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL) return;
 
-    argument = one_argument( argument, arg );
-
-    if (IS_NPC(ch)) return;
+    /* Losing training must not trap an already-active shield. This grants
+     * dismissal only: activation still requires an eligible native source. */
+    if (IS_MORE(ch, MORE_SHIELDED))
+    {
+        send_to_char("You stop shielding your aura.\n\r",ch);
+        REMOVE_BIT(ch->more, MORE_SHIELDED);
+        return;
+    }
     if (!IS_VAMPIRE(ch) && !IS_DRAGON(ch) && !IS_WEREWOLF(ch) && !IS_MONK(ch) && !IS_MAGE(ch))
     {
 	stc("Huh?\n\r",ch);
@@ -1399,14 +1405,8 @@ void do_shield( CHAR_DATA *ch, char *argument )
 	stc("You do not have enough knowledge of the mind sphere to use shield.\n\r", ch);
 	return;
     }
-    if (!IS_MORE(ch, MORE_SHIELDED) )
-    {
     	send_to_char("You shield your aura from those around you.\n\r",ch);
     	SET_BIT(ch->more, MORE_SHIELDED);
-	return;
-    }
-    send_to_char("You stop shielding your aura.\n\r",ch);
-    REMOVE_BIT(ch->more, MORE_SHIELDED);
     return;
 }
 
