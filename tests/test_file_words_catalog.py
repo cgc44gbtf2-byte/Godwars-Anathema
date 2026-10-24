@@ -3,6 +3,7 @@ import hashlib
 from pathlib import Path
 import unittest
 from word_readers_source import without_word_readers_stage
+from test_guardian_lifecycle_catalog import without_hybrid_forms_save
 ROOT=Path(__file__).resolve().parents[1]
 SRC=ROOT/"Genesis/src"
 def blob(text):
@@ -14,7 +15,9 @@ class WordReadersCatalog(unittest.TestCase):
             ("db.c","a910708ed3c89e52190fdf0ccb85e8a05f708bfa"),
             ("save.c","120404c717d1641d19aaf4c8b4b207f683f44ae6"),
         ):
-            self.assertEqual(blob(without_word_readers_stage((SRC/path).read_text())),expected)
+            text=without_word_readers_stage((SRC/path).read_text())
+            if path=="save.c":text=without_hybrid_forms_save(text)
+            self.assertEqual(blob(text),expected)
     def test_real_parser_and_explicit_session_error_policy(self):
         parser=(SRC/"file_word.c").read_text()
         save=(SRC/"save.c").read_text()

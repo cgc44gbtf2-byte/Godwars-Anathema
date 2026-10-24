@@ -2,6 +2,7 @@
 #include <sys/types.h>
 #include <ctype.h>
 #include <errno.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -94,9 +95,81 @@ int hybrid_state_valid(const HYBRID_STATE *state)
     if (state->secondary_class != CLASS_VAMPIRE &&
         (state->secondary_blood[0] != 0 || state->secondary_blood[1] != 0 ||
          state->secondary_beast != 0 || state->secondary_truebeast != 0)) return 0;
+    if (!hybrid_forms_valid(&state->forms) ||
+        state->forms.hybrid_id != state->hybrid_id ||
+        state->forms.parents[0] != state->primary_class ||
+        state->forms.parents[1] != state->secondary_class) return 0;
     return hybrid_progression_valid(state->secondary_class,
                                       &state->secondary_progression) &&
            hybrid_build_record_valid(state);
+}
+
+unsigned long hybrid_state_form_begin(HYBRID_STATE *state, long parent,
+                                      unsigned int logical_token,
+                                      unsigned int grants,
+                                      unsigned int compatible)
+{
+    HYBRID_STATE candidate;
+    if (!hybrid_state_valid(state)) return 0;
+    candidate = *state;
+    unsigned long serial = hybrid_form_begin(&candidate.forms, parent,
+                                             logical_token, grants, compatible);
+    if (!serial || !hybrid_state_valid(&candidate)) return 0;
+    *state = candidate;
+    return serial;
+}
+
+unsigned long hybrid_state_form_fuse(HYBRID_STATE *state, long parent,
+                                     unsigned int logical_token,
+                                     unsigned int grants,
+                                     unsigned int compatible,
+                                     const HYBRID_FUSION_PROFILE *profile)
+{
+    HYBRID_STATE candidate;
+    if (!hybrid_state_valid(state)) return 0;
+    candidate = *state;
+    unsigned long serial = hybrid_form_fuse(&candidate.forms, parent,
+                                             logical_token, grants, compatible,
+                                             profile);
+    if (!serial || !hybrid_state_valid(&candidate)) return 0;
+    *state = candidate;
+    return serial;
+}
+
+int hybrid_state_form_end(HYBRID_STATE *state, long parent,
+                          unsigned int logical_token,
+                          unsigned long activation)
+{
+    HYBRID_STATE candidate;
+    if (!hybrid_state_valid(state)) return 0;
+    candidate = *state;
+    if (!hybrid_form_end(&candidate.forms, parent, logical_token, activation) ||
+        !hybrid_state_valid(&candidate)) return 0;
+    *state = candidate;
+    return 1;
+}
+
+int hybrid_state_feature_request(HYBRID_STATE *state, long parent,
+                                 unsigned int features, int enabled)
+{
+    HYBRID_STATE candidate;
+    if (!hybrid_state_valid(state)) return 0;
+    candidate = *state;
+    if (!hybrid_feature_request(&candidate.forms, parent, features, enabled) ||
+        !hybrid_state_valid(&candidate)) return 0;
+    *state = candidate;
+    return 1;
+}
+
+int hybrid_state_form_release_parent(HYBRID_STATE *state, long parent)
+{
+    HYBRID_STATE candidate;
+    if (!hybrid_state_valid(state)) return 0;
+    candidate = *state;
+    if (!hybrid_forms_release_parent(&candidate.forms, parent) ||
+        !hybrid_state_valid(&candidate)) return 0;
+    *state = candidate;
+    return 1;
 }
 
 int hybrid_state_prepare(const CHAR_DATA *ch,
@@ -111,7 +184,9 @@ int hybrid_state_prepare(const CHAR_DATA *ch,
     candidate.primary_class = ch->class;
     candidate.secondary_class = definition->parents[
         definition->parents[0] == ch->class ? 1 : 0];
-    if (!empty_core(&candidate)) return 0;
+    if (!empty_core(&candidate) ||
+        !hybrid_forms_prepare(definition, candidate.primary_class,
+                              &candidate.forms)) return 0;
     if (!hybrid_state_valid(&candidate)) return 0;
     *destination = candidate;
     return 1;
@@ -251,7 +326,25 @@ int hybrid_state_write(FILE *stream, const HYBRID_STATE *state)
                                    HYBRID_PROGRESSION_WORDS)) return 0;
     for (size_t i = 0; i < HYBRID_PROGRESSION_WORDS; ++i)
         if (fprintf(stream, " %ld", progression[i]) < 0) return 0;
-    return fprintf(stream, " %ld\n", state->secondary_build) >= 0 && !ferror(stream);
+    return fprintf(stream, " %ld\n", state->secondary_build) >= 0 &&
+           !ferror(stream);
+}
+
+int hybrid_state_forms_write(FILE *stream, const HYBRID_STATE *state)
+{
+    if (!stream || !hybrid_state_valid(state)) return 0;
+    const HYBRID_FORM_STATE *f = &state->forms;
+    if (fprintf(stream, "AnathemaHybridForms 1 %ld %ld %ld %u %u",
+                 f->hybrid_id, f->parents[0], f->parents[1],
+                 f->requested[0], f->requested[1]) < 0) return 0;
+    for (size_t i = 0; i < 2; ++i)
+        if (fprintf(stream, " %u %u %u", f->components[i].token,
+                    f->components[i].grants,
+                    f->components[i].compatible) < 0) return 0;
+    if (fprintf(stream, " %ld %u %u %lu\n", f->fusion.hybrid_id,
+                 f->fusion.grants, f->fusion.compatible,
+                 f->activation_serial) < 0) return 0;
+    return !ferror(stream);
 }
 
 static int next_number(const char **cursor, long *value)
@@ -266,6 +359,67 @@ static int next_number(const char **cursor, long *value)
         (*end && !isspace((unsigned char)*end))) return 0;
     *cursor = end;
     *value = parsed;
+    return 1;
+}
+
+static int next_unsigned(const char **cursor, unsigned int *value)
+{
+    long parsed;
+    if (!value || !next_number(cursor, &parsed) ||
+        parsed < 0 || (unsigned long)parsed > UINT_MAX) return 0;
+    *value = (unsigned int)parsed;
+    return 1;
+}
+
+static int next_ulong(const char **cursor, unsigned long *value)
+{
+    const char *start = *cursor;
+    char *end;
+    unsigned long parsed;
+    while (isspace((unsigned char)*start)) ++start;
+    if (!isdigit((unsigned char)*start)) return 0;
+    errno = 0;
+    parsed = strtoul(start, &end, 10);
+    if (end == start || errno == ERANGE ||
+        (*end && !isspace((unsigned char)*end))) return 0;
+    *cursor = end;
+    *value = parsed;
+    return 1;
+}
+
+static int read_forms(const char **cursor, HYBRID_FORM_STATE *forms)
+{
+    if (!forms ||
+        !next_number(cursor, &forms->hybrid_id) ||
+        !next_number(cursor, &forms->parents[0]) ||
+        !next_number(cursor, &forms->parents[1]) ||
+        !next_unsigned(cursor, &forms->requested[0]) ||
+        !next_unsigned(cursor, &forms->requested[1])) return 0;
+    for (size_t i = 0; i < 2; ++i)
+        if (!next_unsigned(cursor, &forms->components[i].token) ||
+            !next_unsigned(cursor, &forms->components[i].grants) ||
+            !next_unsigned(cursor, &forms->components[i].compatible)) return 0;
+    return next_number(cursor, &forms->fusion.hybrid_id) &&
+        next_unsigned(cursor, &forms->fusion.grants) &&
+        next_unsigned(cursor, &forms->fusion.compatible) &&
+        next_ulong(cursor, &forms->activation_serial);
+}
+
+int hybrid_state_forms_read_tail(FILE *stream, HYBRID_STATE *state)
+{
+    char line[4096];
+    const char *cursor;
+    long version;
+    HYBRID_STATE candidate;
+    if (!stream || !state || !hybrid_state_valid(state)) return 0;
+    if (!fgets(line, sizeof(line), stream) || !strchr(line, '\n')) return 0;
+    cursor = line;
+    if (!next_number(&cursor, &version) || version != 1) return 0;
+    candidate = *state;
+    if (!read_forms(&cursor, &candidate.forms)) return 0;
+    while (isspace((unsigned char)*cursor)) ++cursor;
+    if (*cursor || !hybrid_state_valid(&candidate)) return 0;
+    *state = candidate;
     return 1;
 }
 
@@ -317,7 +471,10 @@ static int read_record(FILE *stream, HYBRID_STATE *destination, int tail)
     }
     if (version == 4 && !next_number(&cursor, &candidate.secondary_build)) return 0;
     while (isspace((unsigned char)*cursor)) ++cursor;
-    if (*cursor || !hybrid_state_valid(&candidate)) return 0;
+    if (*cursor || !hybrid_forms_prepare(hybrid_by_id(candidate.hybrid_id),
+                                         candidate.primary_class,
+                                         &candidate.forms) ||
+        !hybrid_state_valid(&candidate)) return 0;
     *destination = candidate;
     return 1;
 }

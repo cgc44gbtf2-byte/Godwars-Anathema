@@ -213,7 +213,8 @@ static void real_updates(void)
         if(parents[q]==CLASS_NINJA)expected.secondary_progression.ninja[NINJA_KI]=2;
         assert(!memcmp(&expected,&pc.hybrid,sizeof(expected)));
         PC_DATA actual=pc;
-        actual.hybrid_present=0;memset(&actual.hybrid,0,sizeof(actual.hybrid));
+        actual.hybrid_present=0;actual.hybrid_forms_present=0;
+        memset(&actual.hybrid,0,sizeof(actual.hybrid));
         assert(!memcmp(&actual,&nativepc,sizeof(actual)));
         assert(!memcmp(&actor,&native,sizeof(actor)));
         ++pairs;

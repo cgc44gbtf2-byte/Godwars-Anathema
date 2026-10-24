@@ -84,7 +84,7 @@ TESTS += tests/test_werewolf_reversion
 TESTS += tests/test_class_reset
 # Real validators/effective access for older isolated native fixtures too.
 # Never replace hybrid access with permissive stubs just to satisfy linking.
-HYBRID_ACCESS_SOURCES = $(addprefix Genesis/src/classes/hybrid/,registry.c state.c player.c build.c progression.c specialization.c access.c passives.c books.c) Genesis/src/classes/sorcerer/vision.c Genesis/src/classes/monk/favour.c Genesis/src/guardian.c
+HYBRID_ACCESS_SOURCES = $(addprefix Genesis/src/classes/hybrid/,registry.c state.c player.c build.c progression.c specialization.c access.c passives.c books.c forms.c) Genesis/src/classes/sorcerer/vision.c Genesis/src/classes/monk/favour.c Genesis/src/guardian.c
 
 all:
 	$(MAKE) -C Genesis/src
@@ -117,7 +117,7 @@ tests/save_info.o: Genesis/src/act_info.c $(ENGINE_HEADERS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) -c $< -o $@
 
 tests/test_save: tests/test_save.c $(ENGINE_SOURCES) $(ENGINE_HEADERS) tests/save_info.o
-	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< Genesis/src/classes/hybrid/state.c Genesis/src/classes/hybrid/player.c Genesis/src/classes/hybrid/build.c Genesis/src/classes/hybrid/progression.c Genesis/src/classes/hybrid/specialization.c Genesis/src/classes/hybrid/registry.c Genesis/src/classes/monk/favour.c Genesis/src/classes/hybrid/access.c Genesis/src/guardian.c tests/save_info.o $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< Genesis/src/classes/hybrid/state.c Genesis/src/classes/hybrid/player.c Genesis/src/classes/hybrid/build.c Genesis/src/classes/hybrid/progression.c Genesis/src/classes/hybrid/specialization.c Genesis/src/classes/hybrid/registry.c Genesis/src/classes/monk/favour.c Genesis/src/classes/hybrid/access.c Genesis/src/classes/hybrid/forms.c Genesis/src/guardian.c tests/save_info.o $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_classes tests/test_wall tests/test_mage_powers: tests/%: tests/%.c $(ENGINE_SOURCES) $(ENGINE_HEADERS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) -O0 $< $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@

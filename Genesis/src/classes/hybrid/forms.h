@@ -7,11 +7,12 @@
 #define HYBRID_FEATURE_FANGS 2U
 #define HYBRID_FEATURE_ALL (HYBRID_FEATURE_CLAWS | HYBRID_FEATURE_FANGS)
 
-/* Transient policy state, NOT a character's legacy flags or training.
- * Logical form tokens are supplied by future reviewed handler adapters:
- * multiple legacy flags can describe one form. This component only arbitrates
- * logical-body/feature ownership; it does NOT authorize a class power.
- * No live handler, stat, gear, save or combat formula uses this state yet. */
+/* Persisted hybrid form ledger, separate from native flags and training.
+ * Logical form tokens are supplied by reviewed class adapters: multiple
+ * legacy flags may describe one form. This arbitrates logical-body and feature
+ * ownership only; it does not alter native flags or authorize class powers.
+ * All trained powers remain available in every form. Runtime transformation
+ * handlers still need to map native class forms to these logical tokens. */
 typedef struct hybrid_form_component {
     unsigned int token;
     unsigned int grants;

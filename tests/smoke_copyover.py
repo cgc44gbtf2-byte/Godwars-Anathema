@@ -90,6 +90,9 @@ with tempfile.TemporaryDirectory(prefix="anathema-copyover-") as directory:
     hybrid_line = next(line for line in original_player.splitlines()
                        if line.startswith(b"AnathemaHybrid "))
     assert hybrid_line.startswith(b"AnathemaHybrid 4 ")
+    forms_line = next(line for line in original_player.splitlines()
+                      if line.startswith(b"AnathemaHybridForms "))
+    assert forms_line.startswith(b"AnathemaHybridForms 1 ")
     rejected_player = b"#PLAYER\nName Rejected~\nAnathemaHybrid 99 1\nEnd\n#END\n"
     (runtime / "player/Rejected").write_bytes(rejected_player)
     with (runtime / "server.log").open("w") as log:
@@ -181,6 +184,7 @@ with tempfile.TemporaryDirectory(prefix="anathema-copyover-") as directory:
             assert (runtime / "player/Rejected").read_bytes() == rejected_player
             updated_player = (runtime / "player/Restarter").read_bytes()
             assert hybrid_line in updated_player.splitlines(), "Copyover lost hybrid storage"
+            assert forms_line in updated_player.splitlines(), "Copyover lost hybrid form state"
             if vision_mode:
                 source_mask = 268435456 | 536870912 | 1073741824
                 saved_extra = int(next(line.split()[1] for line in updated_player.splitlines()

@@ -65,7 +65,9 @@ static void equal_state(const HYBRID_STATE *a, const HYBRID_STATE *b)
 {
     FILE *left = tmpfile(), *right = tmpfile();
     assert(left && right && hybrid_state_write(left, a) &&
-           hybrid_state_write(right, b));
+           hybrid_state_forms_write(left, a) &&
+           hybrid_state_write(right, b) &&
+           hybrid_state_forms_write(right, b));
     rewind(left); rewind(right);
     int x, y;
     do { x = fgetc(left); y = fgetc(right); assert(x == y); } while (x != EOF);
@@ -115,6 +117,19 @@ static void all_pairs(void)
             if (state.secondary_class == CLASS_WEREWOLF)
                 assert(state.secondary_progression.wolf_rank == 1 &&
                        state.secondary_progression.selected_gifts[0] == -1);
+            if (state.primary_class == CLASS_VAMPIRE &&
+                state.secondary_class == CLASS_WEREWOLF) {
+                unsigned long serial = hybrid_state_form_begin(
+                    &state, CLASS_VAMPIRE, 11, HYBRID_FEATURE_CLAWS,
+                    HYBRID_FEATURE_ALL);
+                HYBRID_FUSION_PROFILE profile = {
+                    state.hybrid_id, HYBRID_FEATURE_FANGS,
+                    HYBRID_FEATURE_CLAWS | HYBRID_FEATURE_FANGS
+                };
+                assert(serial && hybrid_state_form_fuse(
+                    &state, CLASS_WEREWOLF, 22, HYBRID_FEATURE_FANGS,
+                    HYBRID_FEATURE_ALL, &profile));
+            }
             assert(hybrid_player_attach(ch, &state));
             assert(!hybrid_player_attach(ch, &state));
             assert(ch->class == before.class && ch->vampgen == 4 &&
@@ -125,8 +140,10 @@ static void all_pairs(void)
             assert(save_char_obj_checked(ch));
             assert(save_char_obj_backup_checked(ch));
             char *disk = read_file("../player/Newfixture");
-            assert(strstr(disk, "AnathemaHybrid 4 ") &&
-                   !strstr(strstr(disk, "AnathemaHybrid") + 14, "AnathemaHybrid"));
+            char *core_line = strstr(disk, "AnathemaHybrid 4 ");
+            assert(core_line && strstr(disk, "AnathemaHybridForms 1 ") &&
+                   !strstr(core_line + strlen("AnathemaHybrid 4 "),
+                           "AnathemaHybrid 4 "));
             char *backup = read_file("../backup/Newfixture");
             assert(!strcmp(disk, backup));
             free(backup);
@@ -137,6 +154,7 @@ static void all_pairs(void)
                                     load_char_obj(&shell, "Newfixture"));
                 ch = shell.character;
                 assert(!ch->pcdata->player_load_failed && ch->pcdata->hybrid_present);
+                assert(ch->pcdata->hybrid_forms_present);
                 assert(ch->more==(MORE_FAVOUR|MORE_CLOAK|MORE_BRISTLES));
                 equal_state(&state, &ch->pcdata->hybrid);
                 assert(ch->class == before.class && ch->gold == 123456 &&
@@ -248,6 +266,54 @@ static void corruptions(void)
         free(original);
         assert(unlink("../player/Newfixture") == 0);
     }
+}
+
+static void core_only_compatibility(void)
+{
+    CHAR_DATA *ch = fresh();
+    const HYBRID_DEFINITION *definition =
+        hybrid_by_parents(CLASS_NINJA, CLASS_WEREWOLF);
+    HYBRID_STATE state;
+    assert(definition);
+    ch->class = CLASS_NINJA;
+    assert(hybrid_secondary_initialize(ch, definition, &state));
+    FILE *fp = fopen("../player/Newfixture", "w");
+    assert(fp && fprintf(fp, "#PLAYER\nName Newfixture~\nClass %ld\n",
+                         CLASS_NINJA) > 0);
+    assert(hybrid_state_write(fp, &state));
+    assert(fputs("End\n#END\n", fp) >= 0 && fclose(fp) == 0);
+    release(ch);
+    memset(&shell, 0, sizeof(shell));
+    assert(load_char_obj(&shell, "Newfixture"));
+    ch = shell.character;
+    assert(ch->pcdata->hybrid_present && !ch->pcdata->hybrid_forms_present &&
+           !ch->pcdata->player_load_failed &&
+           hybrid_forms_mode(&ch->pcdata->hybrid.forms) == HYBRID_BODY_NORMAL);
+    release(ch);
+    assert(unlink("../player/Newfixture") == 0);
+
+    /* The optional extension may precede Class in a legacy player record.
+     * Its parent ownership must be checked at End, not at the extension line. */
+    assert(hybrid_state_form_begin(&state, CLASS_WEREWOLF, 11,
+                                   HYBRID_FEATURE_CLAWS,
+                                   HYBRID_FEATURE_ALL));
+    for (int short_load = 0; short_load < 2; ++short_load) {
+        fp = fopen("../player/Newfixture", "w"); assert(fp);
+        assert(fputs("#PLAYER\nName Newfixture~\n", fp) >= 0);
+        assert(hybrid_state_write(fp, &state) &&
+               hybrid_state_forms_write(fp, &state));
+        assert(fprintf(fp, "Class %ld\nEnd\n#END\n", CLASS_NINJA) > 0 &&
+               fclose(fp) == 0);
+        memset(&shell, 0, sizeof(shell));
+        assert(short_load ? load_char_short(&shell, "Newfixture") :
+                            load_char_obj(&shell, "Newfixture"));
+        ch = shell.character;
+        assert(ch->pcdata->hybrid_present && ch->pcdata->hybrid_forms_present &&
+               !ch->pcdata->player_load_failed &&
+               hybrid_forms_mode(&ch->pcdata->hybrid.forms) == HYBRID_BODY_SINGLE);
+        release(ch);
+    }
+    assert(unlink("../player/Newfixture") == 0);
 }
 
 static void favour_expiry(void)
@@ -497,6 +563,7 @@ int main(void)
     room.name = "Private fixture room"; room.description = "";
     room_index_hash[900 % MAX_KEY_HASH] = &room;
     favour_expiry();all_pairs(); legacy_and_atomic(); corruptions();
+    core_only_compatibility();
     conversion_backend();
     assert(fclose(fpReserve) == 0 && chdir("..") == 0);
     assert(rmdir("player") == 0 && rmdir("backup") == 0 &&

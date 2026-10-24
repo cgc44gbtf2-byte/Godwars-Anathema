@@ -20,5 +20,7 @@ def without_class_reset_banks(text):
         return text
     assert text.count(BLOCK) == 1
     old = text.replace(BLOCK, "", 1)
+    # Form-ledger teardown is independent of this older primary-bank stage.
+    old = old.replace("    victim->pcdata->hybrid_forms_present = 0;\n", "")
     assert hashlib.sha256(old.encode()).hexdigest() == BEFORE
     return old

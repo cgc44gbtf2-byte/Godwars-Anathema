@@ -18,6 +18,21 @@ def without_guardian_lifecycle_save(text):
                    '    fprintf( fp, "More         %li\\n",monk_favour_saved_more(ch, &time_info));')
     return once(text,"                guardian_reconcile(ch);\n","")
 
+def without_hybrid_forms_save(text):
+    text=once(text,
+        "    if (ch->pcdata->hybrid_present) {\n"
+        "        hybrid_state_write(fp, &ch->pcdata->hybrid);\n"
+        "        hybrid_state_forms_write(fp, &ch->pcdata->hybrid);\n"
+        "    }\n",
+        "    if (ch->pcdata->hybrid_present)\n"
+        "        hybrid_state_write(fp, &ch->pcdata->hybrid);\n")
+    return once(text,
+        '    if (!str_cmp(word, "AnathemaHybridForms")) {\n'
+        '        if (!hybrid_player_read_forms_tail(ch, fp)) return;\n'
+        '        fMatch = TRUE;\n'
+        '        break;\n'
+        '    }\n',"")
+
 def blob(text):
     from werewolf_source import without_werewolf_stage
     text=without_werewolf_stage(text)
@@ -26,7 +41,8 @@ def blob(text):
 
 class GuardianLifecycleCatalog(unittest.TestCase):
     def test_only_narrow_save_and_pulse_changes(self):
-        self.assertEqual(blob(without_guardian_lifecycle_save((SRC/"save.c").read_text())),
+        self.assertEqual(blob(without_hybrid_forms_save(
+            without_guardian_lifecycle_save((SRC/"save.c").read_text()))),
                          "1f3317263a45d1a886db411d4c0a52a5bba92909")
         text=(SRC/"combat_status.c").read_text()
         text=once(text,'#include "guardian.h"\n',"")
@@ -35,7 +51,10 @@ class GuardianLifecycleCatalog(unittest.TestCase):
         for path,sha in (("more.c","94245671b79931e1749010e1779411d42f9bea83"),
                          ("comm.c","925a22782183ae8e9269197b5504b4505d1962ae"),
                          ("merc.h","b843f157662ab181daabe913d74685f1c8bc75e6")):
-            self.assertEqual(blob(without_progress_metrics_stage((SRC/path).read_text())),sha)
+            text=without_progress_metrics_stage((SRC/path).read_text())
+            if path=="merc.h":
+                text=text.replace("    int                 hybrid_forms_present;\n","")
+            self.assertEqual(blob(text),sha)
 
     def test_current_grants_only_no_rank_addition_or_auto_activation(self):
         text=(SRC/"guardian.c").read_text()

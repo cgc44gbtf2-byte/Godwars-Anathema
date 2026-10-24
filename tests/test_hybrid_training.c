@@ -179,7 +179,8 @@ static void compare_native(CHAR_DATA *ch,HYBRID_LESSON_REQUEST r,const HYBRID_LE
     /* A separate native actor, never the hybrid or a temporarily swapped
      * primary. Compare actual native handler price/increment at each step. */
     CHAR_DATA native=*ch; PC_DATA pc=*ch->pcdata; native.pcdata=&pc;
-    native.desc=NULL;native.class=r.parent;pc.hybrid_present=0;
+    native.desc=NULL;native.class=r.parent;
+    pc.hybrid_present=0;pc.hybrid_forms_present=0;
     memcpy(pc.cland,ch->pcdata->hybrid.secondary_branches,sizeof(pc.cland));
     memcpy(pc.tgift,ch->pcdata->hybrid.secondary_progression.selected_gifts,sizeof(pc.tgift));
     long raw;
@@ -287,7 +288,7 @@ static void compare_special(CHAR_DATA *ch,HYBRID_LESSON_REQUEST r,const char *co
     HYBRID_LESSON q;assert(quote(ch,r,&q)==HYBRID_LESSON_OK);
     CHAR_DATA native=*ch;PC_DATA pc=*ch->pcdata;
     native.pcdata=&pc;native.desc=NULL;native.class=r.parent;
-    native.name="Nativetrain";pc.hybrid_present=0;
+    native.name="Nativetrain";pc.hybrid_present=0;pc.hybrid_forms_present=0;
     const HYBRID_STATE *s=&ch->pcdata->hybrid;
     memcpy(pc.classpoints,s->secondary_classpoints,sizeof(pc.classpoints));
     pc.rank=s->secondary_progression.wolf_rank;

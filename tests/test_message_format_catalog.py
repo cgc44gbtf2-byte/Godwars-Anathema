@@ -50,6 +50,8 @@ class MessageFormatCatalog(unittest.TestCase):
             if path in ("clan.c","interp.c"):
                 from reader_fields_source import without_reader_fields_stage
                 b=without_reader_fields_stage(b.decode()).encode()
+            if path=="merc.h":
+                b=b.replace(b"    int                 hybrid_forms_present;\n",b"")
             self.assertEqual(hashlib.sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest(),sha)
         source=(SRC/"core.c").read_text()
         self.assertEqual(re.findall(r"^void (\w+)\(",source,re.M),["act","act2","kavitem"])

@@ -50,7 +50,24 @@ class AuraCatalog(unittest.TestCase):
                          ("save.c","3655e4f99b37b0d5165e58dc73d78c00b47564fc"),
                          ("classes/monk/monk.c","051fe16da87e9b7647c819512e833893c22762b0"),
                          ("classes/hybrid/training.c","4646c2494470f6427efbba6da69752b32590c2a2")):
-            self.assertEqual(blob((SRC/path).read_text()),sha)
+            text=(SRC/path).read_text()
+            if path=="merc.h":
+                text=text.replace("    int                 hybrid_forms_present;\n","")
+            if path=="save.c":
+                text=text.replace(
+                    "    if (ch->pcdata->hybrid_present) {\n"
+                    "        hybrid_state_write(fp, &ch->pcdata->hybrid);\n"
+                    "        hybrid_state_forms_write(fp, &ch->pcdata->hybrid);\n"
+                    "    }\n",
+                    "    if (ch->pcdata->hybrid_present)\n"
+                    "        hybrid_state_write(fp, &ch->pcdata->hybrid);\n")
+                text=text.replace(
+                    '    if (!str_cmp(word, "AnathemaHybridForms")) {\n'
+                    '        if (!hybrid_player_read_forms_tail(ch, fp)) return;\n'
+                    '        fMatch = TRUE;\n'
+                    '        break;\n'
+                    '    }\n',"")
+            self.assertEqual(blob(text),sha)
         self.assertEqual(json.loads((ROOT/"deploy/update_compat.json").read_text()),
                          {"schema":1,"save_epoch":4,"handoff":2})
 

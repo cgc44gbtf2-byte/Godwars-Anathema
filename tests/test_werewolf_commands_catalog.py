@@ -21,6 +21,10 @@ class WerewolfCommandsCatalog(unittest.TestCase):
             if path=="interp.c":
                 from reader_fields_source import without_reader_fields_stage
                 restored=without_reader_fields_stage(restored)
+            if path=="merc.h":
+                # The hybrid form-ledger stage adds its own independent
+                # persistence marker; it is not part of Werewolf command scope.
+                restored=restored.replace("    int                 hybrid_forms_present;\n","")
             self.assertEqual(blob(restored),expected,path)
 
     def test_only_shared_pricing_policy_no_quest_gate(self):

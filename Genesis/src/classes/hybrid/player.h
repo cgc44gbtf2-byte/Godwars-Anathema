@@ -15,6 +15,7 @@ int hybrid_secondary_initialize(const struct char_data *ch,
 int hybrid_player_attach(struct char_data *ch, const HYBRID_STATE *state);
 int hybrid_player_save_valid(const struct char_data *ch);
 int hybrid_player_read_tail(struct char_data *ch, FILE *stream);
+int hybrid_player_read_forms_tail(struct char_data *ch, FILE *stream);
 int hybrid_player_load_finish(struct char_data *ch);
 enum hybrid_conversion_result {
     HYBRID_CONVERSION_COMMITTED,

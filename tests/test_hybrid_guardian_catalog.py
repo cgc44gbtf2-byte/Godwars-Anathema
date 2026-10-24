@@ -3,7 +3,7 @@ import hashlib
 import json
 import unittest
 from test_class_layout import ROOT,SRC,make_values
-from test_guardian_lifecycle_catalog import without_guardian_lifecycle_save
+from test_guardian_lifecycle_catalog import without_guardian_lifecycle_save,without_hybrid_forms_save
 from aura_source import without_aura_stage
 from item_info_source import without_item_info_stage
 
@@ -64,8 +64,11 @@ class GuardianCatalog(unittest.TestCase):
                          ("interp.c","ccb0125d4264a8a5447618c29a9240ec674d2eb4"),
                          ("save.c","1f3317263a45d1a886db411d4c0a52a5bba92909")):
             text=(SRC/path).read_text()
-            if path=="save.c":text=without_guardian_lifecycle_save(text)
+            if path=="save.c":
+                text=without_hybrid_forms_save(without_guardian_lifecycle_save(text))
             if path=="clan.c":text=without_aura_stage(text)
+            if path=="merc.h":
+                text=text.replace("    int                 hybrid_forms_present;\n","")
             self.assertEqual(blob(text),sha)
         self.assertEqual(json.loads((ROOT/"deploy/update_compat.json").read_text()),
                          {"schema":1,"save_epoch":4,"handoff":2})

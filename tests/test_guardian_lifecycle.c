@@ -42,6 +42,7 @@ static void disk_boundary(int mode)
         assert(ch->more==keep);ch->desc=NULL;ch->in_room=NULL;free_char(ch);
     }
     assert(!unlink("../player/Guardexpiry")&&!fclose(fpReserve));fpReserve=NULL;
+    free(string_space);string_space=top_string=NULL;
     assert(!chdir("..")&&!rmdir("player")&&!rmdir("backup")&&!rmdir("run"));
     assert(!chdir(cwd)&&!rmdir(root));
 }
@@ -209,6 +210,7 @@ static void lifecycle_loaders(void)
         fixture(natives[p],0,trained+4,-1,trained+2);reload_case(trained==2,brief);
     }
     assert(load_cases==630&&!fclose(fpReserve));fpReserve=NULL;
+    free(string_space);string_space=top_string=NULL;
     assert(!chdir("..")&&!rmdir("player")&&!rmdir("backup")&&!rmdir("run"));
     assert(!chdir(cwd)&&!rmdir(root));
 }

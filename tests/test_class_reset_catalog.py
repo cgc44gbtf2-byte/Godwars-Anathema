@@ -56,6 +56,7 @@ class ResetCatalog(unittest.TestCase):
                       "lord","clan","morph"):
             self.assertEqual(text.count("free_string(victim->"+field+");"),1)
         self.assertIn("victim->pcdata->hybrid_present = 0;",text)
+        self.assertIn("victim->pcdata->hybrid_forms_present = 0;",text)
         self.assertLess(text.index("memset(&victim->pcdata->hybrid"),
                         text.index('do_save(victim, "")'))
         self.assertEqual(json.loads((ROOT/"deploy/update_compat.json").read_text()),

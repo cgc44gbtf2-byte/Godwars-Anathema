@@ -3,6 +3,7 @@ import hashlib
 import unittest
 from test_class_layout import ROOT,SRC,make_values
 from file_numbers_source import without_file_number_db,without_file_number_save
+from test_guardian_lifecycle_catalog import without_hybrid_forms_save
 
 
 def blob(text):
@@ -14,7 +15,8 @@ class FileNumbersCatalog(unittest.TestCase):
     def test_all_other_database_and_save_source_remains_pinned(self):
         self.assertEqual(blob(without_file_number_db((SRC/"db.c").read_text())),
                          "062398a86ec90e64c0d94e49ce34a4bae9da046d")
-        self.assertEqual(blob(without_file_number_save((SRC/"save.c").read_text())),
+        self.assertEqual(blob(without_hybrid_forms_save(
+            without_file_number_save((SRC/"save.c").read_text()))),
                          "3655e4f99b37b0d5165e58dc73d78c00b47564fc")
 
     def test_checked_pure_bounded_nonrecursive_arithmetic(self):

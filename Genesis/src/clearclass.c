@@ -240,6 +240,7 @@ do_mclear(victim, "self");
     victim->class                           = 0;
     /* No secondary identity can survive its original class being reset. */
     victim->pcdata->hybrid_present = 0;
+    victim->pcdata->hybrid_forms_present = 0;
     memset(&victim->pcdata->hybrid,0,sizeof victim->pcdata->hybrid);
     victim->affected_by			    = 0;
     if (!IS_BUI(victim)) victim->level = LEV_AWA;

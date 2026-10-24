@@ -27,8 +27,9 @@ def without_favour_metadata_monk(text):
     return once(text,"monk_favour_clear(vch);","REMOVE_BIT(vch->more, MORE_FAVOUR);")
 
 def without_favour_metadata_merc(text):
-    return once(text,"    long                favour_since; /* Optional next-dawn metadata, game hours. */\n"
-                     "    long                favour_until;\n","")
+    text=once(text,"    long                favour_since; /* Optional next-dawn metadata, game hours. */\n"
+                   "    long                favour_until;\n","")
+    return once(text,"    int                 hybrid_forms_present;\n","")
 
 def without_favour_metadata_save(text):
     from test_guardian_lifecycle_catalog import without_guardian_lifecycle_save
@@ -39,6 +40,18 @@ def without_favour_metadata_save(text):
                    '    fprintf( fp, "More         %li\\n",  ch->more\t\t);')
     text=once(text,'    if (!str_cmp(word, "*AnathemaFavor")) monk_favour_read(ch, fp);\n'
                    '    else fread_to_eol( fp );','\t    fread_to_eol( fp );')
+    text=once(text,'        hybrid_state_forms_write(fp, &ch->pcdata->hybrid);\n',"")
+    text=once(text,'    if (ch->pcdata->hybrid_present) {\n'
+                   '        hybrid_state_write(fp, &ch->pcdata->hybrid);\n'
+                   '    }\n',
+                   '    if (ch->pcdata->hybrid_present)\n'
+                   '        hybrid_state_write(fp, &ch->pcdata->hybrid);\n')
+    text=once(text,
+        '    if (!str_cmp(word, "AnathemaHybridForms")) {\n'
+        '        if (!hybrid_player_read_forms_tail(ch, fp)) return;\n'
+        '        fMatch = TRUE;\n'
+        '        break;\n'
+        '    }\n',"")
     return once(text,"                monk_favour_reconcile(ch, &time_info);\n","")
 
 class FavourExpiryCatalog(unittest.TestCase):

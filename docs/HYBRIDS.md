@@ -1,9 +1,10 @@
 # Hybrid conversion: staged implementation
 
-> Current compatibility: **save epoch 4, hybrid record v4, socket handoff v2**.
+> Current compatibility: **save epoch 4, hybrid core v4, optional form ledger
+> v1, socket handoff v2**.
 > Disquiet adds a named saved affect; epoch3 references below describe earlier
-> stages, not the current rollback policy. Hybrid record and handoff layouts
-> are unchanged. Follow `deploy/UPDATING.md`: do not downgrade to an epoch3
+> stages, not the current rollback policy. The core hybrid record and handoff
+> layouts are unchanged. Follow `deploy/UPDATING.md`: do not downgrade to an epoch3
 > binary after running an epoch4 release.
 
 ## Colors, help and approved book policy
@@ -438,17 +439,22 @@ This is raw storage access, not effective rank/ability authorization.
 The older secondary-bank pointer API remains available for existing callers;
 it is not a validated assignment API and can invalidate a record if misused.
 
-The standalone `AnathemaHybrid` codec now writes version 4 and reads versions
-1, 2, 3 and 4. Older records preserve their existing banks/core; v1/v2 receive
-empty added progression, including -1 for owned unselected choices. Loading checks
-IDs, pair membership, ranges, field count, ownership, blood consistency and
-trailing data before replacing its destination. Malformed, unsupported,
-truncated and overlong records are rejected without partially replacing state.
-Older readers cannot read a new v4 record. The new stable build ID is zero
-on older records; loading never guesses clan identity or silently resets ranks.
+The `AnathemaHybrid` core codec writes v4 and reads versions 1–4. Older records
+preserve their banks/core; v1/v2 receive empty added progression, including -1
+for owned unselected choices. A separate optional `AnathemaHybridForms 1` line
+stores the parent-owned logical form ledger and activation serial. Older
+player readers safely skip this unknown line; older writers may drop it, so
+keep form transformations disabled until the running code supports the ledger.
+New readers default a missing line to the normal/base form. Both records are
+validated before accepting a player; bad IDs, parent pairs, masks, counters,
+truncation or trailing tokens fail closed. The core save epoch and socket
+handoff remain unchanged. The stable build ID is zero on older records; loading
+never guesses clan identity or silently resets ranks.
 
-**The codec is now connected to optional player saving/loading.** The record
-is still not a complete secondary class: forms, remaining buffs/timers,
+**The codec is now connected to optional player saving/loading.** The form
+ledger survives new-code saves and copyover, but is not yet connected to native
+transformation handlers. The record is still not a complete secondary class:
+remaining buffs/timers,
 absorption/familiar lifecycle, social clan membership and remaining live ability adapters
 remain pending. Native build selection and paid learning now have backend APIs
 described below. Secondary Sorcerer focus/color ranks and material creation now

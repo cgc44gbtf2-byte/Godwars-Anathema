@@ -49,12 +49,16 @@ static void roundtrip(const HYBRID_STATE *state)
     HYBRID_STATE loaded;
     FILE *fp = tmpfile();
     assert(fp);
-    assert(hybrid_state_write(fp, state));
+    assert(hybrid_state_write(fp, state) && hybrid_state_forms_write(fp, state));
     assert(fputs("NEXT\n", fp) >= 0);
     assert(fflush(fp) == 0);
     rewind(fp);
     memset(&loaded, 0xa5, sizeof(loaded));
     assert(hybrid_state_read(fp, &loaded));
+    char record[32];
+    assert(fscanf(fp, "%31s", record) == 1 &&
+           !strcmp(record, "AnathemaHybridForms"));
+    assert(hybrid_state_forms_read_tail(fp, &loaded));
     assert(hybrid_state_valid(&loaded));
     assert(loaded.hybrid_id == state->hybrid_id);
     assert(loaded.primary_class == state->primary_class);
@@ -72,6 +76,7 @@ static void roundtrip(const HYBRID_STATE *state)
                    sizeof(loaded.secondary_blood)));
     assert(loaded.secondary_beast == state->secondary_beast);
     assert(loaded.secondary_truebeast == state->secondary_truebeast);
+    assert(!memcmp(&loaded.forms, &state->forms, sizeof(loaded.forms)));
     long loaded_values[HYBRID_PROGRESSION_WORDS], expected_values[HYBRID_PROGRESSION_WORDS];
     assert(hybrid_progression_export(&loaded.secondary_progression, loaded_values,
                                      HYBRID_PROGRESSION_WORDS));
@@ -136,6 +141,71 @@ static void all_pairs(void)
             roundtrip(&state);
         }
     }
+}
+
+static void persisted_forms(void)
+{
+    fresh(CLASS_VAMPIRE);
+    const HYBRID_DEFINITION *definition =
+        hybrid_by_parents(CLASS_VAMPIRE, CLASS_WEREWOLF);
+    HYBRID_STATE state;
+    assert(definition && hybrid_state_prepare(&actor, definition, &state));
+    assert(hybrid_forms_mode(&state.forms) == HYBRID_BODY_NORMAL);
+    assert(state.forms.parents[0] == CLASS_VAMPIRE &&
+           state.forms.parents[1] == CLASS_WEREWOLF);
+    FILE *legacy = tmpfile();
+    HYBRID_STATE migrated;
+    assert(legacy && hybrid_state_write(legacy, &state));
+    rewind(legacy);
+    assert(hybrid_state_read(legacy, &migrated) &&
+           hybrid_forms_mode(&migrated.forms) == HYBRID_BODY_NORMAL);
+    assert(fclose(legacy) == 0);
+
+    assert(hybrid_state_feature_request(&state, CLASS_VAMPIRE,
+                                        HYBRID_FEATURE_CLAWS, 1));
+    unsigned long first = hybrid_state_form_begin(
+        &state, CLASS_VAMPIRE, 11, HYBRID_FEATURE_CLAWS, HYBRID_FEATURE_ALL);
+    assert(first && hybrid_forms_mode(&state.forms) == HYBRID_BODY_SINGLE);
+    roundtrip(&state);
+
+    HYBRID_FUSION_PROFILE profile = {
+        state.hybrid_id, HYBRID_FEATURE_FANGS,
+        HYBRID_FEATURE_CLAWS | HYBRID_FEATURE_FANGS
+    };
+    unsigned long fused = hybrid_state_form_fuse(
+        &state, CLASS_WEREWOLF, 22, HYBRID_FEATURE_FANGS,
+        HYBRID_FEATURE_ALL, &profile);
+    assert(fused > first && hybrid_forms_mode(&state.forms) == HYBRID_BODY_FUSED);
+    assert(hybrid_features_effective(&state.forms) ==
+           (HYBRID_FEATURE_CLAWS | HYBRID_FEATURE_FANGS));
+    roundtrip(&state);
+
+    /* Stale activations and mismatched parent identity fail closed. */
+    HYBRID_STATE before = state;
+    assert(!hybrid_state_form_end(&state, CLASS_VAMPIRE, 11, first));
+    assert(!memcmp(&state, &before, sizeof(state)));
+    state.forms.parents[0] = CLASS_DROW;
+    assert(!hybrid_state_valid(&state));
+    FILE *fp = tmpfile();
+    assert(fp && !hybrid_state_write(fp, &state) && ftell(fp) == 0);
+    assert(fclose(fp) == 0);
+    state = before;
+    fp = tmpfile();
+    assert(fp && fputs("AnathemaHybridForms 2\n", fp) >= 0);
+    rewind(fp);
+    char keyword[32];
+    assert(fscanf(fp, "%31s", keyword) == 1 &&
+           !strcmp(keyword, "AnathemaHybridForms"));
+    assert(!hybrid_state_forms_read_tail(fp, &state));
+    assert(!memcmp(&state, &before, sizeof(state)));
+    assert(fclose(fp) == 0);
+
+    assert(hybrid_state_form_end(&state, CLASS_WEREWOLF, 22, fused));
+    assert(hybrid_forms_mode(&state.forms) == HYBRID_BODY_SINGLE);
+    assert(hybrid_state_form_end(&state, CLASS_VAMPIRE, 11,
+                                 state.forms.activation_serial));
+    assert(hybrid_forms_mode(&state.forms) == HYBRID_BODY_NORMAL);
+    roundtrip(&state);
 }
 
 static void invalid_prepare(void)
@@ -434,7 +504,7 @@ static void codec_errors(void)
     snprintf(changed, sizeof(changed), "AnathemaHybrid 4 45 2 1 -2%s", banks + 2);
     rejects(changed, strlen(changed));
     strcpy(changed, good);
-    changed[strlen("AnathemaHybrid ")] = '5';
+    changed[strlen("AnathemaHybrid ")] = '6';
     rejects(changed, length);
     snprintf(changed, sizeof(changed), "%.*s 99\n", (int)length - 1, good);
     rejects(changed, strlen(changed));
@@ -494,6 +564,7 @@ static void legacy_records(void)
             assert(state.hybrid_id == h->id &&
                    state.primary_class == h->parents[order] &&
                    state.secondary_class == h->parents[1-order]);
+            assert(hybrid_forms_mode(&state.forms) == HYBRID_BODY_NORMAL);
             assert(state.secondary_generation == 0 &&
                    state.secondary_rage == 0 && state.secondary_speed_timer == 0);
             assert(state.secondary_blood[0] == 0 && state.secondary_blood[1] == 0);
@@ -528,6 +599,7 @@ static void legacy_records(void)
 int main(void)
 {
     all_pairs();
+    persisted_forms();
     invalid_prepare();
     invalid_states();
     parent_values();

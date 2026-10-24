@@ -54,6 +54,8 @@ long hybrid_power_rank(CHAR_DATA *ch, long parent,
                        enum hybrid_training_tree tree, size_t i)
 {
     if (!ch || IS_NPC(ch) || !ch->pcdata) return 0;
+    /* Power ownership is training-based, never body/form-based: trained
+     * primary and secondary powers remain available in every hybrid form. */
     /* Validate before even a primary getter (some log bad indexes). */
     int valid=0;
     switch (tree) {

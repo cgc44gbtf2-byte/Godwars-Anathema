@@ -151,7 +151,8 @@ static void native_counterpart(CHAR_DATA *native,PC_DATA *pc)
 {
     *native=actors[0];*pc=pcs[0];native->pcdata=pc;
     HYBRID_STATE *s=&pcs[0].hybrid;HYBRID_PROGRESSION *p=&s->secondary_progression;
-    native->class=s->secondary_class;pc->hybrid_present=0;
+    native->class=s->secondary_class;
+    pc->hybrid_present=0;pc->hybrid_forms_present=0;
     memcpy(pc->powers,s->secondary_powers,sizeof(pc->powers));
     memcpy(pc->breed,p->breed,sizeof(p->breed));
     memcpy(pc->auspice,p->auspice,sizeof(p->auspice));
@@ -199,8 +200,37 @@ static void learned_contributions(void)
 }
 static void rejection_and_conditions(void)
 {
-    fixture(CLASS_NINJA,0);attach(CLASS_HIGHLANDER);train_fixture();
+    fixture(CLASS_NINJA,0);
+    pcs[0].ninja[NINJA_CHIKYU]=3;
+    attach(CLASS_HIGHLANDER);train_fixture();
     assert(hybrid_power_rank(actors,CLASS_HIGHLANDER,HYBRID_TRAIN_HIGHLAND,HIGH_ATTACK)==6);
+    /* Learned primary and secondary ranks are deliberately form-independent. */
+    long primary_rank=hybrid_power_rank(actors,CLASS_NINJA,
+                                        HYBRID_TRAIN_NINJA,NINJA_CHIKYU);
+    long secondary_rank=hybrid_power_rank(actors,CLASS_HIGHLANDER,
+                                          HYBRID_TRAIN_HIGHLAND,HIGH_ATTACK);
+    assert(primary_rank>0&&secondary_rank==6);
+    HYBRID_STATE *form_state=&pcs[0].hybrid;
+    unsigned long form_serial=hybrid_state_form_begin(
+        form_state,CLASS_NINJA,1,HYBRID_FEATURE_CLAWS,HYBRID_FEATURE_ALL);
+    assert(form_serial);
+    assert(hybrid_power_rank(actors,CLASS_NINJA,HYBRID_TRAIN_NINJA,
+                             NINJA_CHIKYU)==primary_rank);
+    assert(hybrid_power_rank(actors,CLASS_HIGHLANDER,HYBRID_TRAIN_HIGHLAND,
+                             HIGH_ATTACK)==secondary_rank);
+    HYBRID_FUSION_PROFILE fusion={form_state->hybrid_id,HYBRID_FEATURE_FANGS,
+                                  HYBRID_FEATURE_CLAWS|HYBRID_FEATURE_FANGS};
+    form_serial=hybrid_state_form_fuse(
+        form_state,CLASS_HIGHLANDER,2,HYBRID_FEATURE_FANGS,
+        HYBRID_FEATURE_ALL,&fusion);
+    assert(form_serial&&hybrid_forms_mode(&form_state->forms)==HYBRID_BODY_FUSED);
+    assert(hybrid_power_rank(actors,CLASS_NINJA,HYBRID_TRAIN_NINJA,
+                             NINJA_CHIKYU)==primary_rank);
+    assert(hybrid_power_rank(actors,CLASS_HIGHLANDER,HYBRID_TRAIN_HIGHLAND,
+                             HIGH_ATTACK)==secondary_rank);
+    assert(hybrid_state_form_end(form_state,CLASS_HIGHLANDER,2,form_serial));
+    assert(hybrid_state_form_end(form_state,CLASS_NINJA,1,
+                                 form_state->forms.activation_serial));
     assert(!hybrid_power_rank(actors,CLASS_HIGHLANDER,HYBRID_TRAIN_HIGHLAND,SIZE_MAX));
     assert(!hybrid_power_rank(actors,CLASS_HIGHLANDER,HYBRID_TRAIN_MONK,0));
     assert(!hybrid_power_rank(actors,CLASS_VAMPIRE,HYBRID_TRAIN_DISCIPLINE,0));

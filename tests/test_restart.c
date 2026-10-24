@@ -301,6 +301,19 @@ int main(int argc,char **argv)
         HYBRID_STATE secondary;
         assert(hybrid && hybrid_secondary_initialize(ch, hybrid, &secondary) &&
                hybrid_player_attach(ch, &secondary));
+        unsigned long form_serial = hybrid_state_form_begin(
+            &ch->pcdata->hybrid, CLASS_NINJA, 1,
+            HYBRID_FEATURE_CLAWS, HYBRID_FEATURE_ALL);
+        assert(form_serial);
+        HYBRID_FUSION_PROFILE fusion = {
+            hybrid->id, HYBRID_FEATURE_FANGS,
+            HYBRID_FEATURE_CLAWS | HYBRID_FEATURE_FANGS
+        };
+        form_serial = hybrid_state_form_fuse(
+            &ch->pcdata->hybrid, second, 2, HYBRID_FEATURE_FANGS,
+            HYBRID_FEATURE_ALL, &fusion);
+        assert(form_serial &&
+               hybrid_forms_mode(&ch->pcdata->hybrid.forms) == HYBRID_BODY_FUSED);
         char *hash=crypt("test-only-passphrase","$6$fixture$");
         assert(hash && hash[0]!='*');
         free_string(ch->pcdata->pwd); ch->pcdata->pwd=str_dup(hash);

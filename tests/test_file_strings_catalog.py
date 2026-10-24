@@ -3,6 +3,7 @@ import hashlib
 from pathlib import Path
 import unittest
 from string_readers_source import without_string_readers_stage
+from test_guardian_lifecycle_catalog import without_hybrid_forms_save
 ROOT=Path(__file__).resolve().parents[1]
 SRC=ROOT/"Genesis/src"
 def blob(text):
@@ -14,7 +15,9 @@ class StringReadersCatalog(unittest.TestCase):
             ("db.c","e5240dc752bdac278be07a9fc5e929e19fb31579"),
             ("save.c","616bdd8a655425e1ea104f04181e9cada9162fba"),
         ):
-            self.assertEqual(blob(without_string_readers_stage((SRC/path).read_text())),expected)
+            text=without_string_readers_stage((SRC/path).read_text())
+            if path=="save.c":text=without_hybrid_forms_save(text)
+            self.assertEqual(blob(text),expected)
     def test_checked_parser_and_scoped_session_wiring(self):
         parser=(SRC/"file_string.c").read_text()
         save=(SRC/"save.c").read_text()

@@ -4,7 +4,7 @@ import json
 import re
 import unittest
 from test_class_layout import ROOT,SRC,make_values
-from test_guardian_lifecycle_catalog import without_guardian_lifecycle_save
+from test_guardian_lifecycle_catalog import without_guardian_lifecycle_save,without_hybrid_forms_save
 from item_info_source import without_item_info_stage
 from progress_metrics_source import without_progress_metrics_stage
 
@@ -59,7 +59,10 @@ class CelestialCatalog(unittest.TestCase):
                          ("act_info.c","d4b24a952210f67fbfadabb480e9908422c72280"),
                          ("save.c","1f3317263a45d1a886db411d4c0a52a5bba92909")):
             text=(SRC/path).read_text()
-            if path=="save.c":text=without_guardian_lifecycle_save(text)
+            if path=="save.c":
+                text=without_hybrid_forms_save(without_guardian_lifecycle_save(text))
+            if path=="merc.h":
+                text=text.replace("    int                 hybrid_forms_present;\n","")
             self.assertEqual(blob(text),sha)
         self.assertEqual(json.loads((ROOT/"deploy/update_compat.json").read_text()),
                          {"schema":1,"save_epoch":4,"handoff":2})

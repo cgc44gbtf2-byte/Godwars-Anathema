@@ -538,8 +538,10 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
 	    );
     }
 
-    if (ch->pcdata->hybrid_present)
+    if (ch->pcdata->hybrid_present) {
         hybrid_state_write(fp, &ch->pcdata->hybrid);
+        hybrid_state_forms_write(fp, &ch->pcdata->hybrid);
+    }
     fprintf( fp, "End\n\n" );
     return;
 }
@@ -1453,6 +1455,11 @@ if (!numbers_ok) { ch->pcdata->player_load_failed=1; return; }
 	case 'A':
     if (!str_cmp(word, "AnathemaHybrid")) {
         if (!hybrid_player_read_tail(ch, fp)) return;
+        fMatch = TRUE;
+        break;
+    }
+    if (!str_cmp(word, "AnathemaHybridForms")) {
+        if (!hybrid_player_read_forms_tail(ch, fp)) return;
         fMatch = TRUE;
         break;
     }

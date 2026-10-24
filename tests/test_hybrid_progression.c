@@ -71,7 +71,8 @@ static void roundtrip(const HYBRID_STATE *state)
     assert(hybrid_progression_export(&state->secondary_progression, before,
                                      HYBRID_PROGRESSION_WORDS));
     FILE *fp = tmpfile();
-    assert(fp && hybrid_state_write(fp, state));
+    assert(fp && hybrid_state_write(fp, state) &&
+           hybrid_state_forms_write(fp, state));
     assert(fputs("NEXT\n", fp) >= 0 && fflush(fp) == 0);
     rewind(fp);
     char header[32];
@@ -80,6 +81,10 @@ static void roundtrip(const HYBRID_STATE *state)
     rewind(fp);
     memset(&loaded, 0xa5, sizeof(loaded));
     assert(hybrid_state_read(fp, &loaded) && hybrid_state_valid(&loaded));
+    char record[32];
+    assert(fscanf(fp, "%31s", record) == 1 &&
+           !strcmp(record, "AnathemaHybridForms"));
+    assert(hybrid_state_forms_read_tail(fp, &loaded));
     assert(loaded.hybrid_id == state->hybrid_id &&
            loaded.primary_class == state->primary_class &&
            loaded.secondary_class == state->secondary_class);
@@ -336,7 +341,7 @@ static void migrations_and_codec(void)
     snprintf(changed,sizeof(changed),"%.*s 0\n",(int)length-1,good);
     reject_record(changed,strlen(changed));
     memcpy(changed,good,length);
-    changed[strlen("AnathemaHybrid ")]='5';
+        changed[strlen("AnathemaHybrid ")]='6';
     reject_record(changed,length);
     strcpy(changed,"AnathemaHybrid 3 ");
     memset(changed+strlen(changed),' ',5000);
@@ -471,6 +476,6 @@ int main(void)
     native_boundaries();
     rejects_and_boundaries();
     puts("hybrid progression: all 45 pairs/both orders, 17 owned banks, "
-         "secondary WW caps/native preservation and v1/v2/v3 codec tests passed");
+         "secondary WW caps/native preservation and v1-v4 codec tests passed");
     return 0;
 }

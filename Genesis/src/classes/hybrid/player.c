@@ -42,6 +42,11 @@ int hybrid_player_save_valid(const CHAR_DATA *ch)
 {
     if (!ch || IS_NPC(ch) || !ch->pcdata || ch->pcdata->player_load_failed)
         return 0;
+    if ((ch->pcdata->hybrid_present != 0 && ch->pcdata->hybrid_present != 1) ||
+        (ch->pcdata->hybrid_forms_present != 0 &&
+         ch->pcdata->hybrid_forms_present != 1) ||
+        (ch->pcdata->hybrid_forms_present && !ch->pcdata->hybrid_present))
+        return 0;
     return !ch->pcdata->hybrid_present ||
         (ch->pcdata->hybrid_present == 1 &&
          hybrid_state_valid(&ch->pcdata->hybrid) &&
@@ -54,6 +59,7 @@ int hybrid_player_attach(CHAR_DATA *ch, const HYBRID_STATE *state)
         !hybrid_state_valid(state) || ch->class != state->primary_class) return 0;
     ch->pcdata->hybrid = *state;
     ch->pcdata->hybrid_present = 1;
+    ch->pcdata->hybrid_forms_present = 1;
     return 1;
 }
 
@@ -70,6 +76,29 @@ int hybrid_player_read_tail(CHAR_DATA *ch, FILE *stream)
      * explicit End, before equipment repair, authentication or any save. */
     ch->pcdata->hybrid = candidate;
     ch->pcdata->hybrid_present = 1;
+    ch->pcdata->hybrid_forms_present = 0;
+    return 1;
+}
+
+int hybrid_player_read_forms_tail(CHAR_DATA *ch, FILE *stream)
+{
+    HYBRID_STATE candidate;
+    if (!ch || !ch->pcdata || ch->pcdata->player_load_failed ||
+        ch->pcdata->hybrid_present != 1 ||
+        ch->pcdata->hybrid_forms_present ||
+        !hybrid_state_valid(&ch->pcdata->hybrid)) {
+        if (ch && ch->pcdata) ch->pcdata->player_load_failed = 1;
+        return 0;
+    }
+    /* The Class field may appear later in a legacy player file. Whole-player
+     * ownership is checked by hybrid_player_load_finish at record End. */
+    candidate = ch->pcdata->hybrid;
+    if (!hybrid_state_forms_read_tail(stream, &candidate)) {
+        ch->pcdata->player_load_failed = 1;
+        return 0;
+    }
+    ch->pcdata->hybrid = candidate;
+    ch->pcdata->hybrid_forms_present = 1;
     return 1;
 }
 

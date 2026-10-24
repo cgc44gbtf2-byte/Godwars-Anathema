@@ -53,7 +53,8 @@ static CHAR_DATA *load_reset(void)
     assert(load_char_obj(&shell,"Target"));
     CHAR_DATA *loaded=shell.character;
     assert(loaded&&!loaded->pcdata->player_load_failed);
-    assert(loaded->class==0&&!loaded->pcdata->hybrid_present);
+    assert(loaded->class==0&&!loaded->pcdata->hybrid_present&&
+           !loaded->pcdata->hybrid_forms_present);
     loaded->desc=NULL;loaded->next=char_list;char_list=loaded;
     char_to_room(loaded,&home);
     return loaded;
@@ -130,11 +131,13 @@ static void hybrid_case(unsigned id,int order,bool disk_only)
     HYBRID_STATE state;
     assert(hybrid_secondary_initialize(victim,definition,&state));
     assert(hybrid_player_attach(victim,&state));
+    assert(victim->pcdata->hybrid_forms_present);
     assert(save_char_obj_checked(victim));
     do_clearclass(staff,"Target");
     assert(victim->class==0&&victim->gold==1234&&victim->primal==4321);
     if(!disk_only) {
-        assert(!victim->pcdata->hybrid_present);
+        assert(!victim->pcdata->hybrid_present&&
+               !victim->pcdata->hybrid_forms_present);
         const unsigned char *bytes=(const unsigned char *)&victim->pcdata->hybrid;
         for(size_t i=0;i<sizeof victim->pcdata->hybrid;i++)assert(bytes[i]==0);
         assert(hybrid_player_save_valid(victim));

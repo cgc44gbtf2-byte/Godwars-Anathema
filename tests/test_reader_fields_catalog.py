@@ -4,6 +4,7 @@ import re
 import unittest
 from test_class_layout import ROOT,SRC,make_values
 from reader_fields_source import without_reader_fields_stage
+from test_guardian_lifecycle_catalog import without_hybrid_forms_save
 
 def blob(text):
     b=text.encode()
@@ -34,8 +35,9 @@ class ReaderFieldsCatalog(unittest.TestCase):
             "rename.c":"109f8ae08d341caa14f8eb5dae5749a96d8975de",
         }.items():
             with self.subTest(path=path):
-                self.assertEqual(blob(without_reader_fields_stage(
-                    (SRC/path).read_text())),expected)
+                text=without_reader_fields_stage((SRC/path).read_text())
+                if path=="save.c":text=without_hybrid_forms_save(text)
+                self.assertEqual(blob(text),expected)
 
     def test_factory_integer_limits_have_exact_rng_contract(self):
         numbers=(SRC/"object_numbers.h").read_text()
