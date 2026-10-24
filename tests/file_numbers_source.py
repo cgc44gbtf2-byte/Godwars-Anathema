@@ -3,6 +3,18 @@ def replace_once(text,old,new="",count=1):
     assert text.count(old)==count,(old,text.count(old),count)
     return text.replace(old,new)
 
+def without_hybrid_conversion_backend(text):
+    """Remove the separately reviewed selfbrid transaction for old save pins."""
+    if "static bool hybrid_conversion_actor_is_live" not in text:
+        return text
+    text=replace_once(text,'#include "classes/hybrid/mastery.h"\n')
+    start=text.index("static bool hybrid_conversion_actor_is_live")
+    end=text.index("enum atomic_save_result hybrid_player_commit",start)
+    text=text[:start]+text[end:]
+    start=text.index("enum hybrid_conversion_result hybrid_player_convert_commit")
+    end=text.index("/* FALSE includes skipped saves",start)
+    return text[:start]+text[end:]
+
 def without_file_number_db(text):
     from reader_fields_source import without_reader_fields_stage
     text=without_reader_fields_stage(text)
@@ -90,4 +102,5 @@ def without_file_number_save(text):
         "        free_string(f_createtime);free_string(f_marriage);free_string(f_email);\n"
         '        send_to_char("Their playerfile has invalid numeric data.\\n\\r",ch);\n'
         "        return;\n    }\n")
-    return replace_once(text,"#undef fread_number\n")
+    text=replace_once(text,"#undef fread_number\n")
+    return without_hybrid_conversion_backend(text)

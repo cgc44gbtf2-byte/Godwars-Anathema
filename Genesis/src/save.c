@@ -40,6 +40,7 @@
 #include <errno.h>
 #include "atomic_save.h"
 #include "classes/hybrid/player.h"
+#include "classes/hybrid/mastery.h"
 #include "classes/monk/favour.h"
 #include "guardian.h"
 
@@ -187,6 +188,32 @@ static bool save_player_atomic(CHAR_DATA *ch, const char *directory)
     return save_player_atomic_record(ch, directory, NULL) == ATOMIC_SAVE_OK;
 }
 
+static bool hybrid_conversion_actor_is_live(const CHAR_DATA *ch)
+{
+    const CHAR_DATA *person;
+    const DESCRIPTOR_DATA *descriptor;
+    size_t checked;
+    bool found_person = FALSE, found_descriptor = FALSE;
+    if (!ch || !ch->desc) return FALSE;
+    for (person = char_list, checked = 0;
+         person && checked < 100000; person = person->next, ++checked)
+        if (person == ch) {
+            found_person = TRUE;
+            break;
+        }
+    for (descriptor = descriptor_list, checked = 0;
+         descriptor && checked < 100000;
+         descriptor = descriptor->next, ++checked)
+        if (descriptor == ch->desc) {
+            found_descriptor = TRUE;
+            break;
+        }
+    return found_person && found_descriptor &&
+        ch->desc->character == ch && ch->desc->original == NULL &&
+        ch->desc->connected == CON_PLAYING &&
+        descriptor_is_in_game(ch->desc);
+}
+
 enum atomic_save_result hybrid_player_commit(CHAR_DATA *ch,
     const HYBRID_STATE *state, long primal, long experience, long quest)
 {
@@ -219,6 +246,68 @@ enum atomic_save_result hybrid_player_commit(CHAR_DATA *ch,
         ch->save_pending |= PLAYER_SAVE_BACKUP;
     }
     return result;
+}
+
+enum hybrid_conversion_result hybrid_player_convert_commit(
+    CHAR_DATA *ch, const HYBRID_DEFINITION *definition)
+{
+    HYBRID_PREREQUISITES prerequisites;
+    HYBRID_STATE candidate;
+    if (!ch || IS_NPC(ch) || !ch->pcdata || !definition ||
+        hybrid_by_id(definition->id) != definition ||
+        !hybrid_player_save_valid(ch) || ch->pcdata->hybrid_present ||
+        ch->pcdata->player_load_failed ||
+        !hybrid_has_parent(definition, ch->class))
+        return HYBRID_CONVERSION_INVALID;
+
+    /* A paid conversion is only for the connected player's own, live body.
+     * Do not let switched, link-dead, editing or fabricated actors reach the
+     * serializer, even if an internal caller bypasses the command table. */
+    if (!hybrid_conversion_actor_is_live(ch) ||
+        !ch->in_room || ch->position < POS_STANDING || ch->fighting ||
+        get_trust(ch) < LEV_AWA || ch->level < LEV_AWA)
+        return HYBRID_CONVERSION_UNSAFE_CONTEXT;
+    if (ch->save_pending & PLAYER_SAVE_PRIMARY)
+        return HYBRID_CONVERSION_SAVE_PENDING;
+
+    /* Recompute every prerequisite at the commit boundary. A previous
+     * read-only preview is never an authorization token. */
+    if (!hybrid_prerequisites_read(ch, &prerequisites) ||
+        !prerequisites.requirements_met)
+        return HYBRID_CONVERSION_NOT_READY;
+    if (ch->pcdata->quest < HYBRID_DEFAULT_QUEST_COST)
+        return HYBRID_CONVERSION_NOT_READY;
+    if (!hybrid_secondary_initialize(ch, definition, &candidate) ||
+        candidate.primary_class != ch->class ||
+        candidate.secondary_class == candidate.primary_class ||
+        !hybrid_state_valid(&candidate))
+        return HYBRID_CONVERSION_INVALID;
+
+    /* Serialize the complete player with a shadow PC_DATA. Nothing in the
+     * live class banks, inventory, identity or QP changes before primary rename.
+     * UNCERTAIN is deliberately committed in memory: the new file is visible,
+     * so refunding or retrying could duplicate the conversion. */
+    CHAR_DATA shadow = *ch;
+    PC_DATA player = *ch->pcdata;
+    shadow.pcdata = &player;
+    player.hybrid = candidate;
+    player.hybrid_present = 1;
+    player.quest -= HYBRID_DEFAULT_QUEST_COST;
+
+    enum atomic_save_result result =
+        save_player_atomic_record(ch, PLAYER_DIR, &shadow);
+    if (result == ATOMIC_SAVE_FAILED)
+        return HYBRID_CONVERSION_SAVE_FAILED;
+
+    ch->pcdata->hybrid = candidate;
+    ch->pcdata->hybrid_present = 1;
+    ch->pcdata->quest = player.quest;
+    /* The next normal checkpoint writes the same state to backup. A failed
+     * backup cannot roll back or duplicate the already-visible primary. */
+    ch->save_pending |= PLAYER_SAVE_BACKUP;
+    return result == ATOMIC_SAVE_UNCERTAIN ?
+        HYBRID_CONVERSION_DURABILITY_UNCERTAIN :
+        HYBRID_CONVERSION_COMMITTED;
 }
 
 /* FALSE includes skipped saves and uncertain durability after rename. */

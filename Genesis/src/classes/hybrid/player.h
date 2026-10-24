@@ -16,6 +16,23 @@ int hybrid_player_attach(struct char_data *ch, const HYBRID_STATE *state);
 int hybrid_player_save_valid(const struct char_data *ch);
 int hybrid_player_read_tail(struct char_data *ch, FILE *stream);
 int hybrid_player_load_finish(struct char_data *ch);
+enum hybrid_conversion_result {
+    HYBRID_CONVERSION_COMMITTED,
+    HYBRID_CONVERSION_DURABILITY_UNCERTAIN,
+    HYBRID_CONVERSION_INVALID,
+    HYBRID_CONVERSION_NOT_READY,
+    HYBRID_CONVERSION_UNSAFE_CONTEXT,
+    HYBRID_CONVERSION_SAVE_PENDING,
+    HYBRID_CONVERSION_SAVE_FAILED
+};
+/* Atomic backend only. Not exposed by selfbrid until all secondary abilities,
+ * forms, upkeep and social-identity adapters are ready. Rechecks the complete
+ * original-parent prerequisites; initializes a fresh untrained secondary bank;
+ * charges only the approved QP price; leaves primary class/training untouched.
+ * UNCERTAIN means the rename is visible: keep the in-memory conversion and
+ * never refund or repeat it. */
+enum hybrid_conversion_result hybrid_player_convert_commit(
+    struct char_data *ch, const HYBRID_DEFINITION *definition);
 /* Write a candidate state/payment through the primary atomic transaction.
  * FAILED leaves progression/currency unchanged. UNCERTAIN means rename took
  * place: keep the visible candidate in memory and retry durability, NEVER

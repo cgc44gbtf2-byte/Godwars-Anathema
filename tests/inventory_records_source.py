@@ -2,6 +2,8 @@
 def without_inventory_records_stage(text):
     from admin_config_source import without_admin_config_stage
     text=without_admin_config_stage(text)
+    from file_numbers_source import without_hybrid_conversion_backend
+    text=without_hybrid_conversion_backend(text)
     marker="/* Publish only a complete record."
     if marker not in text:return text
     def once(new,old):

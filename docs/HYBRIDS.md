@@ -1314,6 +1314,30 @@ existing numeric rules. Gear is neither inspected nor granted. No new generic
 spell or resource-pool grinding requirement is introduced.
 
 Native trainers, original power access, secondary caps, book limits, inventory,
-Record4/save epoch3/handoff2 are unchanged. Safe actor-state validation and an
-atomic paid conversion with rollback/retry handling remain future work; a green
-preview must not be used as an authorization token or bypass a fresh check.
+Record4/save epoch3/handoff2 are unchanged. The read-only preview must not be
+used as an authorization token or bypass a fresh commit-time check.
+
+### Atomic conversion backend (not player-enabled)
+
+`hybrid_player_convert_commit` is a tested backend transaction, not a command.
+At the commit boundary it rechecks the canonical parent pair, live unswitched
+descriptor/body, standing and out-of-combat state, save-recovery status, the
+complete original-parent mastery/numeric requirements, and the 50,000-QP
+balance. It constructs a fresh secondary bank from the class initializer;
+callers cannot inject trained ranks or copy/normalize primary-class storage.
+
+The candidate class record and QP deduction are serialized together through
+the primary atomic player save. Before-rename failure leaves the conversion
+and payment unapplied (the ordinary primary-save retry flag may still be set).
+After-rename directory-sync uncertainty applies the state and price exactly
+once, marks primary durability recovery, and rejects another conversion.
+Success keeps the original class ID and all primary training/resources intact;
+only the secondary record is attached and 50,000 quest points are charged.
+The next normal backup checkpoint remains separate, so there is no
+multi-destination atomicity or power-loss journal guarantee.
+
+`selfbrid` deliberately does not call this API yet. Secondary ability/command
+coverage, class-specific resource upkeep, clan identity and live forms are not
+complete; enabling conversion now would expose a hybrid with a partial power
+set. Existing hybrids are also blocked from repeating the transaction. Player
+conversion remains disabled until those runtime gaps are closed and audited.

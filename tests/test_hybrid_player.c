@@ -281,6 +281,209 @@ static void favour_expiry(void)
     memset(&time_info,0,sizeof(time_info));
 }
 
+static void conversion_ready(CHAR_DATA *ch, long parent)
+{
+    ch->class = parent;
+    ch->level = LEV_AWA;
+    ch->position = POS_STANDING;
+    ch->fighting = NULL;
+    ch->hit = 1;                 /* Capacity, not current HP, is the gate. */
+    ch->mana = 0;
+    ch->max_hit = ch->max_mana = 50000;
+    ch->pcdata->quest = HYBRID_DEFAULT_QUEST_COST;
+    for (int stat = STAT_STR; stat <= STAT_WIS; ++stat)
+        ch->stats[stat] = stat_max(ch, stat);
+    for (long style = STYLE_UNARMED; style <= STYLE_TWOWEAPON; ++style) {
+        ch->style[0] = style;
+        ch->style[style] = LONG_MAX;
+        improve_style(ch);
+    }
+    for (long skill = TYPE_UNARMED; skill <= TYPE_BLUNT; ++skill) {
+        ch->weapon[skill] = LONG_MAX;
+        improve_weapon(ch, skill);
+    }
+    for (long stance = STANCE_VIPER; stance <= STANCE_SWALLOW; ++stance) {
+        ch->stance[0] = stance;
+        ch->stance[stance] = LONG_MAX;
+        improve_stance(ch);
+    }
+    if (parent == CLASS_MONK)
+        for (int rank = 0; rank < 3; ++rank) ch->pcdata->monk[rank] = 8;
+    else if (parent == CLASS_HIGHLANDER)
+        for (int rank = 0; rank < 4; ++rank) ch->pcdata->highland[rank] = 6;
+    else
+        assert(0);
+}
+
+static void online(CHAR_DATA *ch)
+{
+    static char outbuf[32768];
+    memset(outbuf, 0, sizeof(outbuf));
+    shell.character = ch;
+    shell.connected = CON_PLAYING;
+    shell.original = NULL;
+    shell.outbuf = outbuf;
+    shell.outsize = sizeof(outbuf);
+    ch->desc = &shell;
+    descriptor_list = &shell;
+    ch->next = char_list;
+    char_list = ch;
+}
+
+static void offline_release(CHAR_DATA *ch)
+{
+    assert(ch && char_list == ch);
+    char_list = ch->next;
+    ch->next = NULL;
+    descriptor_list = NULL;
+    release(ch);
+}
+
+static void conversion_backend(void)
+{
+    const long parents[] = {CLASS_MONK, CLASS_HIGHLANDER};
+    const long secondary[] = {CLASS_HIGHLANDER, CLASS_MONK};
+    const enum atomic_save_fault pre_rename[] = {
+        SAVE_FAULT_CREATE, SAVE_FAULT_FLUSH, SAVE_FAULT_SYNC,
+        SAVE_FAULT_CLOSE, SAVE_FAULT_RENAME
+    };
+
+    for (size_t order = 0; order < 2; ++order) {
+        CHAR_DATA *ch = fresh();
+        const HYBRID_DEFINITION *definition =
+            hybrid_by_parents(parents[order], secondary[order]);
+        assert(definition);
+        conversion_ready(ch, parents[order]);
+        online(ch);
+
+        descriptor_list = NULL;
+        assert(hybrid_player_convert_commit(ch, definition) ==
+               HYBRID_CONVERSION_UNSAFE_CONTEXT);
+        descriptor_list = &shell;
+        ch->desc = NULL;
+        assert(hybrid_player_convert_commit(ch, definition) ==
+               HYBRID_CONVERSION_UNSAFE_CONTEXT);
+        ch->desc = &shell;
+
+        /* A read-only preview is not authorization after balance or training
+         * changes: the commit API recomputes prerequisites. */
+        ch->pcdata->quest--;
+        assert(hybrid_player_convert_commit(ch, definition) ==
+               HYBRID_CONVERSION_NOT_READY);
+        assert(!ch->pcdata->hybrid_present &&
+               ch->pcdata->quest == HYBRID_DEFAULT_QUEST_COST - 1 &&
+               ch->class == parents[order]);
+        ch->pcdata->quest++;
+        if (parents[order] == CLASS_MONK) {
+            ch->pcdata->monk[MONK_TECH] = 7;
+            assert(hybrid_player_convert_commit(ch, definition) ==
+                   HYBRID_CONVERSION_NOT_READY);
+            ch->pcdata->monk[MONK_TECH] = 8;
+        }
+
+        /* Switched control, combat, non-standing and pending primary-save
+         * recovery must not create a record or charge the player. */
+        shell.original = ch;
+        assert(hybrid_player_convert_commit(ch, definition) ==
+               HYBRID_CONVERSION_UNSAFE_CONTEXT);
+        shell.original = NULL;
+        ch->fighting = ch;
+        assert(hybrid_player_convert_commit(ch, definition) ==
+               HYBRID_CONVERSION_UNSAFE_CONTEXT);
+        ch->fighting = NULL;
+        ch->position = POS_SLEEPING;
+        assert(hybrid_player_convert_commit(ch, definition) ==
+               HYBRID_CONVERSION_UNSAFE_CONTEXT);
+        ch->position = POS_STANDING;
+        ch->save_pending |= PLAYER_SAVE_PRIMARY;
+        assert(hybrid_player_convert_commit(ch, definition) ==
+               HYBRID_CONVERSION_SAVE_PENDING);
+        ch->save_pending &= ~PLAYER_SAVE_PRIMARY;
+
+        PC_DATA before = *ch->pcdata;
+        CHAR_DATA before_char = *ch;
+        for (size_t i = 0; i < sizeof(pre_rename)/sizeof(pre_rename[0]); ++i) {
+            atomic_save_test_fault = pre_rename[i];
+            assert(hybrid_player_convert_commit(ch, definition) ==
+                   HYBRID_CONVERSION_SAVE_FAILED);
+            assert(!ch->pcdata->hybrid_present &&
+                   ch->pcdata->quest == before.quest &&
+                   ch->class == before_char.class &&
+                   !memcmp(ch->pcdata->monk, before.monk, sizeof(before.monk)) &&
+                   !memcmp(ch->pcdata->highland, before.highland,
+                           sizeof(before.highland)));
+            /* Failed saves queue normal durability recovery; the transaction
+             * itself still leaves training/currency unchanged. */
+            ch->save_pending &= ~PLAYER_SAVE_PRIMARY;
+            ch->save_retry_delay[0] = 0;
+        }
+
+        atomic_save_test_fault = SAVE_FAULT_NONE;
+        assert(hybrid_player_convert_commit(ch, definition) ==
+               HYBRID_CONVERSION_COMMITTED);
+        assert(ch->pcdata->hybrid_present == 1 &&
+               ch->pcdata->quest == 0 &&
+               ch->class == parents[order] &&
+               ch->primal == before_char.primal &&
+               ch->exp == before_char.exp &&
+               ch->gold == before_char.gold &&
+               ch->hit == before_char.hit &&
+               ch->mana == before_char.mana &&
+               ch->max_hit == before_char.max_hit &&
+               ch->max_mana == before_char.max_mana &&
+               !memcmp(ch->stats, before_char.stats, sizeof(ch->stats)) &&
+               !memcmp(ch->style, before_char.style, sizeof(ch->style)) &&
+               !memcmp(ch->weapon, before_char.weapon, sizeof(ch->weapon)) &&
+               !memcmp(ch->stance, before_char.stance, sizeof(ch->stance)) &&
+               (ch->save_pending & PLAYER_SAVE_BACKUP));
+        assert(ch->pcdata->hybrid.primary_class == parents[order] &&
+               ch->pcdata->hybrid.secondary_class == secondary[order] &&
+               ch->pcdata->hybrid.secondary_progression.full_branch == -1);
+        for (size_t i = 0; i < 20; ++i)
+            assert(ch->pcdata->hybrid.secondary_powers[i] == 0);
+        assert(hybrid_player_convert_commit(ch, definition) ==
+               HYBRID_CONVERSION_INVALID); /* Never double-charge. */
+        char *disk = read_file("../player/Newfixture");
+        assert(strstr(disk, "AnathemaHybrid 4 "));
+        free(disk);
+        offline_release(ch);
+
+        for (int short_load = 0; short_load < 2; ++short_load) {
+            memset(&shell, 0, sizeof(shell));
+            assert(short_load ? load_char_short(&shell, "Newfixture") :
+                                load_char_obj(&shell, "Newfixture"));
+            ch = shell.character;
+            assert(ch->pcdata->hybrid_present == 1 &&
+                   !ch->pcdata->player_load_failed &&
+                   ch->class == parents[order] &&
+                   ch->pcdata->quest == 0 &&
+                   ch->pcdata->hybrid.primary_class == parents[order] &&
+                   ch->pcdata->hybrid.secondary_class == secondary[order]);
+            release(ch);
+        }
+        assert(unlink("../player/Newfixture") == 0);
+    }
+
+    /* Directory fsync failure happens after rename: apply once and refuse a
+     * second call rather than refunding a conversion that may now be durable. */
+    CHAR_DATA *ch = fresh();
+    const HYBRID_DEFINITION *definition =
+        hybrid_by_parents(CLASS_MONK, CLASS_HIGHLANDER);
+    assert(definition);
+    conversion_ready(ch, CLASS_MONK);
+    online(ch);
+    atomic_save_test_fault = SAVE_FAULT_DIRSYNC;
+    assert(hybrid_player_convert_commit(ch, definition) ==
+           HYBRID_CONVERSION_DURABILITY_UNCERTAIN);
+    assert(ch->pcdata->hybrid_present && ch->pcdata->quest == 0 &&
+           (ch->save_pending & PLAYER_SAVE_PRIMARY));
+    assert(hybrid_player_convert_commit(ch, definition) ==
+           HYBRID_CONVERSION_INVALID);
+    atomic_save_test_fault = SAVE_FAULT_NONE;
+    offline_release(ch);
+    assert(unlink("../player/Newfixture") == 0);
+}
+
 int main(void)
 {
     char root[] = "/tmp/anathema-hybrid-player-XXXXXX", cwd[4096];
@@ -294,10 +497,12 @@ int main(void)
     room.name = "Private fixture room"; room.description = "";
     room_index_hash[900 % MAX_KEY_HASH] = &room;
     favour_expiry();all_pairs(); legacy_and_atomic(); corruptions();
+    conversion_backend();
     assert(fclose(fpReserve) == 0 && chdir("..") == 0);
     assert(rmdir("player") == 0 && rmdir("backup") == 0 &&
            rmdir("run") == 0 && chdir(cwd) == 0 && rmdir(root) == 0);
     puts("hybrid player: 90 initialized pairs, both real loaders, native preservation, "
-         "legacy saves, atomic failures and fail-closed corruption tests passed");
+         "legacy saves, atomic failures, conversion preflight/save/retry and "
+         "fail-closed corruption tests passed");
     return 0;
 }

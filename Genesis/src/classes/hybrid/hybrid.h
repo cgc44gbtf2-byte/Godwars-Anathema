@@ -4,8 +4,8 @@
 #include <stddef.h>
 struct char_data;
 
-/* Agreed server price. This stage displays it but cannot charge it.
- * Runtime configuration/transaction handling belongs to the conversion stage. */
+/* Agreed fixed conversion price. The atomic backend enforces it; the player
+ * command remains preview-only until secondary runtime coverage is complete. */
 #define HYBRID_DEFAULT_QUEST_COST 50000L
 
 /* New identities are deliberately separate from serialized base-class IDs.
