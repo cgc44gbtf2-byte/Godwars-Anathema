@@ -31,6 +31,7 @@ CLASS_MODULE_SOURCES = \
   classes/hybrid/help.c \
   classes/hybrid/books.c \
   classes/hybrid/colors.c \
+  classes/hybrid/drow_training.c \
   classes/hybrid/monk_training.c \
   classes/hybrid/highlander_training.c \
   classes/hybrid/werewolf_training.c \

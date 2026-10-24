@@ -9,6 +9,7 @@
 #include "readiness.h"
 #include "mastery.h"
 #include "colors.h"
+#include "drow_training.h"
 #include "highlander_training.h"
 #include "monk_training.h"
 #include "werewolf_training.h"
@@ -24,6 +25,7 @@ void do_selfbrid(CHAR_DATA *ch, char *argument)
     if (!argument) argument = "";
     while (isspace((unsigned char)*argument)) ++argument;
     if (hybrid_colors_command(ch, argument)) return;
+    if (hybrid_drow_training_command(ch, argument)) return;
     if (hybrid_highlander_training_command(ch, argument)) return;
     if (hybrid_monk_training_command(ch, argument)) return;
     if (hybrid_werewolf_training_command(ch, argument)) return;

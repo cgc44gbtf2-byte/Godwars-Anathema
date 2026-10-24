@@ -19,7 +19,7 @@ EXPECTED = {
     "ninja": ("ninja",),
     "monk": ("monk", "favour"),
     "elemental": ("elemental",),
-    "hybrid": ("registry", "selfbrid", "state", "player", "progression", "specialization", "forms", "build", "training", "access", "passives", "resources", "readiness", "mastery", "help", "books", "colors", "monk_training", "highlander_training", "werewolf_training"),
+    "hybrid": ("registry", "selfbrid", "state", "player", "progression", "specialization", "forms", "build", "training", "access", "passives", "resources", "readiness", "mastery", "help", "books", "colors", "drow_training", "monk_training", "highlander_training", "werewolf_training"),
 }
 IDS = {"NONE": 0, "VAMPIRE": 1, "WEREWOLF": 2, "SORCERER": 4,
        "DROW": 8, "HIGHLANDER": 16, "MAGE": 32, "DRAGON": 64,

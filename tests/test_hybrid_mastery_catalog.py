@@ -99,6 +99,8 @@ class HybridMasteryCatalog(unittest.TestCase):
             "    hybrid_mastery_show(ch);\n", "", 1)
         before = before.replace(
             "    if (hybrid_highlander_training_command(ch, argument)) return;\n", "", 1)
+        before = before.replace('#include "drow_training.h"\n', "", 1).replace(
+            "    if (hybrid_drow_training_command(ch, argument)) return;\n", "", 1)
         data = before.encode()
         self.assertEqual(hashlib.sha1(b"blob " + str(len(data)).encode() +
                                      b"\0" + data).hexdigest(),

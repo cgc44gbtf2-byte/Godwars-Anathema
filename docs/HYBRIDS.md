@@ -896,7 +896,7 @@ The initialization/paid-training/conversion policies are unchanged.
 Both native utilities cost zero to activate. These adapters do not invent a
 DP, mana or primal charge, grant a learned flag, change a class, borrow a form
 flag or alter either parent's training/resource banks. Learning still has its
-normal backend costs; Drow player-facing training remains unwired. The separate
+normal backend costs; the limited Drow player-facing trainer is described below. The separate
 Sorcerer color UI does not grant Drow ranks or item permissions.
 
 Attunement keeps the existing exact item-owner check and all excluded item
@@ -919,6 +919,33 @@ only the include and four permission checks introduced for these two handlers.
 Other Drow attacks, forms, gear creation, summon/teleport, upkeep and social
 commands remain native-only; no `IS_*` macro or interpreter table was widened.
 Record v4, save epoch 3 and handoff v2 are unchanged. Conversion stays disabled.
+
+### Secondary Drow training for integrated utilities
+
+For an existing secondary Drow record only:
+
+```text
+selfbrid drow
+selfbrid drow attunement
+selfbrid drow attunement learn
+selfbrid drow faeriefire
+selfbrid drow faeriefire learn
+```
+
+The listing/details are read-only. `learn` buys exactly one existing flag:
+Attunement costs **1,000 DP** and Faerie Fire **5,000 DP**, matching the native
+prayer prices. Their activation remains free, with native item ownership,
+target-safety, resistance, affect and lag rules. The lesson writes only the
+secondary Drow bank through the existing checked save transaction; original
+class identity, primary Drow storage, other currencies and save format are
+unchanged. Primary Drow characters continue using native `prayer`; this UI
+does not intercept or alter it.
+
+Only these two active utilities are offered by this trainer in this stage.
+Other Drow unlocks remain backend-only pending their complete runtime and
+learning review; backend storage is not permission to expose an unadapted
+power. No compatibility change: record4/save epoch4/handoff2. Conversion and
+live hybrid forms remain disabled.
 
 ## Sunbath — trained secondary Elementalist, shared mana
 
