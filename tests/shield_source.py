@@ -11,6 +11,8 @@ REVIEWED={
 }
 
 def without_shield_stage(text):
+    from heighten_source import without_heighten_stage
+    text=without_heighten_stage(text)
     if "void do_shield(" not in text:return text
     raw=FIXTURE.read_bytes()
     assert hashlib.sha256(raw).hexdigest()==PIN,"Native Shield fixture changed"

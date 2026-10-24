@@ -782,8 +782,16 @@ void do_shadowplane( CHAR_DATA *ch, char *argument )
 
 void do_truesight( CHAR_DATA *ch, char *argument )
 {
-    if (IS_NPC(ch))
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL)
 	return;
+
+    /* Turning a shared effect off must not require its former training. */
+    if (IS_SET(ch->act, PLR_HOLYLIGHT))
+    {
+REMOVE_BIT(ch->act, PLR_HOLYLIGHT);
+stc("Your senses return to normal.\n\r", ch);
+return;
+    }
 
     if (!IS_DRAGON(ch) && !IS_DROW(ch) && !IS_HIGHLANDER(ch) && !IS_MONK(ch)
      && !IS_NINJA(ch) && !IS_VAMPIRE(ch) && !IS_WEREWOLF(ch) && !IS_MAGE(ch))
@@ -834,17 +842,9 @@ void do_truesight( CHAR_DATA *ch, char *argument )
 	return;
     }
   
-    if (IS_SET(ch->act, PLR_HOLYLIGHT))
-    {
-	REMOVE_BIT(ch->act, PLR_HOLYLIGHT);
-	stc("Your senses return to normal.\n\r", ch);
-    }
-    else
-    {
 	SET_BIT(ch->act, PLR_HOLYLIGHT);
 	stc("Your senses increase to incredible proportions.\n\r", ch);
 	WAIT_STATE(ch, 6);
-    }
     return;
 }
 
