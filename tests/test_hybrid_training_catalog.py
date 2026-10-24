@@ -61,13 +61,24 @@ class NativeBuildCatalogTests(unittest.TestCase):
         self.assertNotRegex(staged, r"ch->(?:class|clan)\s*=(?!=)")
         self.assertNotRegex(staged, r"\bclan_(?:join|create|promote)\s*\(")
 
-    def test_training_still_not_exposed_by_preview(self):
+    def test_training_is_explicit_secondary_only_and_conversion_stays_disabled(self):
         preview = (SRC / "classes/hybrid/selfbrid.c").read_text()
         self.assertNotIn("hybrid_training_commit(", preview)
         self.assertNotIn("hybrid_player_attach(", preview)
+        self.assertIn("hybrid_monk_training_command(ch, argument)", preview)
+        self.assertIn("hybrid_werewolf_training_command(ch, argument)", preview)
+        self.assertIn("hybrid_colors_command(ch, argument)", preview)
+        self.assertIn("conversion is not enabled", preview)
         trainer = (SRC / "classes/hybrid/training.c").read_text()
         self.assertIn("hybrid_player_commit(", trainer)
         self.assertNotRegex(trainer, r"\b(?:fopen|fwrite|fprintf|rename)\s*\(")
+        wolf = (SRC / "classes/hybrid/werewolf_training.c").read_text()
+        self.assertIn("HYBRID_LESSON_SPECIALIZE", wolf)
+        self.assertIn("HYBRID_LESSON_GIFT_SELECT", wolf)
+        self.assertIn("HYBRID_LESSON_RANK", wolf)
+        self.assertIn("hybrid_training_commit(ch,&request)", wolf)
+        self.assertIn("one permanent full family", wolf)
+        self.assertIn("the other two cap at 3", wolf)
 
 
 if __name__ == "__main__":

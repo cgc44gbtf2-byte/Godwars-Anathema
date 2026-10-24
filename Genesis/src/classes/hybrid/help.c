@@ -60,8 +60,10 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
                      "both possible original parents.\n\r"
                      "This HELP catalog shows all pairs; the SELFBRID command "
                      "offers only your nine parent-compatible choices.\n\r"
-                     "Use: selfbrid list / selfbrid info <listed name>.\n\r"
-                     "Preview only: no conversion, payment or free training.\n\r", ch);
+                      "Use: selfbrid list / selfbrid info <listed name>.\n\r"
+                      "The catalog itself is read-only; conversion is disabled. "
+                      "Separate training controls affect only already attached "
+                      "secondary-parent records.\n\r", ch);
         for (size_t i = 0; i < sizeof(parent_topics)/sizeof(parent_topics[0]); i++) {
             long parent = parent_topics[i].parent;
             snprintf(line, sizeof(line), "\n\rParent 1: %s%s#n\n\r",
@@ -85,6 +87,13 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
         send_to_char("Existing secondary Sorcerers: selfbrid colors shows ranks/caps. "
                      "Confirm one permanent full color before paid rank training; "
                      "this does not create a hybrid.\n\r",ch);
+        send_to_char("Existing secondary Werewolves: selfbrid wolf lists Breed, "
+                     "Auspice and Tribe gifts with effective ranks/caps. Choose "
+                     "one permanent full family (the others cap at3), then "
+                     "choose one gift per family and buy ranks with native "
+                     "primal pricing. This never changes a primary Werewolf's "
+                     "native gifts. Some active Werewolf commands still require "
+                     "hybrid runtime integration; conversion remains disabled.\n\r",ch);
         send_to_char("Existing secondary Sorcerers can sorccreate book/page/pen: "
                      "book or pen: 10 primal; page: free. With a held pen, write "
                      "titles and spell-page lines, then the native end.<color>. "
@@ -107,6 +116,12 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
     send_to_char(line, ch);
     send_to_char("Original training is retained; the second parent starts untrained. "
                  "There is no playable conversion yet.\n\r", ch);
+    if (hybrid_has_parent(h, CLASS_WEREWOLF))
+        send_to_char("For an existing secondary Werewolf record: selfbrid wolf "
+                     "lists gift ranks/caps; confirm one full family, then "
+                     "select one gift per family and use selfbrid wolf gain "
+                     "<family> <gift-key> to buy a rank. The other two families "
+                     "cap at3. Not all active Werewolf commands are hybrid-ready.\n\r",ch);
     if (hybrid_has_parent(h, CLASS_MONK))
     {
         send_to_char("Existing secondary Monks: selfbrid monk shows paths; "

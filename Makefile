@@ -48,6 +48,7 @@ TESTS += tests/test_hybrid_celestial
 TESTS += tests/test_hybrid_guardian
 TESTS += tests/test_guardian_lifecycle
 TESTS += tests/test_hybrid_monk_training
+TESTS += tests/test_hybrid_werewolf_training
 TESTS += tests/test_hybrid_aura
 TESTS += tests/test_message_format
 TESTS += tests/test_identify
@@ -139,6 +140,7 @@ tests/test_class_runtime: tests/test_class_runtime.c $(ENGINE_SOURCES) $(ENGINE_
 check-layout:
 	python3 tests/test_class_layout.py
 	python3 tests/test_hybrid_training_catalog.py
+	python3 tests/test_hybrid_werewolf_training_catalog.py
 	python3 tests/test_hybrid_access_catalog.py
 	python3 tests/test_hybrid_resources_catalog.py
 	python3 tests/test_hybrid_drow_catalog.py
@@ -303,6 +305,9 @@ tests/test_guardian_lifecycle: tests/test_guardian_lifecycle.c tests/test_hybrid
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_hybrid_monk_training: tests/test_hybrid_monk_training.c $(ENGINE_OBJECTS)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
+tests/test_hybrid_werewolf_training: tests/test_hybrid_werewolf_training.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_hybrid_aura: tests/test_hybrid_aura.c $(ENGINE_OBJECTS)

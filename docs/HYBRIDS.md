@@ -1080,6 +1080,41 @@ on the full Mantra path; training alone never turns it on.
 Record4/save epoch3/handoff2 are unchanged. Generated help is updated, but
 custom world helps keep priority; no live help-file import is performed.
 
+### Secondary Werewolf family training (existing records only)
+
+`selfbrid wolf` is available only to a character with a valid attached
+secondary-Werewolf record. It leaves native `gifts` and primary Werewolf data
+alone. The player permanently chooses one of **Breed, Auspice or Tribe** as
+the full secondary family; the other two families cap at3. Within the full
+family, the selected gift follows its native cap5 and other gifts keep their
+native cap4. Gifts in the other families cap at3. The free family and gift
+choices require an explicit `confirm`; neither grants a rank.
+
+- `selfbrid wolf` shows the secondary gift ranks, saved choices, effective
+  caps and next-rank prices.
+- `selfbrid wolf focus breed` previews the permanent full-family choice;
+  append `confirm` to save it.
+- `selfbrid wolf gift tribe black-furies` previews the permanent gift choice
+  for that family; append `confirm` to save. The catalog displays all valid
+  gift keys.
+- `selfbrid wolf gain tribe black-furies` buys one rank. Native gift pricing is
+  retained: **10 x next rank** for the selected gift in a family, otherwise
+  **15 x next rank**.
+
+Choose a full family before training. The existing atomic lesson transaction
+requires the player's own connected body, standing and out of combat, valid
+training state, enough primal, and no pending primary-save recovery. It writes
+only the secondary Werewolf banks and the lesson cost; class identity and native
+primary banks are not swapped or rewritten. Failed saves charge and train
+nothing. An uncertain directory sync applies the lesson once and blocks
+another purchase until primary-save recovery; do not repeat it.
+
+This only wires saved ranks and their passive effects already supported by the
+hybrid access layer. **Not all active Werewolf commands or forms accept a
+secondary Werewolf yet**, and conversion remains disabled; do not interpret
+this trainer as complete hybrid playability. Original Werewolves continue
+using their native `gifts` command and normal behavior.
+
 ### Secondary Monk Read Aura (existing records only)
 
 `readaura <target>` now accepts learned secondary **Mantra2**, on any legal

@@ -1,5 +1,5 @@
-/* List/info remain read-only. Explicit colors/monk subcommands train only an
- * existing secondary record; class conversion/mastery transactions pending. */
+/* List/info remain read-only. Explicit colors/monk/wolf subcommands train only
+ * an existing secondary record; class conversion remains disabled. */
 #include <sys/types.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -10,6 +10,7 @@
 #include "mastery.h"
 #include "colors.h"
 #include "monk_training.h"
+#include "werewolf_training.h"
 
 void do_selfbrid(CHAR_DATA *ch, char *argument)
 {
@@ -23,6 +24,7 @@ void do_selfbrid(CHAR_DATA *ch, char *argument)
     while (isspace((unsigned char)*argument)) ++argument;
     if (hybrid_colors_command(ch, argument)) return;
     if (hybrid_monk_training_command(ch, argument)) return;
+    if (hybrid_werewolf_training_command(ch, argument)) return;
     if (!str_prefix("list", argument)) {
         name = argument + 4;
         while (isspace((unsigned char)*name)) ++name;

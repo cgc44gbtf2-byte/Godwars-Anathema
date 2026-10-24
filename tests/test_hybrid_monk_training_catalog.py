@@ -21,8 +21,10 @@ class MonkTrainingCatalog(unittest.TestCase):
         text=once(text,"    hybrid_mastery_show(ch);\n","")
         text=once(text,'#include "monk_training.h"\n',"")
         text=once(text,"    if (hybrid_monk_training_command(ch, argument)) return;\n","")
-        text=once(text,"/* List/info remain read-only. Explicit colors/monk subcommands train only an",
-                       "/* List/info remain read-only. An explicit colors subcommand can train only an")
+        text=once(text,'#include "werewolf_training.h"\n',"")
+        text=once(text,"    if (hybrid_werewolf_training_command(ch, argument)) return;\n","")
+        text=once(text,"/* List/info remain read-only. Explicit colors/monk/wolf subcommands train only\n * an existing secondary record; class conversion remains disabled. */",
+                       "/* List/info remain read-only. An explicit colors subcommand can train only an\n * existing secondary record; class conversion/mastery transactions pending. */")
         self.assertEqual(blob(text),"5d74784c64dbdd28ba5c547323bcab58be659437")
 
     def test_native_training_backend_getters_save_and_colors_are_unchanged(self):
