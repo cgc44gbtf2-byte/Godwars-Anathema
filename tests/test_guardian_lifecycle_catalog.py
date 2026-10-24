@@ -46,7 +46,12 @@ class GuardianLifecycleCatalog(unittest.TestCase):
                          "1f3317263a45d1a886db411d4c0a52a5bba92909")
         text=(SRC/"combat_status.c").read_text()
         text=once(text,'#include "guardian.h"\n',"")
+        text=once(text,'#include "classes/hybrid/access.h"\n',"")
         text=once(text,"        guardian_reconcile(ch);\n","")
+        text=once(text,
+                  "        if (IS_NPC(ch) || !hybrid_power_parent(ch, CLASS_HIGHLANDER)\n"
+                  "            || ch->fighting == NULL)\n",
+                  "        if (IS_NPC(ch) || !IS_HIGHLANDER(ch) || ch->fighting == NULL)\n")
         self.assertEqual(blob(text),"2c7f2f2e6583abe95ddbbdfca2373e9e63e03112")
         for path,sha in (("more.c","94245671b79931e1749010e1779411d42f9bea83"),
                          ("comm.c","925a22782183ae8e9269197b5504b4505d1962ae"),

@@ -6,6 +6,7 @@
 #include <time.h>
 #include "merc.h"
 #include "guardian.h"
+#include "classes/hybrid/access.h"
 
 /* Callback arguments are untrusted pointers until found in a live room list. */
 bool combat_character_in_room(ROOM_INDEX_DATA *room, CHAR_DATA *ch)
@@ -52,7 +53,8 @@ void combat_status_update(void)
         if (ch->highland_guard > 0) --ch->highland_guard;
         if (ch->highland_riposte > 0) --ch->highland_riposte;
         if (ch->highland_counter_reuse > 0) --ch->highland_counter_reuse;
-        if (IS_NPC(ch) || !IS_HIGHLANDER(ch) || ch->fighting == NULL)
+        if (IS_NPC(ch) || !hybrid_power_parent(ch, CLASS_HIGHLANDER)
+            || ch->fighting == NULL)
             ch->highland_guard = ch->highland_riposte = 0;
     }
 }

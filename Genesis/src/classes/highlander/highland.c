@@ -170,6 +170,12 @@ void do_increase( CHAR_DATA *ch, char *argument )
 
     argument = one_argument(argument, arg);
 
+    if (ch && ch->class != CLASS_HIGHLANDER &&
+        hybrid_power_parent(ch, CLASS_HIGHLANDER))
+    {
+        stc("Use selfbrid highland to view and train your secondary paths.\n\r", ch);
+        return;
+    }
     if (!IS_HIGHLANDER(ch))
     {
 	stc("Huh?\n\r", ch);
@@ -428,12 +434,13 @@ void do_lunge( CHAR_DATA *ch, char *argument )
 
     if (IS_NPC(ch)) return;
 
-    if (!IS_HIGHLANDER(ch))
+    if (!hybrid_power_parent(ch, CLASS_HIGHLANDER))
     {
 	stc("Huh?\n\r",ch );
 	return;
     }
-    if (get_highland(ch, HIGH_ABILITY) < 6)
+    if (hybrid_power_rank(ch, CLASS_HIGHLANDER, HYBRID_TRAIN_HIGHLAND,
+                          HIGH_ABILITY) < 6)
     {
 	stc("You have not learned this attack.\n\r",ch);
 	return;

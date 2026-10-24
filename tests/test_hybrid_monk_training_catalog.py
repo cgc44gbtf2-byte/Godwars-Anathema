@@ -19,6 +19,8 @@ class MonkTrainingCatalog(unittest.TestCase):
         text=(SRC/"classes/hybrid/selfbrid.c").read_text()
         text=once(text,'#include "mastery.h"\n',"")
         text=once(text,"    hybrid_mastery_show(ch);\n","")
+        text=once(text,'#include "highlander_training.h"\n',"")
+        text=once(text,"    if (hybrid_highlander_training_command(ch, argument)) return;\n","")
         text=once(text,'#include "monk_training.h"\n',"")
         text=once(text,"    if (hybrid_monk_training_command(ch, argument)) return;\n","")
         text=once(text,'#include "werewolf_training.h"\n',"")

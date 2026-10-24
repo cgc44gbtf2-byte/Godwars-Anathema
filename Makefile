@@ -48,6 +48,7 @@ TESTS += tests/test_hybrid_celestial
 TESTS += tests/test_hybrid_guardian
 TESTS += tests/test_guardian_lifecycle
 TESTS += tests/test_hybrid_monk_training
+TESTS += tests/test_hybrid_highlander_training
 TESTS += tests/test_hybrid_werewolf_training
 TESTS += tests/test_hybrid_aura
 TESTS += tests/test_message_format
@@ -307,6 +308,9 @@ tests/test_guardian_lifecycle: tests/test_guardian_lifecycle.c tests/test_hybrid
 tests/test_hybrid_monk_training: tests/test_hybrid_monk_training.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
+tests/test_hybrid_highlander_training: tests/test_hybrid_highlander_training.c $(ENGINE_OBJECTS)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
 tests/test_hybrid_werewolf_training: tests/test_hybrid_werewolf_training.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
@@ -447,7 +451,7 @@ tests/restart_engine.o: Genesis/src/restart.c $(ENGINE_HEADERS)
 
 sanitize:
 	$(MAKE) clean
-	$(MAKE) test CFLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer -fno-pie" LDFLAGS="-fsanitize=address,undefined -no-pie"
+	$(MAKE) test CFLAGS="$(CFLAGS) -fsanitize=address,undefined -fno-omit-frame-pointer -fno-pie" LDFLAGS="$(LDFLAGS) -fsanitize=address,undefined -no-pie"
 
 clean:
 	rm -f tests/save_info.o tests/restart_engine.o tests/runtime_info.o tests/powers_info.o

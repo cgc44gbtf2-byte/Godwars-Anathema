@@ -771,7 +771,7 @@ callbacks outside these paths remain native-only until separately adapted.
 | Vampire | Fortitude armor/soak; Potence damroll/damage cap | Celerity activation, blood/rage, form/bodycraft flags, damage multipliers and advanced damage callbacks |
 | Werewolf | Learned Breed/Auspice/Tribe combat bonuses and injury protection | Rank-based class baseline, rage, forms and activated gifts |
 | Mage | Time speed/avoidance; Entropy avoidance-breaking/damage cap | Spellcasting, quint/paradox and physical damage multiplier |
-| Highlander | Weapon/Attack/Defense combat bonuses | Speed timer/DEX boost, forge/gear ownership and Lunge |
+| Highlander | Weapon/Attack/Defense combat bonuses | Speed timer/DEX boost and forge/gear ownership |
 | Ninja | Ningenno speed/avoidance-breaking; Chikyu avoidance/damage cap | Ki, Harakiri, weapon multipliers and toggles |
 | Monk | Learned Arts speed, armor, soak, accuracy, damroll, avoidance and damage cap | Chimera flags, weapon multipliers and activated techniques |
 | Drow | Trained speed and learned Skip/Tough/Eyes/Might/Bite bonuses | Spells, active shields, flight and shape ownership |
@@ -784,14 +784,21 @@ activation flags, copied primary resources or compounded weapon multipliers.
 The primary retains its full existing behavior, including its own active forms.
 No NPC receives a secondary bonus.
 
-Three existing Highlander commands now use owned, effective ranks:
-`bflash` needs Powers 2, `bash` Powers 3, and `judge` Powers 5. Their native
-costs/waits, safe-target checks and effect implementations remain intact.
+The existing Highlander commands `bflash` (Powers 2), `bash` (Powers 3),
+`judge` (Powers 5) and `lunge` (Powers 6) use owned, effective ranks. Their
+native costs/waits, safe-target checks and effect implementations remain intact.
+Secondary Highlanders can inspect/focus/train the four ranked paths with
+`selfbrid highland`; one path is capped at6, the rest at3, with each paid rank
+costing 15 times its next rank. The focus is permanent and grants no ranks.
+Primary/native `increase` training remains unchanged; secondary Highlanders are
+directed to the isolated trainer. `htwist` still uses a shared native Celerity
+timer and is not enabled for the secondary bank. `forge` and class-bound gear ownership also
+remain native-only.
 Powers 5 requires choosing that full secondary path. Counter retains BOTH
 Defense 4 and Powers 4: under one-full-tree/other-paths 3 it is deliberately
 unavailable to a secondary Highlander, including when a migrated raw bank has
-both ranks 4. Original Highlanders retain Counter normally. Htwist and Lunge
-are not broadened, and secondary forge/class gear is not enabled.
+both ranks 4. Original Highlanders retain Counter normally. Secondary Lunge
+requires Powers 6; Htwist and forge/class gear remain native-only.
 
 The real-engine regression captures 20 original profiles before the combat
 hooks, checks 180 untrained pair orientations and compares 90 learned secondary
@@ -802,8 +809,9 @@ unchanged RNG, interpreter-routed Highlander powers and Counter refusal.
 These are mechanics checks, not proof of PvP balance or multiplayer stability.
 Conversion previews remain read-only; normal players cannot create hybrids.
 Only the existing-record secondary Sorcerer color UI described above reaches
-paid lessons. Other secondary commands and the conversion/eligibility
-transaction remain pending.
+paid lessons and the secondary Werewolf, Monk, and Highlander training UIs.
+Other secondary commands and the conversion/eligibility transaction remain
+pending.
 Save record v4/epoch 3 and socket handoff v2 are unchanged by this stage.
 
 ## Owned resources and independent Ninja clocks

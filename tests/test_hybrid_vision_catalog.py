@@ -73,6 +73,28 @@ NATIVE_READERS={
     "classes/monk/monk.c":"101110633ada4ead4205c5c4574255a21aae9183c1e721ae915b21abd304fd82",
     "classes/elemental/elemental.c":"da8474d2063b020b76afbf96269b889388bacf4c359ddc40c470c58f20232583",
 }
+
+def without_highlander_lunge_adapter(text):
+    redirect = ('    if (ch && ch->class != CLASS_HIGHLANDER &&\n'
+                '        hybrid_power_parent(ch, CLASS_HIGHLANDER))\n'
+                '    {\n'
+                '        stc("Use selfbrid highland to view and train your '
+                'secondary paths.\\n\\r", ch);\n'
+                '        return;\n'
+                '    }\n')
+    assert text.count(redirect) == 1
+    text = text.replace(redirect, "", 1)
+    start = text.index("void do_lunge")
+    before, after = text[:start], text[start:]
+    after = after.replace(
+        "if (!hybrid_power_parent(ch, CLASS_HIGHLANDER))",
+        "if (!IS_HIGHLANDER(ch))", 1)
+    after = after.replace(
+        "hybrid_power_rank(ch, CLASS_HIGHLANDER, HYBRID_TRAIN_HIGHLAND,\n"
+        "                          HIGH_ABILITY)",
+        "get_highland(ch, HIGH_ABILITY)", 1)
+    return before + after
+
 def native_reader_tokens(text):
     text=without_werewolf_combat_stage(text)
     text=without_progress_metrics_stage(text)
@@ -106,6 +128,8 @@ class HybridVisionCatalog(unittest.TestCase):
             with self.subTest(path=path):
                 text=(SRC/path).read_text()
                 if path=="classes/monk/monk.c":text=without_hybrid_stun_adapter(text)
+                if path=="classes/highlander/highland.c":
+                    text=without_highlander_lunge_adapter(text)
                 self.assertEqual(hashlib.sha256(native_reader_tokens(text).encode()).hexdigest(),digest)
 
     def test_source_bits_are_independent_and_persist_in_existing_extra(self):

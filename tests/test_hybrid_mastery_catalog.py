@@ -48,6 +48,27 @@ class HybridMasteryCatalog(unittest.TestCase):
             data = (SRC / path).read_bytes()
             from werewolf_source import without_werewolf_stage
             data = without_werewolf_stage(data.decode()).encode()
+            if path == "classes/highlander/highland.c":
+                text = data.decode().replace(
+                    '    if (ch && ch->class != CLASS_HIGHLANDER &&\n'
+                    '        hybrid_power_parent(ch, CLASS_HIGHLANDER))\n'
+                    '    {\n'
+                    '        stc("Use selfbrid highland to view and train your '
+                    'secondary paths.\\n\\r", ch);\n'
+                    '        return;\n'
+                    '    }\n', '', 1)
+                lunge = text.index("void do_lunge")
+                before, after = text[:lunge], text[lunge:]
+                after = after.replace(
+                    "if (!hybrid_power_parent(ch, CLASS_HIGHLANDER))",
+                    "if (!IS_HIGHLANDER(ch))", 1)
+                after = after.replace(
+                    "hybrid_power_rank(ch, CLASS_HIGHLANDER, "
+                    "HYBRID_TRAIN_HIGHLAND,\n"
+                    "                          HIGH_ABILITY)",
+                    "get_highland(ch, HIGH_ABILITY)", 1)
+                text = before + after
+                data = text.encode()
             if path == "clan.c":
                 from scry_source import without_scry_stage
                 data = without_scry_stage(data.decode()).encode()
@@ -74,7 +95,10 @@ class HybridMasteryCatalog(unittest.TestCase):
                             r"do_autoclass|hybrid_secondary_initialize)\s*\(")
         self.assertIn("conversion is not enabled", source)
         before = source.replace('#include "mastery.h"\n', "", 1).replace(
+            '#include "highlander_training.h"\n', "", 1).replace(
             "    hybrid_mastery_show(ch);\n", "", 1)
+        before = before.replace(
+            "    if (hybrid_highlander_training_command(ch, argument)) return;\n", "", 1)
         data = before.encode()
         self.assertEqual(hashlib.sha1(b"blob " + str(len(data)).encode() +
                                      b"\0" + data).hexdigest(),
