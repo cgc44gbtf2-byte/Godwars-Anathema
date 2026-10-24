@@ -1,0 +1,3716 @@
+#AREADATA
+Name        .       Inn of the Red Dragon~
+Builders    None~
+VNUMs       15100 15244
+End
+
+
+
+#MOBILES
+#15100
+minotaur guard~
+minotaur guard~
+An impressive  minotaur warrior stands ready
+~
+The minotaur glares back at you, if he was'nt being paid well by the owners to break up fights you would already be dead for looking at him.
+~
+17 0 0 S
+907 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15101
+alderak bartender~
+Alderak the Bartender~
+Alderak is here serving drinks
+~
+This large (in size and girth) balding barbarian has long ago retired from adventuring, he now spends his days swapping tales of glory and serving drinks to customers
+~
+17 32896 0 S
+522 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15102
+shop vendor souviner~
+a souviner vendor~
+Sandra the Fallen Empire Souviner shop keeper is here
+~
+Sandra looks back at you and smiles
+~
+17 680 0 S
+995 0 0 0d0+0 0d0+0
+0 0
+0 0 2
+#15103
+dummy stuffed merek~
+animated MereK dummy~
+A stuffed animated MereK dummy sits here smiling.
+~
+The doll comes to life as you look at him "Hello, i am the model X3262-Z animated mortal abuse doll, i have been set up for your convience if there are no immortals on to hear your complaints, just feel free to yell at me, hit me or do whatever floats your boat" the doll finishes his speech and once against becomes lifeless.
+~
+17 680 0 S
+984 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15104
+elven guardian warrior ghost~
+ghostly elven warrior~
+A ghostly elven warrior screams at you and attacks!
+~
+The misty form of a long dead elven warrior floats here, damned to eternity for trying to steal the lost treasure of Salvos, is now forced to stand guard against anyone else who tries.
+~
+81 66090 0 S
+662 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#15105
+spy sneak~
+a spy~
+A sneaky little spy has been caught!!
+~
+This sneakly little spy snoops on people then blackmails them..
+~
+81 65666 0 S
+245 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15106
+Salvnos guardian undead~
+undead guardian~
+A Undead Guardian wanders the caverns
+~
+This guardian appears to be what remains of a dark dwarf. It stares at you with hatred in its glowing red eyes as it is compelled to attack!
+~
+65 524288 0 S
+567 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15107
+hook horror undead~
+undead hook horror~
+A Undead Hook Horror Guardian attacks you!
+~
+This guardian appears to be what remains of a hook horror. It clacks its claws and attacks you eagerly
+~
+81 524288 0 S
+602 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#15108
+salvnos scout  patrol~
+patrol scout~
+A Salvnos patrol scout searchs the tunnels
+~
+This is one of the patrol scouts which guard the caverns and tunnels around Salvnos. You are shocked to relize that she appears to be drow!!
+~
+65 623114 0 S
+790 0 0 0d0+0 0d0+0
+0 0
+0 0 2
+#15109
+beholder guard~
+guardian beholder~
+A large beholder guards the city
+~
+This mighty beholder scans the crowds with its multiple eyes searching for trouble
+~
+49 524840 0 S
+726 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#15110
+merchant human~
+human merchant~
+A visible frightened merchant sees you and panics!
+~
+This human has come to the city to bartar his wares, he nervously looks around at everyone around him full well knowing the reputation of the city and its inhabitants
+~
+65 128 0 S
+503 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15111
+salvnos cityguard guard~
+a Salvnos cityguard~
+A Salvnos cityguard guards the streets
+~
+A female dark elf clothed in the standards of the Salvnos Cityguards patrols the streets for trouble
+~
+49 557576 0 S
+830 0 0 0d0+0 0d0+0
+0 0
+0 0 2
+#15112
+archmage salvnos vailz~
+Archmagus Vailz~
+The ArchMage of Salvnos Vailz looks at you dangerously
+~
+The ArchMage does not like to be disturbed, infact not many people even get this far, he tends to kill intruders at the front gate.
+~
+81 524840 0 S
+950 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15113
+familar~
+archmages familar~
+The hideous form of the ArchMages familiar rises up to attack
+~
+You are looking at your doom
+~
+81 648 0 S
+472 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#15114
+apprentice drow~
+apprentice~
+A young apprentice drow attacks you!
+~
+This young drow stares at you with hate filled eyes as he attacks!
+~
+81 0 0 S
+396 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15115
+Bregan D'aerthe Warrior~
+a Bregan D'aerthe Warrior~
+A Bregan D'aerthe Warrior attacks as soon as you enter!
+~
+This drow works for the Bregan D'aerthe, a houseless rogue who works as a mercenary.
+~
+81 623146 0 S
+833 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15116
+goblin slave~
+a goblin slave~
+A goblin slave cowers in the darkness
+~
+This slave is dressed in rags and is filthy, you almost vomit from the smell
+~
+33 66304 0 S
+538 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15117
+assassin drow~
+a drow assassin~
+A drow assassin stares at you from the shadows
+~
+Dressed in black you can barely make out her form in the darkness
+~
+17 98944 0 S
+762 0 0 0d0+0 0d0+0
+0 0
+0 0 2
+#15118
+minotaur huge guard~
+a huge minotaur guard~
+The minotaur guard stands here ready to kill
+~
+The guard snorts at you and attacks!
+~
+17 512 0 S
+817 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15119
+dwarf dark~
+a dark dwarf~
+A dark dwarf is here arguing with an illithid
+~
+The Dark Dwarf looks at you
+~
+17 512 0 S
+334 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15120
+Illithid~
+a Illithid is here~
+A Illithid is here arguing with a dark dwarf
+~
+The illithid looks back at you
+~
+17 524928 0 S
+321 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#15121
+dragon black~
+a huge black dragon~
+A huge black dragon searches the rubble for prey
+~
+Black as midnight, this ferocious dragon instills fear into all those that look at her.
+~
+81 557704 0 S
+855 0 0 0d0+0 0d0+0
+0 0
+0 0 2
+#15122
+Bregan D'aerthe~
+Bregan D'aerthe warrior~
+A long Bregan D'aerthe warrior sneaks in the shadows
+~
+This warrior must be on a mission, he is keeping out of sight and just beyond the torch lights.
+~
+17 98818 0 S
+818 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15123
+aura waitress~
+Aura the waitress~
+The former imm Aura has been reduced to waiting tables..
+~
+Well it seems Fallen Empires does not forget its former immortals, after deciding to take a break from mudding, Aura quit the imm staff, now she's back as a temp waitress for Alderak.
+~
+33 32896 0 S
+793 0 0 0d0+0 0d0+0
+0 0
+0 0 2
+#15124
+articus~
+articus the coat man~
+Articus is here trying to take your coat
+~
+Looks like Articus went from an imm to a coat boy..
+~
+33 0 0 S
+829 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15125
+shade~
+shade the coat man~
+Shade the ex-imm is trying to take get your coat
+~
+Looks like Shade went from an imm to a coat boy..
+~
+49 0 0 S
+841 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15126
+orc barfly~
+orcish barfly~
+The orcish barfly looks at you cautiously
+~
+This orc has no where else to go but drink his troubles away.
+~
+17 0 0 S
+698 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15127
+high priestess~
+high priestess of Lloth~
+A High Priestess of Lloth stands here chanting.
+~
+This drow priestess is deep in her chants to Lloth, its a pity she has devoted herself so fully to Lloth, its a shame to let such beauty go to waste.
+~
+17 0 0 S
+762 0 0 0d0+0 0d0+0
+0 0
+0 0 2
+#15128
+Matron Mother~
+a Matron Mother~
+A Matron Mother passes by on a drift disc.
+~
+The matron mother ignores you as she passes by.
+~
+65 524938 0 S
+836 0 0 0d0+0 0d0+0
+0 0
+0 0 2
+#15129
+commoner drow~
+a drow commoner~
+A drow commoner wanders around
+~
+This drow is a house soldier, wearing simple armor. You can only imagine what important task his matron has sent him on.
+~
+81 524810 0 S
+485 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15130
+obsidien stone spider~
+a obsidien stone spider~
+A large stone spider guards the entrance.
+~
+This spider is huge! You did'nt relize underdark spiders came the size of a small dragon.
+~
+81 524842 0 S
+907 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#15131
+drow priestess~
+a drow priestess~
+A drow priestess stands here chanting
+~
+This drow priestess is deep in her chants to Lloth, her eyes dart around insanely.
+~
+81 522 0 S
+784 0 0 0d0+0 0d0+0
+0 0
+0 0 2
+#15132
+drider~
+a drider~
+A huge drider stands here
+~
+Once a drow male, this individual has now become a perversion of nature, a half spider, half drow.
+~
+81 778 0 S
+744 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15133
+cityguard guard salvnos~
+a Salvnos cityguard~
+A Salvnos cityguard patrols the streets
+~
+A dark elf clothed in the standards of the Salvnos Cityguards patrols the streets for trouble
+~
+65 33288 0 S
+688 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15134
+dark dwarf~
+a dark dwarf~
+A dark dwarf wanders the caverns
+~
+A dark dwarf wanders the tunnels searching for veins of ore
+~
+65 33288 0 S
+495 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15135
+Bregan D'aerthe commander~
+Bregan D'aerthe commander~
+A Bregan D'aerthe commander see's you and attacks!
+~
+This drow works for the Bregan D'aerthe,he has risen in the ranks through long hard devotion to the band.
+~
+65 33288 0 S
+742 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15136
+Bregan D'aerthe commander~
+Bregan D'aerthe commander~
+This Bregan D'aerthe commander draws her sword as you enter the room
+~
+This drow works for the Bregan D'aerthe, she has risen in the ranks through long hard devotion to the band.
+~
+65 33288 0 S
+731 0 0 0d0+0 0d0+0
+0 0
+0 0 2
+#15137
+Bregan D'aerthe leader~
+Bregan D'aerthe leader~
+The mob stands here, completely clueless.
+~
+This drow is the leader of this cities Bregan D'aerthe drows, he is fearless and utterly faithful to his superiors.
+~
+17 33416 0 S
+770 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15138
+bar patron~
+a bar patron~
+A bar patron stumbles around drunkenly
+~
+He smiles at you drunkenly and stumbles off
+~
+33 0 0 S
+243 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15139
+female bar patron~
+a female bar patron~
+A female bar patron giggles before she passes out.
+~
+~
+33 0 0 S
+231 0 0 0d0+0 0d0+0
+0 0
+0 0 2
+#15140
+wandering patron~
+inn patron~
+A patron of the inn wanders the hallways
+~
+~
+33 0 0 S
+248 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15141
+coal cat~
+Coal~
+A tiny black cat scampers around in the darkness
+~
+This black cat has gotten quite adept at navigating the reality shifts of the
+room, he jumps in and out of different parts of the room never allowing
+himself to be seen for too long.
+
+A small inscription has been carved on its collar:
+"To MereK, love Aria 05/06/99."
+~
+1 98944 0 S
+992 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#15233
+Revenant~
+Revenant~
+A #0Revenant#n stands here running charcoal dusted threads through the skin of helpless victims.
+~
+~
+81 128 0 S
+500002 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#15234
+Ghoul~
+A Twisted Ghoul~
+A Warped Twisted Figure Stands Here Moistening the eyes of faces set into the wall.
+~
+~
+17 0 0 S
+20004 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#0
+
+
+
+#OBJECTS
+#15100
+table candle~
+a table~
+A table with a small candle is here, a small note is on it~
+~
+12 0 16384
+0 0 0 0
+500 1000 0
+E
+note~
+Welcome to the Inn, please keep things clean after you are done. And remember, no use in violence while in these rooms please, these rooms are absolutly private and safe for all our customers
+~
+#15101
+coke can~
+a can of coke~
+A can of coke sits on the ground~
+~
+17 0 16385
+0 0 15 0
+5 1000 0
+#15102
+ale bottle~
+a mug of ale~
+A mud of ale~
+~
+17 0 16385
+0 0 3 0
+5 1000 0
+#15103
+blood bottle~
+a bottle of blood~
+A bottle of blood sits here~
+~
+17 0 16385
+10 10 13 0
+5 1000 0
+#15104
+cabinet~
+cabinet~
+A Liquor Cabinet~
+~
+15 1 16384
+0 1 0 0
+999 1000 0
+#15105
+bowl altar~
+a small altar with a silver bowl and two daggers~
+A simple altar sits on the floor, a tiny silver bowl sits on top of it. flanked by two small daggers.~
+~
+15 1 16384
+0 14 6080 0
+500 1000 0
+#15106
+dragon head red~
+a stuffed red dragons head~
+A huge red dragons head has been mounted here.~
+~
+9 80 17
+25 0 0 0
+5 1000 0
+A
+24 -500
+A
+23 -200
+#15107
+a key~
+a small magical key....~
+A small magical key sits on the ground.~
+~
+18 80 1
+0 0 0 0
+5 1000 0
+#15116
+bumper sticker fallen~
+a "i play at Fallen Empires"  bumper sticker~
+A "i play at Fallen Empires"  bumper sticker~
+~
+9 129 16385
+0 0 0 0
+5 1000 0
+#15117
+fallen empires cola~
+a can of "Fallen Empires" Cola~
+A can of "Fallen Empires" Cola~
+~
+17 192 16385
+20 20 15 0
+5 1000 0
+#15120
+elven long bow~
+an elven longbow~
+An old elven longbow sits in the dust..forgotten~
+~
+5 1 8193
+0 0 0 3
+5 1000 0
+A
+17 25
+A
+18 10
+A
+24 15
+A
+19 8
+#15121
+mail chain elven~
+a fine elven chain mail~
+A suit of elven chain mail sits in the dust..forgotten~
+~
+9 1 9
+0 0 0 0
+5 1000 0
+A
+14 -50
+A
+19 -2
+A
+18 5
+A
+24 -15
+A
+23 -15
+A
+2 3
+#15130
+rune body~
+the unconcious form of Rune~
+The unconcious form of Rune~
+~
+23 0 0
+0 0 0 0
+999 1000 0
+E
+rune~
+Seems Rune got a little too drunk..he's passed out amoung the the spiders and rats of the cellar
+~
+#15131
+altar key~
+the marriage altar key~
+The key to the altar in the wedding chapel is here.~
+~
+18 3 1
+0 0 0 0
+500 1000 0
+#15132
+silver ring~
+a simple yet elegant silver ring~
+A simple yet elegant ring sparkes in the dust~
+~
+9 2179 3
+0 0 0 0
+5 1000 0
+A
+4 5
+#15133
+gold ring~
+a simple gold ring~
+A simple gold ring~
+~
+9 129 3
+0 0 0 0
+5 1000 0
+A
+4 0
+#15134
+moldy leather vest~
+a moldy leather vest~
+An old moldy vest of leather sits here falling apart~
+~
+9 128 9
+0 0 0 0
+5 1000 0
+A
+23 15
+A
+24 -5
+A
+2 5
+A
+17 3
+#15135
+a dwarven battle axe~
+a gleaming dwarven battle axe~
+A gleaming dwarven battle axe lays on the ground forgotten~
+~
+5 3 8193
+0 0 0 2
+10 1000 0
+A
+1 3
+A
+18 8
+A
+19 8
+#15136
+hook horror shell~
+a hook horror shell~
+A hallowed out hook horror shell is here~
+~
+9 0 1025
+0 0 0 0
+5 1000 0
+A
+19 10
+A
+24 -25
+A
+23 -25
+A
+5 5
+A
+18 -5
+A
+14 -60
+#15137
+claw hook horror~
+claw of a hook horror~
+A lost hook horror claw is here~
+~
+5 0 8193
+0 0 0 5
+5 1000 0
+A
+3 -1
+A
+18 6
+A
+19 5
+#15138
+pure mithil ring~
+a magical mithil ring~
+A magical mithil ring shimmers here~
+~
+9 2 3
+0 0 0 0
+5 1000 0
+A
+18 5
+A
+19 5
+A
+3 3
+#15139
+cloak~
+a glittering black cloak~
+A black cloak sits in the dust long forgotten~
+~
+9 531 1025
+0 0 0 0
+5 1000 0
+A
+24 -15
+A
+18 3
+A
+17 5
+A
+2 0
+#15140
+gauntlets spiked onyx~
+a Pair of Spiked Onyx Gauntlets~
+A Pair of Spiked Onyx Gauntlets is neatly placed here~
+~
+9 529 129
+0 0 0 0
+5 1000 0
+A
+18 5
+A
+19 5
+#15141
+pouch wealth~
+a drow wealth pouch~
+A drow tiny wealth pouch sits here~
+~
+15 529 5
+500 1 0 0
+5 1000 0
+A
+23 -15
+A
+24 -15
+#15142
+medallion spider lloth onyx~
+a tiny onyx Lloth spider medallion~
+A tiny onyx Lloth spider medallion lays here glowing in the dark~
+~
+9 4625 5
+0 0 0 0
+5 1000 0
+A
+19 5
+A
+18 5
+A
+17 10
+#15143
+bracer onyx~
+a sleek onyx bracer~
+A sleek onyx bracer lays here~
+~
+9 529 4097
+0 0 0 0
+5 1000 0
+A
+18 8
+#15144
+mask black~
+a black mask~
+A black mask is in the corner~
+~
+9 529 17
+0 0 0 0
+5 1000 0
+A
+18 5
+A
+19 5
+A
+23 -15
+A
+17 15
+#15145
+salvnos forged sword~
+a Salvnos forged sword~
+A salvnos forged sword is here.~
+~
+5 530 8193
+0 0 0 2
+5 1000 0
+A
+19 8
+A
+18 8
+#15146
+a Salvnos Forged grepper~
+a Salvnos forged grepper~
+A Salvnos forged grepper is here~
+~
+5 530 8193
+0 0 0 5
+5 1000 0
+A
+18 5
+A
+19 3
+#15147
+salvnos chestplate padded~
+a Salvnos padded chestplate~
+A Salvnos padded chestplate sits here~
+~
+9 529 9
+0 0 0 0
+10 1000 0
+A
+17 15
+A
+23 -10
+A
+24 -25
+#15148
+corpse gnome deek~
+a slain deep gnome~
+The corpse of a slain deep gnome merchant lies here in its own blood.~
+~
+23 0 16384
+0 0 0 0
+999 1000 0
+#15149
+pick axe~
+a mithril pick axe~
+A finely crafted mithril pick axe sits in the dust~
+~
+5 1 8193
+0 0 0 5
+5 1000 0
+A
+18 5
+A
+19 5
+#15150
+Salvnos Cityguard Chestplate~
+a Salvnos Cityguard Chestplate~
+A Salvnos Cityguard chestplate is here~
+~
+9 528 9
+0 0 0 0
+5 1000 0
+A
+17 15
+A
+19 3
+A
+18 3
+#15151
+Salvnos Cityguard bracer~
+a Salvnos Cityguard Bracer~
+A Salvnos Cityguard Chestplate is here.~
+~
+9 528 4097
+0 0 0 0
+5 1000 0
+A
+24 -20
+A
+18 5
+#15152
+Salvnos Cityguard belt~
+a Salvnos Cityguard Belt~
+A Salvnos Cityguard Belt is here~
+~
+9 528 2049
+0 0 0 0
+5 1000 0
+A
+5 3
+A
+14 500
+#15153
+wand fire breath~
+a wand of fire breath~
+A wand of fire break lays here~
+~
+3 4688 16385
+100 20 20 201
+5 1000 0
+#15154
+drow fighting staff~
+a Salvnos drow fighting staff~
+A Salvnos drow fighting staff is here~
+~
+5 528 8193
+0 0 0 3
+5 1000 0
+A
+19 2
+A
+18 10
+#15155
+jerkin black~
+a black leather jerkin~
+A black leather jerkin~
+~
+9 528 9
+0 0 0 0
+5 1000 0
+A
+19 3
+A
+18 5
+A
+24 -20
+#15156
+tattoo assassin guild~
+a tattoo of the Salvnos Assassin Guild~
+A forgotten tattoo sits on the ground~
+~
+9 528 257
+0 0 0 0
+5 1000 0
+A
+17 15
+A
+2 3
+A
+1 3
+#15157
+archmages cloak~
+the Salvnos ArchMages Cloak~
+A glittering cloak is here~
+~
+9 528 1025
+0 0 0 0
+5 1000 0
+A
+17 10
+A
+24 -50
+A
+23 -50
+#15158
+drow sword~
+a magical drow sword~
+A magical drow sword sparkles at you~
+~
+5 528 8193
+0 0 0 3
+5 1000 0
+A
+18 8
+A
+19 5
+#15159
+mace drow magic~
+a magical drow mace~
+A magical drow mace is here~
+~
+5 528 8193
+0 0 0 5
+5 1000 0
+A
+18 5
+A
+19 8
+#15160
+minotaurs axe~
+a huge minotaurs axe~
+A massive minotaurs axe is here~
+~
+5 0 8193
+0 0 0 2
+5 1000 0
+A
+19 10
+A
+18 -5
+A
+1 3
+A
+2 -2
+#15161
+cart~
+a push cart~
+A farmers cart is here~
+~
+15 0 0
+0 0 0 0
+999 1000 0
+#15162
+underfish~
+a dead underfish.~
+A dead underfish~
+~
+19 128 1
+3 0 0 1
+5 1000 0
+#15163
+sign~
+sign~
+A sign has been placed here..must be IMPORTANT.~
+~
+12 65 16384
+0 0 0 0
+9999 1000 0
+E
+sign~
+Hello,for those who are wondering, this area was originally intended for the
+amusement of the players, however, since it has expanded beyond just the inn
+(as you shall no doubt find out) its become an xp area.
+ 
+This area consists of mobs varying from DayCare Mobs to Atlantis level mobs
+(some even tougher). This obviously means there are some pretty mean mobs in
+here, newbies are NOT suggested in the exp area but are suggested to explore
+the inn section of the area. Most of the mobs are aggressive and pack a
+punch..so watch out!
+
+For those more experienced players, explore, exploit and most of all, have fun.
+
+                                    - MereK
+~
+#15164
+robes lloth~
+the robes of a High Priestess of Lloth~
+Robes of a High Priestess of Lloth~
+~
+9 529 1025
+0 0 0 0
+5 1000 0
+A
+24 -50
+A
+4 5
+A
+18 10
+A
+24 -50
+#15165
+axe large~
+a large axe~
+A large axe is here~
+~
+5 528 8193
+0 0 0 0
+5 1000 0
+A
+18 -5
+A
+19 8
+#15166
+Salvnos forged dagger~
+a Salvnos forged dagger~
+A Salvnos forged dagger is here~
+~
+5 528 8209
+0 0 0 4
+5 1000 0
+A
+18 12
+A
+19 3
+#15167
+spider throwing star~
+a many legged spider throwing star~
+A many legged spider throwing star sits here~
+~
+5 528 8193
+0 0 0 5
+5 1000 0
+A
+12 0
+A
+19 2
+A
+18 10
+#15168
+aura armor~
+aura of death~
+A aura of death~
+~
+9 32 16385
+0 0 0 0
+1 1000 0
+A
+13 100
+A
+17 100
+#15169
+aura decay~
+aura of decay~
+A aura of decay~
+~
+9 32 1025
+0 0 0 0
+5 1000 0
+A
+5 -5
+A
+12 90
+A
+14 210
+#15170
+pocket reality~
+pocket~
+~
+~
+15 0 16384
+999 15 15107 0
+1000 1000 0
+#15171
+vampire Information Pamphlet~
+vampire Information Pamphlet~
+A pamphlet full of information about vampires rests here.~
+~
+13 0 0
+0 0 0 0
+0 0 0
+E
+The Sign Reads~
+Please consider Classing vampire, undoubtedly this muds greatest
+class in my personal opinion. clans include - brujah, gangrel, tzimisce, ventrue,
+lasombra, and nosferatu.
+Base Classing reqs are 5k across, though this subject to the decision of the Clan Leader.
+Help clandisc shows the 3 disciplines which will go to level 7 for each clan
+ 
+-Kalgor, Master Vampire
+~
+#15244
+claw of caine~
+#0Claw of #rCaine#n~
+#0Claw of #rCaine#n~
+~
+13 0 0
+0 0 0 0
+0 0 0
+#0
+
+
+
+#ROOMS
+#15100
+Entrance to the The Red Dragon Inn~
+You stand infront of the The Red Dragon Inn, one of the most famous inns of
+heroes. This inn is a place where hero's and villians can come together
+under a banner of peace and talk, plot and have fun.
+~
+0 1028 1
+D0
+~
+~
+0 -1 15101
+D5
+~
+~
+0 0 5268
+S
+#15101
+The Red Dragon Inn~
+You enter the Inn and are assulted by the sounds of cheers and singing, people
+of all races sit here talking, drinking and generally having a good time. You
+try to scan the crowds for familiar faces but find none so far.
+Your concentration is shattered however as your gaze is drawn to the huge
+stuffed red dragon head which is the inn's namesake.
+~
+0 4 0
+D0
+~
+~
+0 -1 15112
+D1
+~
+~
+0 -1 15102
+D2
+~
+~
+0 -1 15100
+D3
+~
+~
+0 -1 15109
+S
+#15102
+A hallway~
+This hallway leads to rooms where players can sit, talk or do...other things,
+in private without being disturbed.
+~
+0 4 0
+D0
+~
+~
+0 -1 15219
+D1
+~
+~
+0 -1 15103
+D3
+~
+~
+0 -1 15101
+S
+#15103
+A hallway~
+A huge minotaur in full war armor stands here ready to stop any fights that may occur in the booths.
+~
+0 0 0
+D0
+~
+~
+0 -1 15104
+D3
+~
+~
+0 -1 15102
+S
+#15104
+A Hallway~
+The hallway continues north, to your right is a room where patrons of the inn
+can talk in private.
+~
+0 4 0
+D0
+~
+~
+0 -1 15105
+D1
+~
+~
+0 -1 15124
+D2
+~
+~
+0 -1 15103
+S
+#15105
+A Hallway~
+Shadows flicker omniously throughout this hallway. Your view into the private
+room on your right is shrouded by spells.
+~
+0 4 0
+D0
+~
+~
+0 -1 15106
+D1
+~
+~
+0 -1 15125
+D2
+~
+~
+0 -1 15104
+S
+#15106
+A Hallway~
+Shadows flicker omniously throughout this hallway. You can hear muffled
+shouting from the room to the left, but its magically garbled by spells of
+privacy.
+~
+0 4 0
+D0
+~
+~
+0 -1 15107
+D1
+~
+~
+0 -1 15128
+D2
+~
+~
+0 -1 15105
+S
+#15107
+A Hallway~
+Shadows flicker omniously throughout this hallway. Your view into the private
+room on your right is shrouded by spells. A muffled scream can be heard in the
+distance, those rooms are not only for talking...
+~
+0 4 0
+D0
+~
+~
+0 -1 15108
+D1
+~
+~
+0 -1 15129
+D2
+~
+~
+0 -1 15106
+S
+#15108
+End of the Hallway~
+You reach the end of the hallway, a liquor cabinet sits here for the convience
+of the patrons of the inn
+~
+0 4 0
+D2
+~
+~
+0 -1 15107
+S
+#15109
+A Corridor~
+You enter on of the more quiet sections of the inn. The lanterns on the wall
+cause shadows to move and dance along the walls. This corridor will lead you
+to the second floor of the inn.
+~
+0 0 0
+D1
+~
+~
+0 -1 15101
+D3
+~
+~
+0 -1 15110
+S
+#15110
+A Corridor~
+You wander the corridor, nothing really special here, to the north you see a
+large spiriling stair case. A figure seperates the shadows and salutes you,
+its Komrad Seta!
+~
+0 0 0
+D0
+~
+~
+0 -1 15111
+D1
+~
+~
+0 -1 15109
+S
+#15111
+End of the Corridor~
+You come to the end of the corridor, the staircase leading to the second floor
+of the inn is here.
+~
+0 0 0
+D2
+~
+~
+0 -1 15110
+D4
+~
+~
+0 -1 15132
+S
+#15112
+The Red Dragon Inn~
+The party is in full pitch here, two werewolves are arm wrestling, A roaring
+drunk mage is here turning a furious Paladin five different shades of Faerie
+Fire.
+~
+0 0 0
+D0
+~
+~
+0 -1 15118
+D1
+~
+~
+0 -1 15114
+D2
+~
+~
+0 -1 15101
+D3
+~
+~
+0 -1 15113
+S
+#15113
+The Red Dragon Inn~
+In this corner of the inn two ninja's are playing a game of darts. A roar of
+laughter erupts as one of the ninja's bomzimites himself by accident and
+misses the target.
+~
+0 0 0
+D0
+~
+~
+0 -1 15121
+D1
+~
+~
+0 -1 15112
+S
+#15114
+The Red Dragon Inn~
+Dozens of monks in pure white robes sit at a large table discussing various
+things quietly, suddenly two of them stand up and yell 'screw it, lets just
+get drunk!' A cheer raises from the group as they go into full party mode...
+who knew monks could have a good time?
+~
+0 0 0
+D0
+~
+~
+0 -1 15115
+D3
+~
+~
+0 -1 15112
+S
+#15115
+The Red Dragon Inn~
+Walking into the room you are stunned as you see 5 identical clones staring
+back at you. They all chuckle at your confused expression as they unmask and
+reveal their true vampric nature. As a group they look at you and mutter 'you
+will remember nothing...' Then laugh as your eyes glaze over and you stumble
+out of the room.
+~
+0 0 0
+D0
+~
+~
+0 -1 15116
+D2
+~
+~
+0 -1 15114
+D3
+~
+~
+0 -1 15118
+S
+#15116
+The Red Dragon Inn~
+Fire and Brimstone mark this section of the room. A bunch of the greater and
+lesser demons mill about the room torturing anyone who enters.
+~
+0 0 0
+D0
+~
+~
+0 -1 15117
+D2
+~
+~
+0 -1 15115
+D3
+~
+~
+0 -1 15119
+S
+#15117
+Shadowed Corner of the Inn~
+Shadows amoung shadows cling here. Ninja's talk here in hushed tones. You can
+see a group of ninja arguing over what looks like the plans to immortal
+offices....
+~
+0 0 0
+D2
+~
+~
+0 -1 15116
+D3
+~
+~
+0 -1 15120
+S
+#15118
+The Red Dragon Inn~
+You wander the crowds greeting old friends and rivals. The dark elves Jade and
+Morgan can be seen in the corner talking in hushed tones to each other. The
+start of a brawl seems almost un-thinkable in this peaceful inn
+~
+0 0 0
+D0
+~
+~
+0 -1 15119
+D1
+~
+~
+0 -1 15115
+D2
+~
+~
+0 -1 15112
+D3
+~
+~
+0 -1 15121
+S
+#15119
+The Red Dragon Inn~
+A pair of vampyres and a trio of monks are here deeply emursed in a discussion
+of the advantages of good vs. evil. At another table a ninja and werewolf are
+arguing stealth vs overwelming power.
+~
+0 0 0
+D0
+~
+~
+0 -1 15120
+D1
+~
+~
+0 -1 15116
+D2
+~
+~
+0 -1 15118
+D3
+~
+~
+0 -1 15122
+S
+#15120
+The Bar~
+Your eyes are immediatly drawn to the impressive selection of imported
+beverages Alderak has collected for the enjoyment of his customers. You see a
+Thalos ale, Prydain spirits, Tsavo grog and even a rare Palanthas wine bottle
+or two.
+
+~
+0 0 0
+D0
+~
+~
+0 -1 15130
+D1
+~
+~
+0 -1 15117
+D2
+~
+~
+0 -1 15119
+D3
+~
+~
+0 -1 15123
+S
+#15121
+The Red Dragon Inn~
+A polymorphed dragon is here talking to a demon about the hazards of
+indigestion from eating mortals. A vampire mage is also here hypnotizing
+mortals into thinking they are chickens! You see one of the lesser imms dart
+around in the shadows looking for dropped spare change.
+~
+0 0 0
+D0
+~
+~
+0 -1 15122
+D1
+~
+~
+0 -1 15118
+D2
+~
+~
+0 -1 15113
+S
+#15122
+The Red Dragon Inn~
+This section of the Inn has been clearly claimed by the werewolves. You
+pale as you see them tear into the raw boar they ordered for a meal.
+Each werewolf raises his or her tankard of ale and salutes you as you pass.
+~
+0 0 0
+D0
+~
+~
+0 -1 15123
+D1
+~
+~
+0 -1 15119
+D2
+~
+~
+0 -1 15121
+S
+#15123
+The Red Dragon Inn~
+This is the favorite table of the Immortals from the Fallen Empires Mud, Kai
+can be seen lighting up a spliff. You can see MereK, Aria and Scorch laughing
+over memories of the original RoP and Diamondgate. Rakarth meanwhile is trying
+to get everyones attention with some idea's to implement. Oddly enough Rune is
+no where to be seen.
+~
+0 0 0
+D1
+~
+~
+0 -1 15120
+D2
+~
+~
+0 -1 15122
+S
+#15124
+Private Room~
+The walls are blank, spells of protection and privacy have been placed on the room to ensure no one disturbs you.
+~
+0 1540 0
+D0
+~
+~
+0 -1 15126
+D3
+~
+~
+0 -1 15104
+S
+#15125
+Private Room~
+The walls are blank, spells of protection and privacy have been placed on the room to ensure no one disturbs you.
+~
+0 1540 0
+D1
+~
+~
+0 -1 15156
+D3
+~
+~
+0 -1 15105
+S
+#15126
+In The Walls~
+~
+0 1028 0
+D1
+~
+~
+0 -1 15127
+D2
+~
+~
+0 -1 15124
+S
+#15127
+Private Private Room~
+The walls are blank, spells of protection and privacy have been placed on the
+room to ensure no one disturbs you. The words MEREK WAS HERE (in
+crayon!) has been scribbled on the walls
+~
+0 1540 0
+D3
+~
+~
+0 -1 15126
+S
+#15128
+Private Room~
+The walls are blank, spells of protection and privacy have been placed on the
+room to ensure no one disturbs you.
+~
+0 1540 0
+D3
+~
+~
+0 -1 15106
+S
+#15129
+A Private Room~
+The walls are blank, spells of protection and privacy have been placed on the
+room to ensure no one disturbs you.
+~
+0 1536 0
+D3
+~
+~
+0 -1 15107
+S
+#15130
+Behind the Bar~
+Some how it seems a few people have snuck behind Alderak and have gotten into
+the really hard liquor. You see a few young children in various states of
+drunken delrium singing and dancing around.
+~
+0 0 0
+D2
+~
+~
+0 -1 15120
+D5
+~
+~
+0 -1 15131
+S
+#15131
+Wine Cellar~
+This room is HUGE. Racks and Racks of wine line the walls. You stare in awe as
+you take a step in. Suddenly you stumble over something, looking down you see
+you have tripped over someone!
+Well it looks like you've found Rune, seems he took it upon himself to guard
+the wine, unfortunatly no one told him not to drink any of it either.
+~
+0 4 0
+D0
+~
+~
+0 -1 15151
+D4
+~
+~
+0 -1 15130
+S
+#15132
+The North-West  Corner of the Second Floor of the Inn~
+A row of lanterns light the hallway creating dancing shadows along the walls.
+To the east you hear the faint sound of wedding bells, to the south you sense
+an aura of greatness.
+~
+0 0 0
+D1
+~
+~
+0 -1 15133
+D2
+~
+~
+0 -1 15146
+D5
+~
+~
+0 -1 15111
+S
+#15133
+The Second Floor of the Inn~
+The flickering shadows from the lanterns on the walls make it hard to see your
+surroundings, you can still barely hear the faint sounds from the people below
+you through the floorboards. To the east you hear the sounds of wedding bells.
+You can barely detect the faint smell of incense
+~
+0 0 0
+D1
+~
+~
+0 -1 15134
+D3
+~
+~
+0 -1 15132
+S
+#15134
+The Second Floor of the Inn~
+The flickering shadows from the lanterns on the walls make it hard to see your
+surroundings. To the south you hear the chimes of wedding bells, the smell of
+incense is strongest from there.
+~
+0 0 0
+D1
+~
+~
+0 -1 15135
+D2
+~
+~
+0 -1 15147
+D3
+~
+~
+0 -1 15133
+S
+#15135
+The Second Floor of the Inn~
+The flickering shadows from the lanterns on the walls make it hard to see your
+surroundings. The smell of incense lingers in the air. The hallway continues
+east and west.
+~
+0 0 0
+D1
+~
+~
+0 -1 15136
+D3
+~
+~
+0 -1 15134
+S
+#15136
+The North-East Corner of the Second Floor of the Inn~
+The flickering shadows from the lanterns on the walls make it hard to see your
+surroundings. You can see the glow of a neon sign to the south, but cannot
+read its lettering
+~
+0 0 0
+D2
+~
+~
+0 -1 15137
+D3
+~
+~
+0 -1 15135
+S
+#15137
+The Second Floor of the Inn~
+The flickering shadows from the lanterns on the walls make it hard to see your
+surroundings. You can hear muzak coming from the south, you can make out "Flle
+Emps Snir Sop" from a bright neon sign to the south.
+~
+0 0 0
+D0
+~
+~
+0 -1 15136
+D2
+~
+~
+0 -1 15138
+S
+#15138
+The Second Floor of the Inn~
+You continue down the hallway, a neon green 
+"Souvenir Shop" sign blinks at you annoyingly on your left draws your
+attention. A less noticable brass sign informs you the mortal complaint room
+is situated on the right.
+~
+0 4 0
+D0
+~
+~
+0 -1 15137
+D1
+~
+~
+0 -1 15149
+D2
+~
+~
+0 -1 15139
+D3
+~
+~
+0 -1 15148
+S
+#15139
+The Second Floor of the Inn~
+The flickering shadows from the lanterns on the walls make it hard to see your
+surroundings. You can see a neon sign to the north and hear the sounds of some
+long forgotten song in muzak form coming from one of the rooms.
+~
+0 0 0
+D0
+~
+~
+0 -1 15138
+D2
+~
+~
+0 -1 15140
+S
+#15140
+The Second Floor of the Inn~
+The flickering shadows from the lanterns on the walls make it hard to see your
+surroundings. To the west lays a storage room, the hallway continues north and
+south.
+~
+0 0 0
+D0
+~
+~
+0 -1 15139
+D2
+~
+~
+0 -1 15157
+D3
+~
+~
+0 -1 15150
+S
+#15141
+The Second Floor of the Inn~
+The flickering shadows from the lanterns on the walls make it hard to see your
+surroundings. This hallway leads west or east to the OOC room.
+~
+0 0 0
+D1
+~
+~
+0 -1 15158
+D3
+~
+~
+0 -1 15142
+S
+#15142
+The South-West Corner of the Second Floor of the Inn~
+The flickering shadows from the lanterns on the walls make it hard to see your
+surroundings. You can go east or north.
+~
+0 0 0
+D0
+~
+~
+0 -1 15143
+D1
+~
+~
+0 -1 15141
+S
+#15143
+The Second Floor of the Inn~
+The flickering shadows from the lanterns on the walls make it hard to see your surroundings. You can make out a soft blue glow coming from the north.
+~
+0 0 0
+D0
+~
+~
+0 -1 15144
+D2
+~
+~
+0 -1 15142
+S
+#15144
+The Second Floor of the Inn~
+The flickering shadows from the lanterns on the walls make it hard to see your surroundings. A bright glow is coming from the north.
+~
+0 0 0
+D0
+~
+~
+0 -1 15145
+D2
+~
+~
+0 -1 15143
+S
+#15145
+The Second Floor of the Inn~
+The flickering shadows from the lanterns on the walls make it hard to see your
+surroundings. A bright bright light floods out from the room to your left,
+there is a sign by the door but you cannot make it out because of the glare.
+~
+0 0 0
+D0
+~
+~
+0 -1 15146
+D1
+~
+~
+0 -1 15161
+D2
+~
+~
+0 -1 15144
+S
+#15146
+The Second Floor of the Inn~
+The flickering shadows from the lanterns on the walls make it hard to see your
+surroundings. A bright glow is coming from the north. A Highlander is here
+with a Werewolf looking for a hiding ninja (who happens to be invis, in the
+room and making faces at them!)
+~
+0 0 0
+D0
+~
+~
+0 -1 15132
+D2
+~
+~
+0 -1 15145
+S
+#15147
+Wedding Chapel~
+This is a realativly simple room, a small altar sits in the middle of the
+room. A thousand lit incensed candles bask the room in a nice friendly glow.
+MereK often does many marriages here at the request of the mortals. You hear
+the chime of wedding bells but cannot see the source.
+~
+0 1024 0
+D0
+~
+~
+0 -1 15134
+S
+#15148
+The Inn's Gift Shop!~
+This room is full of novelties and rarities.  The whole line of "MereK Wear
+(MW)" clothing covers one of the walls. Other various rarities such as the
+short lived "RoP Cola" and a can of 'Ninja Anti-Invis Spray" are scattered
+around the room.
+~
+0 0 0
+D1
+~
+~
+0 -1 15138
+S
+#15149
+Mortal Complaint Room.~
+This room is were most of the mortal complaints are heard. On various days you
+can talk to one of the immortals about certain problems. Or you can just
+scream at the animated dummy dressed up as MereK.
+~
+0 0 0
+D3
+~
+~
+0 -1 15138
+S
+#15150
+A Storage Room.~
+This room is full of clutter, old snippets of code, old defunct class eq,
+various mortal ideas and bug reports long forgotten in the shuffle. You see a
+large mound of mortal complaints carelessly shoved in the farthest corner of
+the room out of sight and out of mind.
+~
+0 0 0
+D1
+~
+~
+0 -1 15140
+S
+#15151
+Wine Cellar~
+The smell of age and dust is strong here, most of the wine down here is rare
+and never been opened. The inn prides itself on its wines.
+~
+0 4 0
+D0
+~
+~
+0 -1 15152
+D1
+~
+~
+0 -1 15155
+D2
+~
+~
+0 -1 15131
+S
+#15152
+Wine Cellar~
+This room resembles many of the other rooms in the cellar, wine bottles racked
+neatly beside each other, but this room has two differences. One is the large
+glowing portal on the floor leading to god knows where, and second there seems
+to be a ghostly elven warrior here attacking you..
+~
+0 0 0
+D2
+~
+~
+0 -1 15151
+D3
+~
+~
+0 -1 15154
+D5
+~
+~
+0 -1 15162
+S
+#15153
+Wine Cellar~
+This room is HUGE. Racks and Racks of wine line the walls.
+~
+0 1028 0
+S
+#15154
+Wine Cellar~
+This room is HUGE. Racks and Racks of wine line the walls.
+~
+0 4 0
+D1
+~
+~
+0 -1 15152
+S
+#15155
+Wine Cellar~
+This room is HUGE. Racks and Racks of wine line the walls.
+~
+0 4 0
+D3
+~
+~
+0 -1 15151
+S
+#15156
+A Secret Room~
+Looks like not all conversations are kept private, someone has added another
+room to spy on people..
+~
+0 0 0
+D3
+~
+~
+0 -1 15125
+S
+#15157
+The South-East Corner of the Second Floor of the Inn~
+The flickering shadows from the lanterns on the walls make it hard to see your
+surroundings. 
+The hallway continues north and west.
+~
+0 0 0
+D0
+~
+~
+0 -1 15140
+D3
+~
+~
+0 -1 15159
+S
+#15158
+The Second Floor of the Inn~
+The flickering shadows from the lanterns on the walls make it hard to see your
+surroundings.  You see a crude cardboard sign with the words "OOC ROOM" written
+in crayon taped (with duct tape!) above the door frame to the north. The
+hallway continues east and west.
+~
+0 4 0
+D0
+~
+~
+0 -1 15160
+D1
+~
+~
+0 -1 15159
+D3
+~
+~
+0 -1 15141
+S
+#15159
+The Second Floor of the Inn~
+The flickering shadows from the lanterns on the walls make it hard to see your
+surroundings. 
+The hallway continues east and west to the OOC room.
+~
+0 0 0
+D1
+~
+~
+0 -1 15157
+D3
+~
+~
+0 -1 15158
+S
+#15160
+The OOC Room~
+This room has been dedicated to OOC (out of character) matters. Those who RP
+and those who do not are free to use this room to talk about whatever they
+choose: money, politics, sports, even sex if they so desire.
+~
+0 1024 0
+D2
+~
+~
+0 -1 15158
+S
+#15161
+Room of Champions.~
+This room is dedicated to those players who have reached 30k across or 25
+status. So far you see no plaques or statues so far.
+~
+0 1024 0
+D3
+~
+~
+0 -1 15145
+S
+#15162
+The Caverns~
+All these caverns look the same, your not suprised that the lost City of
+Salvos would be hard to find.
+~
+0 1 0
+D0
+~
+~
+0 -1 15163
+D1
+~
+~
+0 -1 15230
+D2
+~
+~
+0 -1 15166
+D3
+~
+~
+0 -1 15165
+D4
+~
+~
+0 -1 15152
+S
+#15163
+Lost in the Caverns~
+All these caverns look the same, your not suprised that the lost underground
+city of Salvos would be hard to find.
+~
+0 1 0
+D0
+~
+~
+0 -1 15168
+D1
+~
+~
+0 -1 15164
+D2
+~
+~
+0 -1 15162
+D3
+~
+~
+0 -1 15167
+S
+#15164
+The Cavern City  of Salvnos~
+You exit the tunnels and find yourself high above the lost underground city of
+Salvnos, you can make out the forms of thousands of Salvnos drow as well as
+humaniod slaves, merchants and beasts of burden in the streets. A path leads
+down to the guarded entrance of the city.
+~
+0 4 0
+D3
+~
+~
+0 -1 15163
+D5
+~
+~
+0 -1 15169
+S
+#15165
+The Caverns~
+This little alcove appears to have become home to one of the many adventurers
+who get lost trying to find the city. It looks to be long abandoned, for you
+see the skeleton of the adventurer still in its bedroll.
+~
+0 1 0
+D1
+~
+~
+0 -1 15162
+S
+#15166
+The Caverns~
+A large squadron of Salvnos guardians rise up to protect the city!
+~
+0 1 0
+D0
+~
+~
+0 -1 15162
+S
+#15167
+The Caverns~
+All these caverns look the same, your not suprised that the lost City of Salvos would be hard to find.
+~
+0 1 0
+D0
+~
+~
+0 -1 15231
+D1
+~
+~
+0 -1 15163
+D2
+~
+~
+0 -1 15236
+D3
+~
+~
+0 -1 15235
+S
+#15168
+The Caverns~
+All these caverns look the same, your not suprised that the lost City of Salvos would be hard to find.
+~
+0 1 0
+D2
+~
+~
+0 0 15163
+S
+#15169
+Path to down to the City~
+This path is packed with people trying to get into the city, you see dark
+elves, dark dwarves, humaniods and creatures you cannot begin to classify mill
+around here.
+~
+0 1 0
+D4
+~
+~
+0 -1 15164
+D5
+~
+~
+0 -1 15170
+S
+#15170
+Path to down to the City~
+You continue walking down the the city, you notice the body of a slain deep
+gnome merchant, you better be more careful then the likes of  him or you will
+end up just like him..
+~
+0 1 0
+D4
+~
+~
+0 -1 15169
+D5
+~
+~
+0 -1 15171
+S
+#15171
+Bottom of the Path~
+You shove your way through the crowds of travellers and merchants trying to
+get into the city. You can see actually feel the tension of the merchants as
+they wait to get into the deadly city of the drow.
+~
+0 1 0
+D1
+~
+~
+0 -1 15172
+D4
+~
+~
+0 -1 15170
+S
+#15172
+Gates of the City~
+You are at the entrance to the underground city. A large adamantite gate
+flanked by two huge beholders which guard the entrance to the city.
+~
+0 1 0
+D0
+~
+~
+0 -1 15173
+D3
+~
+~
+0 -1 15171
+S
+#15173
+The City of Salvnos~
+You are dumbfounded as you enter the city, much like its cousin Menzoberranzan
+the buildings are carved out of the stalagmites creating a etchingly beautiful
+yet haunting sight.
+~
+0 0 1
+D0
+~
+~
+0 -1 15178
+D1
+~
+~
+0 -1 15179
+D2
+~
+~
+0 -1 15172
+D3
+~
+~
+0 -1 15174
+S
+#15174
+Juxal Street~
+You travel west on Juxal street. You can see the harbor in the underground
+lake in the distance, You also see two large buildings but can't determine
+their importance yet.
+~
+0 0 1
+D0
+~
+~
+0 -1 15175
+D1
+~
+~
+0 -1 15173
+D3
+~
+~
+0 -1 15200
+S
+#15175
+a deserted allyway~
+This allyway is so unremarkable even the guards do not bother to patrol it.
+~
+0 4 1
+D0
+~
+~
+0 -1 15176
+D2
+~
+~
+0 -1 15174
+S
+#15176
+a deserted allyway~
+This allyway is so unremarkable even the guards do not bother to patrol it.
+~
+0 0 1
+D0
+~
+~
+0 -1 15217
+D1
+~
+~
+0 -1 15177
+D2
+~
+~
+0 -1 15175
+S
+#15177
+a deserted allyway~
+This allyway is so unremarkable even the guards do not bother to patrol it.
+~
+0 0 1
+D2
+~
+~
+0 -1 15178
+D3
+~
+~
+0 -1 15176
+S
+#15178
+a deserted allyway~
+This allyway is so unremarkable even the guards do not bother to patrol it. 
+Trash is everywhere making it hard to walk without squishing something
+~
+0 4 1
+D0
+~
+~
+0 -1 15177
+D1
+~
+~
+0 -1 15218
+D2
+~
+~
+0 -1 15173
+S
+#15179
+Juxal Street~
+Travelling east in the city is a wise choice, for the west is known to be the
+bad side of town, knowing drow you can only imagine how bad it really is. Just
+at the edge of your vision you see the ArchMages tower.
+~
+0 0 1
+D1
+~
+~
+0 -1 15180
+D3
+~
+~
+0 -1 15173
+S
+#15180
+Juxal Street~
+A Deep Dwarf and a Illithid are here arguing at each other, spectators
+meanwhile are placing bets on who will win if they fight. You can continue
+east or west on Juxal Street or you can go south on Galos Lane
+~
+0 0 1
+D1
+~
+~
+0 -1 15196
+D2
+~
+~
+0 -1 15181
+D3
+~
+~
+0 -1 15179
+S
+#15181
+Galos Lane~
+You come to a intersection, go north onto Juxal Street, South to the citys
+Assassins Guild, or contiue east on Galos Lane.
+~
+0 4 1
+D0
+~
+~
+0 -1 15180
+D1
+~
+~
+0 -1 15183
+D2
+~
+~
+0 -1 15182
+S
+#15182
+Guild of Assassins~
+This room is kept in constant darkness to protect the identities of its
+members.
+~
+0 1 1
+D0
+~
+~
+0 -1 15181
+S
+#15183
+Galos Lane~
+You are on the winding Galos way, This road leads to the Drunken Orc Inn, and
+the ArchMages tower.
+~
+0 0 1
+D0
+~
+~
+0 -1 15184
+D3
+~
+~
+0 -1 15181
+S
+#15184
+Galos Lane~
+You are at a bend in the road, go south or go west, its your choice.
+~
+0 0 1
+D2
+~
+~
+0 -1 15183
+D3
+~
+~
+0 -1 15185
+S
+#15185
+Galos Lane~
+You are at a bend in the road, go north or go east, its your choice.
+~
+0 0 1
+D0
+~
+~
+0 -1 15186
+D1
+~
+~
+0 -1 15184
+S
+#15186
+Galos Lane~
+You are at a bend in the road, go south or go east, its your choice.
+~
+0 0 1
+D1
+~
+~
+0 -1 15187
+D2
+~
+~
+0 -1 15185
+S
+#15187
+Galos and Kjul Avenue~
+You have arrived at a busy intersection. The the east lays The Drunken Orc
+Inn, to the south leads to the ArchMage of Salvnos's tower, and to the north
+leads to a guard post.
+~
+0 0 1
+D0
+~
+~
+0 -1 15191
+D1
+~
+~
+0 -1 15188
+D2
+~
+~
+0 -1 15189
+D3
+~
+~
+0 -1 15186
+S
+#15188
+The Drunken Orc Inn~
+This inn is in shambles, looks like a dragon rolled through here..wait it was
+a dragon!
+~
+0 0 1
+D3
+~
+~
+0 -1 15187
+S
+#15189
+Kjul Avenue~
+The road continues north and south. To the south you can make out the siloette
+of a tower
+~
+0 0 1
+D0
+~
+~
+0 -1 15187
+D2
+~
+~
+0 -1 15190
+S
+#15190
+Before the Archmages Tower~
+You stand before one of the largest buildings of the city. The current
+archmage has the options of living here.
+~
+0 0 1
+D0
+~
+~
+0 -1 15189
+D2
+~
+~
+0 -1 15192
+S
+#15191
+A Guard Post~
+This is one like the many other guard posts around the city.
+~
+0 0 0
+D2
+~
+~
+0 -1 15187
+S
+#15192
+Inside the Archmages Tower~
+You walk into the tower and feel temporarily feel disoriented, looking around
+you can immediatly tell you are no longer within the city but have been
+transported to another plane of existance. Oh look, a couple apprentices have
+come to greet you...
+~
+0 0 0
+D0
+~
+~
+0 -1 15190
+D4
+~
+~
+0 -1 15193
+S
+#15193
+2nd Floor of the Archmages Tower~
+This rooms walls have been scorched from what seems to be a large fire.
+~
+0 0 0
+D4
+~
+~
+0 -1 15194
+D5
+~
+~
+0 -1 15192
+S
+#15194
+Archmages Room~
+This room is filled wall to wall with books, scrolls, enchanted weapons and
+various pieces of armor, this room alone could buy any large city in the
+realms above.
+~
+0 0 0
+D4
+~
+~
+0 -1 15195
+D5
+~
+~
+0 -1 15193
+S
+#15195
+Top of the tower~
+You are at the top of the tower, this is were the archmages does his most
+powerful spells like summoning spirits from the abyss, seems he left his
+familar here to guard the room.
+~
+0 0 0
+D5
+~
+~
+0 -1 15194
+S
+#15196
+Juxal Street~
+This road leads to the a house compound to the north, a guard is here making
+sure no one brings any visible weapons. A goblin slave searchs the carts for
+hidden compartments.
+
+~
+0 0 1
+D0
+~
+~
+0 -1 15197
+D3
+~
+~
+0 -1 15180
+S
+#15197
+Hysrx Road~
+The shadows flicker omniously. You can barely make out the compound to the
+north.
+~
+0 0 1
+D0
+~
+~
+0 -1 15198
+D2
+~
+~
+0 -1 15196
+S
+#15198
+Hysrx Road~
+The shadows flicker omniously. To the north you can see a drow compound lined
+with soldiers and protective wards.
+~
+0 4 1
+D0
+~
+~
+0 -1 15199
+D2
+~
+~
+0 -1 15197
+S
+#15199
+Noble House of Salvnos~
+You come to the gates of a noble house, before you can get even close to the
+doors, a pair of minotaurs burst from hiding spaces and attack!
+~
+0 0 1
+D2
+~
+~
+0 -1 15198
+S
+#15200
+Juxal Street~
+You come to a busy intersection, the road continues north to Bathix street,
+south to a guard post, and west to one of the noble houses compounds.
+~
+0 0 1
+D0
+~
+~
+0 -1 15202
+D1
+~
+~
+0 -1 15174
+D2
+~
+~
+0 -1 15205
+D3
+~
+~
+0 -1 15201
+S
+#15201
+Nobel House of Salvnos~
+You come to the gates of a noble house, before you can get even close to the
+doors, a pair of minotaurs burst from hiding spaces and attack!
+~
+0 0 0
+D1
+~
+~
+0 -1 15200
+S
+#15202
+Bathix Street~
+A pair of city guards are here directing people away from a corpse of a gnome,
+seems he got a little too persistant with his bartering.
+~
+0 0 1
+D0
+~
+~
+0 -1 15203
+D2
+~
+~
+0 -1 15200
+S
+#15203
+Bathix Street~
+This road is neat and orderly, nothing looks out of place. A small crowd has
+gathered south of here, north leads to Nxyt street.
+~
+0 0 1
+D0
+~
+~
+0 -1 15204
+D2
+~
+~
+0 -1 15202
+S
+#15204
+Nxyt Street~
+You quickly jump into the shadows as a large entorage of minotaurs carrying a Matron Mother passes by, you don't want to get in their way.
+~
+0 0 1
+D1
+~
+~
+0 -1 15206
+D2
+~
+~
+0 -1 15203
+D3
+~
+~
+0 -1 15211
+S
+#15205
+A Guard House~
+This is one like the many other guard posts around the city.
+~
+0 0 0
+D0
+~
+~
+0 -1 15200
+S
+#15206
+Nxyt Street~
+Screams filter through the city, just another day in Salvnos.
+~
+0 0 1
+D0
+~
+~
+0 -1 15221
+D1
+~
+~
+0 -1 15207
+D3
+~
+~
+0 -1 15204
+S
+#15207
+Nxyt Street~
+Screams filter through the city, just another day in Salvnos.
+~
+0 0 1
+D1
+~
+~
+0 -1 15208
+D3
+~
+~
+0 -1 15206
+S
+#15208
+Nxyt Street~
+You can go north on Ptyx street or continue east to the community sacraficial
+altars. You get the distinct feeling of evil to the east.... (even more then
+the average drow possesses) ;)
+~
+0 0 1
+D0
+~
+~
+0 -1 15214
+D1
+~
+~
+0 -1 15209
+D3
+~
+~
+0 -1 15207
+S
+#15209
+Nxyt Street~
+The air is oppressive here, you feel like it is smothering you somehow, you
+decide to ignore it. You see a run down inn to the east and what seems to be
+an altar to the north.
+~
+0 0 1
+D0
+~
+~
+0 -1 15220
+D1
+~
+~
+0 -1 15210
+D3
+~
+~
+0 -1 15208
+S
+#15210
+Inn of the Broken Fang~
+This inn has been condemned by the city. A few hanger-ons still frequent this place.
+~
+0 0 0
+D3
+~
+~
+0 -1 15209
+S
+#15211
+Nxyt Street~
+A long progression of drow is heading towards the temple for the evening
+ceremonies. You try to stay out of sight incase they decide to pick you for a
+sacrifice..
+~
+0 0 1
+D1
+~
+~
+0 -1 15204
+D3
+~
+~
+0 -1 15212
+S
+#15212
+Temple Of Lloth~
+You at the temple of Lloth, you can hear the chants and the screams from
+priestesses and sacrifices, you try to block out the horrible sounds but you
+can't...a pair of large spiders rush out and attack you!
+~
+0 0 1
+D0
+~
+~
+0 -1 15222
+D1
+~
+~
+0 -1 15211
+D3
+~
+~
+0 -1 15213
+S
+#15213
+Temple Of Lloth~
+This is were the spiders are held when not protecting the temple, good job, looks like their meals will be brought to them this time.
+~
+0 0 0
+D1
+~
+~
+0 -1 15212
+S
+#15214
+Ptyx Street~
+You get a rare wiff of fresh air..how can that be? your hundreds of feet below
+the surface.
+~
+0 0 1
+D0
+~
+~
+0 -1 15215
+D2
+~
+~
+0 -1 15208
+S
+#15215
+Ptyx Street~
+You can see sunlight to the north!!
+
+~
+0 0 1
+D0
+~
+~
+0 -1 15216
+D2
+~
+~
+0 -1 15214
+S
+#15216
+To the Surface~
+You've found a way out, your sure this tunnel leads somewhere to the surface,
+at least you hope..
+~
+0 0 0
+D2
+~
+~
+0 -1 15215
+D4
+~
+~
+0 -1 15100
+S
+#15217
+Bregan D'aerthe Safe House~
+You have stumbled upon on of the Bregan D'aerthe safe houses, unforunatly for
+you it seems its occupied by a pair of Bregan D'aerthe Soldiers!
+~
+0 0 0
+D0
+~
+~
+0 -1 15237
+D2
+~
+~
+0 -1 15176
+S
+#15218
+A hovel~
+Seems some goblin slaves have taken up residance in this little section of the alley, they see you and attack fearing you could take away thier home.
+~
+0 0 0
+D3
+~
+~
+0 -1 15178
+S
+#15219
+Coat Closet Room~
+You have walked into the inns coat closet room. You quickly remove your coat and wait for an attendent to come and get it. Out of the shadows steps two servants...you think you recognize them ..oh my lord, its Shade and Articus, so this is what happens to those ex-imms...
+~
+0 1024 0
+D2
+~
+~
+0 -1 15102
+S
+#15220
+Altar of Lloth~
+An alter draped with spiders adorns the center of the room, the blood of a common born male still glowing red
+within the earthen chalice. A tension surrounds you, seemingly coming from the altar. You attempt to hide, but
+find that it is too late.
+~
+0 0 0
+D2
+~
+~
+0 -1 15209
+S
+#15221
+Drow Compound~
+You come to the gates of a noble house, before you can get even close to the doors, a pair of minotaurs burst from hiding spaces and attack!
+~
+0 0 1
+D2
+~
+~
+0 -1 15206
+S
+#15222
+Temple of Lloth~
+Its silent and empty in here, everyone must be at the ceremonies.
+~
+0 0 0
+D1
+~
+~
+0 -1 15227
+D2
+~
+~
+0 -1 15212
+D3
+~
+~
+0 -1 15223
+S
+#15223
+Temple of Lloth~
+darkness..utter darkness
+~
+0 0 0
+D0
+~
+~
+0 -1 15224
+D1
+~
+~
+0 -1 15222
+S
+#15224
+Temple of Lloth~
+despair...utter despair..
+~
+0 0 0
+D0
+~
+~
+0 -1 15225
+D2
+~
+~
+0 -1 15223
+S
+#15225
+Temple of Lloth~
+depression..utter depression threatens to smother you....
+~
+0 0 0
+D1
+~
+~
+0 -1 15226
+D2
+~
+~
+0 -1 15224
+S
+#15226
+Altar of Lloth~
+You walk into the room and recoil immediatly, a drow is strapped to the alter
+with a pair of clerics chanting, the drow screams as his body begins to
+destort and strech, within moments what was once a beautiful drow has become
+the ultimate drow perversion....a drider.
+~
+0 0 0
+D1
+~
+~
+0 -1 15229
+D3
+~
+~
+0 -1 15225
+S
+#15227
+Temple of Lloth~
+darkness..utter darkness
+~
+0 0 0
+D0
+~
+~
+0 -1 15228
+D3
+~
+~
+0 -1 15222
+S
+#15228
+Temple of Lloth~
+You feel the urge to run grow strong as you wander the temple of lloth.
+~
+0 0 0
+D0
+~
+~
+0 -1 15229
+D2
+~
+~
+0 -1 15227
+S
+#15229
+Temple of Lloth~
+darkness..utter darkness
+~
+0 0 0
+D2
+~
+~
+0 -1 15228
+D3
+~
+~
+0 -1 15226
+S
+#15230
+The Caverns~
+All these caverns look the same, your not suprised that the lost underground city of Salvos would be hard to find.
+~
+0 1 0
+D3
+~
+~
+0 -1 15162
+S
+#15231
+The Caverns~
+All these caverns look the same, your not suprised that the lost City of Salvos would be hard to find.
+~
+0 1 1
+D1
+~
+~
+0 -1 15233
+D2
+~
+~
+0 -1 15167
+D3
+~
+~
+0 -1 15232
+S
+#15232
+The Caverns~
+All these caverns look the same, your not suprised that the lost City of Salvos would be hard to find.
+~
+0 1 1
+D1
+~
+~
+0 -1 15231
+S
+#15233
+The Caverns~
+All these caverns look the same, your not suprised that the lost City of Salvos would be hard to find.
+~
+0 1 1
+D1
+~
+~
+0 0 15234
+D3
+~
+~
+0 -1 15231
+S
+#15234
+The Caverns~
+All these caverns look the same, your not suprised that the lost City of Salvos would be hard to find
+~
+0 16385 1
+D3
+~
+~
+0 0 15233
+S
+#15235
+The Caverns~
+All these caverns look the same, your not suprised that the lost City of Salvos would be hard to find.
+~
+0 1 1
+D1
+~
+~
+0 -1 15167
+S
+#15236
+The Caverns~
+All these caverns look the same, your not suprised that the lost City of Salvos would be hard to find.
+~
+0 1 1
+D0
+~
+~
+0 -1 15167
+S
+#15237
+Bregan D'aerthe Safe House~
+The room is doused with magical darkness for secrecy
+~
+0 0 1
+D0
+~
+~
+0 -1 15240
+D1
+~
+~
+0 -1 15242
+D2
+~
+~
+0 -1 15217
+D3
+~
+~
+0 -1 15238
+S
+#15238
+Bregan D'aerthe Safe House~
+The room is doused with magical darkness for secrecy
+~
+0 4 1
+D0
+~
+~
+0 -1 15239
+D1
+~
+~
+0 -1 15237
+S
+#15239
+Bregan D'aerthe Safe House~
+The leader for this cities of division of the Bregan D'aerthe is here talking with two commanders, they see you and attack!
+~
+0 0 1
+D2
+~
+~
+0 -1 15238
+S
+#15240
+Bregan D'aerthe Safe House~
+The room is doused with magical darkness for secrecy. You think you hear the
+patter of feet in the darkness but dismiss for some vermin.
+~
+0 0 1
+D1
+~
+~
+0 -1 15241
+D2
+~
+~
+0 -1 15237
+S
+#15241
+Map Room~
+The room is doused with magical darkness for secrecy. Large maps of the
+surface cover the walls, various other maps of drow compounds and the
+immortals offices are here as well.
+~
+0 0 1
+D2
+~
+~
+0 -1 15242
+D3
+~
+~
+0 -1 15240
+S
+#15242
+Bregan D'aerthe Safe House~
+The room is doused with magical darkness for secrecy
+~
+0 0 1
+D0
+~
+~
+0 -1 15241
+D3
+~
+~
+0 -1 15237
+S
+#15243
+Abode of the unknown~
+This room exists and does not exist, parts of the room flicker and fade in and
+out of reality making you unsure of where to step. A small cat with the name
+'Coal' on its collar scampers around in the darkness. You can see pictures of
+various incarnations of MereK fade in and out of a magical picture frame.
+~
+0 0 0
+D1
+~
+~
+0 0 15244
+S
+#15244
+Dedication...~
+Just as a note to whom ever finds this room... This was my first (completed)
+attempt at building, many hours have gone into this area and no doubt many
+more will.
+
+I would just like to thank a few people who brought me into the mudding world.
+Dragonsworn, Danyn and Synner, who first introduced me to mudding at school
+and to the awsome mud named Diamondgate. Sancho, Epoch and Weasel who i met
+on my first mud and have kept in contact since. I've met alot of interesting
+and special people during the 5 or 6 years i've been mudding. Some know me as
+Merek, some as MoonwicK, and some who are unaware that they know me at all and
+probably i shall never tell them for the sake of role playing and i would'nt
+want to shock them too much.
+
+Most of all i would like to thank Aria, my angel and financee rl whom i met
+online, may our love extend the boundries of time and beyond. 
+
+Aria, my love....I dedicate my first area to you.
+
+                                           - MereK/MoonwicK  18/12/99
+
+~
+0 0 0
+D3
+~
+~
+0 0 15243
+S
+#0
+
+
+
+#SPECIALS
+M 15100 spec_guard Load to: minotaur guard
+M 15109 spec_guard Load to: guardian beholder
+M 15111 spec_guard Load to: a Salvnos cityguard
+M 15112 spec_breath_any Load to: Archmagus Vailz
+M 15113 spec_breath_frost Load to: archmages familar
+M 15114 spec_breath_any Load to: apprentice
+M 15121 spec_breath_frost Load to: a huge black dragon
+M 15123 spec_cast_cleric Load to: Aura the waitress
+M 15128 spec_breath_acid Load to: a Matron Mother
+M 15133 spec_guard Load to: a Salvnos cityguard
+M 15233 spec_isha_breg Load to: Revenant
+M 15234 spec_eater Load to: A Twisted Ghoul
+S
+
+
+
+#RESETS
+R 0 15162 4
+R 0 15163 4
+R 0 15231 4
+R 0 15167 4
+O 0 15100 0 15124
+O 0 15100 0 15125
+O 0 15100 0 15127
+O 0 15104 0 15108
+O 0 15100 0 15129
+O 0 15100 0 15128
+O 0 15100 0 15123
+O 0 15105 0 15147
+O 0 15130 0 15131
+O 0 15148 0 15170
+O 0 15163 0 15100
+O 0 15148 0 15202
+O 0 15170 0 15243
+O 0 15106 0 15101
+O 0 15161 0 15196
+P 0 15105 0 6005
+P 0 15105 0 6005
+P 0 15101 0 15104
+P 0 15103 0 15104
+P 0 15102 0 15104
+P 0 15168 0 15170
+P 0 15169 0 15170
+P 0 15162 0 15161
+M 0 15100 2 15103
+E 0 15160 0 14
+M 0 15101 1 15120
+G 0 15102 0
+G 0 15103 0
+G 0 15101 0
+M 0 15102 1 15148
+E 0 15117 0 15
+G 0 15116 0
+G 0 15117 0
+M 0 15103 1 15149
+M 0 15104 2 15152
+E 0 15120 0 14
+E 0 15121 0 4
+M 0 15105 1 15156
+M 0 15107 2 15166
+E 0 15136 0 10
+E 0 15137 0 14
+M 0 15106 2 15166
+E 0 15135 0 14
+G 0 15138 0
+M 0 15108 1 15167
+E 0 15143 0 13
+E 0 15145 0 14
+E 0 15144 0 5
+G 0 15146 0
+M 0 15108 1 15168
+E 0 15141 0 2
+E 0 15142 0 3
+E 0 15147 0 4
+E 0 15144 0 5
+E 0 15140 0 8
+E 0 15143 0 12
+E 0 15143 0 13
+E 0 15145 0 14
+E 0 15139 0 10
+M 0 15109 2 15172
+M 0 15110 1 15169
+M 0 15111 1 15173
+E 0 15150 0 4
+E 0 15152 0 11
+E 0 15151 0 12
+E 0 15151 0 13
+E 0 15146 0 14
+M 0 15112 1 15194
+E 0 15153 0 14
+E 0 15157 0 10
+M 0 15113 2 15195
+M 0 15114 2 15192
+M 0 15115 2 15217
+E 0 15158 0 14
+M 0 15116 2 15218
+M 0 15116 2 15176
+M 0 15116 2 15177
+M 0 15117 2 15182
+E 0 15141 0 3
+E 0 15155 0 4
+E 0 15156 0 9
+E 0 15154 0 14
+M 0 15111 1 15189
+E 0 15154 0 14
+M 0 15111 2 15191
+E 0 15141 0 2
+E 0 15142 0 3
+M 0 15118 2 15199
+E 0 15160 0 14
+M 0 15117 1 15197
+E 0 15141 0 2
+E 0 15142 0 3
+E 0 15155 0 4
+E 0 15144 0 5
+E 0 15156 0 9
+E 0 15143 0 12
+E 0 15143 0 13
+E 0 15159 0 14
+M 0 15119 1 15180
+E 0 15149 0 14
+M 0 15120 1 15180
+M 0 15118 1 15196
+E 0 15160 0 14
+M 0 15116 1 15196
+M 0 15111 2 15185
+E 0 15142 0 3
+E 0 15150 0 4
+E 0 15145 0 14
+M 0 15117 1 15211
+E 0 15155 0 4
+E 0 15156 0 9
+E 0 15158 0 14
+M 0 15111 2 15205
+E 0 15152 0 11
+E 0 15146 0 14
+M 0 15118 2 15201
+E 0 15160 0 14
+M 0 15122 2 15203
+E 0 15142 0 2
+E 0 15141 0 3
+E 0 15155 0 4
+E 0 15159 0 14
+M 0 15124 1 15219
+M 0 15125 1 15219
+M 0 15123 1 15112
+G 0 15102 0
+G 0 15101 0
+M 0 15126 2 15210
+M 0 15127 2 15220
+E 0 15164 0 10
+M 0 15128 1 15204
+M 0 15128 1 15184
+M 0 15129 1 15211
+E 0 15145 0 14
+M 0 15129 2 15207
+E 0 15155 0 4
+E 0 15158 0 14
+M 0 15130 4 15213
+M 0 15118 2 15221
+E 0 15160 0 14
+M 0 15122 1 15209
+E 0 15141 0 2
+E 0 15142 0 3
+E 0 15155 0 4
+E 0 15158 0 14
+M 0 15131 1 15226
+M 0 15132 2 15226
+E 0 15165 0 14
+M 0 15130 3 15212
+M 0 15130 1 15223
+M 0 15130 1 15228
+M 0 15106 2 15165
+M 0 15106 2 15162
+E 0 15134 0 4
+E 0 15149 0 14
+M 0 15108 1 15173
+M 0 15131 1 15225
+E 0 15164 0 10
+M 0 15111 2 15206
+E 0 15166 0 14
+M 0 15126 3 15210
+M 0 15129 1 15181
+E 0 15154 0 14
+M 0 15129 2 15187
+M 0 15121 1 15188
+M 0 15122 1 15189
+E 0 15141 0 2
+E 0 15142 0 3
+E 0 15159 0 14
+M 0 15130 2 15190
+M 0 15130 2 15193
+M 0 15108 1 15165
+M 0 15134 1 15231
+E 0 15149 0 14
+M 0 15107 2 15234
+E 0 15136 0 10
+E 0 15137 0 14
+M 0 15108 1 15232
+E 0 15155 0 4
+E 0 15154 0 14
+M 0 15106 1 15235
+M 0 15133 1 15179
+E 0 15166 0 14
+M 0 15133 1 15186
+E 0 15166 0 14
+M 0 15133 2 15209
+E 0 15167 0 14
+M 0 15135 1 15239
+E 0 15167 0 14
+G 0 15167 0
+M 0 15136 1 15239
+E 0 15158 0 14
+M 0 15137 1 15239
+E 0 15159 0 14
+M 0 15115 2 15237
+M 0 15138 2 15118
+M 0 15139 2 15123
+M 0 15138 3 15121
+M 0 15139 2 15114
+M 0 15140 2 15158
+M 0 15140 2 15140
+M 0 15140 2 15136
+M 0 15141 1 15243
+M 0 15233 1 15234
+G 0 15244 0
+S
+
+
+
+#SHOPS
+15102 0 0 0 0 0 100 100 0 23
+0
+
+
+
+#$

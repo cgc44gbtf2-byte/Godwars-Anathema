@@ -1,0 +1,1439 @@
+#HELPS
+
+0 Classes~
+There are 10 available classes.  For more information on an individual class,
+refer to the help file(help dragon, help drow, etc...).  If you need to know
+anything not listed in these files, ask an experienced player or an imm.
+To be classes, simply type autoclass.
+
+Dragon       - Mythical beasts who soar through the sky.
+#PDrow#n         - Cruel masters of the underdark.
+#cElementalist#n - Instinctive users of natural magics.
+#CHighlander#n   - Immortal blademasters...of death! (*gasp*)
+#pMage#n         - WoD mages, spheres, paradox, and all.
+#7Monk#n         - Devout practioners of unarmed combat.
+#0Ninja#n        - Shadowy assassins wielding poisoned blades.
+#LSorcerer#n     - Wielders of the very fabric of reality.
+#rVampire#n      - Undead denizens of the night.
+#oWerewolf#n     - Shapeshifting servants of Gaia.
+
+Related Helps: Reqs, Clans, Leaders, and 'help <class name>'.
+~
+
+0 Reqs Requirements~
+After you get the reqs listed here, type autoclass to class.
+
+Dragon:       4 Str, 1 Dex, 3 Con, 2 Int, 2 Wis
+#PDrow#n:         2 Str, 4 Dex, 1 Con, 3 Int, 2 Wis
+#cElementalist#n: 2 Str, 1 Dex, 2 Con, 3 Int, 4 Wis
+#CHighlander#n:   4 Str, 2 Dex, 3 Con, 1 Int, 2 Wis
+#LSorcerer#n:     2 Str, 2 Dex, 1 Con, 4 Int, 3 Wis
+#7Monk#n:         2 Str, 3 Dex, 2 Con, 1 Int, 4 Wis
+#0Ninja#n:        3 Str, 4 Dex, 2 Con, 2 Int, 1 Wis
+#rVampire#n:      3 Str, 2 Dex, 4 Con, 2 Int, 1 Wis
+#oWerewolf#n:     4 Str, 2 Dex, 3 Con, 1 Int, 2 Wis
+#pMage#n:         1 Str, 2 Dex, 2 Con, 4 Int, 3 Wis
+
+Related Helps: Class, and 'help <class name>'.
+~
+
+0 Clans Clan~
+Use clan info and clan roster [page] for current managed membership/roles.
+Staff can create or adopt a managed clan for any of the ten classes.
+The historical lineage list below is not a current membership roster, and
+not every listed lineage is selectable. See help leaders.
+
+#PDrow#n:
+    DeVir, Arabani, Azuviir*, Baenrae
+#pMage#n:
+    See help mageclans.
+#7Monk#n:
+    Shar, Marduk, Heaven
+#0Ninja#n:
+    Isobe, Nishi, Mudevi, Kotaro
+#rVampire#n:
+#l Camarilla#n:
+    Ventrue, Nosferatu, Brujah
+#R Sabbat#n: 
+    Panders, Lasombra, Tzimisce
+#C Independent#n: 
+    Assamite, Gangrel
+
+* - This clan has a helpfile.
+Related Helps: Class, Leaders, Mageclans, 'help <class name>', and 'help <clan name>'.
+~
+
+0 Leaders~
+Anathema does not import the previous server's named player leaders.
+Current managed roles are stored in the live clan registry:
+
+  clan info
+  clan roster [page]
+
+Authorized members use clan invite, promote, demote, kick or transfer.
+Invitation acceptance is named: clan accept <inviter>.
+Staff use clanadmin to create/adopt and administer managed class clans.
+All ten classes can use this management, including Elementalist and Sorcerer.
+Managed roles are separate from legacy class-power/generation titles; gaining
+a managed role does not automatically grant a class power or staff level.
+
+Related Helps: Class, Clan, Challenge, and 'help <class name>'.
+~
+
+0 Challenge~
+Leadership challenges are staff-managed policy, not an automatic engine
+transfer. Contact Luto before arranging one. Posting an old-style challenge
+note, waiting a week or winning a fight does not itself update managed roles.
+Any approved transfer must be recorded through authorized clan commands.
+
+Related Helps: Leaders, and Clan.
+~
+
+
+0 Dragons~
+The fierce and lethal dracos.  Strong and proud reptillian creatures, their mere
+presence can induce fear into the brave hearts of many. Breathtaking to behold,
+glorious in the kill, be they good or evil, impressive to the highest extreme.
+As with most creatures, they are split between good - the metallic dragons, and
+evil - the chromatic.  Capable of growing up to sixty feet, these monsterous
+beings stand high on the heirarchy of power.  Growing stronger as their age
+grows, they can become one of the strongest beings to ever tread the earth.
+
+Dragon Abilities
+ Age       - Dragons gain power and strength as they grow older.
+ Powers    - As they age, Dragons can gain access to a variety of powers.
+ Types     - Dragons come in a variety of types, each with its own breath weapon.
+ Morph     - Dragons can shift into and out of Human form at will.
+ Telepathy - Dragons are able to communicate with each other through telepathy.
+
+Related Helps: Dragonskills, and Class.
+~
+
+0 Dragonskills~
+Dragon grow older through the use of the 'dragonskills' command.  As they gain
+older, they become able to purchase other abilities through the 'dragonskills'
+command, as listed below.  Dragon abilities cost 1000 per required age beyond
+Hatchling.
+
+Age           DP Cost  QP Cost  MR  Abilities
+---           -------  -------  --  ---------
+Hatchling     Starting Age      0   None
+Very Young    2500     0        0   Fangs <fangs>, Nightsight <nightsight>
+Young         5000     0        0   Horns <horns>, Claws <claws>
+Juvenile      7500     0        0   Wings <wings>, Breath <breath>
+Young Adult   10000    500      0   Tail <stail>
+Adult         15000    1000     0   Truesight <heighten>
+Mature Adult  25000    1500     10  Dust <dust>
+Old           35000    2000     20  Scry <scry>, Magic (lowers casting time)
+Very Old      50000    2500     30  Readaura <readaura>
+Ancient       70000    3000     40  Shield <shield>
+Wyrm          100000   5000     50  None
+Ancient Wyrm  Leader Position   50  None
+
+Related Helps: Dragon.
+~
+
+
+0 Drow~
+The Drow are perhaps known to be the most merciless, and dangerous race 
+known beneath the surface. They are a subrace of the Elven race, with 
+ebony black skin, though the rest of their features, shapes, and hair 
+colors range in variance as humans do.
+
+Drow Powers
+  Prayer - Drow power system.  Uses DP.
+  Dimensional Door - Inherent travel power.
+  Sign - Drow channel.
+  Drowarmor - Costs 8000 dp & 400 qp. Grants 10% MR each.
+    Cloak - Fireshield.
+    Helmet - Sanctuary.
+    Breastplate - Regeneration.
+    Bracer - Haste.
+    Bolts - drowarmor bolts [1-20], default 1; 100 DP per bolt.
+      No quest, gold or primal charge. Shooting costs 500 DP and one bolt.
+  Meditate - Drow have enhanced healing while meditating.
+  Drowupkeep - Displays known and active powers.
+
+Related Helps: Prayer, and Class.
+~
+
+0 Prayer~
+Skip disc         (fly)         {syntax: skipdisc}      DP cost: 5000
+Spider eyes       (scry)        {syntax: scry}          DP cost: 7500
+Acid bolt         (aggy attack) {syntax: acidbolt}      DP cost: 5000
+Attunement        (loyal)       {syntax: attunement}    DP cost: 1000
+Spider bite       (poison bite) {automatic}             DP cost: 7500
+Venom immunity                  {automatic}             DP cost: 5000
+Summon spider                   {syntax: summonspider}  DP cost: 8000
+Lloth's web       (web spell)   {syntax: web}           DP cost: 8000
+Speed             (4 levels)    {automatic}             DP cost: 10000 each
+Toughness                       {automatic}             DP cost: 8000
+Might                           {automatic}             DP cost: 8000
+Blindfight                      {automatic}             DP cost: 5000
+Globe of Darkness               {syntax: globedarkness} DP cost: 9500
+Faerie fire                     {syntax: faeriefire}    DP cost: 5000
+Dual Wield        (two weapons) {automatic}             DP cost: 10000
+Read aura                       {syntax: readaura}      DP cost: 6000
+Darkvision        (nightsight)  {syntax: darkvision}    DP cost: 5000
+Heighten                        {syntax: heighten}      DP cost: 20000
+
+Related Helps: Drow.
+~
+
+
+0 Elementalists~
+Called everything from geomancers to wizards, these men and women have devoted 
+their lives in learning how to channel the raw energy of the universe and 
+forming it into various things from falling rain to the hottest fire.
+
+Elementalists can access all elements, but they specialize in only ONE element. 
+As a result, their ability in the opposing element is weakened. You must have
+all your elements at 8 in order to specialize, but you may switch out of the
+specialization with the Elemskill command.
+
+Elementalist Elements:
+ Fire        - Element of Strength and Ferocity
+ Water       - Element of Order and Conformity
+ Wind        - Element of Chaos and Speed
+ Earth       - Element of Toughness
+ Sun         - Element of Light and Protection
+ Moon        - Element of Darkness and Illusion
+ Time        - Element of Travel and Moments
+ Infinity    - Element of Unity and the Void
+
+Elementalist Commands:
+ elemskill   - Displays and improves your Elements.
+ upkeep      - Displays what abilities are currently active.
+ elemarmor   - Creates class relics.  Costs 400qp and 100 primal.
+ spiritspeak - The Elementalist channel
+
+Related Helps: Elements, Elements2, and Class.
+~
+
+0 Elements~
+Fire - Element of Strength and Ferocity.
+1 : Flare Arrow    - Launches flaming arrows.
+5 : Flame Aura     - Strength increase. <auto>
+8 : Fire Blade     - Ignites your weapons.
+10: Phoenix Form   - Turn into a Phoenix.
+
+Water - Element of Order and Conformity.
+1 : Icicle Storm  - Conjures a barrage of icicles.
+5 : Aqua Barrier  - Surrounds you with a barrier of water.
+8 : Water Travel  - Allows quick travel.
+10: Water Control - Stuns opponents.
+
+Earth - Element of Toughness.
+1 : Local Quake   - Shakes the earth.
+5 : Earthen Skin  - Defense increase. <auto>
+8 : Stone Blast   - Blasts everything.
+10: Liquify Stone - Turns the land into quicksand.
+
+Wind - Element of Chaos and Speed.
+1 : Wind Wings     - Lifts you into the air.
+5 : Wind Song      - Speed increase. <auto>
+8 : Wind Blades    - Slashes with blades of wind.
+10: Atoning Winds  - Slows opponents.
+
+Related Helps: Elementalist, and Elements2
+~
+
+0 Elements2~
+Sun - Element of Light and Protection.
+1 : Sun Bath        - Showers target with healing light.
+5 : Holy Aura       - Surrounds you with a holy aura.
+8 : Solar Flash     - Blinds opponents.
+10: Solar Light     - Grants you a halo of sunlight.
+	
+Moon - Element of Darkness and Illusion.
+1 : Mirage Slice   - Summons an illusionary double to attack.
+5 : Mirage Bodies  - Evade increase. <auto>
+8 : Night Blade    - Life stealing double attack.
+10: Spiral Moon    - Weakens with dark energy.
+
+Time - Element of Travel and Moments.
+1 : Speed Vision   - Attack increase. <auto>
+5 : Hasten         - Speed increase. <auto>
+8 : Quick Chant    - Spell speed increase. <auto>
+10: Slow           - Slows target.
+
+Infinity - Element of Unity and the Void.
+1 : Far Sight      - Watches from afar.
+3 : Cloak of Sight - Hides you at a distance.
+5 : Infinite Sight - Opens your eyes to everything.
+8 : Focus          - Skill increase. <auto>
+10: Ultima Wave    - Creates a wave of destruction.
+
+Related Helps: Elementalist, and Elements.
+~
+
+
+0 Highlanders~
+For as long as history itself, there have been the immortals. Those, whom 
+through one reason or another are unable to die through normal means.  They 
+wander, be they good or evil, destined to forever uphold their beliefs through 
+adversity, and to, through beheading, rid the world of their adversaries, and 
+each other.  Practiced with their chosen weapons, they are the weapon masters.
+
+* Increase - Increases HL abilities. <Increase (ability)>
+* Forge    - Makes a hasting katana. <forge>
+           - Reforges a weapon into a katana. <forge (weapon)>
+* Where    - Highlanders can make better use of the where command to track
+              people they can't see.
+
+Related Helps: Highabil, and Class.
+~
+
+0 Highabil~
+Weaponry  - Damage bonuses...
+Attack    - Break, Damcap, and Speed bonuses.
+Defense   - Avoid, Soak, and Magic Resist bonuses.
+Abilities - Allows use of class abilities as follows.
+ 1. Heighten    - Improves vision. <heighten>
+ 2. Blade Flash - Removes target's sight, causing induced blindness. <bflash>
+ 3. Bash        - Damages target, causing them to recover before moving again. <bash>
+ 4. Twist       - Temporary speed increase, allowing one to parry more often. <htwist>
+ 5. Judgement   - Though not supernatural, highlanders are a fair judge of strength. <judgement>
+ 6. Lunge       - Opening attack that leaves your opponent unbalanced. <lunge>
+
+Related Helps: Highlanders.
+~
+
+
+0 Mages~
+True WoD Mages.  They bend reality too their will, but as the result of a world
+of nonbelivers the world bends back.  Mages cast powerful spells which are
+divided into spheres, but gain paradox which strikes back at them as they cast
+their more powerful spells.
+
+Mage's power is based on their Arete. The syntax to increase your arete is 'Arete'.
+
+The nine spheres of mage spells are:
+Correspondence, Entropy, Forces, Life, Mind, Spirit, Prime, Matter, and Time.
+
+To see the powers you have available type 'powers'.
+To see what you are currently affected by type 'upkeep'.
+
+Mages can create class equipment using 'magearmor'. This equipment costs 100 primal
+ and 400 qps.
+
+Related Helps: Spheres, Quintessence, Backlash, Mageclans, 'help <sphere name>
+ and Class.
+~
+
+0 Mageclans~
+#pAkashic Brotherhood:#n Simplistic martial artists.#p Focus: Mind
+#pCelestial Chorus:#n Wielders of divine magic. #pFocus: Prime
+#pCult of Esctasy:#n A free will group who strives to reach beyond their normal limitations. #pFocus: Time#n
+#pDreamspeakers:#n A group with deep commentions to the land and their native ways. #pFocus: Spirit#n
+#pEuthanatos:#n Death is not THE end, it is AN end. All things cycle. #pFocus: Entropy#n
+#pOrder of Hermes:#n A complex organization that seeks perfection. #pFocus: Forces#n
+#pSons of Ether:#n Tinkers who create things that simply shouldn't be possible. #pFocus: Matter#n
+#pVerbena:#n Life is the greatest mystery of the universe. All life is a cycle. #pFocus: Life#n
+#pVirtual Adepts:#n Information is the ultimate power and the ultimate tool. #pFocus: Correspondence#n
+#pHollow Ones:#n <Akuma's Edit>Stupid Goth posers</Akuma's Edit>. #pFocus: None#n
+
+Related Helps: Clan, and Mage.
+~
+
+0 Spheres~
+[CORRESPONDENCE] Understanding of Space and Relationships with it.
+[   ENTROPY    ] Mastery of Luck, Fate, and Chaos.
+[    FORCES    ] Command over the Natural elements, from fire to physics.
+[     LIFE     ] Insight into the makeup of living things.
+[    MATTER    ] A grasp of non-living structures--And how they can be changed.
+[     MIND     ] An insight to the inner workings of the mind.
+[    PRIME     ] Command over Quintessence, The cornerstone of the universe.
+[    SPIRIT    ] Insight into the spiritual World.
+[     TIME     ] Mastery of Time and Avoiding its affects.
+
+[*] 'Sphere' will show you the spheres you have learned.
+    'Sphere learn (sphere)' Allows you to increase your knowledge of a sphere.
+     Sphere's cost 20 primal * the level you wish to learn.
+
+Related Helps: Mage, and 'help <sphere name>sphere'(ie. help timesphere).
+~
+
+0 Quintessence~
+Quintessnece is the fundimental building block of the universe. As mage's increase
+their power(Arete) they become able to store more quintessence in their bodies. This
+quintessence can be used to power almost any of their spells to an even greater than
+normal result.
+
+Related Helps: Mage, and Backlash.
+~
+
+0 Backlash~
+Whenever a mage casts a spell the will of the world works against it. When casting
+minor spells this has almost no effect, but with powerful spells it can be quite
+devastating. Depending on the conditions and power of the spell mage's build up
+paradox. Once they have built up enough paradox or they gain enough from one single spell,
+it causes a backlash. In a backlash the forces of paradox the mage has been accumulating
+relase all at once dealing potenially devistating damage.
+
+Related Helps: Mage, and Quintessence.
+~
+
+0 Correspondencesphere~
+Level 1: Allows spells to target the caster.
+Level 2: Allows spels to target others in the same room.
+Level 4: Rift: A travel power which creates a portal that has a duration based on the amount of quintessence used.
+	Syntax: rift (target) (quintessence)
+Level 5: Alows spells to target other in the same area.
+
+Related Helps: Mages, and Spheres.
+~
+
+0 Entropysphere~
+Level 1: Detect Weakness: Break/Damcap bonuses (auto)
+Level 2: Beginner's Luck: Allows the caster to hit automaticly the first attacks in the next combat.
+	Syntax: beginnersluck (quintessence)
+Level 4: Brittle Bones: Cuts through the opponents soak for a number of attacks.
+	Syntax: brittlebones (target) (quintessence)
+Level 5: Mutate Ephemera: Paralized the opponent, and twists fate to send their attacks back against them.
+	Syntax: mutateephemera (target) (quintessence)
+
+Related Helps: Mages, and Spheres.
+~
+
+0 Forcessphere~
+Level 1: Nightsight: Gives nightsight
+	Syntax: nightsight
+Level 2: Electrical Chaos: One target damage spell.
+	Syntax: electricalchaos (target) (quintessence)
+Level 4: Friction Curse: Slows down an opponent and converts their movement into damage.
+	Syntax: frictioncurse (target) (quintessence)
+Level 5: Inferno: Area affect damage spell that causes flames.
+	Syntax: inferno (quintessence)
+
+Related Helps: Mages, and Spheres.
+~
+
+0 Lifesphere~
+Level 1: Readaura
+	Syntax: readaura (target)
+Level 2: Sorc Heal: A one target healing spell.
+	Syntax: sorcheal (target) (quintessence)
+Level 4: Better Body: Increases one person's ability to fight.
+	Syntax: sorcbetterbody (target) (str/dex/con/int/wis) (quintessence)
+Level 5: Polymorph Other: Polymorph's the target into a pig, removing the benefits from any form they were in.
+	Syntax: polymorphother (target) (quintessence)
+
+Related Helps: Mages, and Spheres.
+~
+
+0 Mattersphere~
+Level 1: Analyze: Identify
+	Syntax: analyze (target)
+Level 2: Shatter Wall: Destroys walls.
+	Syntax: shatterwall (direction)
+Level 4: Scuplture: Creates walls.
+	Syntax: sculpture (direction)
+Level 5: Alter Weight: Increases the gravity around your target, crushing them, and then slowing their actions.
+	Syntax: sorcalterweight (target) (quintessence)
+
+Related Helps: Mages, and Spheres.
+~
+
+0 Mindsphere~
+Level 1: Heighten
+	Syntax: heighten
+Level 2: Scry
+	Syntax: scry (target)
+Level 4: Shield: Prevents scry from working on you. (Mages do no regenerate with shield activated)
+	Syntax shield
+Level 5: Invis: Blocks your images from other's minds.
+	Syntax: sorcinvis (quintessence)
+
+Related Helps: Mages, and Spheres.
+~
+
+0 Primesphere~
+Level 1: Heart's Blood: Allows you to take damage in order to put more quintessence into a spell than you have.
+	Syntax: heartsblood
+Level 2: Holy Smote: Creates a sword of quintessence that fights for you.
+	Syntax: holysmote
+Level 4: Enchant Weapon: Channels quintessence into a weapon making it cause aggrivated damage.
+	Syntax: sorcenchant (target)
+Level 5: Paradox Ward: Prevents against the damage from a paradox backlash.
+	Syntax: ward (quintessence)
+
+Related Helps: Mages, and Spheres.
+~
+
+0 Spiritsphere~
+Level 1: Spirit Sence: Allows you to see into the umbra.
+	Syntax: spiritsence
+Level 2: Spirit Caress: Allows you to reach into the umbra and make one attack.
+	Syntax: spiritcaress
+Level 4: Step Sideways: Allows you to enter and leave the umbra.
+	Syntax: stepsideways (quintessence)
+Level 5: Break Dreamshell: Allows you to enter and leave the deep umbra.
+	Syntax: breakdreamshell (quintessence)
+
+Related Helps: Mages, and Spheres.
+~
+
+0 Timesphere~
+Level 1: Time Sense: Lowers Speed (auto)
+Level 2: Future Sense: Raises Avoid (auto)
+Level 4: Contingency: Prepares a spell to be cast when you enter combat.
+	contingency (spell)
+Level 5: Doublecast: Allows you to cast anouther mage spell twice.
+	doublecast (the spell exactly as you would cast it normally, including targets and quintessence)
+
+Related Helps: Mages, and Spheres.
+~
+
+
+0 Monks~
+Monks are a breed of holy warriors well known for their training.  They have
+mastered the use of their body in combat over mere weapons.  By harnessing the
+divine powers of the realm in conjuction with their elite fighting skills, Monks
+are a force to be reckoned with.
+
+Commands:
+Monk      - The monk channel.
+Monklearn - Command to improve powers.
+Decide    - Inducts a clanless monk into your clan. (Priest/Abbot only)
+Expel     - Casts a monk in your clan out. (Abbot only)
+Monkarmor - Creates monk only relic armor.
+Mclan     - Displays the stats of monks in your clan.
+
+Related Helps: Monklearn, and Class
+~
+
+0 Monklearn Arts Techs Mantras~
+Mantras - A myriad of non-combat abilities.
+1: Eyes of God      - Increases awareness. (heighten)
+2: Trio Mantra      - Grants knowledge. (scry/readaura/shield)
+3: Rejuvenation     - Gives regeneration. (auto)
+4: Healing Touch    - Allows you to heal with a touch. (touch)
+5: Almighty Favor   - Grants a blessing. (almighty/almighty group)
+6: Spirit Guardian  - Summons a guardian. (spiritguardian)
+7: Celestial Path   - Instantaneous travel. (celestial)
+8: Cloak of Life    - Saves you from death. (lifecloak)
+
+Arts - Combat abilities and styles.
+1: Focus of Mind    - Boosts damage. (auto)
+2: Reinforce        - Boosts accuracy. (auto)
+3: Speed of Wind    - Boosts speed. (auto)
+4: Illusionary Form - Boosts avoid. (auto)
+5: Heart of Oak     - Strengthens the body. (auto)
+6: Adamantium Hands - Hardens your fists. (auto)
+7: Mystic Soul      - Boosts damage. (auto)
+8: Dragon Movement  - Grants Wavefist attack. (auto)
+
+Techs - Fighting techniques and powers.
+1: Repeating Fist  - Multihit technique. (repeat)
+2: Aura Shot       - Life stealing attack. (aura)
+3: Blitz           - Area affect damage. (blitz)
+4: Invite Beast    - Possesses weak creatures. (invite)
+5: Crippling Kick  - Mana burning kick. (cripple)
+6: Dark Blaze      - Blinds your foes. (darkblaze)
+7: Stun Fist       - Brief melee stun, 5000 mana. (stunfist)
+   No direct damage; 1 second target pause, 2 second caster recovery.
+   The target is immune to another Stun Fist for 6 seconds from application.
+8: Chimera Form    - Powerful form. (chimera)
+
+Related Helps: Monk.
+~
+
+
+0 Ninja~
+Ninja are masters of the night and darkness. Though mortal, they have their own
+unique ways of surviving in the world of vampires and werewolves. Each ninja
+studies under three principles of life, Sora, Chikyu, and Ningenno. Mastery of
+these principles account for the stealth and strength of the ninja.
+
+Powers:
+  Ki         - Source of ninja power.
+  Principles - The main source of a ninja's power. <principle (prin) improve>
+    Sora     - Gives non-combat skills. 
+    Chikyu   - Gives combat preparation skills.
+    Ningenno - Gives combat skills.
+  Ninjaarmor - Purchases ninja class eq.
+  Mikt       - Ninja only channel.
+
+Related Helps: Principles, and Class.
+~
+
+0 Principles Sora Chikyu Ningenno~
+Sora - *Heaven*.  Each level adds 25 to max Michi.
+1 : Michi       - Improves combat abilities. (michi) <100 ki> (calm)
+4 : Kanzuite    - Raises your awareness. (heighten/readaura/scry)
+6 : Kakusu      - Cloaks you in shadows. (kakusu) <20 ki, movement drains>
+8 : Bomuzite    - Renders opponents unconcious. (bomuzite) <20 ki>
+10: Mizotamouyo - Allows quick transportation to distant places. (mizotamouyo)
+
+Chikyu - *Earth*.  Each level adds damage/avoid.
+1 : Mienaku     - "Ninja VANISH!" - TMNT. (mienaku) <20 ki>
+4 : Orimasu     - Increased focus improves healing rates. (orimasu) <50 ki>
+6 : Gunaya      - Entangles your opponent in sticky strands of webbing. (web) <10 ki>
+8 : Tsumazuku   - Leaves opponents unable to respond to your attack. (tsumazuku)
+10: HaraKiri    - Increases power through pain. (harakiri)
+
+Ningenno - *Humanity*.  Each level adds speed/break.
+1 : Tsume       - Attaches steel-bladed claws to your wrist. (tsume)
+4 : Shuurai     - Lightning quick piercing attacks. (shuurai)
+6 : Shuriken    - Throws small blades during combat. (automatic)
+8 : Tsuin Ittou - Allows the use of two weapons. (automatic)
+10: Hakunetsu   - Delivers a powerful piercing attack to your opponents vitals. (hakunetsu)
+
+Related Helps: Ninja.
+~
+
+
+0 Sorcerers~
+Sorcerers are wielders of natural, instinctive magics.  They are born to magic
+rather than taught at a later age, and they enjoy complete flexibility with
+their spells.  In addition to being able to write their own spells, Sorcerers
+have a few extra "basic" spells, and can cast spells faster than normal as
+their colors improve.
+** This is a "Book Mage" type class, HOWEVER, it is EXTREMELY MODIFIED.  Do
+    NOT expect Mage Primers or old spells to work.  Work with what's listed
+    in these helpfiles and nothing else.
+
+Commands:
+Colors     - Trains a color.
+Write      - Writes a spell onto a page.
+Chant      - Chants a spell out of a book.
+Sorccreate - Creates the necessary book writing items.
+Enchant    - Enchants a weapon or armor.
+Vision     - Improves sight.
+Sorctalk   - Sorcerer only channel.
+
+Spells: (Syntax: c '<spell>' unless specified otherwise)
+Charm Person  - Allows a mobile to be ordered.
+Transport     - Sends an item to another person.
+Insert Page   - Inserts a page into a book.
+Remove Page   - Removes a page from a book.
+Find Familiar - Summons an animal for you to command(use [ to give commands).
+
+Umbra         - Moves you into the Umbral plane. <Not in.  Use the Umbra command>
+Ethereal      - Makes you ethereal. <Not in.  Use an affect spell>
+
+Related Helps: Chants, Writing, and Class.
+~
+
+0 Chants~
+Most of a Sorcerer's power comes from the ability to create and use his own
+spells.  Writing spells can be a difficult thing for a new sorcerer to learn,
+understand and master, but hopefully this helpfile and the following ones will
+help all the new sorcerers learn to make basic spells, and understand whats
+going on when they write certain things.  Mastery of writing these books,
+however, can only come through experience.  Note that Sorcerer is a complicated
+class and these help files are on the long side.  However, you need to read ALL
+of them before you can really start writing your spells, because one helpfile
+can't possibly contain all the information your need to write.
+
+Starting with a few basic commands:
+Sorccreate    - Creates objects used in book writing.
+       Syntax : sorccreate (book/page/pen)
+write         - Writes important stuff on books and pages.
+       Syntax : write (page/book) (line/title)
+insert/remove - Inserts or removes a page from a book.
+       Syntax : c 'insert page' page book (*) c 'remove page' book
+chant         - Actually casts a spell which has been written on a page and 
+                 inserted into a book.  The book to be chanted must be held.
+       Syntax : chant <target>
+
+Related Helps: Writing, Damage spells, Affect Spells, Action Spells, and Sorcerer.
+~
+
+0 Writing~
+Writing a book is basically a formula in which you plug in the spell you want
+to write.  Before using this, you'll want a pen and a book in your inventory,
+both of which you can obtain by reading help chant.  The basic layout for
+writing a page follows:
+
+sorccreate page              // Creates your page
+wear pen                     // Wears the pen so you can write with it
+write page title <text>      // Titles the page for easy reference
+write page line <text>       // Writes a line to the page, repeated MANY times
+c 'insert page' page book    // Puts the page into a book, ready to be used
+
+Titles can be anything you want, they are only used for reference.  Lines on
+the other hand must be very specific or the spell will fail.  Basic lines
+follow, the more specific ones for each spell type can be found in help
+damage, affect, and action.
+
+start.<type>.spell           // Starts a spell, type can be damage, affect, or
+                             // action
+message.1: <message>         // First message - use defined by spell type
+message.2: <message>         // Second message - use defined by spell type
+message.3: <message>         // Third message - use defined by spell type
+next.page                    // Tells the spell to use the next page too
+end.<color>                  // Ends the spell and defines its color, color
+                             // can be any magic color listed in the Sorcerer
+                             // colors command, also end.random will use a
+                             // different color every time the page gets
+                             // chanted
+
+In all spells, start.<type>.spell, and end.<color> are necessary.  All spells
+also require message.1-.3.  Next.page can be used to chain up to 10 pages
+together for lethal effects.
+
+Related Helps: Chant, Damage Spells, Affect Spells, Action Spells, and Sorcerer.
+~
+
+0 'Damage spells'~
+Damage spells are the meat and drink of both PKing and exping.  They give
+Sorcerers the ability to lay down the hurt, and lay it down good.  Damage
+spells may only be used on people in the same room as you.  When writing a
+damage spell, there are are no extra lines required.  Each color, however,
+has a different end result.
+
+Purple - Deals damage to all mobs and pks not in your group.
+ Damage: 100 - 140 * Purple.  Mana: 800.
+Red    - Deals damage to one target.
+ Damage: 140 - 180 * Red.     Mana: 600.
+Blue   - Heals damage from one target.
+ Heals:  100 - 140 * Blue.    Mana: 400.
+Green  - Heals damage on self only.
+ Heals:   80 - 120 * Green.   Mana: 500.
+Yellow - Deals damage to one target.
+ Damage:  40 - 200 * Yellow.  Mana: 200.
+Black  - Deals damage and aggravated damage to one target.
+ Damage:  80 - 120 * Black.   Mana: 700.
+
+Damage spells are easy to write.  Start the spell, specify the three
+messages (message.1 is the strike message, message.2 is shown to you, and
+message.3 is shown to the room), tag a next.page if you want, then end it
+in the color you want to get the desired effect.
+
+Damage spells also have a carry over affect.  The color of the previous
+page in a chain will give a bonus or change the usage of the current page.
+
+Color + Same color = Dam + (10 * color)
+Purple - Makes the spell affect an area.
+        Combined with green will heal only your group.
+Red    - +(20 * red) to damage or heal.
+Blue   - Turns damages to heals, +(30 * blue) to heals
+Green  - Autotargets heals on self and damage on who you are fighting.
+        Combined with purple will only hit mobs.
+Yellow - -200 mana, +(random(-10, 10) * yellow) damage.
+Black  - Adds aggravated.  Mixed with healing will heal aggravated.
+        -(20 * black) damage/heal.
+
+Related Helps: Chant, Writing, Affect Spells, Action Spells, and Sorcerer.
+~
+
+0 'Affect spells'~
+Affect spells allow sorcerers to manipulate the stats of both themselves
+and their enemies.  Proper application of affect spells in a chain can
+make damage spells much more effective.  Affects are usable on anyone in
+the same area as you(use where).  In writing an affect spell, there are
+several more lines which can and must be utilized.
+
+affect: <affect bit>         // What affects to set, list below
+apply: <apply bit>           // What stat to effect, list below
+duration: <0-50>             // Duration in number of ticks of spell
+reversed                     // Penalizes listed stats
+
+Affect allows you set specific affects such as Web, Flaming, and Sanct on
+your target.  Apply can be used to give bonuses to your stats to improve
+your abilities, and when combined with a reverse can hinder your foes.
+Message.1 displays to self, message.2 displays to the target, message.3
+displays to the room.  An example of a blessing page follows.
+
+start.affect.spell             // Starts the spell
+apply: hp                      // Applies the bonus to hp...
+apply: mana                    // And applies it to mana
+duration: 50                   // Sets the duration to max
+message.1: You ##lbless##n $N.   // Displayed to caster(you)
+message.2: $n ##lblesses##n you. // Displayed to target
+message.3: $n ##lblesses##n $N.  // Displayed to room
+next.page                      // Moves on to the next page
+end.blue                       // Ends the spell, colors the affect blue
+
+This page would give you a bonus to you hp and mana for 50 ticks.  Now,
+it's time for a list of what affects and applies you can put out there.
+The stuff in parenthesis are how much of a boost it gives, based on the
+bonus.
+
+Apply:
+hp   (color * 250)  damroll (color * 10)  armor (color * 10)
+mana (color * 250)  hitroll (color * 10)  save  (color * 1)
+Affect:
+blind        umbra        sanct        faerie.fire  curse
+flaming      poison       ethereal     sleep        web
+
+Related Helps: Chant, Writing, Damage Spells, Action Spells, and Sorcerer.
+~
+
+0 'Action spells'~
+Used for summoning, traveling, readaura and scry.
+
+Simple helpfile:
+Purple = Object Summon    Yellow = Object Travel
+Red    = Summoning        Blue   = Traveling
+Green  = Readaura         Black  = Scry
+
+All action spells are global.  Unaffected by ranks in colored magic.  Object
+summon spells make the object summoned unusable in quests.  Mobile summon spells
+set the mob to give no exp on death.
+
+Messages:
+Purple/Yellow: 1 = To You.  2 = To character's room.  3 = To object's room.
+Red: 1 = To Victim.  2 = To victim's room.  3 = To you AND your room.
+Blue: 1 = To You.  2 = To start room.  3 = To target room.
+Green/Black: 1 = To victim.  2 = To you.  3 = To your room.
+
+Related Helps: Chant, Writing, Damage Spells, Affect Spells, and Sorcerer.
+~
+
+
+0 Werewolf~
+At the beginning of things, Gaia - the world and the spirit that embodies it - 
+set all things in a balance that would maintain and encourage life.  Near the 
+top of this chain of being was humanity, and above them were the Garou - the 
+sacred warriors of the spirit.  They were appointed to be the crusaders 
+against the Wyrm, who spreads its cancer through the humans.  They are the 
+preservers of the raw essence of life, of nature's diversity and purity.  They 
+are the Earth's immune system, fighting the disease of the Wyrm.  They are the 
+werewolves, and they fight and destroy the children of the Wyrm (such as the 
+vampires) at every opportunity.
+
+Garou Commands
+ Howl      - A special channel that only werewolves can understand.
+ Advance   - Buys one Garou rank with primal and XP; see help ranks.
+ Advance info - Shows the next rank's price and cumulative monster kills.
+ Rage      - Builds rage toward the native Werewolf transformation.
+ Shift     - Uses the existing Rage/Calm transformation; see help shift.
+ Calm      - Reduces rage; requires Children of Gaia 1 and standing.
+ Tribegifts - Selects original-class Breed, Auspice and Tribe gifts.
+             Selected native gifts cap at 5; other native gifts cap at 4.
+ Wwarmor   - Creates class equipment; use the command for available pieces.
+ Wwgifts   - Shows a list of all the gifts you have available.
+ Wwpowers  - Lists all the commands (NOT powers) available to you.
+
+Wwpowers lists registered gift commands, not every passive bonus. Registration
+alone does not certify target safety or balance. An <auto> marker
+in a gift help entry means a passive effect, not a command to type.
+An <upgrade> modifies an existing command, not a second automatic action.
+Stub, disabled, unavailable, unimplemented and unverified entries are not
+advertised as working powers. See the individual gift tree's help.
+Secondary-parent hybrid training uses its own focus/cap rules.
+
+Related Helps: Class, Ranks, Shift, Breeds, Auspices, and Tribes.
+~
+
+0 Shift~
+Shift uses the existing native Werewolf war-form mechanics:
+
+ shift                         Builds rage, or tries to calm a current war-form.
+ shift werewolf|wolf|crinos     Uses rage to enter the native war-form.
+ shift human|homid              Uses calm to return toward human form.
+
+Rage builds toward the 100-rage transformation threshold; several uses may be
+needed. Calm requires Children of Gaia 1 and standing, and may also take
+several uses. Existing waits, combat effects and natural reversion still apply.
+
+Glabro, Hispo and a separate Lupus body form are not implemented Shift options.
+This command does not unlock secondary-parent or fused hybrid forms.
+
+Related Helps: Werewolf, and Breeds.
+~
+
+0 Ranks~
+Garou start at rank 1. Advance buys one rank at a time, up to rank 4:
+
+ Rank     Primal       XP          Cumulative monster kills
+ 1 -> 2     100     1,000,000               1,000
+ 2 -> 3     200     2,000,000               2,000
+ 3 -> 4     300     3,000,000               3,000
+
+A hybrid with either Werewolf parent requires double every number above:
+200/400/600 primal, 2/4/6 million XP, and 2,000/4,000/6,000 kills.
+Kills are cumulative prerequisites, not spent. Quests and quest points are
+not required or spent. Rank 5 cannot be purchased with advance.
+
+Use advance info to check your next rank. Save after native advancement;
+it uses ordinary player-save timing.
+
+Related Helps: Werewolf.
+~
+
+0 Breeds~
+Homid - Human born. "Monkeys"
+Metis - Garou born. "Obscenities"
+Lupus - Wolf born. "Fleabiters"
+
+Related Helps: Auspices, Tribes, 'help <breed name>', and Werewolf.
+~
+
+0 Homid~
+1: Persuasion - Toggle an aura that can deter lower-level mobile attackers. <persuasion>
+2: Jam Technology - Attempts to unequip a target's wielded item. <jamtech>
+3: Reshape Object - Edits carried item names, keywords or glow/hum; ownership restrictions apply. <reshapeobject>
+4: Disquiet - Temporarily reduces hitroll and damroll by five times Homid rank; does not stack or refresh. <disquiet>
+5: Spirit Ward - Toggles aura shielding against inspection. <spiritward>
+
+Related Helps: Breeds, and Werewolf.
+~
+
+0 Metis~
+1: Primal Anger - Increased rage through pain. <primalanger>
+2: Burrow - Toggles earthmelding; cannot activate while fighting. <burrow>
+3: Eyes of the Cat - Enhanced sight allows vision in the dark. <nightsight>
+4: Gift of the Porcupine - Toggles protective bristles in native war-form. <porcupine>
+5: Totem Gift - No working command is implemented. <unimplemented>
+
+Related Helps: Breeds, and Werewolf.
+~
+
+0 Lupus~
+1: Heightened Senses - Raises sensitivity of all senses. <heighten>
+2: Sense Prey - Allows you to locate your quarry. <scry>
+3: Catfeet - Adds avoidance and can resist a Highlander's sweep. <auto>
+4: Beast Life - Toggles animal affinity, or beckons an animal by name. <beastlife>
+5: Elemental Gift - Attacks with fire, water, earth or air; not a summoned pet. <elemental>
+
+Related Helps: Breeds, and Werewolf.
+~
+
+0 Auspices~
+Ragabash - The New moon, the Trickster.
+Theurge - The Crescent moon, the Seer.
+Philodox - The Half moon, the Mediator.
+Galliard - The Gibbous moon, the Moon Dancer.
+Ahroun - The Full moon, the Warrior.
+
+Related Helps: Breeds, Tribes, 'help <auspice name>', and Werewolf.
+~
+
+0 Ragabash~
+1: Blur of the Milky Eye - Toggles a concealment flag; no direct avoidance bonus. <blur>
+2: Blissful Ignorance - Hides the Garou from sight. <blissful>
+3: Scent of Running Water - Suppresses ordinary movement tracks. <auto>
+4: Whelp Body - Weakens your opponent. <whelp>
+5: Luna's Blessing - Prevents the extra silver damage-cap bonus against Werewolves. <auto>
+
+Related Helps: Auspices, and Werewolf.
+~
+
+0 Theurge~
+1: Mother's Touch - Heals others in need. <mother>
+2: Grandmother's Touch - Allows Mother to target yourself; not a separate automatic heal. <upgrade: mother>
+3: Pulse of the Invisible - Gives sight into the Umbra. <pulse>
+4: Grasp the Beyond - Pulls a non-fighting room target with you into the Umbra. <grasp>
+5: Feral Lobotomy - Drains a room target's mana and may provoke retaliation. <lobotomy>
+
+Related Helps: Auspices, and Werewolf.
+~
+
+0 Philodox~
+1: Resist Pain - Wolf has no hit/dam penalty for damage. <auto>
+2: Strength of Purpose - Reveals some Vampire disguise identities while looking. <auto>
+3: Weak Arm - Adds 100 damage cap and improves avoidance breaking. <auto>
+4: Wall of Granite - Summons a wall of granite to block an exit. <wallgranite>
+5: Geas - Charms an eligible mobile, not another player. <geas>
+
+Related Helps: Auspices, and Werewolf.
+~
+
+0 Galliard~
+1: Call of the Wyld - Tells all wolves of danger. <wyld>
+2: Distractions - No dedicated passive effect was located in current source. <unverified>
+3: Call of the Wyrm - Forces eligible players in the room to reveal their beast. <wyrmcall>
+4: Song of Rage - Provokes a target's rage or berserk behavior. <songofrage>
+5: Bridge Walker - Travels toward a target; failure can send you to a random room. <bridgewalk>
+
+Related Helps: Auspices, and Werewolf.
+~
+
+0 Ahroun~
+1: Razor Claws - No separate rank-1 claw-damage bonus was verified; claws are a native command. <unverified>
+2: Spirit of the Fray - Improves combat initiative, not room movement speed. <auto>
+3: Silver Claws - Extended claws gain a silver damage-cap bonus against vulnerable wolves. <auto>
+4: Stoking Fury's Furnace - Accelerates rage gained during combat updates. <auto>
+5: Kiss of Helios - Toggles flaming hands and room light; fire protection varies by attack handler. <helios>
+
+Related Helps: Auspices, and Werewolf.
+~
+
+0 Tribes~
+Black Furies - Feminists with a vengeance.  Totem - Pegasus.
+Bone Gnawers - The Dregs of Garou society.  Totem - Rat.
+Children of Gaia - Born in a cry for peace.  Totem - Unicorn.
+Fianna - Lorekeepers and bards with a reputation for excess.  Totem - Stag
+Get of Fenris - The result of centuries of warrior heritage.  Totem - Fenris
+Glass Walkers - Masters of the tools and technology of man.  Totem - Cockroach
+Red Talons - The most feral and brutal of the Garou.  Totem - Griffin
+Shadow Lords - Masters of Machiavellian politics.  Totem - Grandfather Thunder
+Silent Striders - Mysterious wanderers, tireless scouts, heralds.  Totem - Owl
+Silver Fangs - The proud and noble leaders of Garou society.  Totem - Falcon
+Uktena - Spiritual Garou drawn from animistic peoples.  Totem - Uktena
+Wendigos - Masters of their woodland domain.  Totem - Wendigo
+
+Stargazers - An introspective tribe, not in the Garou Nation.  Totem - Chimera
+
+Related Helps: Breeds, Auspices, 'help <tribe name>', and Werewolf.
+~
+
+0 'Black Furies'~
+1: Breath of the Wyld - Heals many people. <breathwyld>
+2: Curse of Aeolus - Toggles outdoor fog, subject to its weather cooldown. <aeolus>
+3: Visceral Agony - Natural-style attacks can apply poison. <auto>
+4: Coup de Grace - Opening kill attacks against standing targets gain a second attack sequence. <auto>
+5: Body Wrack - Pain attack against a target in the room. <bodywrack>
+
+Related Helps: Tribes, and Werewolf.
+~
+
+0 'Bone Gnawers'~
+1: Resist Toxin - Blocks the standard poison spell; not a universal toxin guarantee. <auto>
+2: Odious Aroma - Adds soak equal to 30 times the tribe rating. <auto>
+3: Friend in Need - Gives away rage. <friend>
+4: Infest - Summons a horde of Vermin. <infest>
+5: Survivor - No separate rank-5 effect located; the existing tribe-based soak still scales. <unverified>
+
+Related Helps: Tribes, and Werewolf.
+~
+
+0 'Children of Gaia'~
+1: Calm - Allows a quick calming of rage. <calm>
+2: Strike the Air - Adds avoidance and armor modifiers. <auto>
+3: Dazzle - Stops a fighting target and stuns them, subject to target checks. <dazzle>
+4: Spirit Guardian - Toggles a warning against detected hostile powers; not a pet. <spiritguardian>
+5: Halo of Sun - Toggles a sunlight halo that boosts the damage cap against Vampires. <halosun>
+
+Related Helps: Tribes, and Werewolf.
+~
+
+0 Fianna~
+1: Faerie Light - Creates a ball of light. <faerielight>
+2: Howl of the Banshee - Delays susceptible room targets; fleeing also requires Fianna 5. <howlbanshee>
+3: Form Illusion - Creates an illusion using the selected appearance. <formillusion>
+4: Clone Object - Creates an illusionary copy of an eligible item. <cloneobject>
+5: Balor's Gaze - Inflicts pain on a player target. <balorsgaze>
+
+Related Helps: Tribes, and Werewolf.
+~
+
+0 'Get of Fenris'~
+1: Visage of Fenris - Adds 100 to the Werewolf damage cap. <auto>
+2: Halt the Coward's Flight - Chance to block fleeing scales with tribe rating, starting at rank 1. <auto>
+3: Acid Blood - Feeding on your blood can burn the feeder. <auto>
+4: Scream of Gaia - No working command is implemented. <unimplemented>
+5: Hero's Stand - Prevents punch/hurl. <auto>
+
+Related Helps: Tribes, and Werewolf.
+~
+
+0 'Glass Walkers'~
+1: Diagnostics - Closely examines an object. <diagnostics>
+2: Cybersenses - Reads a visible target's aura; not a senses toggle. <readaura>
+3: Power Surge - Attacks eligible targets in the room. <surge>
+4: Doppleganger - Copies another character's appearance, not their combat powers. <doppleganger>
+5: Summon Net Spider - Summons a net spider. <summonnetspider>
+
+Related Helps: Tribes, and Werewolf.
+~
+
+0 'Red Talons'~
+1: Iron Claws - No rank-specific claw-parry effect was located in current combat code. <unverified>
+2: Steel Claws - No additional rank-specific claw-parry effect was verified. <unverified>
+3: Gorge - Raises the normal combat rage ceiling by 50. <auto>
+4: Quicksand - Handler is a disabled stub; it does not slow a room. <disabled>
+5: Curse of Lycaon - Handler is a disabled stub; it does not transform targets. <disabled>
+
+Related Helps: Tribes, and Werewolf.
+~
+
+0 'Shadow Lords'~
+1: Fatal Flaw - Adds 100 to the Werewolf damage cap. <auto>
+2: Clap of Thunder - Damages eligible foes in the room; may stun. <clapthunder>
+3: Paralyzing Stare - Prevents opponents from reacting. <paralyzingstare>
+4: Strength of the Dominator - Draws rage from a Werewolf or raging Vampire. <dominator>
+5: Obedience - Forces others to obey you. <obedience>
+
+Related Helps: Tribes, and Werewolf.
+~
+
+0 'Silent Striders'~
+1: Speed of Thought - Improves combat initiative. <auto>
+2: Messenger's Fortitude - Upkeep claims resistance, but no dedicated damage modifier was located. <unverified>
+3: Speed Beyond Thought - Adds a further combat initiative improvement. <auto>
+4: Unassigned Silent Strider Gift - No separate rank-4 power was located. <unimplemented>
+5: Reach the Umbra - A legacy handler exists, but no player command is registered. <unavailable>
+
+Related Helps: Tribes, and Werewolf.
+~
+
+0 'Silver Fangs'~
+1: Falcon's Grasp - No rank-specific disarm immunity was verified. <unverified>
+2: Lambent Flame - No dedicated rank-2 avoidance effect was located. <unverified>
+3: Wrath of Gaia - A legacy handler exists, but no player command is registered. <unavailable>
+4: Shield - Toggles aura shielding against inspection. <shield>
+5: Mastery - A legacy handler exists, but no player command is registered. <unavailable>
+
+The old Luna's Avenger description does not provide an implemented body form.
+
+Related Helps: Tribes, and Werewolf.
+~
+
+0 Uktena~
+1: Shroud - Toggles magical room darkness; this rating also permits sight in that darkness. <shroudnight>
+2: Spirit of the Fish - Permits underwater movement without breathing equipment. <auto>
+3: Spirit of the Bird - No rank-3 flight-granting effect was located in current source. <unverified>
+4: Invisibility - A legacy handler exists, but no player command is registered. <unavailable>
+5: Fetish Doll - Creates a doll for a valid reciprocal head/owner target. <fetishdoll>
+
+Related Helps: Tribes, and Werewolf.
+~
+
+0 Wendigos~
+1: Camouflage - Hides the user from sight. <camouflage>
+2: Cutting Wind - Attacks a room target with a chance to stun; not typed cold damage. <cutting>
+3: Bloody Feast - Consumes corpses for strength. <bloodyfeast>
+4: Heart of Ice - Blocks the standard frost-breath spell; not universal cold immunity. <auto>
+5: Invoke the Spirits of the Storm - Controls fog, rain or lightning outdoors with a cooldown. <invoke>
+
+Related Helps: Tribes, and Werewolf.
+~
+
+0 Stargazers~
+1: Falling Touch - Stuns opponent. <falling>
+2: Inner Strength - Increases hit/dam. <auto>
+3: Clarity - Sees through Obfuscate up to the tribe rating; the check is not exclusive to rank 3. <auto>
+4: Preternatural Awareness - Makes the Garou hard to hit. <auto>
+5: Circular Attack - A one-in-eight damage-path check can redirect the incoming attack. <auto>
+
+Related Helps: Tribes, and Werewolf.
+~
+
+
+0 Vampires~
+Vampires are the creatures of the night and thus take damage if exposed 
+to daylight.  Vampires cannot eat food, or drink any liquids except for 
+blood.  If they cannot drink blood for a long duration of time they will 
+start taking damage or maybe even go berserk, so it's a good idea to feed 
+from time to time.  Vampires take half damage from cold, 
+none from gas, and double from fire, although those with the Heat 
+immunity take normal fire damage rather than double.  Other abilities:
+
+* #REmbrace#n - Allows you to feed from the willing or defenceless.
+* #ROrder#n - As if target lower generation vampire of your clan was charmed.
+* #RVamptalk#n - A special vampire channel which distinguishes between clans.
+* #RRegenerate#n - Vampires need to use this to regen, use: regen <number of rounds> 
+* #RVclan#n - Shows information on the other members of a vampires clan.
+* #RFeed#n - For feeding other vampires with your blood.
+* #RPowers#n - Lists all the commands (NOT powers) available to you.
+* #RClan -#n Shows your personal and clan disciplines. 
+* #RDisciplines#n - shows all the disciplines that you know and their level.
+* #RDefence/vampire#n - controls feeding and Blood Rage consent.
+* #RTeachdisc <target> <discipline>#n - offers a free discipline unlock.
+   The student must accept the named offer; see help teachdisc.
+* #RUpkeep#n - shows what powers you are currently utilising. 
+* #RFangs#n - Gives a free bite attack in combat. 
+* #Rvarmor#n - Create vampire armor, cost 100 primal and 400 quest points.
+
+Related Helps: Clandisc, Disciplines, and Class.
+~
+
+0 Clandisc~
+Not all of these clans are available.
+
+Assamite:    Celerity, Obfuscate, Quietus
+Brujah:      Celerity, Potence, Presence
+Setites:     Obfuscate, Presence, Serpentis	(Also Serpents of the Light)
+Gangrel:     Animalism, Fortitude, Protean
+Lasombra:    Dominate, Obtenebration, Potence
+Malkavian:   unavailable in Anathema; no supported clan mapping.
+Nosferatu:   Animalism, Obfuscate, Potence
+Ravnos:      Animalism, Chimerstry, Fortitude
+Toreador:    Auspex, Celerity, Presence
+Tremere:     Auspex, Dominate, Thaumaturgy
+Tzimisce:    Animalism, Auspex, Vicissitude
+Ventrue:     Dominate, Fortitude, Presence
+
+Related Helps: Disciplines, Clans, and Vampires
+~
+
+0 Disciplines~
+Each vampire has access to a number of disciplines, from which their powers 
+stem.  Clan disciplines for each clan of vampires will max at 7, while non-clan
+disciplines will max at 5.
+
+There are eight basic disciplines to which all clans have access to:
+* Animalism     - Control over Animals
+* Auspex        - Extra sensory powers
+* Celerity      - Great combat speed
+* Dominate      - Hypnotic powers
+* Fortitude     - Damage resistance
+* Obfuscate     - Art of concealment
+* Potence       - Supernatural strength
+* Presence      - Charismatic aura's
+
+There are also eight more clan-specific Disciplines which only a few clans can 
+make use of:
+* Chimerstry    - Illusionary powers
+* Necromancy    - Mastery over the dead
+* Obtenebration - Shadow magic
+* Protean       - Shapeshifting
+* Quietus       - Assassination powers
+* Serpentis     - Wyrm abilities
+* Thaumaturgy   - Blood magic
+* Vicissitude   - Body control
+
+Related Helps: Clandisc, 'help <discipline name>', and Vampire.
+~
+
+0 AUSPEX~
+Auspex and Obfuscate tend to cancel out each others powers.
+[*]       Heighten - Increases detection abilities.
+[**]      Readaura - In depth analyzation of target(character or object).
+[***]     Scry - Views a distant place.
+[****]    Unveil - Views the thoughts of another person.
+[******]  Omnipotence - Forms a spectral eye to continuously watch an area.
+[*******] Mindblast - Injures the target through psychic assault.
+
+Related Helps: Disciplines, and Vampire.
+~
+
+0 ANIMALISM~
+[*]      Pigeon - Sends an object to target.
+[**]     Beckon - Summons an animal.
+[***]    Song - Stops the frenzy.
+[****]   Beastwithin - Sends someone into a frenzy.
+[*****]  Succulence - Increase the quality of a targets blood.
+[******] Frenzy - Complete control over your own frenzy.
+[*******] Fleshbond - take on some of the qualities of a bonded animal.
+
+Related Helps: Disciplines, and Vampire.
+~
+
+0 CELERITY~
+This Discipline explains the legendary superior quickness of vampires.  
+They have the ability to move with amazing speed and become little more than a blur
+to mortal eyes, obviously such an ability is extremely useful allowing the vampire to
+hit and dodge faster than lesser opponents. Typing 'celerity renew' will renew your
+celerity while you are still fighting.
+
+Related Helps: Disciplines, and Vampire.
+~
+
+0 CHIMERSTRY~
+[*]      Formillusion - Makes a mirror image of the target.
+[**]     Phantasmal - Slashes with a chimerstral dagger.<auto>
+[***]    Clone - Creates an clone of an object.
+[****]   Falseappearance - Manipulates the form of an object.
+[*****]  Control - Allows the user to control illusions.
+[******] Horridreality - Not in.
+
+Related Helps: Disciplines, and Vampire.
+~
+
+0 DOMINATE~
+[*]      Command - Allows you to give the target a single word command.
+[**]     Mesmerize - Allows you to give multiple word commands.
+[***]    Conditioning - Target is unable to resist dominate or attack you.
+[****]   Possession - Allows you to control a mob.
+[*****]  Obedience - No speech or eye contact for command.
+[******] Mob Rule - Command are usable on 'all'.
+[*******] Commands work through willpower.
+
+Related Helps: Disciplines, and Vampire.
+~
+
+0 FORTITUDE~
+Fortitude describes a type of supernatural toughness and vigor which
+allows Kindred to resist harm.  Many vampires are very tough and are able
+to withstand a lot of injury inflicted by weapons and spells.  However 
+with the Fortitude power, they resist damage even further by often keeping 
+the weapons from harming them at all.
+
+Related Helps: Disciplines, and Vampire.
+~
+
+0 OBFUSCATE~
+Obfuscate and Auspex cancel out many of each others powers.
+[*]      Vanish - Makes you invisduhble.
+[**]     Mask - Makes you look like someone else.
+[***]    Cloak - Allows you to use Vanish all.
+[****]   Vanished Movement - Says what it does, does what it says.
+[*****]  Soulmask - Fools readaura.
+[******] Shield - Stops readaura and scry.
+
+Related Helps: Disciplines, and Vampire.
+~
+
+0 OBTENEBRATION~
+Obtenebration allows the user to manipulate the powers of darkness.  By 
+using their powers they are able to switch between the normal world and 
+the plane of shadows at will.  They may also view things in both planes 
+simultaneously if they so wish.
+
+This Discipline allows the following powers:
+[*]	Shroud - The vampire can blanket a whole area with an impenetrable inky 
+	blackness, a darkness deeper than a moonlit night, anyone caught by 
+	such a shroud will find it both disturbing and disorientating. 
+
+[**]	Arms 'target' - This allows a vampire to call forth "tentacles" of solid 
+	darkness from the shadows around him. These tentacles will then grasp 
+	and restrain the vampires foes. 
+
+[***] 	Shadowbody - This lets the vampire turn their body into a slithering, 
+	undulating shadow, vampires that use this power are virtually invulnerable 
+	while in this form. 
+
+[****] 	Lamprey 'target' - This acutally calls forth the Darkness to strike the 
+	vampires opponents, draining their blood from them as they stand and fight. 
+
+[*****]	Shadowstep - The vampire may step into human-sized shadows and exit another
+	of similar size in another locale with this power.
+
+[*******] Shadowforge - Creates weapons of pure shadow.  Aggy, but timed(1.5 hours).
+
+[*******] Tenebrous Form - Melding shadows, around the vampires body, gives them
+        Extra attacks, and more advantages in battle.
+
+Related Helps: Disciplines, and Vampire.
+~
+
+0 NECROMANCY~
+[*]      Thanatopsis - Examine corpse to find killer and place of death
+[**]     Spiriteyes - Allows the vampire to see into the umbra.
+[***]    Preserve - Stops corpses from decaying.
+[****]   Spiritgate - Makes a gate to the killer of a corpse.
+[*****]  Spiritguardian - Summons a guardian to warn you of danger.
+[******] Zombie - Creates an Undead subject from a corpse.
+[*******]Torment - Allows the user to directly attack a spirit.
+
+Related Helps: Disciplines, and Vampire.
+~
+
+0 POTENCE~
+This Discipline defines the superior strength that vampires often 
+possess.  This physical might allows the user to inflict much larger 
+amounts of damage in combat than normal.
+
+[*******] Fist of Caine - call forth your strength into an amazing blow.
+
+Related Helps: Disciplines, and Vampire.
+~
+
+0 PRESENCE~
+[*]      Awe - Makes it harder for some to attack the vampire.
+[**]     Dreadgaze - Causes fear in a victim.
+[***]    Entrance - Charms victim.
+[****]   Summoning - Summons target to you.
+[*****]  Majesty - Prevents attacks against you.
+[******] Enrage - Causes target to go into a berserker rage.
+[*******] Mask Empathy - Removes conditioning.
+
+Related Helps: Disciplines, and Vampire.
+~
+
+0 PROTEAN~
+[*]      Nightsight - The vampire is able to see normally in darkness.
+[**]     Claws - This lets the vampire sprout long claws on each hand.
+[***]    Earthmeld - Allows you to meld with the earth.
+[****]   Change - Allow the vampire to transform into bat, wolf or mist.
+[*****]  Spiritform - Turns the vampires body translucent and insubstancial.
+[******] Earthshift - Allows movement while earthmelded. (auto)
+[*******] Beastform - Take the form of a giant bat.
+
+Related Helps: Disciplines, and Vampire.
+~
+
+0 QUIETUS~
+[*] 	Silence - Shrouds the room in silence.
+[**] 	Weakness - Weakens your opponent.
+[***] 	Infirmity - Weakens your opponent more.
+[****] 	Bloodagony - Poisons a weapon.
+[*****]	Spit - Shoots acid at your victim.
+[******] Thinblood - Thins the victims blood, causing them to be unable to regenerate.
+[*******] Leech - Drains a victims blood.
+
+Related Helps: Disciplines, and Vampire.
+~
+
+0 SERPENTIS~
+Serpentis is the art of temptation and corruption.  Vampires with this 
+Discipline have the ability to tear out their own hearts, rendering 
+themselves immune to being staked.  Serpentis users also gain the ability 
+to transform themselves into a giant serpent and back at will. 
+
+[*]	Eyes of the Serpent - A vampire with this ability can freeze a target in
+	place by gazing into there eyes.
+
+[**] 	Tongue 'target' - The vampire with this ability may lengthen their tongue
+	at will, splitting it into a fork like that of a serpent. It can actually 
+	reach out as far as 18 inches and makes a terrifying weapon in combat. 
+
+[***] 	Mummify - This allows the user to actually mummify himself, shriveling 
+	into an almost invulnerable form. This induces a stated similar to torpor, 
+	rendering the user completely immobile. 
+
+[****] 	Serpent - The vampire may change his form into that of a huge serpernt. 
+	It weighs as much as the vampire's human form and streches over eight feet
+	long. This grants the vampire considerable advantages. 
+
+[*******] Mark of Corruption - Places a mark on the forehead of the victim 
+	  disfiguring them so much that anyone who looks at them will feel
+	  an uncontrollable urge to attack.
+
+Related Helps: Disciplines, and Vampire.
+~
+
+0 THAUMATURGY~
+Anathema's implemented Path of Blood:
+
+Rank 1: tasteblood <target> (also tasteofblood)
+  Reads blood/potency and a vampire's clan, generation and trained disciplines.
+Rank 2: bloodrage <vampire> regenerate
+  Starts regeneration, not stat boosting or a forced frenzy. Other vampires
+  must lower vampire defences to consent. Normal regeneration pays its costs.
+Rank 3: potency (also bloodpotency)
+  Temporarily adds 100 blood capacity and 1 potency; generation does not change.
+  Costs (14 - generation clamped to 1..13) * 10 blood; does not stack.
+Rank 4: theftvitae <target> (also theftofvitae)
+  Steals blood up to the available pool/capacity; acidic blood can hurt you.
+  Emptying a blood pool is not an instant kill.
+Rank 5: cauldronblood <target> (also cauldronofblood)
+  Costs 50 blood, drains 10..20 target blood (limited by availability), and
+  deals HP-based damage reduced by Fortitude. It is not guaranteed death.
+
+Hostile powers obey combat safety. Recovery and valid-target checks apply.
+
+Related Helps: Disciplines, and Vampire.
+~
+
+0 VICISSITUDE~
+[*]      Changeling - Changes you to look like the target.
+[**]     Fleshcraft - Molds flesh.
+[***]    Bonecraft - Molds bone.
+[****]   Plasmaform - Living blood pool form.
+[*****]  Zuloform - Horrific beast-like form.
+[******] Disintegration - Damages opponent.
+[*******] Chiroptean Marauder.
+
+Related Helps: Disciplines, and Vampire.
+~
+
+0 TEACHDISC~
+Teacher: teachdisc <student> <discipline>
+Student: teachdisc accept <teacher> <discipline>
+
+The teacher needs trained rank 3. The student's discipline must be locked.
+Both must be visible vampires in the same room, standing and outside combat.
+The named offer expires after 120 seconds. Acceptance is revalidated and saved.
+The lesson unlocks the discipline for free; training ranks still costs primal.
+It does not grant a trained rank, and vampire defence toggles are not consent
+for teaching. There are no automatically seeded teachers.
+~
+
+0 COUNTER~
+Highlander: counter [off]
+Requires Defense 4, Powers 4, your own forged katana and a legal active fight.
+Preparing it costs 1000 mana, gives a 2 second guard and 6 second reuse timer.
+It can respond to weapon and unarmed/contact melee, not spells or ranged fire.
+It is not a guaranteed win or a counter to every attack.
+~
+
+0 $~
+
+#$
