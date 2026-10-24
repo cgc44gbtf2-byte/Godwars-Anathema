@@ -33,6 +33,8 @@ static int read_mode, read_calls, write_mode, write_calls, fail_crypt;
 static int fail_gensalt, saved_passwords, fail_save;
 static char saved_password[CRYPT_OUTPUT_SIZE];
 static int reported_bugs;
+#define TEST_LEGACY_HASH "xy0123456789A"
+#define TEST_WRONG_LEGACY_HASH "xy0123456789B"
 char log_buf[MAX_STRING_LENGTH];
 CHAR_DATA *char_list;
 /* The real registry/name-reservation path is covered by test_clans. */
@@ -88,6 +90,14 @@ static char *comm_test_crypt(const char *key, const char *salt)
         return "xy12345678901"; /* A provider must never silently downgrade. */
     if (fail_crypt == 4 && !strncmp(salt, "$y$", 3))
         return "$y$invalid~hash";
+    /*
+     * Keep the legacy-migration fixture deterministic on libcrypt builds
+     * that disable DES. This stub tests password-upgrade control flow, not
+     * the host's DES implementation.
+     */
+    if (salt != NULL && !strcmp(salt, TEST_LEGACY_HASH))
+        return !strcmp(key, "legacy-test-password")
+            ? TEST_LEGACY_HASH : TEST_WRONG_LEGACY_HASH;
     return crypt(key, salt);
 }
 
@@ -290,7 +300,8 @@ static void test_passwords(void)
     CHAR_DATA ch;
     char oversized[2 * MAX_INPUT_LENGTH + 8];
     char stored[256];
-    char *encoded = crypt("synthetic-test-password", "xy");
+    /* DES crypt is disabled by some modern libxcrypt builds. */
+    char *encoded = crypt("synthetic-test-password", "$6$synthetic-test$");
     assert(encoded != NULL && encoded[0] != '*');
     strcpy(stored, encoded);
     assert(password_matches("synthetic-test-password", stored, FALSE));
@@ -387,7 +398,7 @@ static void test_password_migration(void)
     ch.pcdata = &pc;
     ch.desc = &d;
     d.character = &ch;
-    strcpy(legacy, crypt("legacy-test-password", "xy"));
+    strcpy(legacy, TEST_LEGACY_HASH);
 
     /* DES migrates with or without EXTRA_NEWPASS. Do not hash the stored hash. */
     for (flag = 0; flag <= 1; ++flag)
@@ -472,7 +483,7 @@ static void test_switched_takeover(void)
     player.level = 2;
     player.pcdata = &pc;
     player.extra = EXTRA_SWITCH;
-    pc.pwd = str_dup(crypt("live-password", "xy"));
+    pc.pwd = str_dup(crypt("live-password", "$6$takeover-test$"));
     npc.name = "Syntheticmob";
     npc.act = ACT_IS_NPC;
     npc.desc = &old;
@@ -534,7 +545,7 @@ static void test_password_change(void)
     d.outsize = 2000;
     d.outbuf = alloc_mem(d.outsize);
     d.fcommand = TRUE;
-    pc.pwd = str_dup(crypt("old-test", "xy"));
+    pc.pwd = str_dup(crypt("old-test", "$6$password-change$"));
     strcpy(old, pc.pwd);
     fail_gensalt = 1;
     do_password(&ch, "old-test new-test-password");
