@@ -118,4 +118,5 @@ tests/test_werewolf_room
 tests/room_tribe.o
 bootstrap-backups/
 __pycache__/
+tests/test_hybrid_heighten
 *.py[cod]

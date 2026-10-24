@@ -122,6 +122,10 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
                      "and guardian warnings. Mantra2 also enables shield/mindblock "
                      "(free, one shared self-only aura shield; no stacking). "
                      "Using either command again dismisses it even after training loss.\n\r", ch);
+        send_to_char("Mantra1 enables heighten (Heightened Senses / Eyes of God): "
+                     "free, self-only, six-pulse activation delay. Dismissal is free "
+                     "even after training loss; independent Sorcerer vision remains. "
+                     "Conversion and live hybrid forms are still disabled.\n\r", ch);
         send_to_char("Existing records: secondary Monk Stun Fist needs Tech 7 on the full Tech path; "
                      "other paths cap Tech at4. Costs5000 mana, with1-second interruption, "
                      "2-second caster recovery and shared6-second target immunity. "

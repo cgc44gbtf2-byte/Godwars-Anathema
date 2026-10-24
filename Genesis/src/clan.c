@@ -793,50 +793,53 @@ stc("Your senses return to normal.\n\r", ch);
 return;
     }
 
-    if (!IS_DRAGON(ch) && !IS_DROW(ch) && !IS_HIGHLANDER(ch) && !IS_MONK(ch)
+    const bool monk_ready = hybrid_power_rank(ch, CLASS_MONK,
+        HYBRID_TRAIN_MONK, MONK_MANTRA) >= 1;
+
+    if (!monk_ready && !IS_DRAGON(ch) && !IS_DROW(ch) && !IS_HIGHLANDER(ch) && !IS_MONK(ch)
      && !IS_NINJA(ch) && !IS_VAMPIRE(ch) && !IS_WEREWOLF(ch) && !IS_MAGE(ch))
     {
 	stc("Huh?\n\r", ch);
 	return;
     }
 
-    if (IS_MAGE(ch) && ch->spheres[MMIN] < 1)
+    if (!monk_ready && IS_MAGE(ch) && ch->spheres[MMIN] < 1)
     {
 	stc("You do not have enough knowedlge of the mind sphere to use Heightened Senses.\n\r", ch);
 	return;
     }
 
-    if (IS_WEREWOLF(ch) && get_breed(ch, BREED_LUPUS) < 1)
+    if (!monk_ready && IS_WEREWOLF(ch) && get_breed(ch, BREED_LUPUS) < 1)
     {
 	stc("You require the level 1 Lupis power to use Heightened Senses.\n\r", ch);
 	return;
     }
-    if (IS_NINJA(ch) && get_ninja(ch, NINJA_SORA) < 4)
+    if (!monk_ready && IS_NINJA(ch) && get_ninja(ch, NINJA_SORA) < 4)
     {
 	stc("You have not learned the Sora principle to 4.\n\r", ch);
 	return;
     }
-    if (IS_HIGHLANDER(ch) && get_highland(ch, HIGH_ABILITY) < 1)
+    if (!monk_ready && IS_HIGHLANDER(ch) && get_highland(ch, HIGH_ABILITY) < 1)
     {
 	stc("You must have level 1 powers to use Truesight.\n\r", ch);
 	return;
     }
-    if (IS_VAMPIRE(ch) && get_disc(ch, DISC_AUSPEX) < 1)
+    if (!monk_ready && IS_VAMPIRE(ch) && get_disc(ch, DISC_AUSPEX) < 1)
     {
         stc("You require level 1 Auspex to use Heightened Senses.\n\r", ch);
         return;
     }
-    if (IS_DROW(ch) && !get_drow(ch, DROW_SIGHT))
+    if (!monk_ready && IS_DROW(ch) && !get_drow(ch, DROW_SIGHT))
     {
 	stc("You need to obtain heighten first.\n\r", ch);
 	return;
     }
-    if (IS_DRAGON(ch) && !IS_DRAGAFF(ch, DRAG_TRUESIGHT))
+    if (!monk_ready && IS_DRAGON(ch) && !IS_DRAGAFF(ch, DRAG_TRUESIGHT))
     {
 	stc("You do not yet have the truesight ability\n\r", ch);
 	return;
     }
-    if (IS_MONK(ch) && get_monk(ch, MONK_MANTRA) < 1)
+    if (!monk_ready && IS_MONK(ch) && get_monk(ch, MONK_MANTRA) < 1)
     {
 	stc("You need Mantra 1 for Eyes of God.\n\r", ch);
 	return;

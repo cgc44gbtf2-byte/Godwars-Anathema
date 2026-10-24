@@ -1112,7 +1112,7 @@ The real-engine suite retains **960 native** snapshots and compares
 and original-access cases,12 independent native/Monk overlaps and
 **72 full/short** loaded characters. Six pre-existing crash boundaries were
 reproduced locally before the safety repair and pass afterward.
-Heightened senses, Invite Beast, Chimera and other unfinished
+Invite Beast, Chimera and other unfinished
 secondary adapters remain separate work. No conversion or live hybrid forms
 are enabled; no world/help import is performed and custom world helps keep
 priority.
@@ -1181,8 +1181,43 @@ flag remains until manually dismissed or cleared by normal game behavior.
 
 The saved flag and hybrid record use the existing full/short player loaders;
 no schema, epoch or handoff changes. Player saves retain ordinary timing,
-not a new crash journal or powercut guarantee. Heightened senses, live forms,
+not a new crash journal or powercut guarantee. Live forms,
 full secondary command coverage and playable conversion remain separate work.
+
+### Secondary Monk Heightened Senses
+
+Existing validated secondary Monks with learned **Mantra1** may use `heighten`
+(Heightened Senses / Eyes of God). Every Monk focus can reach rank1. The
+adapter reads the effective owned secondary rank, not unrelated raw primary
+training. Original Monks keep native access and ranks. Native Dragon, Drow,
+Highlander, Mage, Ninja, Vampire and Werewolf grants remain independent when
+the secondary grant is absent, untrained or rejected.
+
+This is the native **free, self-only** holy-sight toggle: activation retains its
+**six-pulse wait**, dismissal has no added wait, and neither spends resources
+or rolls RNG. Arguments remain ignored; `heighten <name>` never targets another
+character. One shared raw holy-sight flag is toggled, without stacking,
+changing other sight flags or adding provider ownership. Sorcerer vision's
+separately owned holy, shadow and night sources are preserved and still
+provide their normal effective sight after Heighten is turned off.
+
+A separate safety fix rejects missing actor/player context and permits
+**manual dismissal after training or class eligibility is lost**, without
+allowing reactivation. Null/unused arguments remain safe; no room is required
+by this self-only command. Existing raw flags have no reliable provenance,
+so this is not an automatic source migration or eligibility-revocation sweep.
+
+Tests retain1,428 native snapshots, compare15,552 paired real-engine commands
+across both parent orders, verify432 rejected-record cases and144 full/short
+reloads, and exercise activation timing and independent Sorcerer sight.
+The old handler reproduced two invalid-context sanitizer failures and ten
+lost-eligibility dismissal failures before repair.
+
+The shared saved flag and hybrid codec remain unchanged (record4/save epoch4/
+handoff2). Ordinary player-save timing is not a crash journal or powercut
+guarantee. Custom world helps retain priority over generated fallback help.
+Invite Beast, Chimera, full secondary access, playable conversion and live
+hybrid forms remain separate work; no PvP balance claim is made.
 
 ## Numeric readiness preview — no conversion
 

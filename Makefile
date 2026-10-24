@@ -69,6 +69,7 @@ TESTS += tests/test_note_editor
 TESTS += tests/test_hybrid_mastery
 TESTS += tests/test_hybrid_scry
 TESTS += tests/test_hybrid_shield
+TESTS += tests/test_hybrid_heighten
 TESTS += tests/test_werewolf_commands
 TESTS += tests/test_disquiet
 TESTS += tests/test_werewolf_combat
@@ -146,6 +147,7 @@ check-layout:
 	python3 tests/test_hybrid_mastery_catalog.py
 	python3 tests/test_hybrid_scry_catalog.py
 	python3 tests/test_hybrid_shield_catalog.py
+	python3 tests/test_hybrid_heighten_catalog.py
 	python3 tests/test_werewolf_commands_catalog.py
 	python3 tests/test_werewolf_help_catalog.py
 	python3 tests/test_disquiet_catalog.py
@@ -256,6 +258,9 @@ tests/test_hybrid_scry: tests/test_hybrid_scry.c tests/test_hybrid_aura.c $(ENGI
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_hybrid_shield: tests/test_hybrid_shield.c tests/test_hybrid_aura.c $(ENGINE_OBJECTS)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
+tests/test_hybrid_heighten: tests/test_hybrid_heighten.c tests/test_hybrid_aura.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_werewolf_commands: tests/test_werewolf_commands.c tests/test_hybrid_aura.c $(ENGINE_OBJECTS)
