@@ -108,6 +108,7 @@ tests/test_aux_shutdown
 tests/test_note_editor
 tests/test_hybrid_mastery
 tests/test_hybrid_scry
+tests/test_hybrid_shield
 tests/test_werewolf_commands
 tests/test_disquiet
 tests/test_werewolf_combat

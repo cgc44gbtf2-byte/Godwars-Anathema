@@ -1112,7 +1112,7 @@ The real-engine suite retains **960 native** snapshots and compares
 and original-access cases,12 independent native/Monk overlaps and
 **72 full/short** loaded characters. Six pre-existing crash boundaries were
 reproduced locally before the safety repair and pass afterward.
-Shield, heightened senses, Invite Beast, Chimera and other unfinished
+Heightened senses, Invite Beast, Chimera and other unfinished
 secondary adapters remain separate work. No conversion or live hybrid forms
 are enabled; no world/help import is performed and custom world helps keep
 priority.
@@ -1151,7 +1151,38 @@ The real-engine suite keeps the **1,440 native** snapshots unchanged and runs
 **23,328 paired** parent/order/focus/rank/target/mana commands,90 rejected-record
 and original-access cases,9 native-grant overlaps and **72 full/short** loads.
 No conversion, new save schema, live hybrid form or world/help import is enabled.
-Shield and the other unfinished secondary powers remain separate work.
+Other unfinished secondary powers remain separate work.
+
+### Secondary Monk Shield / Mindblock
+
+Existing valid records with learned **Mantra2** may use `shield` or its native
+alias `mindblock`. No full-path focus is required for rank2; both parent orders
+work, and original Monks retain native training and access. Secondary access
+uses only the owned effective Monk rank, never an unrelated raw primary bank.
+Malformed/rejected secondary records grant no activation. The original class's
+native Vampire Obfuscate6, Dragon shield skill, Silver Fangs4 and Mage Mind3
+routes remain independent. A vision item alone does not grant Shield.
+
+This is the existing **free, self-only toggle**: no mana/primal/quest fee,
+new wait, RNG, ranks or flags. `shield <name>` retains its native ignored-
+argument behavior and never targets that name. Both aliases operate on one
+shared `MORE_SHIELDED` effect; grants do not stack or multiply protection.
+Native Scry survey/named-target shield rules and item/staff bypasses remain
+unchanged. Native Read Aura does **not** check this shield; this adapter does
+not silently add that new protection.
+
+Already-active shields may now be **manually dismissed even after training,
+class or secondary-record eligibility is lost**. This does not allow turning
+them back on without a current grant. The handler now rejects missing actor/
+player context before reading it, and does not parse unused/null arguments.
+These repairs are separate from secondary access. No automatic eligibility
+revocation or legacy provider-provenance migration is included: an existing
+flag remains until manually dismissed or cleared by normal game behavior.
+
+The saved flag and hybrid record use the existing full/short player loaders;
+no schema, epoch or handoff changes. Player saves retain ordinary timing,
+not a new crash journal or powercut guarantee. Heightened senses, live forms,
+full secondary command coverage and playable conversion remain separate work.
 
 ## Numeric readiness preview — no conversion
 

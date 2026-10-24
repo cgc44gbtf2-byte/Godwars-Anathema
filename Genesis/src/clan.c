@@ -1368,39 +1368,41 @@ void do_shield( CHAR_DATA *ch, char *argument )
     if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL) return;
 
     /* Losing training must not trap an already-active shield. This grants
-     * dismissal only: activation still requires an eligible native source. */
+     * dismissal only: activation still requires an eligible source. */
     if (IS_MORE(ch, MORE_SHIELDED))
     {
         send_to_char("You stop shielding your aura.\n\r",ch);
         REMOVE_BIT(ch->more, MORE_SHIELDED);
         return;
     }
-    if (!IS_VAMPIRE(ch) && !IS_DRAGON(ch) && !IS_WEREWOLF(ch) && !IS_MONK(ch) && !IS_MAGE(ch))
+    const bool monk_ready = hybrid_power_rank(ch, CLASS_MONK,
+        HYBRID_TRAIN_MONK, MONK_MANTRA) >= 2;
+    if (!IS_VAMPIRE(ch) && !IS_DRAGON(ch) && !IS_WEREWOLF(ch) && !IS_MONK(ch) && !IS_MAGE(ch) && !monk_ready)
     {
 	stc("Huh?\n\r",ch);
 	return;
     }
-    else if (IS_VAMPIRE(ch) && get_disc(ch,DISC_OBFUSCATE) < 6)
+    else if (!monk_ready && IS_VAMPIRE(ch) && get_disc(ch,DISC_OBFUSCATE) < 6)
     {
 	stc("You require level 6 Obfuscate to Shield your aura.\n\r",ch);
 	return;
     }
-    else if (IS_DRAGON(ch) && !IS_DRAGAFF(ch, DRAG_SHIELD))
+    else if (!monk_ready && IS_DRAGON(ch) && !IS_DRAGAFF(ch, DRAG_SHIELD))
     {
 	stc("You dont have the shield ability yet.\n\r",ch);
 	return;
     }
-    else if (IS_WEREWOLF(ch) && (get_tribe(ch, TRIBE_SILVER_FANGS) < 4))
+    else if (!monk_ready && IS_WEREWOLF(ch) && (get_tribe(ch, TRIBE_SILVER_FANGS) < 4))
     {
 	stc("You require lvl 4 in Silver Fangs for this ability.",ch);
 	return;
     }
-    else if (IS_MONK(ch) && get_monk(ch, MONK_MANTRA) < 2)
+    else if (!monk_ready && IS_MONK(ch) && get_monk(ch, MONK_MANTRA) < 2)
     {
 	stc("You need Mantra 2 for Trio Mantra.\n\r", ch);
 	return;
     }
-    else if (IS_MAGE(ch) && ch->spheres[MMIN] < 3)
+    else if (!monk_ready && IS_MAGE(ch) && ch->spheres[MMIN] < 3)
     {
 	stc("You do not have enough knowledge of the mind sphere to use shield.\n\r", ch);
 	return;
