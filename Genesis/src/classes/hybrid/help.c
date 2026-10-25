@@ -102,6 +102,8 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
                      "It does not cleanse existing poison. "
                      "Blind Fighting costs 5,000 DP to learn: passive protection "
                      "from the unseen-opponent avoidance/break penalty, not actual sight. "
+                     "Toughness costs 8,000 DP to learn: passive 300 soak before "
+                     "Brittle Bones, once only; it is not damage immunity. "
                      "Spider Eyes costs 7,500 DP to learn: scry [target] is free; "
                      "shielding and Guardian warnings still apply. "
                      "Learn these through "

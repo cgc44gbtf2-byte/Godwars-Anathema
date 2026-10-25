@@ -952,6 +952,8 @@ selfbrid drow poisonimmunity
 selfbrid drow poisonimmunity learn
 selfbrid drow blindfight
 selfbrid drow blindfight learn
+selfbrid drow toughness
+selfbrid drow toughness learn
 ```
 
 The listing/details are read-only. `learn` buys exactly one existing flag:
@@ -966,11 +968,32 @@ class identity, primary Drow storage, other currencies and save format are
 unchanged. Primary Drow characters continue using native `prayer`; this UI
 does not intercept or alter it.
 
-Only these nine integrated powers are offered by this trainer in this stage.
+Only these ten integrated powers are offered by this trainer in this stage.
 Other Drow unlocks remain backend-only pending their complete runtime and
 learning review; backend storage is not permission to expose an unadapted
 power. No compatibility change: record4/save epoch4/handoff2. Conversion and
 live hybrid forms remain disabled.
+
+### Secondary Drow Toughness
+
+Preview `selfbrid drow toughness`, then use `selfbrid drow toughness learn`
+to buy the native unlock for **8,000 secondary DP**. The existing checked
+lesson transaction saves the new grant and deducted points together. Failed
+saves do not grant a free lesson; uncertain persistence blocks further lessons
+until recovery. Primary Drow still use native `prayer`.
+
+Toughness already has a validated secondary passive path: it contributes
+**300 soak once**, alongside the original class's normal soak. Resistance,
+Favor and stance adjustments keep their existing order; Brittle Bones halves
+the resulting soak, including Toughness. It is not damage immunity, does not
+increase HP or armor, and consumes no combat RNG or activation resource.
+Untrained, invalid or rejected secondary records do not grant the bonus;
+training loss removes it on the next calculation. No combat formulas or
+active flags changed in this stage.
+
+The checked lesson and both player loaders are covered by real-engine tests.
+Custom world helps still take priority over generated help; no live help
+import is performed. Conversion and live hybrid forms remain disabled.
 
 ### Lloth's Web and Ninja overlap
 

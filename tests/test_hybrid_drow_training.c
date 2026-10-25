@@ -311,6 +311,40 @@ static void blindfight_lessons(void)
     }
 }
 
+static void toughness_lessons(void)
+{
+    for(size_t i=0;i<sizeof(originals)/sizeof(originals[0]);i++){
+        CHAR_DATA *ch=fresh(originals[i],CLASS_DROW,7999);
+        unchanged(ch,"drow toughness learn");
+        assert(strstr(output,"Not enough secondary Drow points"));
+        ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]=8000;
+        unchanged(ch,"drow toughness");
+        assert(strstr(output,"8000 DP to learn"));
+        long before=get_soak(ch);
+        command(ch,"drow toughness learn");
+        assert(strstr(output,"learned and saved"));
+        assert(hybrid_power_drow(ch,DROW_TOUGH));
+        assert(get_soak(ch)==before+300);
+        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==0);
+        unchanged(ch,"drow toughness learn");
+        for(int short_file=0;short_file<2;short_file++){
+            DESCRIPTOR_DATA reload={0};
+            assert(short_file?load_char_short(&reload,"Drowfixture"):
+                              load_char_obj(&reload,"Drowfixture"));
+            CHAR_DATA *loaded=reload.character;
+            assert(hybrid_power_drow(loaded,DROW_TOUGH));
+            assert(loaded->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==0);
+            PC_DATA snapshot=*loaded->pcdata;
+            long trained=get_soak(loaded);
+            assert(!memcmp(&snapshot,loaded->pcdata,sizeof snapshot));
+            REMOVE_BIT(loaded->pcdata->hybrid.secondary_progression.drow[DROW_POWERS],DROW_TOUGH);
+            assert(get_soak(loaded)==trained-300);
+            free_char(loaded);
+        }
+        release(ch);
+    }
+}
+
 static void refusals_and_native_isolation(void)
 {
     CHAR_DATA *ch=fresh(CLASS_MAGE,CLASS_DROW,4999);
@@ -446,6 +480,7 @@ int main(void)
     supported_utilities();
     poison_lessons();
     blindfight_lessons();
+    toughness_lessons();
     refusals_and_native_isolation();
     context_and_save_faults();
     utility_save_faults("drow llothsweb learn",DROW_WEB,8000);
@@ -454,6 +489,7 @@ int main(void)
     utility_save_faults("drow spidereyes learn",DROW_EYES,7500);
     utility_save_faults("drow poisonimmunity learn",DROW_PIMM,5000);
     utility_save_faults("drow blindfight learn",DROW_BFIGHT,5000);
+    utility_save_faults("drow toughness learn",DROW_TOUGH,8000);
     assert(!char_list&&!room.people&&!fclose(fpReserve));
     assert(!chdir("..")&&!rmdir("player")&&!rmdir("backup")&&
            !rmdir("run")&&!chdir(cwd)&&!rmdir(root));

@@ -16,13 +16,14 @@ class HybridDrowTrainingCatalog(unittest.TestCase):
                       '{"heighten",DROW_SIGHT,20000}',
                       '{"spidereyes",DROW_EYES,7500}',
                       '{"poisonimmunity",DROW_PIMM,5000}',
-                      '{"blindfight",DROW_BFIGHT,5000}'):
+                      '{"blindfight",DROW_BFIGHT,5000}',
+                      '{"toughness",DROW_TOUGH,8000}'):
             self.assertIn(entry, ui)
         for unsupported in ("DROW_DARK",
                             "DROW_BITE", "DROW_DUALWIELD",
                             "DROW_SPIDER",
                             "DROW_NIGHT",
-                            "DROW_SKIP", "DROW_MIGHT", "DROW_TOUGH"):
+                            "DROW_SKIP", "DROW_MIGHT"):
             self.assertNotIn(unsupported, ui)
 
     def test_lesson_uses_atomic_backend_and_secondary_record(self):
