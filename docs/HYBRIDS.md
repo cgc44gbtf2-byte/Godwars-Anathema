@@ -948,12 +948,14 @@ selfbrid drow heighten
 selfbrid drow heighten learn
 selfbrid drow spidereyes
 selfbrid drow spidereyes learn
+selfbrid drow poisonimmunity
+selfbrid drow poisonimmunity learn
 ```
 
 The listing/details are read-only. `learn` buys exactly one existing flag:
 Attunement costs **1,000 DP**; Faerie Fire and Acid Bolt cost **5,000 DP each**;
 Lloth's Web costs **8,000 DP**, Read Aura **6,000 DP**, Heightened Senses
-**20,000 DP**, and Spider Eyes **7,500 DP**, matching the native
+**20,000 DP**, Spider Eyes **7,500 DP**, and Poison Immunity **5,000 DP**, matching the native
 prayer prices. Their activation remains free, with native item ownership,
 target-safety, resistance, affect and lag rules. The lesson writes only the
 secondary Drow bank through the existing checked save transaction; original
@@ -961,7 +963,7 @@ class identity, primary Drow storage, other currencies and save format are
 unchanged. Primary Drow characters continue using native `prayer`; this UI
 does not intercept or alter it.
 
-Only these seven integrated powers are offered by this trainer in this stage.
+Only these eight integrated powers are offered by this trainer in this stage.
 Other Drow unlocks remain backend-only pending their complete runtime and
 learning review; backend storage is not permission to expose an unadapted
 power. No compatibility change: record4/save epoch4/handoff2. Conversion and
@@ -1051,6 +1053,29 @@ route on the next command without changing independent native grants.
 No class swap, teleport, schema, save epoch or handoff change is introduced.
 Conversion and live hybrid forms remain disabled; custom world helps retain
 priority. This is not a live-host or PvP balance certification.
+
+### Poison Immunity — learned Drow passive
+
+For an existing valid secondary Drow record, preview with
+`selfbrid drow poisonimmunity`, then use
+`selfbrid drow poisonimmunity learn` to buy the native unlock for
+**5,000 secondary DP**. Original Drow characters continue using `prayer`.
+The checked lesson saves only the secondary bank and its DP payment.
+Save failure refuses the lesson without payment; uncertain durability applies
+it once and blocks further lessons until save recovery.
+
+There is no activation command or upkeep charge. The learned source blocks
+the shared poison spell and the Drow crossbow's poison-induced sleep.
+Physical bolt damage, ammunition consumption and the shooter's 500-DP price
+are unchanged. This does not grant general sleep, toxin, spell or damage
+immunity; Vampire and Bone Gnawer poison-spell exemptions remain independent.
+It neither cures existing poison nor wakes a previously sleeping character.
+Removing training removes only this source on the next attack; there is no
+active flag, delayed cleanup or new save field.
+
+Native and original-parent Drow behavior is preserved. Invalid, rejected,
+missing or failed-load records and stale foreign primary flags grant nothing.
+Conversion/live forms remain disabled; custom world helps retain priority.
 
 ## Sunbath — trained secondary Elementalist, shared mana
 

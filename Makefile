@@ -55,6 +55,7 @@ TESTS += tests/test_hybrid_web
 TESTS += tests/test_hybrid_drow_aura
 TESTS += tests/test_hybrid_drow_heighten
 TESTS += tests/test_hybrid_drow_scry
+TESTS += tests/test_hybrid_drow_poison
 TESTS += tests/test_hybrid_werewolf_training
 TESTS += tests/test_hybrid_aura
 TESTS += tests/test_message_format
@@ -190,6 +191,7 @@ check-layout:
 	python3 tests/test_hybrid_drow_aura_catalog.py
 	python3 tests/test_hybrid_drow_heighten_catalog.py
 	python3 tests/test_hybrid_drow_scry_catalog.py
+	python3 tests/test_hybrid_drow_poison_catalog.py
 	python3 tests/test_hybrid_aura_catalog.py
 	python3 tests/test_message_format_catalog.py
 	python3 tests/test_identify_catalog.py
@@ -339,6 +341,9 @@ tests/test_hybrid_drow_heighten: tests/test_hybrid_drow_heighten.c tests/test_hy
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_hybrid_drow_scry: tests/test_hybrid_drow_scry.c tests/test_hybrid_scry.c tests/test_hybrid_aura.c $(ENGINE_OBJECTS)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
+tests/test_hybrid_drow_poison: tests/test_hybrid_drow_poison.c tests/test_drow_ammo.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_hybrid_werewolf_training: tests/test_hybrid_werewolf_training.c $(ENGINE_OBJECTS)

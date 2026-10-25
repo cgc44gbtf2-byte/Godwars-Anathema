@@ -34,6 +34,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "classes/hybrid/access.h"
 
 
 
@@ -2077,7 +2078,7 @@ void spell_poison( long sn, long level, CHAR_DATA *ch, void *vo )
     /* Ghosts cannot be poisoned - KaVir */
     if (IS_VAMPIRE(victim)) return;
     else if (IS_WEREWOLF(victim) && get_tribe(victim, TRIBE_BONE_GNAWERS) >= 1) return;
-    else if (get_drow(victim, DROW_PIMM)) return;
+    else if (hybrid_power_drow(victim, DROW_PIMM)) return;
     if (!IS_NPC(victim) && victim->pcdata->atm >= number_percent())
 	return;
 

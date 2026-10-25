@@ -13,6 +13,8 @@ def between(text,name,next_name):
 class HybridDrowCatalog(unittest.TestCase):
     def test_native_bodies_preserved_except_owned_permission_checks(self):
         text=(SRC/"classes/drow/drow.c").read_text()
+        from drow_poison_source import without_drow_poison_stage
+        text=without_drow_poison_stage(text)
         self.assertEqual(text.count('#include "classes/hybrid/access.h"\n'),1)
         self.assertEqual(text.count("if (!hybrid_power_parent(ch,CLASS_DROW))"),3)
         self.assertEqual(text.count("if (!hybrid_power_drow(ch,"),3)

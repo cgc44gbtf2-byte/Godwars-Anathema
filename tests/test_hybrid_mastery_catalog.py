@@ -75,7 +75,8 @@ class HybridMasteryCatalog(unittest.TestCase):
             if path == "classes/drow/drow.c":
                 # Reverse only the reviewed Acid Bolt adapter and callback guard.
                 # Keep the complete older file hash, including every native trainer.
-                text = data.decode()
+                from drow_poison_source import without_drow_poison_stage
+                text = without_drow_poison_stage(data.decode())
                 start = text.index("void do_acidbolt(")
                 end = text.index("void do_faeriefire(", start)
                 body = text[start:end]

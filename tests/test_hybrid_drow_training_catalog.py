@@ -14,12 +14,13 @@ class HybridDrowTrainingCatalog(unittest.TestCase):
                       '{"llothsweb",DROW_WEB,8000}',
                       '{"readaura",DROW_READ,6000}',
                       '{"heighten",DROW_SIGHT,20000}',
-                      '{"spidereyes",DROW_EYES,7500}'):
+                      '{"spidereyes",DROW_EYES,7500}',
+                      '{"poisonimmunity",DROW_PIMM,5000}'):
             self.assertIn(entry, ui)
         for unsupported in ("DROW_DARK",
                             "DROW_BITE", "DROW_DUALWIELD", "DROW_BFIGHT",
                             "DROW_SPIDER",
-                            "DROW_NIGHT", "DROW_PIMM",
+                            "DROW_NIGHT",
                             "DROW_SKIP", "DROW_MIGHT", "DROW_TOUGH"):
             self.assertNotIn(unsupported, ui)
 

@@ -851,7 +851,7 @@ damage = number_range((int)(10 * damroll), (int)(20 * damroll));
             ;
         if (live == NULL || live->hit <= 0 || live->position == POS_DEAD) goto shoot_restore;
 
-	if (IS_DROW(victim) && get_drow(victim, DROW_PIMM))
+	if (hybrid_power_drow(victim, DROW_PIMM))
 	{
 	    stc("Your poison has been resisted.\n\r", ch);
 	    stc("You were hit by a crossbow bolt, but resisted it's poison.\n\r", victim);
