@@ -48,7 +48,7 @@ class DrowHeightenCatalog(unittest.TestCase):
             self.assertIn(text,test)
         training=(ROOT/"tests/test_hybrid_drow_training.c").read_text()
         self.assertIn('utility_save_faults("drow heighten learn",DROW_SIGHT,20000)',training)
-        self.assertIn("purchases==54",training)
+        self.assertIn("purchases==63",training)
         self.assertEqual(training.count("loaded_heighten(reload.character)"),2)
 
 if __name__=="__main__":unittest.main()

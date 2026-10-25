@@ -121,6 +121,7 @@ bootstrap-backups/
 __pycache__/
 tests/test_hybrid_heighten
 tests/test_hybrid_drow_heighten
+tests/test_hybrid_drow_scry
 tests/test_hybrid_acidbolt
 tests/test_hybrid_web
 *.py[cod]

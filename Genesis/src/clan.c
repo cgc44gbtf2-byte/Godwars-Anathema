@@ -1062,15 +1062,18 @@ void do_scry( CHAR_DATA *ch, char *argument )
     /* A learned Monk source is free and independent of the original class. */
     const bool monk_ready = hybrid_power_rank(ch, CLASS_MONK,
         HYBRID_TRAIN_MONK, MONK_MANTRA) >= 2;
+    /* Spider Eyes grants the same use, not extra range or shield bypass. */
+    const bool drow_ready = hybrid_power_drow(ch, DROW_EYES);
+    const bool free_scry = monk_ready || drow_ready;
 
     if (!IS_VAMPIRE(ch) && !IS_NINJA(ch) && !IS_ITEMAFF(ch, ITEMA_VISION) && !IS_WEREWOLF(ch)
-     && !IS_DROW(ch) && !IS_DRAGON(ch) && !IS_MONK(ch) && !IS_MAGE(ch) && !IS_BUI(ch) && !monk_ready)
+     && !IS_DROW(ch) && !IS_DRAGON(ch) && !IS_MONK(ch) && !IS_MAGE(ch) && !IS_BUI(ch) && !free_scry)
     {
 	send_to_char( "Huh?\n\r", ch );
 	return;
     }
 
-    if (!IS_ITEMAFF(ch,ITEMA_VISION) && !monk_ready)
+    if (!IS_ITEMAFF(ch,ITEMA_VISION) && !free_scry)
     {
 	if (IS_NINJA(ch) && get_ninja(ch, NINJA_SORA) < 4)
 	{
@@ -1109,7 +1112,7 @@ void do_scry( CHAR_DATA *ch, char *argument )
 	}
     }
 
-    if (IS_MAGE(ch) && !monk_ready)
+    if (IS_MAGE(ch) && !free_scry)
     {
         if (ch->mana < 500)
         {

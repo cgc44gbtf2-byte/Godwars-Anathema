@@ -946,12 +946,14 @@ selfbrid drow readaura
 selfbrid drow readaura learn
 selfbrid drow heighten
 selfbrid drow heighten learn
+selfbrid drow spidereyes
+selfbrid drow spidereyes learn
 ```
 
 The listing/details are read-only. `learn` buys exactly one existing flag:
 Attunement costs **1,000 DP**; Faerie Fire and Acid Bolt cost **5,000 DP each**;
-Lloth's Web costs **8,000 DP**, Read Aura **6,000 DP**, and Heightened Senses
-**20,000 DP**, matching the native
+Lloth's Web costs **8,000 DP**, Read Aura **6,000 DP**, Heightened Senses
+**20,000 DP**, and Spider Eyes **7,500 DP**, matching the native
 prayer prices. Their activation remains free, with native item ownership,
 target-safety, resistance, affect and lag rules. The lesson writes only the
 secondary Drow bank through the existing checked save transaction; original
@@ -959,7 +961,7 @@ class identity, primary Drow storage, other currencies and save format are
 unchanged. Primary Drow characters continue using native `prayer`; this UI
 does not intercept or alter it.
 
-Only these six active powers are offered by this trainer in this stage.
+Only these seven integrated powers are offered by this trainer in this stage.
 Other Drow unlocks remain backend-only pending their complete runtime and
 learning review; backend storage is not permission to expose an unadapted
 power. No compatibility change: record4/save epoch4/handoff2. Conversion and
@@ -1023,6 +1025,32 @@ does not add automatic provenance migration. Sorcerer vision and item-based
 sight remain independent. No new ranks, costs, schema or form permissions are
 introduced. Record4/save epoch4/handoff2 are unchanged; playable conversion
 and live hybrid forms remain disabled. Custom world helps retain priority.
+
+### Spider Eyes — independent learned Drow Scry
+
+For an existing valid secondary Drow record, preview with
+`selfbrid drow spidereyes`, then use `selfbrid drow spidereyes learn` to buy
+the existing flag for **7,500 secondary DP**, the native prayer price.
+The checked lesson transaction preserves points/training on pre-commit
+failure; uncertain durability applies once and blocks lessons until recovery.
+Original Drow characters continue using native `prayer`.
+
+Use `scry [target]`. A learned Drow source supplies one free use, independent
+of the original class's untrained or more expensive Scry route. Learned
+Monk Mantra2 and Drow Spider Eyes do not produce extra readings or bonuses.
+With no learned source, native prerequisites and the Mage-only 500-mana
+charge remain unchanged. Invalid or untrained secondary records grant nothing.
+The already-integrated Spider Eyes avoidance passive remains unchanged;
+this stage does not add a second passive or modify combat calculations.
+
+Shielding, item-vision exceptions, staff privacy, original Werewolf/Vampire
+advantages, Guardian warnings, visibility and remote-room restoration retain
+their native rules. Spider Eyes is not an item-vision grant or shield bypass.
+No flag is activated or retained by using Scry; losing training removes this
+route on the next command without changing independent native grants.
+No class swap, teleport, schema, save epoch or handoff change is introduced.
+Conversion and live hybrid forms remain disabled; custom world helps retain
+priority. This is not a live-host or PvP balance certification.
 
 ## Sunbath — trained secondary Elementalist, shared mana
 

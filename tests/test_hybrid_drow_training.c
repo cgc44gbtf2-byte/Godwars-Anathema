@@ -106,10 +106,30 @@ static void loaded_heighten(CHAR_DATA *ch)
     assert(!memcmp(&before,ch->pcdata,sizeof before));
 }
 
+static void loaded_spidereyes(CHAR_DATA *ch)
+{
+    ROOM_INDEX_DATA *before_room=ch->in_room;
+    DESCRIPTOR_DATA *before_desc=ch->desc;
+    CHAR_DATA *before_character=shell.character;
+    PC_DATA before=*ch->pcdata;
+    long mana=ch->mana;
+    /* The list view needs no remote fixture and still exercises permission,
+     * zero charge, context preservation and the real interpreter. */
+    ch->in_room=&room;
+    ch->desc=&shell;shell.character=ch;
+    shell.outtop=0;output[0]='\0';
+    interpret(ch,"scry");
+    assert(strstr(output,"mentally survey"));
+    assert(ch->mana==mana&&ch->in_room==&room);
+    assert(!memcmp(&before,ch->pcdata,sizeof before));
+    ch->in_room=before_room;
+    ch->desc=before_desc;shell.character=before_character;
+}
+
 static void supported_utilities(void)
 {
     for(size_t i=0;i<sizeof(originals)/sizeof(originals[0]);++i) {
-        CHAR_DATA *ch=fresh(originals[i],CLASS_DROW,45000);
+        CHAR_DATA *ch=fresh(originals[i],CLASS_DROW,52500);
         long native_dp=ch->pcdata->classpoints[CP_CURRENT];
         long primal=ch->primal,exp=ch->exp,quest=ch->pcdata->quest;
         assert(!hybrid_power_drow(ch,DROW_ATTUNE));
@@ -122,6 +142,7 @@ static void supported_utilities(void)
         assert(strstr(output,"llothsweb: available"));
         assert(strstr(output,"readaura: available"));
         assert(strstr(output,"heighten: available"));
+        assert(strstr(output,"spidereyes: available"));
         assert(strstr(output,"5000 DP"));
         assert(strstr(output,"Other secondary Drow powers"));
 
@@ -135,10 +156,10 @@ static void supported_utilities(void)
         command(ch,"drow attunement learn");
         assert(strstr(output,"learned and saved"));
         assert(hybrid_power_drow(ch,DROW_ATTUNE));
-        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==44000);
+        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==51500);
         command(ch,"drow attunement learn");
         assert(strstr(output,"already learned"));
-        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==44000);
+        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==51500);
 
         OBJ_INDEX_DATA index={0};
         OBJ_DATA item={0};
@@ -157,30 +178,36 @@ static void supported_utilities(void)
         command(ch,"drow faeriefire learn");
         assert(strstr(output,"learned and saved"));
         assert(hybrid_power_drow(ch,DROW_FIRE));
-        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==39000);
+        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==46500);
         command(ch,"drow acidbolt learn");
         assert(strstr(output,"learned and saved"));
         assert(hybrid_power_drow(ch,DROW_ACID));
-        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==34000);
+        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==41500);
         unchanged(ch,"drow acidbolt learn");
         assert(strstr(output,"already learned"));
         command(ch,"drow llothsweb learn");
         assert(strstr(output,"learned and saved"));
         assert(hybrid_power_drow(ch,DROW_WEB));
-        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==26000);
+        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==33500);
         unchanged(ch,"drow llothsweb learn");
         assert(strstr(output,"already learned"));
         command(ch,"drow readaura learn");
         assert(strstr(output,"learned and saved"));
         assert(hybrid_power_drow(ch,DROW_READ));
-        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==20000);
+        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==27500);
         unchanged(ch,"drow readaura learn");
         assert(strstr(output,"already learned"));
         command(ch,"drow heighten learn");
         assert(strstr(output,"learned and saved"));
         assert(hybrid_power_drow(ch,DROW_SIGHT));
-        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==0);
+        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==7500);
         unchanged(ch,"drow heighten learn");
+        assert(strstr(output,"already learned"));
+        command(ch,"drow spidereyes learn");
+        assert(strstr(output,"learned and saved"));
+        assert(hybrid_power_drow(ch,DROW_EYES));
+        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==0);
+        unchanged(ch,"drow spidereyes learn");
         assert(strstr(output,"already learned"));
         assert(ch->pcdata->classpoints[CP_CURRENT]==native_dp);
         assert(ch->primal==primal&&ch->exp==exp&&ch->pcdata->quest==quest);
@@ -195,25 +222,29 @@ static void supported_utilities(void)
         assert(hybrid_power_drow(reload.character,DROW_WEB));
         assert(hybrid_power_drow(reload.character,DROW_READ));
         assert(hybrid_power_drow(reload.character,DROW_SIGHT));
+        assert(hybrid_power_drow(reload.character,DROW_EYES));
         assert(reload.character->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==0);
         assert(reload.character->pcdata->classpoints[CP_CURRENT]==native_dp);
         assert(reload.character->class==originals[i]);
         loaded_heighten(reload.character);
+        loaded_spidereyes(reload.character);
         free_char(reload.character);
         reload.character=NULL;
         assert(load_char_short(&reload,"Drowfixture"));
         assert(reload.character&&hybrid_power_drow(reload.character,DROW_WEB));
         assert(hybrid_power_drow(reload.character,DROW_READ));
         assert(hybrid_power_drow(reload.character,DROW_SIGHT));
+        assert(hybrid_power_drow(reload.character,DROW_EYES));
         assert(reload.character->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==0);
         assert(reload.character->class==originals[i]);
         loaded_heighten(reload.character);
+        loaded_spidereyes(reload.character);
         free_char(reload.character);
         reload.character=NULL;
-        purchases+=6;
+        purchases+=7;
         release(ch);
     }
-    assert(purchases==54);
+    assert(purchases==63);
 }
 
 static void refusals_and_native_isolation(void)
@@ -240,6 +271,10 @@ static void refusals_and_native_isolation(void)
     assert(strstr(output,"Not enough secondary Drow points"));
     assert(!memcmp(&before,ch->pcdata,sizeof(before)));
     assert(!hybrid_power_drow(ch,DROW_SIGHT));
+    command(ch,"drow spidereyes learn");
+    assert(strstr(output,"Not enough secondary Drow points"));
+    assert(!memcmp(&before,ch->pcdata,sizeof(before)));
+    assert(!hybrid_power_drow(ch,DROW_EYES));
     release(ch);
 
     ch=fresh(CLASS_MAGE,CLASS_MONK,6000);
@@ -350,6 +385,7 @@ int main(void)
     utility_save_faults("drow llothsweb learn",DROW_WEB,8000);
     utility_save_faults("drow readaura learn",DROW_READ,6000);
     utility_save_faults("drow heighten learn",DROW_SIGHT,20000);
+    utility_save_faults("drow spidereyes learn",DROW_EYES,7500);
     assert(!char_list&&!room.people&&!fclose(fpReserve));
     assert(!chdir("..")&&!rmdir("player")&&!rmdir("backup")&&
            !rmdir("run")&&!chdir(cwd)&&!rmdir(root));

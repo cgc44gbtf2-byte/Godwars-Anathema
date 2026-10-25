@@ -182,6 +182,7 @@ static void scry_loaders(void)
     assert(count==72&&!fclose(fpReserve)&&!chdir(".."));
     assert(!rmdir("player")&&!rmdir("backup")&&!rmdir("run")&&!chdir(cwd)&&!rmdir(root));
 }
+#ifndef SCRY_FIXTURE_ONLY
 int main(int argc,char **argv)
 {
     if(argc==2&&!strcmp(argv[1],"--native-dump")){scry_native(1);return 0;}
@@ -193,3 +194,4 @@ int main(int argc,char **argv)
          "9 independent native grants,72 full/short loads and9 safety boundaries passed.");
     return 0;
 }
+#endif

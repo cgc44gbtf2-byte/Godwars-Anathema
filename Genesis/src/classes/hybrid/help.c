@@ -97,6 +97,8 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
                      "one reading shared by learned Drow and Monk sources. "
                      "Heighten costs 20,000 DP to learn: heighten toggles one "
                      "shared sight effect for free, with a six-pulse activation wait. "
+                     "Spider Eyes costs 7,500 DP to learn: scry [target] is free; "
+                     "shielding and Guardian warnings still apply. "
                      "Learn these through "
                      "selfbrid drow <power> learn. Other Drow powers are not "
                      "yet offered by this trainer.\n\r",ch);

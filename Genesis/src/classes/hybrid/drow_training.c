@@ -20,7 +20,8 @@ static const struct drow_utility utilities[] = {
     {"acidbolt",DROW_ACID,5000},
     {"llothsweb",DROW_WEB,8000},
     {"readaura",DROW_READ,6000},
-    {"heighten",DROW_SIGHT,20000}
+    {"heighten",DROW_SIGHT,20000},
+    {"spidereyes",DROW_EYES,7500}
 };
 
 static int word(const char **input,char out[32])
@@ -46,7 +47,7 @@ static const struct drow_utility *find_utility(const char *name)
 
 static void usage(CHAR_DATA *ch)
 {
-    send_to_char("Use: selfbrid drow | selfbrid drow <attunement|faeriefire|acidbolt|llothsweb|readaura|heighten>\n\r"
+    send_to_char("Use: selfbrid drow | selfbrid drow <attunement|faeriefire|acidbolt|llothsweb|readaura|heighten|spidereyes>\n\r"
         "Learn an integrated power: selfbrid drow <power> learn\n\r"
         "Other secondary Drow powers are not available yet; conversion remains disabled.\n\r",
         ch);

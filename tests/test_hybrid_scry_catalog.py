@@ -7,7 +7,8 @@ from scry_source import without_scry_stage
 
 class ScryCatalog(unittest.TestCase):
     def body(self):
-        return (SRC/"clan.c").read_text().split("void do_scry(",1)[1].split(
+        from drow_scry_source import without_drow_scry_stage
+        return without_drow_scry_stage((SRC/"clan.c").read_text()).split("void do_scry(",1)[1].split(
             "\nvoid do_readaura(",1)[0]
 
     def test_entire_shared_module_restores_exact_previous_source(self):
