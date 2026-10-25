@@ -72,6 +72,25 @@ class HybridMasteryCatalog(unittest.TestCase):
             if path == "clan.c":
                 from scry_source import without_scry_stage
                 data = without_scry_stage(data.decode()).encode()
+            if path == "classes/drow/drow.c":
+                # Reverse only the reviewed Acid Bolt callback guard.
+                # Keep the complete older file hash, including every native trainer.
+                text = data.decode()
+                start = text.index("void do_acidbolt(")
+                end = text.index("void do_faeriefire(", start)
+                body = text[start:end]
+                changes = (
+                    ("    ROOM_INDEX_DATA *combat_room;\n\n"
+                     "    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL || ch->in_room == NULL)\n"
+                     "        return;\n", ""),
+                    ("    combat_room = ch->in_room;\n", ""),
+                    ("    if (combat_character_in_room(combat_room, ch)) WAIT_STATE(ch, 8);",
+                     "    WAIT_STATE(ch, 8);"),
+                )
+                for current, original in changes:
+                    self.assertEqual(body.count(current), 1, current)
+                    body = body.replace(current, original, 1)
+                data = (text[:start] + body + text[end:]).encode()
             self.assertEqual(hashlib.sha1(b"blob " + str(len(data)).encode() +
                                          b"\0" + data).hexdigest(), expected, path)
 

@@ -16,6 +16,20 @@ class HybridDrowCatalog(unittest.TestCase):
         self.assertEqual(text.count('#include "classes/hybrid/access.h"\n'),1)
         self.assertEqual(text.count("if (!hybrid_power_parent(ch,CLASS_DROW))"),2)
         self.assertEqual(text.count("if (!hybrid_power_drow(ch,"),2)
+        safety_head = (
+            "    ROOM_INDEX_DATA *combat_room;\n\n"
+            "    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL || ch->in_room == NULL)\n"
+            "        return;\n")
+        self.assertEqual(text.count(safety_head),1)
+        self.assertEqual(text.count("    combat_room = ch->in_room;\n"),1)
+        self.assertEqual(text.count(
+            "    if (combat_character_in_room(combat_room, ch)) WAIT_STATE(ch, 8);"),1)
+        text=text.replace(safety_head,"").replace("    combat_room = ch->in_room;\n","").replace(
+            "    if (combat_character_in_room(combat_room, ch)) WAIT_STATE(ch, 8);",
+            "    WAIT_STATE(ch, 8);")
+        # Remove only the extra blank line introduced before the entry guard.
+        text=text.replace("    CHAR_DATA *victim;\n\n\n    one_argument(argument, arg);",
+                          "    CHAR_DATA *victim;\n\n    one_argument(argument, arg);")
         restored=text.replace('#include "classes/hybrid/access.h"\n',"").replace(
             "if (!hybrid_power_parent(ch,CLASS_DROW))","if (!IS_DROW(ch))")
         for flag in ("DROW_ATTUNE","DROW_FIRE"):

@@ -79,6 +79,10 @@ void do_acidbolt( CHAR_DATA *ch, char *argument )
 {
     char arg [MAX_INPUT_LENGTH];
     CHAR_DATA *victim;
+    ROOM_INDEX_DATA *combat_room;
+
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL || ch->in_room == NULL)
+        return;
 
     one_argument(argument, arg);
 
@@ -113,8 +117,9 @@ void do_acidbolt( CHAR_DATA *ch, char *argument )
     act("You fire a bolt of acid at $N!", ch, NULL, victim, TO_CHAR);
     act("$n fires a bolt of acid at you!", ch, NULL, victim, TO_VICT);
     act("$n fires a bolt of acid at $N!", ch, NULL, victim, TO_NOTVICT);
+    combat_room = ch->in_room;
     one_hit(ch, victim, TYPE_HIT, "acid bolt");
-    WAIT_STATE(ch, 8);
+    if (combat_character_in_room(combat_room, ch)) WAIT_STATE(ch, 8);
     return;  
 }
 
