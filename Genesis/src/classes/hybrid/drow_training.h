@@ -3,7 +3,7 @@
 
 struct char_data;
 
-/* Secondary-only training for Drow powers with audited runtime adapters. */
+/* Secondary-only training for audited Drow powers and Speed ranks. */
 int hybrid_drow_training_command(struct char_data *ch,const char *argument);
 
 #endif

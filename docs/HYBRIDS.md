@@ -954,6 +954,8 @@ selfbrid drow blindfight
 selfbrid drow blindfight learn
 selfbrid drow toughness
 selfbrid drow toughness learn
+selfbrid drow speed
+selfbrid drow speed learn
 ```
 
 The listing/details are read-only. `learn` buys exactly one existing flag:
@@ -968,7 +970,17 @@ class identity, primary Drow storage, other currencies and save format are
 unchanged. Primary Drow characters continue using native `prayer`; this UI
 does not intercept or alter it.
 
-Only these ten integrated powers are offered by this trainer in this stage.
+Speed is a separate ranked lesson: each next rank costs **10,000 secondary DP**,
+up to rank4, matching native Drow advancement. Each rank uses the existing
+combat calculations: one fewer pulse between attacks, +50 damroll, +100 damage
+cap, +5 avoidance-break chance, and +2.5 avoidance before the native integer
+rounding and floor. These are existing bonuses, not new formulas or an
+activation toggle. Rank4 preview reports the cap; another purchase is refused.
+Speed training is saved through the same checked transaction and does not
+change native Drow speed or the primary class.
+
+Only these ten integrated one-time powers and the four Speed ranks are offered
+by this trainer in this stage.
 Other Drow unlocks remain backend-only pending their complete runtime and
 learning review; backend storage is not permission to expose an unadapted
 power. No compatibility change: record4/save epoch4/handoff2. Conversion and

@@ -19,6 +19,10 @@ class HybridDrowTrainingCatalog(unittest.TestCase):
                       '{"blindfight",DROW_BFIGHT,5000}',
                       '{"toughness",DROW_TOUGH,8000}'):
             self.assertIn(entry, ui)
+        self.assertIn("static void show_speed", ui)
+        self.assertIn("request.action=HYBRID_LESSON_DROW_SPEED", ui)
+        self.assertIn("request.parent=CLASS_DROW", ui)
+        self.assertIn('!strcmp(args[1],"speed")', ui)
         for unsupported in ("DROW_DARK",
                             "DROW_BITE", "DROW_DUALWIELD",
                             "DROW_SPIDER",
@@ -61,6 +65,20 @@ class HybridDrowTrainingCatalog(unittest.TestCase):
         self.assertIn('arg2, "spidereyes")) {grant = DROW_EYES; cost = 7500;}', native)
         self.assertIn("{DROW_EYES,7500,0}", trainer)
         self.assertIn("{DROW_ATTUNE,1000,0}", trainer)
+        self.assertIn("case HYBRID_LESSON_DROW_SPEED:", trainer)
+        self.assertIn("lesson.secondary_dp_cost=10000", trainer)
+        self.assertIn("p->drow[DROW_SPEED]>=4", trainer)
+        self.assertIn('!str_cmp(arg2, "speed")', native)
+        self.assertIn("cost = 10000", native)
+
+    def test_speed_uses_existing_secondary_passive_paths(self):
+        passive = (SRC / "passives.c").read_text()
+        self.assertIn("a=s->secondary_progression.drow[DROW_SPEED]", passive)
+        self.assertIn("value-=a", passive)
+        self.assertIn("value+=(a*5)/2", passive)
+        self.assertIn("value+=a*5", passive)
+        self.assertIn("value+=a*100", passive)
+        self.assertIn("value+=a*50", passive)
 
 
 if __name__ == "__main__":

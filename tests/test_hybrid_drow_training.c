@@ -9,6 +9,7 @@
 #include "merc.h"
 #include "atomic_save.h"
 #include "classes/hybrid/access.h"
+#include "classes/hybrid/passives.h"
 #include "classes/hybrid/player.h"
 
 extern char *string_space,*top_string;
@@ -143,6 +144,8 @@ static void supported_utilities(void)
         assert(strstr(output,"readaura: available"));
         assert(strstr(output,"heighten: available"));
         assert(strstr(output,"spidereyes: available"));
+        assert(strstr(output,"Speed: rank 0/4"));
+        assert(strstr(output,"next rank costs 10000 DP"));
         assert(strstr(output,"5000 DP"));
         assert(strstr(output,"Other secondary Drow powers"));
 
@@ -345,6 +348,70 @@ static void toughness_lessons(void)
     }
 }
 
+static void speed_lessons(void)
+{
+    for(size_t i=0;i<sizeof(originals)/sizeof(originals[0]);i++){
+        CHAR_DATA *ch=fresh(originals[i],CLASS_DROW,9999);
+        long native_dp=ch->pcdata->classpoints[CP_CURRENT];
+        long speed=get_speed(ch);
+        long damroll=char_damroll(ch);
+        long damcap=get_damcap(ch);
+
+        unchanged(ch,"drow speed");
+        assert(strstr(output,"Speed: rank 0/4"));
+        assert(strstr(output,"10000 DP"));
+        unchanged(ch,"drow speed learn");
+        assert(strstr(output,"Not enough secondary Drow points"));
+        assert(ch->pcdata->hybrid.secondary_progression.drow[DROW_SPEED]==0);
+
+        ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]=40000;
+        for(long rank=1;rank<=4;rank++){
+            char expected[64];
+            snprintf(expected,sizeof(expected),"rank %ld/4",rank-1);
+            unchanged(ch,"drow speed");
+            assert(strstr(output,expected));
+            assert(strstr(output,"next rank costs 10000 DP"));
+            command(ch,"drow speed learn");
+            assert(strstr(output,"learned and saved"));
+            assert(ch->pcdata->hybrid.secondary_progression.drow[DROW_SPEED]==rank);
+            assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==
+                   40000-rank*10000);
+            assert(ch->pcdata->classpoints[CP_CURRENT]==native_dp);
+            assert(ch->class==originals[i]);
+            assert(get_speed(ch)==(speed-rank<6?6:speed-rank));
+            assert(char_damroll(ch)==damroll+rank*50);
+            assert(get_damcap(ch)==damcap+rank*100);
+            assert(hybrid_secondary_passive(ch,HYBRID_PASSIVE_AVOID,100)==
+                   100+(rank*5)/2);
+            assert(hybrid_secondary_passive(ch,HYBRID_PASSIVE_BREAK,100)==
+                   100+rank*5);
+        }
+        unchanged(ch,"drow speed");
+        assert(strstr(output,"rank 4/4"));
+        assert(strstr(output,"maximum reached"));
+        unchanged(ch,"drow speed learn");
+        assert(strstr(output,"already learned"));
+        assert(ch->pcdata->hybrid.secondary_progression.drow[DROW_SPEED]==4);
+        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==0);
+
+        for(int short_file=0;short_file<2;short_file++){
+            DESCRIPTOR_DATA reload={0};
+            assert(short_file?load_char_short(&reload,"Drowfixture"):
+                              load_char_obj(&reload,"Drowfixture"));
+            CHAR_DATA *loaded=reload.character;
+            assert(loaded->pcdata->hybrid.secondary_progression.drow[DROW_SPEED]==4);
+            assert(loaded->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==0);
+            assert(loaded->pcdata->classpoints[CP_CURRENT]==native_dp);
+            assert(loaded->class==originals[i]);
+            assert(get_speed(loaded)==(speed-4<6?6:speed-4));
+            assert(char_damroll(loaded)==damroll+200);
+            assert(get_damcap(loaded)==damcap+400);
+            free_char(loaded);
+        }
+        release(ch);
+    }
+}
+
 static void refusals_and_native_isolation(void)
 {
     CHAR_DATA *ch=fresh(CLASS_MAGE,CLASS_DROW,4999);
@@ -373,6 +440,9 @@ static void refusals_and_native_isolation(void)
     assert(strstr(output,"Not enough secondary Drow points"));
     assert(!memcmp(&before,ch->pcdata,sizeof(before)));
     assert(!hybrid_power_drow(ch,DROW_EYES));
+    command(ch,"drow speed learn");
+    assert(strstr(output,"Not enough secondary Drow points"));
+    assert(!memcmp(&before,ch->pcdata,sizeof(before)));
     release(ch);
 
     ch=fresh(CLASS_MAGE,CLASS_MONK,6000);
@@ -458,6 +528,33 @@ static void utility_save_faults(const char *lesson,long flag,long price)
     release(ch);
 }
 
+static void speed_save_faults(void)
+{
+    CHAR_DATA *ch=fresh(CLASS_NINJA,CLASS_DROW,10000);
+    const int faults[]={SAVE_FAULT_CREATE,SAVE_FAULT_FLUSH,SAVE_FAULT_SYNC,
+                        SAVE_FAULT_CLOSE,SAVE_FAULT_RENAME};
+    for(size_t i=0;i<sizeof(faults)/sizeof(faults[0]);i++) {
+        atomic_save_test_fault=faults[i];
+        unchanged(ch,"drow speed learn");
+        atomic_save_test_fault=SAVE_FAULT_NONE;
+        assert(ch->pcdata->hybrid.secondary_progression.drow[DROW_SPEED]==0);
+        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==10000);
+        assert(save_char_obj_checked(ch));
+    }
+    atomic_save_test_fault=SAVE_FAULT_DIRSYNC;
+    command(ch,"drow speed learn");
+    atomic_save_test_fault=SAVE_FAULT_NONE;
+    assert(strstr(output,"Do not repeat"));
+    assert(ch->pcdata->hybrid.secondary_progression.drow[DROW_SPEED]==1);
+    assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==0);
+    unchanged(ch,"drow speed learn");
+    assert(strstr(output,"recovery is pending"));
+    assert(save_char_obj_checked(ch));
+    unchanged(ch,"drow speed learn");
+    assert(strstr(output,"Not enough secondary Drow points"));
+    release(ch);
+}
+
 int main(void)
 {
     char cwd[4096],root[]="/tmp/anathema-hybrid-drow-training-XXXXXX";
@@ -481,6 +578,7 @@ int main(void)
     poison_lessons();
     blindfight_lessons();
     toughness_lessons();
+    speed_lessons();
     refusals_and_native_isolation();
     context_and_save_faults();
     utility_save_faults("drow llothsweb learn",DROW_WEB,8000);
@@ -490,6 +588,7 @@ int main(void)
     utility_save_faults("drow poisonimmunity learn",DROW_PIMM,5000);
     utility_save_faults("drow blindfight learn",DROW_BFIGHT,5000);
     utility_save_faults("drow toughness learn",DROW_TOUGH,8000);
+    speed_save_faults();
     assert(!char_list&&!room.people&&!fclose(fpReserve));
     assert(!chdir("..")&&!rmdir("player")&&!rmdir("backup")&&
            !rmdir("run")&&!chdir(cwd)&&!rmdir(root));

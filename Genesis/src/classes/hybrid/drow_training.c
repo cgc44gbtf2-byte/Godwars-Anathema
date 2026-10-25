@@ -1,4 +1,4 @@
-/* Secondary Drow UI exposes only powers with audited secondary handlers. */
+/* Secondary Drow UI exposes only lessons with audited secondary behavior. */
 #include <sys/types.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -50,8 +50,8 @@ static const struct drow_utility *find_utility(const char *name)
 
 static void usage(CHAR_DATA *ch)
 {
-    send_to_char("Use: selfbrid drow | selfbrid drow <attunement|faeriefire|acidbolt|llothsweb|readaura|heighten|spidereyes|poisonimmunity|blindfight|toughness>\n\r"
-        "Learn an integrated power: selfbrid drow <power> learn\n\r"
+    send_to_char("Use: selfbrid drow | selfbrid drow <attunement|faeriefire|acidbolt|llothsweb|readaura|heighten|spidereyes|poisonimmunity|blindfight|toughness|speed>\n\r"
+        "Learn an integrated power: selfbrid drow <power> learn; Speed: selfbrid drow speed learn\n\r"
         "Other secondary Drow powers are not available yet; conversion remains disabled.\n\r",
         ch);
 }
@@ -88,6 +88,18 @@ static void show(CHAR_DATA *ch,const struct drow_utility *u)
     send_to_char(line,ch);
 }
 
+static void show_speed(CHAR_DATA *ch,const HYBRID_STATE *s)
+{
+    char line[192];
+    long rank=s->secondary_progression.drow[DROW_SPEED];
+    if(rank>=4)
+        snprintf(line,sizeof(line),"Speed: rank %ld/4; maximum reached.\n\r",rank);
+    else
+        snprintf(line,sizeof(line),"Speed: rank %ld/4; next rank costs 10000 DP. "
+            "Each rank improves your existing Drow combat-speed bonuses.\n\r",rank);
+    send_to_char(line,ch);
+}
+
 int hybrid_drow_training_command(CHAR_DATA *ch,const char *argument)
 {
     char args[3][32],tail[32];
@@ -109,9 +121,29 @@ int hybrid_drow_training_command(CHAR_DATA *ch,const char *argument)
     if(!*args[1]) {
         for(size_t i=0;i<sizeof(utilities)/sizeof(utilities[0]);++i)
             show(ch,&utilities[i]);
+        show_speed(ch,s);
         if(!hybrid_secondary_ranks_valid(s))
             send_to_char("Stored Drow training needs staff review; no lesson is allowed.\n\r",ch);
         usage(ch);
+        return 1;
+    }
+    if(!strcmp(args[1],"speed")) {
+        if(!hybrid_secondary_ranks_valid(s)) {
+            send_to_char("Stored Drow training needs staff review; no lesson is allowed.\n\r",ch);
+            return 1;
+        }
+        if(!*args[2]) {
+            show_speed(ch,s);
+            return 1;
+        }
+        if(strcmp(args[2],"learn")) {
+            usage(ch);
+            return 1;
+        }
+        HYBRID_LESSON_REQUEST request={0};
+        request.action=HYBRID_LESSON_DROW_SPEED;
+        request.parent=CLASS_DROW;
+        result(ch,hybrid_training_commit(ch,&request));
         return 1;
     }
     const struct drow_utility *u=find_utility(args[1]);

@@ -106,6 +106,9 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
                      "Brittle Bones, once only; it is not damage immunity. "
                      "Spider Eyes costs 7,500 DP to learn: scry [target] is free; "
                      "shielding and Guardian warnings still apply. "
+                      "Drow Speed costs 10,000 DP per rank, up to rank 4. "
+                      "Learn with selfbrid drow speed learn; it improves the "
+                      "existing Drow speed calculations. "
                      "Learn these through "
                      "selfbrid drow <power> learn. Other Drow powers are not "
                      "yet offered by this trainer.\n\r",ch);
