@@ -942,11 +942,16 @@ selfbrid drow acidbolt
 selfbrid drow acidbolt learn
 selfbrid drow llothsweb
 selfbrid drow llothsweb learn
+selfbrid drow readaura
+selfbrid drow readaura learn
+selfbrid drow heighten
+selfbrid drow heighten learn
 ```
 
 The listing/details are read-only. `learn` buys exactly one existing flag:
 Attunement costs **1,000 DP**; Faerie Fire and Acid Bolt cost **5,000 DP each**;
-Lloth's Web costs **8,000 DP**, matching the native
+Lloth's Web costs **8,000 DP**, Read Aura **6,000 DP**, and Heightened Senses
+**20,000 DP**, matching the native
 prayer prices. Their activation remains free, with native item ownership,
 target-safety, resistance, affect and lag rules. The lesson writes only the
 secondary Drow bank through the existing checked save transaction; original
@@ -954,7 +959,7 @@ class identity, primary Drow storage, other currencies and save format are
 unchanged. Primary Drow characters continue using native `prayer`; this UI
 does not intercept or alter it.
 
-Only these four active powers are offered by this trainer in this stage.
+Only these six active powers are offered by this trainer in this stage.
 Other Drow unlocks remain backend-only pending their complete runtime and
 learning review; backend storage is not permission to expose an unadapted
 power. No compatibility change: record4/save epoch4/handoff2. Conversion and
@@ -998,6 +1003,26 @@ Werewolf restrictions remain unchanged. No new Shield/Scry access is granted.
 Target formatting, guardian feedback, illusion handling and item identification
 are unchanged. Record4/save epoch4/handoff2 are unchanged; playable conversion
 and live hybrid forms remain disabled. Existing custom world helps retain priority.
+
+### Heightened Senses — independent learned Drow access
+
+For an existing valid secondary Drow record, `selfbrid drow heighten`
+previews the lesson. `selfbrid drow heighten learn` costs **20,000 secondary DP**,
+the native prayer price, through the existing checked save transaction.
+Pre-commit save failure preserves points and training. Uncertain durability
+applies the lesson once and blocks another lesson until save recovery.
+
+Use `heighten` to toggle the existing shared sight flag. Activation is free
+and retains the native six-pulse wait; dismissal is free and imposes no wait.
+An earned Drow source and Monk Mantra1 share one toggle, not two bonuses.
+Original-class prerequisites remain the fallback when neither source is learned.
+Missing, rejected or untrained secondary records never supply a grant.
+Turning the flag off remains possible after training loss. An already-active
+legacy flag is not automatically revoked or assigned a new source; this stage
+does not add automatic provenance migration. Sorcerer vision and item-based
+sight remain independent. No new ranks, costs, schema or form permissions are
+introduced. Record4/save epoch4/handoff2 are unchanged; playable conversion
+and live hybrid forms remain disabled. Custom world helps retain priority.
 
 ## Sunbath — trained secondary Elementalist, shared mana
 

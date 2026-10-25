@@ -208,6 +208,7 @@ static void ht_loaders(void)
     assert(!rmdir("player")&&!rmdir("backup")&&!rmdir("run")&&!chdir(cwd)&&!rmdir(root));
 }
 
+#ifndef HEIGHTEN_FIXTURE_ONLY
 int main(int argc,char **argv)
 {
     if(argc==2&&!strcmp(argv[1],"--native-dump")){ht_native(1);return 0;}
@@ -221,3 +222,4 @@ int main(int argc,char **argv)
          "7 context boundaries,2 timing/source cases,144 full/short loads passed.");
     return 0;
 }
+#endif

@@ -12,12 +12,13 @@ class HybridDrowTrainingCatalog(unittest.TestCase):
                       '{"faeriefire",DROW_FIRE,5000}',
                       '{"acidbolt",DROW_ACID,5000}',
                       '{"llothsweb",DROW_WEB,8000}',
-                      '{"readaura",DROW_READ,6000}'):
+                      '{"readaura",DROW_READ,6000}',
+                      '{"heighten",DROW_SIGHT,20000}'):
             self.assertIn(entry, ui)
         for unsupported in ("DROW_DARK",
                             "DROW_BITE", "DROW_DUALWIELD", "DROW_BFIGHT",
                             "DROW_SPIDER", "DROW_EYES",
-                            "DROW_NIGHT", "DROW_SIGHT", "DROW_PIMM",
+                            "DROW_NIGHT", "DROW_PIMM",
                             "DROW_SKIP", "DROW_MIGHT", "DROW_TOUGH"):
             self.assertNotIn(unsupported, ui)
 
@@ -51,6 +52,8 @@ class HybridDrowTrainingCatalog(unittest.TestCase):
         self.assertIn("{DROW_WEB,8000,0}", trainer)
         self.assertIn('arg2, "readaura")) {grant = DROW_READ; cost = 6000;}', native)
         self.assertIn("{DROW_READ,6000,0}", trainer)
+        self.assertIn('arg2, "heighten")) {grant = DROW_SIGHT; cost = 20000;}', native)
+        self.assertIn("{DROW_SIGHT,20000,0}", trainer)
         self.assertIn("{DROW_ATTUNE,1000,0}", trainer)
 
 

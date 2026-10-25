@@ -10,6 +10,8 @@ GRANT="""    /* Each learned source supplies the same free reading, not a second
 """
 
 def without_drow_aura_stage(text):
+    from drow_heighten_source import without_drow_heighten_stage
+    text=without_drow_heighten_stage(text)
     if "void do_readaura(" not in text:return text
     start=text.index("void do_readaura(")
     end=text.index("\nvoid do_shield(",start)

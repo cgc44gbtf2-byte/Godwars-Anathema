@@ -3,10 +3,11 @@ import hashlib
 import unittest
 from test_class_layout import ROOT,SRC,make_values
 from heighten_source import without_heighten_stage
+from drow_heighten_source import without_drow_heighten_stage
 
 class HeightenCatalog(unittest.TestCase):
     def body(self):
-        return (SRC/"clan.c").read_text().split("void do_truesight(",1)[1].split(
+        return without_drow_heighten_stage((SRC/"clan.c").read_text()).split("void do_truesight(",1)[1].split(
             "\nvoid do_soulmask(",1)[0]
 
     def test_shared_module_restores_exact_parent(self):

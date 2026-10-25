@@ -95,6 +95,8 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
                      "Chikyu8/10-Ki route applies. Read Aura costs 6,000 DP "
                      "to learn: readaura <target|carried item> is free, with "
                      "one reading shared by learned Drow and Monk sources. "
+                     "Heighten costs 20,000 DP to learn: heighten toggles one "
+                     "shared sight effect for free, with a six-pulse activation wait. "
                      "Learn these through "
                      "selfbrid drow <power> learn. Other Drow powers are not "
                      "yet offered by this trainer.\n\r",ch);
