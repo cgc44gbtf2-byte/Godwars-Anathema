@@ -35,6 +35,8 @@ NEW_TOGGLE='''\tSET_BIT(ch->act, PLR_HOLYLIGHT);
 '''
 
 def without_heighten_stage(text):
+    from web_source import without_web_stage
+    text=without_web_stage(text)
     if "void do_truesight(" not in text:return text
     start=text.index("void do_truesight(")
     end=text.index("\nvoid do_soulmask(",start)

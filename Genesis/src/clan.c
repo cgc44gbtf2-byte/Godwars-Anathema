@@ -2260,10 +2260,10 @@ void do_web( CHAR_DATA *ch, char *argument )
     CHAR_DATA *victim;
     char arg[MIL];
     long sn;
+    ROOM_INDEX_DATA *combat_room;
 
-    argument = one_argument(argument, arg);
-
-    if (IS_NPC(ch)) return;
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL || ch->in_room == NULL) return;
+    argument = one_argument(argument != NULL ? argument : "", arg);
 
     if (!IS_NINJA(ch) && !IS_DROW(ch))
     {
@@ -2292,6 +2292,8 @@ void do_web( CHAR_DATA *ch, char *argument )
 	}
     }
 
+    /* A current-opponent fallback must still be a live local actor. */
+    if (!combat_character_in_room(ch->in_room, victim)) return;
     if (is_safe(ch, victim)) return;
     if (IS_NINJA(ch) && ch->pcdata->ninja[NINJA_KI] < 10)
     {
@@ -2299,8 +2301,10 @@ void do_web( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    if ((sn = skill_lookup("web")) < 0) return;
+    if ((sn = skill_lookup("web")) < 0 || skill_table[sn].spell_fun == NULL) return;
+    combat_room = ch->in_room;
     (*skill_table[sn].spell_fun) (sn, 50, ch, victim);
+    if (!combat_character_in_room(combat_room, ch)) return;
     if (IS_NINJA(ch)) ch->pcdata->ninja[NINJA_KI] -= 10;
     WAIT_STATE(ch, 12);
     return;
