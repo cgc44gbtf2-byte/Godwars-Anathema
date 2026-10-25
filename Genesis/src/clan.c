@@ -2265,19 +2265,22 @@ void do_web( CHAR_DATA *ch, char *argument )
     if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL || ch->in_room == NULL) return;
     argument = one_argument(argument != NULL ? argument : "", arg);
 
-    if (!IS_NINJA(ch) && !IS_DROW(ch))
+    /* Independent grants, one spell: a learned Drow web has its native free
+     * activation even for Ninja originals. Otherwise retain the Ninja route. */
+    const bool drow_ready = hybrid_power_drow(ch, DROW_WEB);
+    if (!IS_NINJA(ch) && !hybrid_power_parent(ch,CLASS_DROW))
     {
 	stc("Huh?\n\r", ch);
 	return;
     }
 
-    if (IS_DROW(ch) && !get_drow(ch, DROW_WEB))
+    if (!IS_NINJA(ch) && !drow_ready)
     {
         stc("You need to obtain Lloth's web first.\n\r",ch);
         return;
     }
 
-    if (IS_NINJA(ch) && get_ninja(ch, NINJA_CHIKYU) < 8)
+    if (!drow_ready && IS_NINJA(ch) && get_ninja(ch, NINJA_CHIKYU) < 8)
     {
 	stc("You require 8 Chikyu.\n\r",ch);
 	return;
@@ -2295,7 +2298,7 @@ void do_web( CHAR_DATA *ch, char *argument )
     /* A current-opponent fallback must still be a live local actor. */
     if (!combat_character_in_room(ch->in_room, victim)) return;
     if (is_safe(ch, victim)) return;
-    if (IS_NINJA(ch) && ch->pcdata->ninja[NINJA_KI] < 10)
+    if (!drow_ready && IS_NINJA(ch) && ch->pcdata->ninja[NINJA_KI] < 10)
     {
 	stc("You don't have enough Ki to use web.\n\r", ch);
 	return;
@@ -2305,7 +2308,7 @@ void do_web( CHAR_DATA *ch, char *argument )
     combat_room = ch->in_room;
     (*skill_table[sn].spell_fun) (sn, 50, ch, victim);
     if (!combat_character_in_room(combat_room, ch)) return;
-    if (IS_NINJA(ch)) ch->pcdata->ninja[NINJA_KI] -= 10;
+    if (!drow_ready && IS_NINJA(ch)) ch->pcdata->ninja[NINJA_KI] -= 10;
     WAIT_STATE(ch, 12);
     return;
 }

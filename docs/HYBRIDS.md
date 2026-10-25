@@ -940,10 +940,13 @@ selfbrid drow faeriefire
 selfbrid drow faeriefire learn
 selfbrid drow acidbolt
 selfbrid drow acidbolt learn
+selfbrid drow llothsweb
+selfbrid drow llothsweb learn
 ```
 
 The listing/details are read-only. `learn` buys exactly one existing flag:
-Attunement costs **1,000 DP**; Faerie Fire and Acid Bolt cost **5,000 DP each**, matching the native
+Attunement costs **1,000 DP**; Faerie Fire and Acid Bolt cost **5,000 DP each**;
+Lloth's Web costs **8,000 DP**, matching the native
 prayer prices. Their activation remains free, with native item ownership,
 target-safety, resistance, affect and lag rules. The lesson writes only the
 secondary Drow bank through the existing checked save transaction; original
@@ -951,11 +954,32 @@ class identity, primary Drow storage, other currencies and save format are
 unchanged. Primary Drow characters continue using native `prayer`; this UI
 does not intercept or alter it.
 
-Only these three active powers are offered by this trainer in this stage.
+Only these four active powers are offered by this trainer in this stage.
 Other Drow unlocks remain backend-only pending their complete runtime and
 learning review; backend storage is not permission to expose an unadapted
 power. No compatibility change: record4/save epoch4/handoff2. Conversion and
 live hybrid forms remain disabled.
+
+### Lloth's Web and Ninja overlap
+
+An earned secondary `DROW_WEB` grant enables the existing `web [target]`
+command, using the native level-50 web spell and 12-pulse wait. Native targeting,
+protection, dodge chance, duplicate-web handling and two-tick armor/web affect
+remain unchanged; no extra attack, damage formula, effect stack or activation
+charge is added. The learned Drow grant is independent: even a Ninja original
+uses its free activation when trained, without spending Ki or requiring Chikyu8.
+Without a learned Drow grant, original Ninjas still require Chikyu8 and pay
+10 Ki, including the native cost on a dodged/already-webbed cast. Secondary
+Ninja access is not enabled by this change.
+
+A separate native repair rejects missing caster context and a remote/stale
+current-opponent fallback, checks the spell pointer, and verifies cached-room
+membership after the spell callback before charging Ki or applying lag.
+This does not solve same-address actor reuse or malformed linked lists.
+Tests preserve 224 pre-change native snapshots, exercise both parent orders
+and both shared grants, and cover full/short saves and failed/uncertain lessons.
+Record4/save epoch4/handoff2 remain unchanged; playable conversion and live
+hybrid form integration remain disabled.
 
 ## Sunbath — trained secondary Elementalist, shared mana
 

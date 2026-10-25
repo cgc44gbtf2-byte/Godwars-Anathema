@@ -89,7 +89,10 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
                      "this does not create a hybrid.\n\r",ch);
         send_to_char("Existing secondary Drow: selfbrid drow lists the currently "
                      "integrated powers. Attunement costs 1,000 DP; Faerie "
-                     "Fire and Acid Bolt cost 5,000 DP each. Learn these through "
+                     "Fire and Acid Bolt cost 5,000 DP each; Lloth's Web costs "
+                     "8,000 DP. Web casts once for free using the learned Drow "
+                     "grant, including Ninja originals; otherwise the native "
+                     "Chikyu8/10-Ki route applies. Learn these through "
                      "selfbrid drow <power> learn. Other Drow powers are not "
                      "yet offered by this trainer.\n\r",ch);
         send_to_char("Existing secondary Werewolves: selfbrid wolf lists Breed, "

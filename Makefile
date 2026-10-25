@@ -51,6 +51,7 @@ TESTS += tests/test_hybrid_monk_training
 TESTS += tests/test_hybrid_highlander_training
 TESTS += tests/test_hybrid_drow_training
 TESTS += tests/test_hybrid_acidbolt
+TESTS += tests/test_hybrid_web
 TESTS += tests/test_hybrid_werewolf_training
 TESTS += tests/test_hybrid_aura
 TESTS += tests/test_message_format
@@ -182,6 +183,7 @@ check-layout:
 	python3 tests/test_hybrid_monk_training_catalog.py
 	python3 tests/test_hybrid_drow_training_catalog.py
 	python3 tests/test_hybrid_acidbolt_catalog.py
+	python3 tests/test_hybrid_web_catalog.py
 	python3 tests/test_hybrid_aura_catalog.py
 	python3 tests/test_message_format_catalog.py
 	python3 tests/test_identify_catalog.py
@@ -320,6 +322,9 @@ tests/test_hybrid_drow_training: tests/test_hybrid_drow_training.c $(ENGINE_OBJE
 
 tests/test_hybrid_acidbolt: tests/test_hybrid_acidbolt.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) -Wl,--wrap=one_hit $(LDLIBS) -o $@
+
+tests/test_hybrid_web: tests/test_hybrid_web.c tests/test_hybrid_acidbolt.c $(ENGINE_OBJECTS)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) -Wl,--wrap=one_hit -Wl,--wrap=spell_web $(LDLIBS) -o $@
 
 tests/test_hybrid_werewolf_training: tests/test_hybrid_werewolf_training.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@

@@ -10,9 +10,10 @@ class HybridDrowTrainingCatalog(unittest.TestCase):
         ui = (SRC / "drow_training.c").read_text()
         for entry in ('{"attunement",DROW_ATTUNE,1000}',
                       '{"faeriefire",DROW_FIRE,5000}',
-                      '{"acidbolt",DROW_ACID,5000}'):
+                      '{"acidbolt",DROW_ACID,5000}',
+                      '{"llothsweb",DROW_WEB,8000}'):
             self.assertIn(entry, ui)
-        for unsupported in ("DROW_WEB", "DROW_DARK",
+        for unsupported in ("DROW_DARK",
                             "DROW_BITE", "DROW_DUALWIELD", "DROW_BFIGHT",
                             "DROW_SPIDER", "DROW_EYES", "DROW_READ",
                             "DROW_NIGHT", "DROW_SIGHT", "DROW_PIMM",
@@ -45,6 +46,8 @@ class HybridDrowTrainingCatalog(unittest.TestCase):
         self.assertIn('arg2, "acidbolt")) {grant = DROW_ACID; cost = 5000;}', native)
         self.assertIn("{DROW_FIRE,5000,0}", trainer)
         self.assertIn("{DROW_ACID,5000,0}", trainer)
+        self.assertIn('arg2, "llothsweb")) {grant = DROW_WEB; cost = 8000;}', native)
+        self.assertIn("{DROW_WEB,8000,0}", trainer)
         self.assertIn("{DROW_ATTUNE,1000,0}", trainer)
 
 

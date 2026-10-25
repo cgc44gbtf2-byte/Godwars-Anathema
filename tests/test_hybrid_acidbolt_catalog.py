@@ -32,7 +32,8 @@ class HybridAcidBoltCatalog(unittest.TestCase):
     def test_no_implicit_other_power_or_compatibility_change(self):
         ui=(SRC/"classes/hybrid/drow_training.c").read_text()
         self.assertIn('{"acidbolt",DROW_ACID,5000}',ui)
-        self.assertNotIn("DROW_WEB",ui)
+        self.assertIn('{"llothsweb",DROW_WEB,8000}',ui)
+        self.assertNotIn("DROW_SPIDER",ui)
         compat=json.loads((ROOT/"deploy/update_compat.json").read_text())
         self.assertEqual(compat["save_epoch"],4)
         self.assertEqual(compat["handoff"],2)
