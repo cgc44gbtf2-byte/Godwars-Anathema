@@ -16,7 +16,8 @@ struct drow_utility {
 
 static const struct drow_utility utilities[] = {
     {"attunement",DROW_ATTUNE,1000},
-    {"faeriefire",DROW_FIRE,5000}
+    {"faeriefire",DROW_FIRE,5000},
+    {"acidbolt",DROW_ACID,5000}
 };
 
 static int word(const char **input,char out[32])
@@ -42,8 +43,8 @@ static const struct drow_utility *find_utility(const char *name)
 
 static void usage(CHAR_DATA *ch)
 {
-    send_to_char("Use: selfbrid drow | selfbrid drow <attunement|faeriefire>\n\r"
-        "Learn an integrated utility: selfbrid drow <power> learn\n\r"
+    send_to_char("Use: selfbrid drow | selfbrid drow <attunement|faeriefire|acidbolt>\n\r"
+        "Learn an integrated power: selfbrid drow <power> learn\n\r"
         "Other secondary Drow powers are not available yet; conversion remains disabled.\n\r",
         ch);
 }
@@ -52,11 +53,11 @@ static void result(CHAR_DATA *ch,enum hybrid_lesson_result r)
 {
     switch(r) {
     case HYBRID_LESSON_OK:
-        send_to_char("Secondary Drow utility learned and saved.\n\r",ch);break;
+        send_to_char("Secondary Drow power learned and saved.\n\r",ch);break;
     case HYBRID_LESSON_NO_FUNDS:
         send_to_char("Not enough secondary Drow points. Nothing changed.\n\r",ch);break;
     case HYBRID_LESSON_AT_CAP:
-        send_to_char("That Drow utility is already learned. Nothing changed.\n\r",ch);break;
+        send_to_char("That Drow power is already learned. Nothing changed.\n\r",ch);break;
     case HYBRID_LESSON_SAVE_PENDING:
         send_to_char("Primary save recovery is pending. Wait before another lesson.\n\r",ch);break;
     case HYBRID_LESSON_SAVE_FAILED:

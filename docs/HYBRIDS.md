@@ -883,17 +883,18 @@ boundaries (63 cases, including zero, negative, LONG_MIN and LONG_MAX).
 That new regression failed on the old debit before the fix. This does not
 enable secondary Vampire upkeep or infer ownership of a primary activation.
 
-## Drow utility adapters — no new conversion or activation flags
+## Drow command adapters — no new conversion or activation flags
 
-Two existing commands now check the appropriate parent's earned Drow flags:
-`attunement <item>` (`DROW_ATTUNE`) and `faeriefire <target>` (`DROW_FIRE`).
+Three existing commands now check the appropriate parent's earned Drow flags:
+`attunement <item>` (`DROW_ATTUNE`), `faeriefire <target>` (`DROW_FIRE`) and
+`acidbolt [target]` (`DROW_ACID`).
 The original Drow uses its unchanged native getter. A secondary Drow must
 have a valid owned record and have learned that exact flag: neither the other
-utility flag nor stale original-class Drow fields substitutes for training.
+power flag nor stale original-class Drow fields substitutes for training.
 Drow remains branchless: this adds no half-cap or specialization requirement.
 The initialization/paid-training/conversion policies are unchanged.
 
-Both native utilities cost zero to activate. These adapters do not invent a
+These commands cost zero to activate. These adapters do not invent a
 DP, mana or primal charge, grant a learned flag, change a class, borrow a form
 flag or alter either parent's training/resource banks. Learning still has its
 normal backend costs; the limited Drow player-facing trainer is described below. The separate
@@ -908,19 +909,26 @@ Existing Faerie Fire blocks duplicates rather than stacking or refreshing,
 regardless of which class originally applied it. This is a target spell
 effect with an existing expiry/save lifecycle, not a new caster form.
 
+Acid Bolt retains the native single `one_hit` attack and 8-pulse lag. Its hit,
+damage and weapon effects use the original class's existing combat rules, not
+a new damage formula or extra attack. Empty target defaults to the current
+opponent. Existing safety checks remain. A separate native safety repair rejects
+missing caster context and checks cached-room membership before applying lag
+after a combat callback; it never dereferences a removed caster.
+
 Real interpreter tests cover native Drow and all nine secondary orientations:
 individual earned flags, normal RNG parity, unchanged original training and
 owned banks, effect removal, duplicate prevention, protected/AFK/link-dead
 targets, resistance, missing targets, item ownership and excluded types.
 Untrained actors and eight invalid/unauthorized cases fail closed, including
 wrong parent, absent/corrupt record, failed load, NPC, stale original flags and
-an unrelated learned flag. The native-file hash is unchanged after removing
-only the include and four permission checks introduced for these two handlers.
+an unrelated learned flag. The native-file hash is unchanged after narrowly
+normalizing the include, six permission checks and Acid Bolt safety guards.
 Other Drow attacks, forms, gear creation, summon/teleport, upkeep and social
 commands remain native-only; no `IS_*` macro or interpreter table was widened.
-Record v4, save epoch 3 and handoff v2 are unchanged. Conversion stays disabled.
+Record v4, save epoch 4 and handoff v2 are unchanged. Conversion stays disabled.
 
-### Secondary Drow training for integrated utilities
+### Secondary Drow training for integrated powers
 
 For an existing secondary Drow record only:
 
@@ -930,10 +938,12 @@ selfbrid drow attunement
 selfbrid drow attunement learn
 selfbrid drow faeriefire
 selfbrid drow faeriefire learn
+selfbrid drow acidbolt
+selfbrid drow acidbolt learn
 ```
 
 The listing/details are read-only. `learn` buys exactly one existing flag:
-Attunement costs **1,000 DP** and Faerie Fire **5,000 DP**, matching the native
+Attunement costs **1,000 DP**; Faerie Fire and Acid Bolt cost **5,000 DP each**, matching the native
 prayer prices. Their activation remains free, with native item ownership,
 target-safety, resistance, affect and lag rules. The lesson writes only the
 secondary Drow bank through the existing checked save transaction; original
@@ -941,7 +951,7 @@ class identity, primary Drow storage, other currencies and save format are
 unchanged. Primary Drow characters continue using native `prayer`; this UI
 does not intercept or alter it.
 
-Only these two active utilities are offered by this trainer in this stage.
+Only these three active powers are offered by this trainer in this stage.
 Other Drow unlocks remain backend-only pending their complete runtime and
 learning review; backend storage is not permission to expose an unadapted
 power. No compatibility change: record4/save epoch4/handoff2. Conversion and

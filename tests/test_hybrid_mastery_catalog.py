@@ -73,7 +73,7 @@ class HybridMasteryCatalog(unittest.TestCase):
                 from scry_source import without_scry_stage
                 data = without_scry_stage(data.decode()).encode()
             if path == "classes/drow/drow.c":
-                # Reverse only the reviewed Acid Bolt callback guard.
+                # Reverse only the reviewed Acid Bolt adapter and callback guard.
                 # Keep the complete older file hash, including every native trainer.
                 text = data.decode()
                 start = text.index("void do_acidbolt(")
@@ -83,6 +83,8 @@ class HybridMasteryCatalog(unittest.TestCase):
                     ("    ROOM_INDEX_DATA *combat_room;\n\n"
                      "    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL || ch->in_room == NULL)\n"
                      "        return;\n", ""),
+                    ("if (!hybrid_power_parent(ch,CLASS_DROW))", "if (!IS_DROW(ch))"),
+                    ("if (!hybrid_power_drow(ch,DROW_ACID))", "if (!get_drow(ch, DROW_ACID))"),
                     ("    combat_room = ch->in_room;\n", ""),
                     ("    if (combat_character_in_room(combat_room, ch)) WAIT_STATE(ch, 8);",
                      "    WAIT_STATE(ch, 8);"),

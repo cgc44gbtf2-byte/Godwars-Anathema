@@ -88,10 +88,10 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
                      "Confirm one permanent full color before paid rank training; "
                      "this does not create a hybrid.\n\r",ch);
         send_to_char("Existing secondary Drow: selfbrid drow lists the currently "
-                     "integrated utilities. Attunement costs 1,000 DP and Faerie "
-                     "Fire costs 5,000 DP; learn only these through "
+                     "integrated powers. Attunement costs 1,000 DP; Faerie "
+                     "Fire and Acid Bolt cost 5,000 DP each. Learn these through "
                      "selfbrid drow <power> learn. Other Drow powers are not "
-                     "yet available to secondary records.\n\r",ch);
+                     "yet offered by this trainer.\n\r",ch);
         send_to_char("Existing secondary Werewolves: selfbrid wolf lists Breed, "
                      "Auspice and Tribe gifts with effective ranks/caps. Choose "
                      "one permanent full family (the others cap at3), then "

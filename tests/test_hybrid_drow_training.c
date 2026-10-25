@@ -97,7 +97,7 @@ static void unchanged(CHAR_DATA *ch,const char *argument)
 static void supported_utilities(void)
 {
     for(size_t i=0;i<sizeof(originals)/sizeof(originals[0]);++i) {
-        CHAR_DATA *ch=fresh(originals[i],CLASS_DROW,6000);
+        CHAR_DATA *ch=fresh(originals[i],CLASS_DROW,11000);
         long native_dp=ch->pcdata->classpoints[CP_CURRENT];
         long primal=ch->primal,exp=ch->exp,quest=ch->pcdata->quest;
         assert(!hybrid_power_drow(ch,DROW_ATTUNE));
@@ -106,12 +106,13 @@ static void supported_utilities(void)
         assert(strstr(output,"attunement: available"));
         assert(strstr(output,"1000 DP"));
         assert(strstr(output,"faeriefire: available"));
+        assert(strstr(output,"acidbolt: available"));
         assert(strstr(output,"5000 DP"));
         assert(strstr(output,"Other secondary Drow powers"));
 
         command(ch,"drow attunement");
         assert(strstr(output,"1000 DP to learn"));
-        unchanged(ch,"drow acidbolt learn");
+        unchanged(ch,"drow llothsweb learn");
         unchanged(ch,"drow faeriefire learn trailing");
         unchanged(ch,"drow faeriefire unknown");
         assert(!hybrid_power_drow(ch,DROW_ACID));
@@ -119,10 +120,10 @@ static void supported_utilities(void)
         command(ch,"drow attunement learn");
         assert(strstr(output,"learned and saved"));
         assert(hybrid_power_drow(ch,DROW_ATTUNE));
-        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==5000);
+        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==10000);
         command(ch,"drow attunement learn");
         assert(strstr(output,"already learned"));
-        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==5000);
+        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==10000);
 
         OBJ_INDEX_DATA index={0};
         OBJ_DATA item={0};
@@ -141,7 +142,13 @@ static void supported_utilities(void)
         command(ch,"drow faeriefire learn");
         assert(strstr(output,"learned and saved"));
         assert(hybrid_power_drow(ch,DROW_FIRE));
+        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==5000);
+        command(ch,"drow acidbolt learn");
+        assert(strstr(output,"learned and saved"));
+        assert(hybrid_power_drow(ch,DROW_ACID));
         assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==0);
+        unchanged(ch,"drow acidbolt learn");
+        assert(strstr(output,"already learned"));
         assert(ch->pcdata->classpoints[CP_CURRENT]==native_dp);
         assert(ch->primal==primal&&ch->exp==exp&&ch->pcdata->quest==quest);
         assert(ch->class==originals[i]);
@@ -151,13 +158,16 @@ static void supported_utilities(void)
         assert(load_char_obj(&reload,"Drowfixture"));
         assert(reload.character&&hybrid_power_drow(reload.character,DROW_ATTUNE));
         assert(hybrid_power_drow(reload.character,DROW_FIRE));
+        assert(hybrid_power_drow(reload.character,DROW_ACID));
+        assert(reload.character->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==0);
+        assert(reload.character->pcdata->classpoints[CP_CURRENT]==native_dp);
         assert(reload.character->class==originals[i]);
         free_char(reload.character);
         reload.character=NULL;
-        purchases+=2;
+        purchases+=3;
         release(ch);
     }
-    assert(purchases==18);
+    assert(purchases==27);
 }
 
 static void refusals_and_native_isolation(void)
@@ -168,6 +178,10 @@ static void refusals_and_native_isolation(void)
     assert(strstr(output,"Not enough secondary Drow points"));
     assert(!memcmp(&before,ch->pcdata,sizeof(before)));
     assert(!hybrid_power_drow(ch,DROW_FIRE));
+    command(ch,"drow acidbolt learn");
+    assert(strstr(output,"Not enough secondary Drow points"));
+    assert(!memcmp(&before,ch->pcdata,sizeof(before)));
+    assert(!hybrid_power_drow(ch,DROW_ACID));
     release(ch);
 
     ch=fresh(CLASS_MAGE,CLASS_MONK,6000);
@@ -251,7 +265,7 @@ int main(void)
     assert(!char_list&&!room.people&&!fclose(fpReserve));
     assert(!chdir("..")&&!rmdir("player")&&!rmdir("backup")&&
            !rmdir("run")&&!chdir(cwd)&&!rmdir(root));
-    printf("Secondary Drow UI: %u paid utilities across nine original parents, "
+    printf("Secondary Drow UI: %u paid powers across nine original parents, "
            "atomic reloads, DP isolation, adapter use and refusal paths passed.\n",
            purchases);
     return 0;

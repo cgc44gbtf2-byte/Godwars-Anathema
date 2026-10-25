@@ -86,13 +86,13 @@ void do_acidbolt( CHAR_DATA *ch, char *argument )
 
     one_argument(argument, arg);
 
-    if (!IS_DROW(ch))
+    if (!hybrid_power_parent(ch,CLASS_DROW))
     {
 	stc("Huh?\n\r",ch);
 	return;
     }
 
-    if (!get_drow(ch, DROW_ACID))
+    if (!hybrid_power_drow(ch,DROW_ACID))
     {
 	stc("You need to obtain acid bolt first.\n\r",ch);
 	return;

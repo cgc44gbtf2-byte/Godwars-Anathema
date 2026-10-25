@@ -1,4 +1,4 @@
-"""The two utility adapters are not permission to enable other Drow state."""
+"""Audited Drow adapters are not permission to enable other Drow state."""
 import hashlib
 import json
 import re
@@ -14,8 +14,8 @@ class HybridDrowCatalog(unittest.TestCase):
     def test_native_bodies_preserved_except_owned_permission_checks(self):
         text=(SRC/"classes/drow/drow.c").read_text()
         self.assertEqual(text.count('#include "classes/hybrid/access.h"\n'),1)
-        self.assertEqual(text.count("if (!hybrid_power_parent(ch,CLASS_DROW))"),2)
-        self.assertEqual(text.count("if (!hybrid_power_drow(ch,"),2)
+        self.assertEqual(text.count("if (!hybrid_power_parent(ch,CLASS_DROW))"),3)
+        self.assertEqual(text.count("if (!hybrid_power_drow(ch,"),3)
         safety_head = (
             "    ROOM_INDEX_DATA *combat_room;\n\n"
             "    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL || ch->in_room == NULL)\n"
@@ -32,7 +32,7 @@ class HybridDrowCatalog(unittest.TestCase):
                           "    CHAR_DATA *victim;\n\n    one_argument(argument, arg);")
         restored=text.replace('#include "classes/hybrid/access.h"\n',"").replace(
             "if (!hybrid_power_parent(ch,CLASS_DROW))","if (!IS_DROW(ch))")
-        for flag in ("DROW_ATTUNE","DROW_FIRE"):
+        for flag in ("DROW_ATTUNE","DROW_FIRE","DROW_ACID"):
             restored=restored.replace("if (!hybrid_power_drow(ch,"+flag+"))",
                                       "if (!get_drow(ch, "+flag+"))")
         data=restored.encode()
@@ -41,8 +41,7 @@ class HybridDrowCatalog(unittest.TestCase):
 
     def test_other_drow_handlers_remain_native(self):
         text=(SRC/"classes/drow/drow.c").read_text()
-        for name,next_name in (("do_acidbolt","do_faeriefire"),
-                               ("do_drowarmor","do_door"),
+        for name,next_name in (("do_drowarmor","do_door"),
                                ("do_door","do_prayer"),
                                ("do_globedark","do_shoot")):
             body=between(text,name,next_name)

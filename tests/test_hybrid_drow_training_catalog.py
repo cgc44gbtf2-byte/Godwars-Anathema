@@ -9,9 +9,10 @@ class HybridDrowTrainingCatalog(unittest.TestCase):
     def test_only_runtime_adapted_powers_are_exposed(self):
         ui = (SRC / "drow_training.c").read_text()
         for entry in ('{"attunement",DROW_ATTUNE,1000}',
-                      '{"faeriefire",DROW_FIRE,5000}'):
+                      '{"faeriefire",DROW_FIRE,5000}',
+                      '{"acidbolt",DROW_ACID,5000}'):
             self.assertIn(entry, ui)
-        for unsupported in ("DROW_ACID", "DROW_WEB", "DROW_DARK",
+        for unsupported in ("DROW_WEB", "DROW_DARK",
                             "DROW_BITE", "DROW_DUALWIELD", "DROW_BFIGHT",
                             "DROW_SPIDER", "DROW_EYES", "DROW_READ",
                             "DROW_NIGHT", "DROW_SIGHT", "DROW_PIMM",
@@ -41,7 +42,9 @@ class HybridDrowTrainingCatalog(unittest.TestCase):
         trainer = (SRC / "training.c").read_text()
         self.assertIn('arg2, "attunement")) {grant = DROW_ATTUNE; cost = 1000;}', native)
         self.assertIn('arg2, "faeriefire")) {grant = DROW_FIRE; cost = 5000;}', native)
+        self.assertIn('arg2, "acidbolt")) {grant = DROW_ACID; cost = 5000;}', native)
         self.assertIn("{DROW_FIRE,5000,0}", trainer)
+        self.assertIn("{DROW_ACID,5000,0}", trainer)
         self.assertIn("{DROW_ATTUNE,1000,0}", trainer)
 
 
