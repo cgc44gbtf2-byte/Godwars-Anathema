@@ -277,6 +277,40 @@ static void poison_lessons(void)
     }
 }
 
+static void blindfight_lessons(void)
+{
+    for(size_t i=0;i<sizeof(originals)/sizeof(originals[0]);i++){
+        CHAR_DATA *ch=fresh(originals[i],CLASS_DROW,4999);
+        unchanged(ch,"drow blindfight learn");
+        assert(strstr(output,"Not enough secondary Drow points"));
+        ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]=5000;
+        unchanged(ch,"drow blindfight");
+        assert(strstr(output,"5000 DP to learn"));
+        command(ch,"drow blindfight learn");
+        assert(strstr(output,"learned and saved"));
+        assert(hybrid_power_drow(ch,DROW_BFIGHT));
+        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==0);
+        unchanged(ch,"drow blindfight learn");
+        for(int short_file=0;short_file<2;short_file++){
+            DESCRIPTOR_DATA reload={0};
+            assert(short_file?load_char_short(&reload,"Drowfixture"):
+                              load_char_obj(&reload,"Drowfixture"));
+            assert(hybrid_power_drow(reload.character,DROW_BFIGHT));
+            assert(reload.character->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==0);
+            /* Use the loaded record in the real defensive calculation. */
+            PC_DATA before=*reload.character->pcdata;
+            CHAR_DATA *loaded=reload.character;
+            loaded->in_room=&room;loaded->position=POS_FIGHTING;
+            ch->position=POS_FIGHTING;
+            init_mm();(void)check_avoid(ch,loaded,TRUE);
+            assert(!memcmp(&before,loaded->pcdata,sizeof before));
+            loaded->in_room=NULL;
+            free_char(loaded);
+        }
+        release(ch);
+    }
+}
+
 static void refusals_and_native_isolation(void)
 {
     CHAR_DATA *ch=fresh(CLASS_MAGE,CLASS_DROW,4999);
@@ -411,6 +445,7 @@ int main(void)
     room_index_hash[901%MAX_KEY_HASH]=&room;
     supported_utilities();
     poison_lessons();
+    blindfight_lessons();
     refusals_and_native_isolation();
     context_and_save_faults();
     utility_save_faults("drow llothsweb learn",DROW_WEB,8000);
@@ -418,6 +453,7 @@ int main(void)
     utility_save_faults("drow heighten learn",DROW_SIGHT,20000);
     utility_save_faults("drow spidereyes learn",DROW_EYES,7500);
     utility_save_faults("drow poisonimmunity learn",DROW_PIMM,5000);
+    utility_save_faults("drow blindfight learn",DROW_BFIGHT,5000);
     assert(!char_list&&!room.people&&!fclose(fpReserve));
     assert(!chdir("..")&&!rmdir("player")&&!rmdir("backup")&&
            !rmdir("run")&&!chdir(cwd)&&!rmdir(root));

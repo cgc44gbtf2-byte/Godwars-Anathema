@@ -100,6 +100,8 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
                      "Poison Immunity costs 5,000 DP to learn: passive protection "
                      "against the poison spell and crossbow poison, not physical damage. "
                      "It does not cleanse existing poison. "
+                     "Blind Fighting costs 5,000 DP to learn: passive protection "
+                     "from the unseen-opponent avoidance/break penalty, not actual sight. "
                      "Spider Eyes costs 7,500 DP to learn: scry [target] is free; "
                      "shielding and Guardian warnings still apply. "
                      "Learn these through "

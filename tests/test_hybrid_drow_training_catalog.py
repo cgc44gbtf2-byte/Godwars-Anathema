@@ -15,10 +15,11 @@ class HybridDrowTrainingCatalog(unittest.TestCase):
                       '{"readaura",DROW_READ,6000}',
                       '{"heighten",DROW_SIGHT,20000}',
                       '{"spidereyes",DROW_EYES,7500}',
-                      '{"poisonimmunity",DROW_PIMM,5000}'):
+                      '{"poisonimmunity",DROW_PIMM,5000}',
+                      '{"blindfight",DROW_BFIGHT,5000}'):
             self.assertIn(entry, ui)
         for unsupported in ("DROW_DARK",
-                            "DROW_BITE", "DROW_DUALWIELD", "DROW_BFIGHT",
+                            "DROW_BITE", "DROW_DUALWIELD",
                             "DROW_SPIDER",
                             "DROW_NIGHT",
                             "DROW_SKIP", "DROW_MIGHT", "DROW_TOUGH"):

@@ -950,12 +950,15 @@ selfbrid drow spidereyes
 selfbrid drow spidereyes learn
 selfbrid drow poisonimmunity
 selfbrid drow poisonimmunity learn
+selfbrid drow blindfight
+selfbrid drow blindfight learn
 ```
 
 The listing/details are read-only. `learn` buys exactly one existing flag:
 Attunement costs **1,000 DP**; Faerie Fire and Acid Bolt cost **5,000 DP each**;
 Lloth's Web costs **8,000 DP**, Read Aura **6,000 DP**, Heightened Senses
-**20,000 DP**, Spider Eyes **7,500 DP**, and Poison Immunity **5,000 DP**, matching the native
+**20,000 DP**, Spider Eyes **7,500 DP**, and Poison Immunity and Blind Fighting
+**5,000 DP** each, matching the native
 prayer prices. Their activation remains free, with native item ownership,
 target-safety, resistance, affect and lag rules. The lesson writes only the
 secondary Drow bank through the existing checked save transaction; original
@@ -963,7 +966,7 @@ class identity, primary Drow storage, other currencies and save format are
 unchanged. Primary Drow characters continue using native `prayer`; this UI
 does not intercept or alter it.
 
-Only these eight integrated powers are offered by this trainer in this stage.
+Only these nine integrated powers are offered by this trainer in this stage.
 Other Drow unlocks remain backend-only pending their complete runtime and
 learning review; backend storage is not permission to expose an unadapted
 power. No compatibility change: record4/save epoch4/handoff2. Conversion and
@@ -1053,6 +1056,29 @@ route on the next command without changing independent native grants.
 No class swap, teleport, schema, save epoch or handoff change is introduced.
 Conversion and live hybrid forms remain disabled; custom world helps retain
 priority. This is not a live-host or PvP balance certification.
+
+### Blind Fighting — learned Drow passive
+
+For an existing valid secondary Drow record, preview with
+`selfbrid drow blindfight` and learn with `selfbrid drow blindfight learn`.
+The native unlock costs **5,000 secondary DP**, saved through the same checked
+lesson transaction. Failed saves do not apply the lesson or charge; uncertain
+durability blocks another lesson until save recovery.
+
+The passive removes the existing 25% unseen-opponent penalty from the
+character's avoidance and avoidance-breaking roll. It does not grant sight,
+reveal hidden targets, bypass targeting/safety checks, add attacks, or remove
+the unarmed/contact avoidance reduction. Seeing an opponent already avoids
+that penalty; learning the power adds no bonus in that case. Both sides of a
+fight check their own independent grant, with unchanged RNG draws and native
+integer truncation. There is no activation command, active flag, upkeep or
+stacked multiplier. Native/original Drow retain their existing learned access.
+
+An untrained or invalid secondary record grants nothing. Losing the learned
+flag removes the benefit on the next calculation without cleanup or rewriting
+stored training. No record, save-epoch or copyover-format change.
+Conversion and live hybrid forms remain disabled; custom world help still
+takes precedence over generated help.
 
 ### Poison Immunity — learned Drow passive
 

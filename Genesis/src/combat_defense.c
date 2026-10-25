@@ -28,6 +28,7 @@
 #include <time.h>
 #include "merc.h"
 #include "classes/hybrid/passives.h"
+#include "classes/hybrid/access.h"
 
 long get_soak( CHAR_DATA *victim )
 {
@@ -116,8 +117,8 @@ bool check_avoid( CHAR_DATA *ch, CHAR_DATA *victim, bool weap )
     br = number_range(1, breakavoid(ch));
 
     if (!weap) av *= .5;
-    if (!get_drow(victim, DROW_BFIGHT) && !can_see(victim, ch)) av *= .75;
-    if (!get_drow(ch, DROW_BFIGHT) && !can_see(ch, victim)) br *= .75;
+    if (!hybrid_power_drow(victim, DROW_BFIGHT) && !can_see(victim, ch)) av *= .75;
+    if (!hybrid_power_drow(ch, DROW_BFIGHT) && !can_see(ch, victim)) br *= .75;
 
     if (av > br) return TRUE;
     else return FALSE;
