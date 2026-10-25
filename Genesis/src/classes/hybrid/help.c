@@ -92,7 +92,10 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
                      "Fire and Acid Bolt cost 5,000 DP each; Lloth's Web costs "
                      "8,000 DP. Web casts once for free using the learned Drow "
                      "grant, including Ninja originals; otherwise the native "
-                     "Chikyu8/10-Ki route applies. Learn these through "
+                     "Chikyu8/10-Ki route applies. Read Aura costs 6,000 DP "
+                     "to learn: readaura <target|carried item> is free, with "
+                     "one reading shared by learned Drow and Monk sources. "
+                     "Learn these through "
                      "selfbrid drow <power> learn. Other Drow powers are not "
                      "yet offered by this trainer.\n\r",ch);
         send_to_char("Existing secondary Werewolves: selfbrid wolf lists Breed, "

@@ -19,6 +19,8 @@ def once(text,new,old):
     return text.replace(new,old)
 
 def without_web_stage(text):
+    from drow_aura_source import without_drow_aura_stage
+    text=without_drow_aura_stage(text)
     if "void do_web(" not in text:return text
     start=text.index("void do_web(");end=text.index("\nvoid do_entrancement(",start)
     body=text[start:end];digest=hashlib.sha256(body.encode()).hexdigest()

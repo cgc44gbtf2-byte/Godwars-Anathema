@@ -1222,51 +1222,54 @@ void do_readaura( CHAR_DATA *ch, char *argument )
      * native free aura reading also applies to Mage/Werewolf originals. */
     const bool monk_ready = hybrid_power_rank(ch, CLASS_MONK,
         HYBRID_TRAIN_MONK, MONK_MANTRA) >= 2;
+    /* Each learned source supplies the same free reading, not a second use. */
+    const bool drow_ready = hybrid_power_drow(ch, DROW_READ);
+    const bool free_aura = monk_ready || drow_ready;
 
     if (!IS_VAMPIRE(ch) && !IS_ITEMAFF(ch, ITEMA_VISION) && !IS_WEREWOLF(ch)
-     && !IS_NINJA(ch) && !IS_DROW(ch) && !IS_DRAGON(ch) && !IS_MONK(ch) && !IS_MAGE(ch) && !monk_ready)
+     && !IS_NINJA(ch) && !IS_DROW(ch) && !IS_DRAGON(ch) && !IS_MONK(ch) && !IS_MAGE(ch) && !free_aura)
     {
 	stc("Huh?\n\r", ch);
 	return;
     }
 
-    if (!monk_ready && IS_NINJA(ch) && get_ninja(ch, NINJA_SORA) < 4)
+    if (!free_aura && IS_NINJA(ch) && get_ninja(ch, NINJA_SORA) < 4)
     {
 	send_to_char("You need Sora 4.\n\r", ch);
 	return;
     }
-    else if (!monk_ready && IS_VAMPIRE(ch) && get_disc(ch, DISC_AUSPEX) < 2)
+    else if (!free_aura && IS_VAMPIRE(ch) && get_disc(ch, DISC_AUSPEX) < 2)
     {
 	send_to_char("You require level 2 Auspex to Read somethings Aura.\n\r",ch);
 	return;
     }
-    else if (!monk_ready && IS_WEREWOLF(ch) && get_tribe(ch,TRIBE_GLASS_WALKERS) < 2)
+    else if (!free_aura && IS_WEREWOLF(ch) && get_tribe(ch,TRIBE_GLASS_WALKERS) < 2)
     {
 	stc("You require Glass Walkers 2 to use Cybersenses.\n\r",ch);
 	return;
     }
-    else if (!monk_ready && IS_DROW(ch) && !get_drow(ch, DROW_READ))
+    else if (!free_aura && IS_DROW(ch) && !get_drow(ch, DROW_READ))
     {
         stc("You need to obtain readaura first.\n\r",ch);
         return;
     }
-    else if(!monk_ready && IS_DRAGON(ch) &&!IS_DRAGAFF(ch, DRAG_READAURA))
+    else if(!free_aura && IS_DRAGON(ch) &&!IS_DRAGAFF(ch, DRAG_READAURA))
     {
 	stc("You do not yet have the ability to read someone's aura.\n\r",ch);
 	return;
     }
-    else if (!monk_ready && IS_MONK(ch) && get_monk(ch, MONK_MANTRA) < 2)
+    else if (!free_aura && IS_MONK(ch) && get_monk(ch, MONK_MANTRA) < 2)
     {
 	stc("You need Mantra 2 for Trio Mantra.\n\r", ch);
 	return;
     }
-    else if (!monk_ready && IS_MAGE(ch) && ch->spheres[MLIF] < 1)
+    else if (!free_aura && IS_MAGE(ch) && ch->spheres[MLIF] < 1)
     {
 	stc("You do not have enough knowledge of the life sphere to use read aura.\n\r", ch);
 	return;
     }
 
-    if (IS_MAGE(ch) && !monk_ready)
+    if (IS_MAGE(ch) && !free_aura)
     {
 	if (ch->mana < 500)
 	{
@@ -1285,7 +1288,7 @@ void do_readaura( CHAR_DATA *ch, char *argument )
 
     if ( ( victim = get_char_room( ch, arg ) ) == NULL )
     {
-        if ( ( obj = get_obj_carry( ch, arg ) ) == NULL || (IS_WEREWOLF(ch) && !monk_ready))
+        if ( ( obj = get_obj_carry( ch, arg ) ) == NULL || (IS_WEREWOLF(ch) && !free_aura))
 	{
 	    send_to_char( "Read the aura on what?\n\r", ch );
 	    return;
@@ -1294,7 +1297,7 @@ void do_readaura( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    if (IS_WEREWOLF(ch) && get_breed(ch, BREED_HOMID) >= 5 && !monk_ready)
+    if (IS_WEREWOLF(ch) && get_breed(ch, BREED_HOMID) >= 5 && !free_aura)
     {
 	send_to_char("You are unable to read their aura.\n\r",ch);
 	return;

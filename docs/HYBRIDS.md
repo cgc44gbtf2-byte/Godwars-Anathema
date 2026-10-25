@@ -981,6 +981,24 @@ and both shared grants, and cover full/short saves and failed/uncertain lessons.
 Record4/save epoch4/handoff2 remain unchanged; playable conversion and live
 hybrid form integration remain disabled.
 
+### Read Aura — independent learned Drow access
+
+For an existing valid secondary Drow record, preview with
+`selfbrid drow readaura`, then use `selfbrid drow readaura learn` to buy the
+native `DROW_READ` power for **6,000 secondary DP**. The checked lesson save
+preserves original-class DP and training; a failed save does not charge.
+An uncertain durability result blocks another lesson until save recovery.
+
+Use `readaura <character|carried item>`. A learned Drow source supplies the
+same free reading as native Drow, even when the original class has an
+untrained or more restrictive aura route. Learned Monk Mantra2 and Drow
+sources do not stack, add extra readings, or duplicate costs. Without a
+learned source, the original class's prerequisites, Mage mana charge and
+Werewolf restrictions remain unchanged. No new Shield/Scry access is granted.
+Target formatting, guardian feedback, illusion handling and item identification
+are unchanged. Record4/save epoch4/handoff2 are unchanged; playable conversion
+and live hybrid forms remain disabled. Existing custom world helps retain priority.
+
 ## Sunbath — trained secondary Elementalist, shared mana
 
 `sunbath [target]` now uses earned, parent-owned Sun training (minimum 3).

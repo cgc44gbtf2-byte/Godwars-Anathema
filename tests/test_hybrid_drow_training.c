@@ -97,7 +97,7 @@ static void unchanged(CHAR_DATA *ch,const char *argument)
 static void supported_utilities(void)
 {
     for(size_t i=0;i<sizeof(originals)/sizeof(originals[0]);++i) {
-        CHAR_DATA *ch=fresh(originals[i],CLASS_DROW,19000);
+        CHAR_DATA *ch=fresh(originals[i],CLASS_DROW,25000);
         long native_dp=ch->pcdata->classpoints[CP_CURRENT];
         long primal=ch->primal,exp=ch->exp,quest=ch->pcdata->quest;
         assert(!hybrid_power_drow(ch,DROW_ATTUNE));
@@ -108,6 +108,7 @@ static void supported_utilities(void)
         assert(strstr(output,"faeriefire: available"));
         assert(strstr(output,"acidbolt: available"));
         assert(strstr(output,"llothsweb: available"));
+        assert(strstr(output,"readaura: available"));
         assert(strstr(output,"5000 DP"));
         assert(strstr(output,"Other secondary Drow powers"));
 
@@ -121,10 +122,10 @@ static void supported_utilities(void)
         command(ch,"drow attunement learn");
         assert(strstr(output,"learned and saved"));
         assert(hybrid_power_drow(ch,DROW_ATTUNE));
-        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==18000);
+        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==24000);
         command(ch,"drow attunement learn");
         assert(strstr(output,"already learned"));
-        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==18000);
+        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==24000);
 
         OBJ_INDEX_DATA index={0};
         OBJ_DATA item={0};
@@ -143,18 +144,24 @@ static void supported_utilities(void)
         command(ch,"drow faeriefire learn");
         assert(strstr(output,"learned and saved"));
         assert(hybrid_power_drow(ch,DROW_FIRE));
-        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==13000);
+        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==19000);
         command(ch,"drow acidbolt learn");
         assert(strstr(output,"learned and saved"));
         assert(hybrid_power_drow(ch,DROW_ACID));
-        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==8000);
+        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==14000);
         unchanged(ch,"drow acidbolt learn");
         assert(strstr(output,"already learned"));
         command(ch,"drow llothsweb learn");
         assert(strstr(output,"learned and saved"));
         assert(hybrid_power_drow(ch,DROW_WEB));
-        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==0);
+        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==6000);
         unchanged(ch,"drow llothsweb learn");
+        assert(strstr(output,"already learned"));
+        command(ch,"drow readaura learn");
+        assert(strstr(output,"learned and saved"));
+        assert(hybrid_power_drow(ch,DROW_READ));
+        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==0);
+        unchanged(ch,"drow readaura learn");
         assert(strstr(output,"already learned"));
         assert(ch->pcdata->classpoints[CP_CURRENT]==native_dp);
         assert(ch->primal==primal&&ch->exp==exp&&ch->pcdata->quest==quest);
@@ -167,6 +174,7 @@ static void supported_utilities(void)
         assert(hybrid_power_drow(reload.character,DROW_FIRE));
         assert(hybrid_power_drow(reload.character,DROW_ACID));
         assert(hybrid_power_drow(reload.character,DROW_WEB));
+        assert(hybrid_power_drow(reload.character,DROW_READ));
         assert(reload.character->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==0);
         assert(reload.character->pcdata->classpoints[CP_CURRENT]==native_dp);
         assert(reload.character->class==originals[i]);
@@ -174,14 +182,15 @@ static void supported_utilities(void)
         reload.character=NULL;
         assert(load_char_short(&reload,"Drowfixture"));
         assert(reload.character&&hybrid_power_drow(reload.character,DROW_WEB));
+        assert(hybrid_power_drow(reload.character,DROW_READ));
         assert(reload.character->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==0);
         assert(reload.character->class==originals[i]);
         free_char(reload.character);
         reload.character=NULL;
-        purchases+=4;
+        purchases+=5;
         release(ch);
     }
-    assert(purchases==36);
+    assert(purchases==45);
 }
 
 static void refusals_and_native_isolation(void)
@@ -200,6 +209,10 @@ static void refusals_and_native_isolation(void)
     assert(strstr(output,"Not enough secondary Drow points"));
     assert(!memcmp(&before,ch->pcdata,sizeof(before)));
     assert(!hybrid_power_drow(ch,DROW_WEB));
+    command(ch,"drow readaura learn");
+    assert(strstr(output,"Not enough secondary Drow points"));
+    assert(!memcmp(&before,ch->pcdata,sizeof(before)));
+    assert(!hybrid_power_drow(ch,DROW_READ));
     release(ch);
 
     ch=fresh(CLASS_MAGE,CLASS_MONK,6000);
@@ -258,29 +271,29 @@ static void context_and_save_faults(void)
     release(ch);
 }
 
-static void web_save_faults(void)
+static void utility_save_faults(const char *lesson,long flag,long price)
 {
-    CHAR_DATA *ch=fresh(CLASS_NINJA,CLASS_DROW,8000);
+    CHAR_DATA *ch=fresh(CLASS_NINJA,CLASS_DROW,price);
     const int faults[]={SAVE_FAULT_CREATE,SAVE_FAULT_FLUSH,SAVE_FAULT_SYNC,
                         SAVE_FAULT_CLOSE,SAVE_FAULT_RENAME};
     for(size_t i=0;i<sizeof(faults)/sizeof(faults[0]);i++) {
         atomic_save_test_fault=faults[i];
-        unchanged(ch,"drow llothsweb learn");
+        unchanged(ch,lesson);
         atomic_save_test_fault=SAVE_FAULT_NONE;
-        assert(!hybrid_power_drow(ch,DROW_WEB));
-        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==8000);
+        assert(!hybrid_power_drow(ch,flag));
+        assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==price);
         assert(save_char_obj_checked(ch));
     }
     atomic_save_test_fault=SAVE_FAULT_DIRSYNC;
-    command(ch,"drow llothsweb learn");
+    command(ch,lesson);
     atomic_save_test_fault=SAVE_FAULT_NONE;
     assert(strstr(output,"Do not repeat"));
-    assert(hybrid_power_drow(ch,DROW_WEB));
+    assert(hybrid_power_drow(ch,flag));
     assert(ch->pcdata->hybrid.secondary_classpoints[CP_CURRENT]==0);
-    unchanged(ch,"drow llothsweb learn");
+    unchanged(ch,lesson);
     assert(strstr(output,"recovery is pending"));
     assert(save_char_obj_checked(ch));
-    unchanged(ch,"drow llothsweb learn");
+    unchanged(ch,lesson);
     assert(strstr(output,"already learned"));
     release(ch);
 }
@@ -307,7 +320,8 @@ int main(void)
     supported_utilities();
     refusals_and_native_isolation();
     context_and_save_faults();
-    web_save_faults();
+    utility_save_faults("drow llothsweb learn",DROW_WEB,8000);
+    utility_save_faults("drow readaura learn",DROW_READ,6000);
     assert(!char_list&&!room.people&&!fclose(fpReserve));
     assert(!chdir("..")&&!rmdir("player")&&!rmdir("backup")&&
            !rmdir("run")&&!chdir(cwd)&&!rmdir(root));

@@ -64,7 +64,7 @@ class HybridWebCatalog(unittest.TestCase):
                       'interpret(actors,command)'):
             self.assertIn(token,test)
         training=(ROOT/"tests/test_hybrid_drow_training.c").read_text()
-        for token in ("web_save_faults();","purchases==36",
+        for token in ('utility_save_faults("drow llothsweb learn",DROW_WEB,8000)',"purchases==45",
                       'load_char_short(&reload,"Drowfixture")'):
             self.assertIn(token,training)
 

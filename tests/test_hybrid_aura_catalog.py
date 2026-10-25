@@ -5,6 +5,7 @@ import unittest
 from test_class_layout import ROOT,SRC,make_values
 from aura_source import without_aura_stage
 from item_info_source import without_item_info_stage
+from drow_aura_source import without_drow_aura_stage
 
 def blob(text):
     from file_numbers_source import without_file_number_save
@@ -21,7 +22,7 @@ class AuraCatalog(unittest.TestCase):
         self.assertEqual(text.count("hybrid_power_rank("),1)
 
     def test_independent_learned_source_and_native_fallbacks(self):
-        body=(SRC/"clan.c").read_text().split("void do_readaura(",1)[1].split("\nvoid do_shield(",1)[0]
+        body=without_drow_aura_stage((SRC/"clan.c").read_text()).split("void do_readaura(",1)[1].split("\nvoid do_shield(",1)[0]
         for part in ("HYBRID_TRAIN_MONK, MONK_MANTRA) >= 2",
                      "if (IS_MAGE(ch) && !monk_ready)","ch->mana -= 500",
                      "|| (IS_WEREWOLF(ch) && !monk_ready)",
