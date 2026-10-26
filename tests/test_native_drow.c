@@ -707,6 +707,120 @@ static void communication(void)
          "sender silence, login state and literal message checks passed.");
 }
 
+static void door_check(const char *text,ROOM_INDEX_DATA *destination,bool moved)
+{
+    if(actor->in_room!=&arena){char_from_room(actor);char_to_room(actor,&arena);}
+    long points=actor->pcdata->classpoints[CP_CURRENT];
+    long mana=actor->mana,hit=actor->hit;
+    long powers=actor->pcdata->drow[DROW_POWERS];
+    command(text);
+    assert(actor->in_room==(moved?destination:&arena));
+    assert((strstr(output,"You step through a dimensional door.")!=NULL)==moved);
+    assert(actor->pcdata->classpoints[CP_CURRENT]==points&&
+           actor->pcdata->drow[DROW_POWERS]==powers&&actor->mana==mana&&actor->hit==hit);
+    unsigned occurrences=0;
+    for(CHAR_DATA *p=actor->in_room->people;p;p=p->next_in_room)
+        if(p==actor)++occurrences;
+    assert(occurrences==1);
+}
+
+static void dimensional_travel(void)
+{
+    DESCRIPTOR_DATA target_session={0};char target_output[16384]={0};
+    assert(!load_char_obj(&target_session,"DoorTarget"));
+    CHAR_DATA *target=target_session.character;
+    target->class=CLASS_MONK;target->pcdata->monk[MONK_MANTRA]=6;
+    target->level=LEV_AWA;target->position=POS_STANDING;
+    target->desc=&target_session;target_session.connected=CON_PLAYING;
+    target_session.outbuf=target_output;target_session.outsize=sizeof target_output;
+    target->next=char_list;char_list=target;
+    ROOM_INDEX_DATA destination={0};
+    destination.vnum=999903;destination.name="Drow travel audit";destination.description="";
+    destination.area=&area;destination.light=1;
+    char_to_room(target,&destination);
+    long points=actor->pcdata->classpoints[CP_CURRENT];
+    door_check("dimensiondoor",&destination,FALSE);
+    door_check("dimensiondoor AbsentDoorTarget",&destination,FALSE);
+    door_check("dimensiondoor NativeDrow",&destination,FALSE);
+    house_input(target,"summon off");
+    assert(!IS_EXTRA(target,EXTRA_SUMMON));
+    door_check("dimensiondoor DoorTarget",&destination,FALSE);
+    house_input(target,"spiritguardian");
+    assert(IS_MORE(target,MORE_GUARDIAN));
+    const long flags[]={ROOM_SAFE,ROOM_PRIVATE,ROOM_SOLITARY};
+    /* Exhaust every combination, not just each protection in isolation. */
+    for(unsigned rooms=0;rooms<8;++rooms)
+        for(int illusion=0;illusion<2;++illusion)
+            for(int consent=0;consent<2;++consent) {
+                destination.room_flags=0;
+                for(unsigned bit=0;bit<3;++bit)
+                    if(rooms&(1u<<bit))SET_BIT(destination.room_flags,flags[bit]);
+                if(illusion)SET_BIT(target->extra,EXTRA_ILLUSION);
+                else REMOVE_BIT(target->extra,EXTRA_ILLUSION);
+                if(consent)SET_BIT(target->extra,EXTRA_SUMMON);
+                else REMOVE_BIT(target->extra,EXTRA_SUMMON);
+                target_session.outtop=0;target_output[0]='\0';
+                door_check("dimensiondoor DoorTarget",&destination,
+                           rooms==0&&!illusion&&consent);
+                if(rooms||illusion||!consent)
+                    assert(strstr(target_output,"failed to open a Dimensional Door"));
+            }
+    destination.room_flags=0;REMOVE_BIT(target->extra,EXTRA_ILLUSION);
+    SET_BIT(target->extra,EXTRA_SUMMON);
+    char_from_room(target);char_to_room(target,&arena);
+    door_check("dimensiondoor DoorTarget",&destination,FALSE);
+    char_from_room(target);char_to_room(target,&destination);
+    target->level=801;door_check("dimensiondoor DoorTarget",&destination,FALSE);
+    target->level=800;door_check("dimensiondoor DoorTarget",&destination,TRUE);
+    target->level=LEV_AWA;
+    SET_BIT(actor->extra,BLINDFOLDED);
+    door_check("dimensiondoor DoorTarget",&destination,FALSE);
+    REMOVE_BIT(actor->extra,BLINDFOLDED);
+    SET_BIT(target->affected_by,AFF_SHADOWPLANE);
+    door_check("dimensiondoor DoorTarget",&destination,FALSE);
+    REMOVE_BIT(target->affected_by,AFF_SHADOWPLANE);
+    actor->class=CLASS_MAGE;
+    door_check("dimensiondoor DoorTarget",&destination,FALSE);
+    actor->class=CLASS_DROW;
+    /* Consent is a normal player preference, not an NPC-only travel fixture. */
+    for(int consent=0;consent<2;++consent) {
+        house_input(target,consent?"summon on":"summon off");
+        assert(save_char_obj_checked(target));
+        DESCRIPTOR_DATA reload={0};assert(load_char_obj(&reload,"DoorTarget"));
+        assert(!!IS_EXTRA(reload.character,EXTRA_SUMMON)==consent);
+        assert(reload.character->class==CLASS_MONK&&
+               reload.character->pcdata->monk[MONK_MANTRA]==6&&
+               IS_MORE(reload.character,MORE_GUARDIAN));
+        /* Reloaded player is actually used for the next travel attempt. */
+        extract_char(target,TRUE);target=reload.character;
+        target_session.character=target;target_session.outtop=0;target_output[0]='\0';
+        target->desc=&target_session;target->position=POS_STANDING;
+        target->next=char_list;char_list=target;char_to_room(target,&destination);
+        door_check("dimensiondoor DoorTarget",&destination,consent!=0);
+    }
+    /* NPCs need no summon preference, but eye mobs and protected rooms refuse. */
+    CHAR_DATA *npc=create_mobile(get_mob_index(MOB_VNUM_GUARDIAN));
+    free_string(npc->name);npc->name=str_dup("DoorMob");npc->level=1;
+    char_to_room(npc,&destination);
+    door_check("dimensiondoor DoorMob",&destination,TRUE);
+    for(unsigned bit=0;bit<3;++bit) {
+        destination.room_flags=flags[bit];
+        door_check("dimensiondoor DoorMob",&destination,FALSE);
+    }
+    destination.room_flags=0;
+    MOB_INDEX_DATA *eye=get_mob_index(MOB_VNUM_EYE);assert(eye);
+    CHAR_DATA *eye_mob=create_mobile(eye);
+    free_string(eye_mob->name);eye_mob->name=str_dup("DoorEye");eye_mob->level=1;
+    char_to_room(eye_mob,&destination);
+    door_check("dimensiondoor DoorEye",&destination,FALSE);
+    assert(actor->pcdata->classpoints[CP_CURRENT]==points);
+    if(actor->in_room!=&arena){char_from_room(actor);char_to_room(actor,&arena);}
+    extract_char(eye_mob,TRUE);extract_char(npc,TRUE);extract_char(target,TRUE);
+    assert(destination.people==NULL);
+    puts("Native Drow dimensional travel: all destination/illusion/consent combinations, "
+         "visibility, NPC exclusions, Guardian notices and real player reloads passed.");
+}
+
 int main(int argc,char **argv)
 {
     char cwd[4096],from[8192],to[16384],name[256];
@@ -748,8 +862,11 @@ int main(int argc,char **argv)
     else if(argc==2&&!strcmp(argv[1],"--communication")) {
         prayers();communication();
     }
+    else if(argc==2&&!strcmp(argv[1],"--dimensional-travel")) {
+        prayers();dimensional_travel();
+    }
     else {
-        prayers();equipment_use();toggles();training_and_reports();prayer_menu();house_training();house_commands();communication();
+        prayers();equipment_use();toggles();training_and_reports();prayer_menu();house_training();house_commands();communication();dimensional_travel();
         if(argc==2&&!strcmp(argv[1],"--spider"))spider();
         else {equipment();dual_wield();combat_and_travel();spider();}
     }

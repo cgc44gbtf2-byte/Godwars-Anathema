@@ -156,5 +156,18 @@ class NativeDrowCatalog(unittest.TestCase):
                       'descriptor_list=saved_descriptors'):
             self.assertIn(token,fixture)
 
+    def test_dimensional_door_covers_consent_protections_and_real_reload(self):
+        fixture=(ROOT/"tests/test_native_drow.c").read_text()
+        for token in ('"--dimensional-travel"','rooms<8','illusion<2','consent<2',
+                      'ROOM_SAFE,ROOM_PRIVATE,ROOM_SOLITARY',
+                      'target->level=801','target->level=800',
+                      '"summon on":"summon off"','"spiritguardian"',
+                      'load_char_obj(&reload,"DoorTarget")',
+                      'target_session.character=target',
+                      'failed to open a Dimensional Door','MOB_VNUM_EYE',
+                      'actor->pcdata->classpoints[CP_CURRENT]==points',
+                      'assert(destination.people==NULL)'):
+            self.assertIn(token,fixture)
+
 if __name__ == "__main__":
     unittest.main()

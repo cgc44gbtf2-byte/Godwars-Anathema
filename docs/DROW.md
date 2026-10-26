@@ -103,6 +103,27 @@ descriptor still at login. It checks sender/recipient mutes, saved preferences,
 literal message text and unchanged powers/DP. No channel permission or runtime
 behavior is changed by this audit.
 
+## Dimensional Door
+
+Use `dimensiondoor <target>` to travel to a visible character in another room.
+It is a native Drow command, not a prayer purchase. The existing command does
+not spend mana or DP. Player destinations must permit travel with `summon on`;
+`summon off` refuses it. This preference persists through a normal save/reload.
+
+Safe, private and solitary destination rooms, illusion targets, eye mobs,
+targets above the existing level-800 boundary, missing targets and same-room
+targets are refused. Ordinary NPC targets do not require the player summon
+preference. Target lookup retains the shared visibility rules; this command
+does not override blindness or plane visibility. A destination player's active
+Spirit Guardian receives the existing warning when location protections or
+summon consent block the attempt.
+
+The real-world audit tests all 32 combinations of the three protected-room
+flags, illusion and player consent, plus the individual lookup/level/NPC
+boundaries. It uses real saved/reloaded player targets, checks Guardian notices,
+room-list membership and unchanged HP/mana/DP/training. This is test coverage,
+not a new travel policy or a blanket restriction on travel out of origin rooms.
+
 ## Class equipment
 
 The crafting command is **`drowarmor`**, not `classeq`.
