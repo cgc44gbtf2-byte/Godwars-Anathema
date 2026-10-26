@@ -323,6 +323,37 @@ static void training_and_reports(void)
     do_prayer(actor,"");do_drowupkeep(actor,"");actor->pcdata=original_pc;
 }
 
+static void prayer_menu(void)
+{
+    const char *help[]={"prayer","prayer self","prayer acidbolt",
+                       "prayer self nosuchgift"};
+    for(size_t i=0;i<sizeof help/sizeof *help;++i) {
+        PC_DATA before=*actor->pcdata;command(help[i]);
+        assert(!memcmp(&before,actor->pcdata,sizeof before));
+        assert(strstr(output,"no deity or trainer is required"));
+        assert(strstr(output,"prayer self <power>"));
+        assert(strstr(output,"prayer <name> <power>"));
+        assert(strstr(output,"prayer self acidbolt"));
+        assert(strstr(output,"You pay the DP costs"));
+        assert(strstr(output,"DualWield (10000)"));
+        assert(!strstr(output,"Dual Wield (10000)"));
+    }
+    long powers=actor->pcdata->drow[DROW_POWERS];
+    long points=actor->pcdata->classpoints[CP_CURRENT];
+    REMOVE_BIT(actor->pcdata->drow[DROW_POWERS],DROW_ACID);
+    actor->pcdata->classpoints[CP_CURRENT]=5000;
+    command("prayer self acidbolt");
+    assert(get_drow(actor,DROW_ACID)&&actor->pcdata->classpoints[CP_CURRENT]==0);
+    command("prayer self acidbolt");
+    assert(strstr(output,"already got")&&actor->pcdata->classpoints[CP_CURRENT]==0);
+    DESCRIPTOR_DATA reload={0};assert(load_char_obj(&reload,"NativeDrow"));
+    assert(get_drow(reload.character,DROW_ACID)&&
+           reload.character->pcdata->classpoints[CP_CURRENT]==0);
+    free_char(reload.character);
+    actor->pcdata->drow[DROW_POWERS]=powers;
+    actor->pcdata->classpoints[CP_CURRENT]=points;
+}
+
 static void house_training(void)
 {
     DESCRIPTOR_DATA other_descriptor={0};
@@ -393,8 +424,9 @@ int main(int argc,char **argv)
     if(argc==2&&!strcmp(argv[1],"--report-only"))upkeep_check(0,1);
     else if(argc==2&&!strcmp(argv[1],"--report-extreme"))upkeep_check(DROW_ACID,LONG_MAX);
     else if(argc==2&&!strcmp(argv[1],"--training-bounds"))training_and_reports();
+    else if(argc==2&&!strcmp(argv[1],"--prayer-menu"))prayer_menu();
     else {
-        prayers();toggles();training_and_reports();house_training();
+        prayers();toggles();training_and_reports();prayer_menu();house_training();
         if(argc==2&&!strcmp(argv[1],"--spider"))spider();
         else {equipment();dual_wield();combat_and_travel();spider();}
     }

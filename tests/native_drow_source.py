@@ -66,6 +66,7 @@ def without_native_drow_stage(text):
     text = without_native_drow_speed(text)
     if "void do_summonspider(" not in text:
         return text
+    text = without_native_drow_prayer_menu(text)
     text = without_native_drow_reports(text)
     start = text.index("void do_summonspider(")
     end = text.index("\n/* Consumable recipe", start)
@@ -101,6 +102,19 @@ def without_native_drow_stage(text):
         body = once(body, RELIC_GUARDS, "")
         text = text[:start]+body+text[end:]
     return text
+
+PRAYER_MENU = """stc("Prayer grants a power to a Drow; no deity or trainer is required.\\n\\r", ch);
+stc("Learn for yourself: prayer self <power>\\n\\r", ch);
+stc("Grant to another Drow in your house: prayer <name> <power>\\n\\r", ch);
+stc("Examples: prayer self acidbolt   |   prayer self speed\\n\\r", ch);
+stc("You pay the DP costs below. Speed has four ranks.\\n\\r", ch);
+"""
+
+def without_native_drow_prayer_menu(text):
+    if PRAYER_MENU not in text:
+        return text
+    text=once(text,PRAYER_MENU,'\tstc("Syntax: prayer <person> <power>\\n\\r", ch);\n')
+    return once(text,"DualWield (10000)","Dual Wield (10000)")
 
 SPEED_GETTER = """/* Do not turn malformed player data into combat bonuses or arithmetic UB.
  * Preserve the stored rank for staff inspection; only 0..4 is trainable. */

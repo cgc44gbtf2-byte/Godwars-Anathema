@@ -492,9 +492,13 @@ void do_prayer( CHAR_DATA *ch, char *argument )
 
     if (arg1[0] == '\0' || arg2[0] == '\0')
     {
-	stc("Syntax: prayer <person> <power>\n\r", ch);
+stc("Prayer grants a power to a Drow; no deity or trainer is required.\n\r", ch);
+stc("Learn for yourself: prayer self <power>\n\r", ch);
+stc("Grant to another Drow in your house: prayer <name> <power>\n\r", ch);
+stc("Examples: prayer self acidbolt   |   prayer self speed\n\r", ch);
+stc("You pay the DP costs below. Speed has four ranks.\n\r", ch);
 	stc("AcidBolt (5000), LlothsWeb (8000), Darkness (9500), FaerieFire (5000),\n\r", ch);
-	stc("SpiderBite (7500), Dual Wield (10000), Blindfight (5000), SummonSpider (8000),\n\r", ch);
+	stc("SpiderBite (7500), DualWield (10000), Blindfight (5000), SummonSpider (8000),\n\r", ch);
 	stc("SpiderEyes (7500), Readaura (6000), Darkvision (5000), Heighten (20000).\n\r", ch);
 	stc("PoisonImmunity (5000), SkipDisc (5000), Attunement (1000),\n\r", ch);
 	stc("Speed (10000 per increase), Toughness (8000), Might (8000),\n\r", ch);

@@ -5,8 +5,19 @@ change class identity or enable hybrid conversion.
 
 ## Learning
 
-Use `prayer <person> <power>`. Training yourself is allowed; another Drow must
-belong to your house. The payer spends DP, the recipient receives the gift.
+No deity, altar or trainer NPC is required. The target is the Drow **receiving**
+the power:
+
+```text
+prayer
+prayer self acidbolt
+prayer self speed
+prayer self dualwield
+prayer <other-Drow-name> <power>
+```
+
+Bare `prayer` lists the menu; it does not buy a gift. Another Drow must be in the
+same room and belong to your house. The payer spends DP, the recipient receives the gift.
 Already learned gifts are not charged again. Speed has four ranks.
 
 | Prayer power | DP | How it is used |

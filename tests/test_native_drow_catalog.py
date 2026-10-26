@@ -79,5 +79,18 @@ class NativeDrowCatalog(unittest.TestCase):
                       "assert(get_drow_speed(NULL)==0)"):
             self.assertIn(token,test)
 
+    def test_prayer_menu_explains_recipient_and_self_alias(self):
+        test=(ROOT/"tests/test_native_drow.c").read_text()
+        for token in ('"prayer self nosuchgift"','"prayer acidbolt"',
+                      'command("prayer self acidbolt")',
+                      'assert(strstr(output,"prayer <name> <power>"))',
+                      'load_char_obj(&reload,"NativeDrow")',"prayer_menu();"):
+            self.assertIn(token,test)
+        from native_drow_source import without_native_drow_stage
+        text=(SRC/"classes/drow/drow.c").read_text()
+        for old,new in (("cost = 5000;","cost = 50;"),
+                        ("grant = DROW_ACID","grant = DROW_WEB")):
+            self.assertNotEqual(blob(without_native_drow_stage(text.replace(old,new,1))),BASE)
+
 if __name__ == "__main__":
     unittest.main()
