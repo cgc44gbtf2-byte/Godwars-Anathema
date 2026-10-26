@@ -65,6 +65,7 @@ def once(text, new, old):
 def without_native_drow_stage(text):
     if "void do_summonspider(" not in text:
         return text
+    text = without_native_drow_reports(text)
     start = text.index("void do_summonspider(")
     end = text.index("\n/* Consumable recipe", start)
     body = text[start:end]
@@ -97,5 +98,47 @@ def without_native_drow_stage(text):
                         f'{{vnum = {vnum}; wear_flag = {flag};}}',
                         f'if (!str_cmp(arg,"{piece}")) vnum = {vnum};')
         body = once(body, RELIC_GUARDS, "")
+        text = text[:start]+body+text[end:]
+    return text
+
+INVALID_SPEED = """if (victim->pcdata->drow[DROW_SPEED] < 0 || victim->pcdata->drow[DROW_SPEED] > 4)
+{
+    stc("They have an invalid Speed rank; please tell staff.\\n\\r", ch);
+    return;
+}
+"""
+INVALID_REPORT = """    if (ch->pcdata->drow[DROW_SPEED] < 0 || ch->pcdata->drow[DROW_SPEED] > 4)
+    {
+snprintf(buf, sizeof(buf), "Drow data has an invalid Speed rank (%li). Tell staff.\\n\\r",
+         ch->pcdata->drow[DROW_SPEED]);
+stc(buf, ch);
+    }
+    else if (ch->pcdata->drow[DROW_SPEED] > 0)
+"""
+
+def without_native_drow_reports(text):
+    """Undo only the reviewed native prayer/report safety follow-up."""
+    start = text.index("void do_prayer(")
+    end = text.index("\nvoid do_skipdisc(", start)
+    body = text[start:end]
+    if INVALID_SPEED in body:
+        body = once(body, CONTEXT, "")
+        body = once(body, "if (!IS_DROW(victim) || victim->pcdata == NULL)",
+                    "if (!IS_DROW(victim))")
+        body = once(body, INVALID_SPEED, "")
+        text = text[:start]+body+text[end:]
+    start = text.index("void do_drowupkeep(")
+    end = text.index("\nvoid do_globedark(", start)
+    body = text[start:end]
+    if INVALID_REPORT in body:
+        body = once(body, "    char buf[128];", "    char buf[15];")
+        body = once(body, "    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL) return;\n", "")
+        body = once(body,
+                    "ch->pcdata->drow[DROW_POWERS] == 0 && ch->pcdata->drow[DROW_SPEED] == 0",
+                    "ch->pcdata->drow[DROW_POWERS] == 0")
+        body = once(body, INVALID_REPORT, "    if (ch->pcdata->drow[DROW_SPEED] > 0)\n")
+        body = once(body,
+                    'snprintf(buf, sizeof(buf), "Speed %li\\n\\r", ch->pcdata->drow[DROW_SPEED]);',
+                    '\tsprintf(buf, "Speed %li%s", ch->pcdata->drow[DROW_SPEED], counter == 3 ? "" : "\\n\\r");')
         text = text[:start]+body+text[end:]
     return text

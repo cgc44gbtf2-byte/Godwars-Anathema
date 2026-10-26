@@ -21,6 +21,8 @@ class NativeDrowCatalog(unittest.TestCase):
             ("ch->pcdata->quest -= 400;", "ch->pcdata->quest -= 1;"),
             ("pObjIndex->weight < 0", "pObjIndex->weight < -1"),
             ("ch->pcdata->followers != 0", "ch->pcdata->followers > 10"),
+            ("cost = 10000;", "cost = 999;"),
+            ("char buf[128];", "char buf[16];"),
         ):
             changed=text.replace(old,new)
             self.assertNotEqual(changed,text)
@@ -38,6 +40,15 @@ class NativeDrowCatalog(unittest.TestCase):
             self.assertIn(token,fixture)
         self.assertIn("tests/test_native_drow", make_values(ROOT,"TESTS"))
         self.assertIn("$(ENGINE_OBJECTS)", (ROOT/"Makefile").read_text())
+
+    def test_reports_and_training_have_native_boundary_cases(self):
+        fixture=(ROOT/"tests/test_native_drow.c").read_text()
+        for token in ("--report-only", "--report-extreme", "--training-bounds",
+                      "LONG_MIN,5,LONG_MAX", "house_training();",
+                      'command("prayer DrowStudent speed")',
+                      'load_char_obj(&reload,"DrowStudent")'):
+            self.assertIn(token,fixture)
+        self.assertIn('assert(!memcmp(&before,actor->pcdata,sizeof before))',fixture)
 
 if __name__ == "__main__":
     unittest.main()

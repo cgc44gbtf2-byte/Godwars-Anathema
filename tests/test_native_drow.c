@@ -279,6 +279,89 @@ static void toggles(void)
     command("readaura");command("scry");
 }
 
+static void upkeep_check(long powers,long speed)
+{
+    actor->pcdata->drow[DROW_POWERS]=powers;
+    actor->pcdata->drow[DROW_SPEED]=speed;
+    PC_DATA before=*actor->pcdata;
+    command("drowupkeep");
+    assert(!memcmp(&before,actor->pcdata,sizeof before));
+    if(speed<0||speed>4)assert(strstr(output,"invalid Speed rank"));
+    else if(speed) {
+        char expected[40];snprintf(expected,sizeof expected,"Speed %ld\n\r",speed);
+        assert(strstr(output,expected));
+        assert(!strstr(output,"no drow abilities"));
+    } else if(!powers)assert(strstr(output,"no drow abilities"));
+}
+
+static void training_and_reports(void)
+{
+    long powers=actor->pcdata->drow[DROW_POWERS];
+    long speed=actor->pcdata->drow[DROW_SPEED];
+    long points=actor->pcdata->classpoints[CP_CURRENT];
+    const long invalid[]={-1,LONG_MIN,5,LONG_MAX};
+    for(size_t i=0;i<sizeof invalid/sizeof *invalid;++i) {
+        actor->pcdata->drow[DROW_SPEED]=invalid[i];
+        actor->pcdata->classpoints[CP_CURRENT]=10000;
+        command("prayer NativeDrow speed");
+        assert(actor->pcdata->drow[DROW_SPEED]==invalid[i]);
+        assert(actor->pcdata->classpoints[CP_CURRENT]==10000);
+        assert(strstr(output,"invalid Speed rank"));
+    }
+    for(long rank=0;rank<=4;++rank)
+        for(int mask=0;mask<3;++mask)
+            upkeep_check(mask==0?0:mask==1?DROW_ACID:powers,rank);
+    for(size_t i=0;i<sizeof invalid/sizeof *invalid;++i) {
+        upkeep_check(0,invalid[i]);
+        upkeep_check(powers,invalid[i]);
+    }
+    actor->pcdata->drow[DROW_POWERS]=powers;
+    actor->pcdata->drow[DROW_SPEED]=speed;
+    actor->pcdata->classpoints[CP_CURRENT]=points;
+    do_prayer(NULL,"");do_drowupkeep(NULL,"");
+    PC_DATA *original_pc=actor->pcdata;actor->pcdata=NULL;
+    do_prayer(actor,"");do_drowupkeep(actor,"");actor->pcdata=original_pc;
+}
+
+static void house_training(void)
+{
+    DESCRIPTOR_DATA other_descriptor={0};
+    char other_output[65536]={0};
+    assert(!load_char_obj(&other_descriptor,"DrowStudent"));
+    other_descriptor.outbuf=other_output;other_descriptor.outsize=sizeof other_output;
+    other_descriptor.connected=CON_PLAYING;
+    CHAR_DATA *other=other_descriptor.character;
+    other->class=CLASS_DROW;other->level=LEV_AWA;other->position=POS_STANDING;
+    other->next=char_list;char_list=other;char_to_room(other,&arena);
+    long points=actor->pcdata->classpoints[CP_CURRENT];
+    char *old_house=actor->clan;
+    actor->clan=str_dup("AuditHouse");
+    free_string(other->clan);other->clan=str_dup("OtherHouse");
+    actor->pcdata->classpoints[CP_CURRENT]=5000;
+    command("prayer DrowStudent acidbolt");
+    assert(!get_drow(other,DROW_ACID)&&actor->pcdata->classpoints[CP_CURRENT]==5000);
+    free_string(other->clan);other->clan=str_dup("AuditHouse");
+    command("prayer DrowStudent acidbolt");
+    assert(get_drow(other,DROW_ACID)&&actor->pcdata->classpoints[CP_CURRENT]==0);
+    actor->pcdata->classpoints[CP_CURRENT]=5000;
+    command("prayer DrowStudent acidbolt");
+    assert(actor->pcdata->classpoints[CP_CURRENT]==5000);
+    command("prayer DrowStudent speed");
+    assert(other->pcdata->drow[DROW_SPEED]==0);
+    actor->pcdata->classpoints[CP_CURRENT]=10000;
+    command("prayer DrowStudent speed");
+    assert(other->pcdata->drow[DROW_SPEED]==1&&actor->pcdata->classpoints[CP_CURRENT]==0);
+    assert(save_char_obj_checked(actor)&&save_char_obj_checked(other));
+    DESCRIPTOR_DATA reload={0};
+    assert(load_char_obj(&reload,"DrowStudent"));
+    assert(get_drow(reload.character,DROW_ACID)&&
+           reload.character->pcdata->drow[DROW_SPEED]==1);
+    free_char(reload.character);
+    free_string(actor->clan);actor->clan=old_house;
+    actor->pcdata->classpoints[CP_CURRENT]=points;
+    extract_char(other,TRUE);
+}
+
 int main(int argc,char **argv)
 {
     char cwd[4096],from[8192],to[16384],name[256];
@@ -307,9 +390,14 @@ int main(int argc,char **argv)
     arena.vnum=999901;arena.name="Native Drow audit";arena.description="";
     arena.light=1;area.name="Native Drow audit";arena.area=&area;
     actor->next=char_list;char_list=actor;char_to_room(actor,&arena);
-    prayers();toggles();
-    if(argc==2&&!strcmp(argv[1],"--spider"))spider();
-    else {equipment();dual_wield();combat_and_travel();spider();}
+    if(argc==2&&!strcmp(argv[1],"--report-only"))upkeep_check(0,1);
+    else if(argc==2&&!strcmp(argv[1],"--report-extreme"))upkeep_check(DROW_ACID,LONG_MAX);
+    else if(argc==2&&!strcmp(argv[1],"--training-bounds"))training_and_reports();
+    else {
+        prayers();toggles();training_and_reports();house_training();
+        if(argc==2&&!strcmp(argv[1],"--spider"))spider();
+        else {equipment();dual_wield();combat_and_travel();spider();}
+    }
     extract_char(actor,TRUE);actor=NULL;
     assert(!fclose(fpReserve)&&!chdir(cwd));
     for(size_t i=0;i<6;++i){
@@ -320,6 +408,9 @@ int main(int argc,char **argv)
         assert(!closedir(dir)&&!rmdir(from));
     }
     assert(!rmdir(scratch));
-    printf("Native Drow: %u real-world command checks, 17 prayers, five worn/reloaded relics, native toggles and spider lifecycle passed.\n",checks);
+    if(argc==2)
+        printf("Native Drow focused mode %s: %u real-world command checks passed.\n",argv[1],checks);
+    else
+        printf("Native Drow: %u real-world command checks, 17 prayers, five worn/reloaded relics, native toggles and spider lifecycle passed.\n",checks);
     return 0;
 }

@@ -79,7 +79,23 @@ compatibility, ranged safety, resource use and persistence.
 An exact source inverse preserves the previous complete Drow source hash; its
 negative tests reject unrelated stat/cost/guard changes.
 
+### Native Speed training/reporting follow-up
+
+`drowupkeep` now shows Speed even if it is the only trained gift and always ends
+the Speed entry with a line break. Its numeric output is bounded, including the
+largest and smallest stored `long` values.
+
+Ranks outside 0–4 are reported as invalid, not silently repaired. `prayer` refuses
+to charge for increasing an invalid Speed rank; normal ranks still cost 10,000 DP
+and stop at four. No save-format or combat-formula change is made.
+
+Tests cover Speed-only and mixed reports at every legal rank, invalid-rank
+refusals, read-only reporting, same-house versus different-house prayer, payer
+affordability, duplicate grants, and the recipient's power/Speed reload.
+
 This is not proof of live-server configuration, every custom OLC edit, PvP
-balance, or crash/power-cut durability. House/social authorization and every
-possible hostile room-text callback are not newly audited here. The existing
+balance, or crash/power-cut durability. Clan membership administration and every
+possible hostile room-text callback are not newly audited here. A cross-player
+prayer still uses ordinary separate player saves, not an atomic two-player
+transaction. The existing
 shared flag/follower conventions are retained rather than replaced.

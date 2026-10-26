@@ -479,6 +479,8 @@ void do_prayer( CHAR_DATA *ch, char *argument )
     char arg2[MIL];
     long grant = 0, cost = 0;
 
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL || ch->in_room == NULL)
+        return;
     argument = one_argument(argument, arg1);
     argument = one_argument(argument, arg2);
 
@@ -505,7 +507,7 @@ void do_prayer( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    if (!IS_DROW(victim))
+    if (!IS_DROW(victim) || victim->pcdata == NULL)
     {
 	stc("Only on a drow.\n\r", ch);
 	return;
@@ -537,6 +539,11 @@ void do_prayer( CHAR_DATA *ch, char *argument )
     else if (!str_cmp(arg2, "speed"))
     {
 	cost = 10000;
+if (victim->pcdata->drow[DROW_SPEED] < 0 || victim->pcdata->drow[DROW_SPEED] > 4)
+{
+    stc("They have an invalid Speed rank; please tell staff.\n\r", ch);
+    return;
+}
 	if (victim->pcdata->drow[DROW_SPEED] >= 4)
 	{
 	    stc("They already move at full speed.\n\r", ch);
@@ -610,9 +617,10 @@ void do_skipdisc( CHAR_DATA *ch, char *argument )
 
 void do_drowupkeep( CHAR_DATA *ch, char *argument )
 {
-    char buf[15];
+    char buf[128];
     int loop, counter = 0;
 
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL) return;
     if (!IS_DROW(ch))
     {
 	stc("Huh?\n\r",ch);
@@ -620,7 +628,7 @@ void do_drowupkeep( CHAR_DATA *ch, char *argument )
     }
 
     stc("Drow Upkeep\n\r", ch);
-    if (ch->pcdata->drow[DROW_POWERS] == 0)
+    if (ch->pcdata->drow[DROW_POWERS] == 0 && ch->pcdata->drow[DROW_SPEED] == 0)
     {
 	stc("You have no drow abilities", ch);
 	return;
@@ -653,9 +661,15 @@ void do_drowupkeep( CHAR_DATA *ch, char *argument )
 	if (counter == 0) stc("\n\r", ch);
     }
 
-    if (ch->pcdata->drow[DROW_SPEED] > 0)
+    if (ch->pcdata->drow[DROW_SPEED] < 0 || ch->pcdata->drow[DROW_SPEED] > 4)
     {
-	sprintf(buf, "Speed %li%s", ch->pcdata->drow[DROW_SPEED], counter == 3 ? "" : "\n\r");
+snprintf(buf, sizeof(buf), "Drow data has an invalid Speed rank (%li). Tell staff.\n\r",
+         ch->pcdata->drow[DROW_SPEED]);
+stc(buf, ch);
+    }
+    else if (ch->pcdata->drow[DROW_SPEED] > 0)
+    {
+snprintf(buf, sizeof(buf), "Speed %li\n\r", ch->pcdata->drow[DROW_SPEED]);
 	stc(buf, ch);
     }
 
