@@ -141,5 +141,20 @@ class NativeDrowCatalog(unittest.TestCase):
                       '"clanadmin retry"','role(0, "Leader"); role(1, "Member")'):
             self.assertIn(token,fixture)
 
+    def test_sign_audit_routes_real_descriptors_and_persists_channel_preferences(self):
+        fixture=(ROOT/"tests/test_native_drow.c").read_text()
+        for token in ('"--communication"','descriptor_list=&descriptor',
+                      'sign_message("sign audit-message",peers,11,TRUE)',
+                      'sign_message("sign audit-message",peers,2,TRUE)',
+                      '"channels -sign"','"channels +sign"',
+                      '"channels -all"','"channels +all"',
+                      'load_char_obj(&reload,"SignMember")',
+                      'reload.character->deaf,CHANNEL_DROW',
+                      'ROOM2_SILENCE','PLR_SILENCE','GAGGED',
+                      'peers[1].connected=CON_GET_OLD_PASSWORD',
+                      'assert(strstr(output,"$n $N"))',
+                      'descriptor_list=saved_descriptors'):
+            self.assertIn(token,fixture)
+
 if __name__ == "__main__":
     unittest.main()

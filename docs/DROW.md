@@ -81,6 +81,28 @@ Drow training. Atomic-save failures and recovery are also tested explicitly
 for Drow, in addition to the existing ten-class governance checks. This audit
 does not change runtime permissions, ranks, costs or save formats.
 
+## Communication
+
+`sign <message>` is the **global Drow class channel**, not a private house
+channel. Drow from other houses (or without a house) can receive it; subscribed
+staff can also read and send. Being in another room, on another plane or asleep
+does not make this channel private. Do not use it for house-only secrets.
+There is no separate native Drow house-chat command in the current command table.
+`clan` manages membership and roles; it does not send house messages.
+
+Use `channels` to see `+SIGN` / `-sign`, `channels -sign` to mute sending and
+receiving, and `channels +sign` to rejoin. These preferences persist through a
+normal player save and reload; `channels -all` / `+all` also include Sign.
+Gagged, silenced or room-silenced senders cannot sign. These restrictions prevent
+sending, not receipt. Ordinary non-Drow players do not gain access by enabling
+the channel preference.
+
+The actual-world regression routes messages through real playing descriptors,
+including different houses, remote/sleeping Drow, staff, another class and a
+descriptor still at login. It checks sender/recipient mutes, saved preferences,
+literal message text and unchanged powers/DP. No channel permission or runtime
+behavior is changed by this audit.
+
 ## Class equipment
 
 The crafting command is **`drowarmor`**, not `classeq`.
@@ -161,8 +183,8 @@ refusals, read-only reporting, same-house versus different-house prayer, payer
 affordability, duplicate grants, and the recipient's power/Speed reload.
 
 This is not proof of live-server configuration, every custom OLC edit, PvP
-balance, or crash/power-cut durability. Clan membership administration and every
-possible hostile room-text callback are not newly audited here. A cross-player
+balance, or crash/power-cut durability. The house and Sign checks above do not
+cover every possible hostile room-text callback. A cross-player
 prayer still uses ordinary separate player saves, not an atomic two-player
 transaction. The existing
 shared flag/follower conventions are retained rather than replaced.

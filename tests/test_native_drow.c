@@ -594,6 +594,119 @@ static void house_commands(void)
          "registry reload, offline outcast/relogin, transfer and class-training retention passed.");
 }
 
+/* Sign is a class channel, not a house-private channel. Exercise actual
+ * descriptor routing as well as the interpreter and persisted Deaf field. */
+static void sign_message(const char *text,DESCRIPTOR_DATA *peers,
+                         unsigned recipients,bool allowed)
+{
+    for(int i=0;i<4;++i) {
+        peers[i].outtop=0;peers[i].outbuf[0]='\0';
+    }
+    house_input(actor,text);
+    assert((strstr(output,"audit-message")!=NULL)==allowed);
+    for(int i=0;i<4;++i)
+        assert((strstr(peers[i].outbuf,"audit-message")!=NULL)==
+               ((recipients&(1u<<i))!=0));
+}
+
+static void communication(void)
+{
+    DESCRIPTOR_DATA peers[4]={0},*saved_descriptors=descriptor_list;
+    char buffers[4][16384]={0};
+    const char *names[]={"SignMember","SignRival","SignMage","SignStaff"};
+    CHAR_DATA *people[4];
+    ROOM_INDEX_DATA remote={0};
+    long deaf=actor->deaf,position=actor->position;
+    long powers=actor->pcdata->drow[DROW_POWERS];
+    long speed=actor->pcdata->drow[DROW_SPEED];
+    long points=actor->pcdata->classpoints[CP_CURRENT];
+    char *old_house=actor->clan;actor->clan=str_dup("AuditHouse");
+    remote.vnum=999902;remote.name="Remote sign audit";remote.description="";
+    remote.light=1;remote.area=&area;
+    actor->wait=0;actor->deaf=0;
+    assert(saved_descriptors==NULL);
+    descriptor_list=&descriptor;descriptor.next=&peers[0];
+    for(int i=0;i<4;++i) {
+        assert(!load_char_obj(&peers[i],(char *)names[i]));
+        peers[i].outbuf=buffers[i];peers[i].outsize=sizeof buffers[i];
+        peers[i].connected=CON_PLAYING;people[i]=peers[i].character;
+        peers[i].next=i<3?&peers[i+1]:NULL;
+        people[i]->class=i<2?CLASS_DROW:CLASS_MAGE;
+        people[i]->level=i==3?LEV_IMM:LEV_AWA;
+        people[i]->position=POS_STANDING;people[i]->desc=&peers[i];
+        people[i]->deaf=0;
+        free_string(people[i]->clan);
+        people[i]->clan=str_dup(i==0?"AuditHouse":i==1?"RivalHouse":"");
+        people[i]->next=char_list;char_list=people[i];char_to_room(people[i],&arena);
+    }
+    sign_message("sign audit-message",peers,11,TRUE);
+    house_input(people[2],"sign denied-mage");
+    assert(strstr(buffers[2],"aren't on that channel"));
+    house_input(people[3],"sign staff-message");
+    assert(strstr(buffers[3],"staff-message")&&strstr(output,"staff-message"));
+    /* Different house, room, plane and sleep do not change global class access. */
+    char_from_room(people[1]);char_to_room(people[1],&remote);
+    SET_BIT(people[1]->affected_by,AFF_SHADOWPLANE);
+    people[1]->position=POS_SLEEPING;actor->position=POS_SLEEPING;
+    sign_message("sign audit-message",peers,11,TRUE);
+    assert(actor->position==POS_SLEEPING&&people[1]->position==POS_SLEEPING);
+    actor->position=POS_STANDING;people[1]->position=POS_STANDING;
+    REMOVE_BIT(people[1]->affected_by,AFF_SHADOWPLANE);
+    char_from_room(people[1]);char_to_room(people[1],&arena);
+    house_input(actor,"channels");assert(strstr(output,"+SIGN"));
+    house_input(actor,"channels -sign");assert(IS_SET(actor->deaf,CHANNEL_DROW));
+    house_input(actor,"channels");assert(strstr(output,"-sign"));
+    sign_message("sign audit-message",peers,0,FALSE);
+    assert(save_char_obj_checked(actor));
+    DESCRIPTOR_DATA reload={0};assert(load_char_obj(&reload,"NativeDrow"));
+    assert(IS_SET(reload.character->deaf,CHANNEL_DROW));
+    assert(reload.character->pcdata->drow[DROW_POWERS]==powers&&
+           reload.character->pcdata->drow[DROW_SPEED]==speed);
+    free_char(reload.character);
+    house_input(actor,"channels +sign");assert(!IS_SET(actor->deaf,CHANNEL_DROW));
+    house_input(people[0],"channels -sign");
+    house_input(people[3],"channels -sign");
+    sign_message("sign audit-message",peers,2,TRUE);
+    assert(save_char_obj_checked(people[0]));
+    assert(load_char_obj(&reload,"SignMember"));
+    assert(IS_SET(reload.character->deaf,CHANNEL_DROW));
+    free_char(reload.character);
+    house_input(people[0],"channels +sign");house_input(people[3],"channels +sign");
+    house_input(actor,"channels -all");
+    sign_message("sign audit-message",peers,0,FALSE);
+    house_input(actor,"channels +all");
+    sign_message("sign audit-message",peers,11,TRUE);
+    /* Silent/gagged senders cannot transmit; mute and login state gate receipt. */
+    SET_BIT(actor->extra,GAGGED);
+    sign_message("sign audit-message",peers,0,FALSE);
+    REMOVE_BIT(actor->extra,GAGGED);SET_BIT(actor->act,PLR_SILENCE);
+    sign_message("sign audit-message",peers,0,FALSE);
+    REMOVE_BIT(actor->act,PLR_SILENCE);SET_BIT(arena.added_flags,ROOM2_SILENCE);
+    sign_message("sign audit-message",peers,0,FALSE);
+    REMOVE_BIT(arena.added_flags,ROOM2_SILENCE);
+    peers[1].connected=CON_GET_OLD_PASSWORD;
+    sign_message("sign audit-message",peers,9,TRUE);
+    peers[1].connected=CON_PLAYING;
+    house_input(actor,"sign");assert(strstr(output,"Sign what?"));
+    sign_message("sign audit-message $n $N #Rliteral#n",peers,11,TRUE);
+    assert(strstr(output,"$n $N")); /* Player message is not a format string. */
+    house_input(actor,"channels -sign");house_input(actor,"channels +sign");
+    assert(save_char_obj_checked(actor));
+    assert(load_char_obj(&reload,"NativeDrow"));
+    assert(!IS_SET(reload.character->deaf,CHANNEL_DROW));
+    assert(reload.character->pcdata->classpoints[CP_CURRENT]==points);
+    free_char(reload.character);
+    assert(actor->pcdata->drow[DROW_POWERS]==powers&&
+           actor->pcdata->drow[DROW_SPEED]==speed&&
+           actor->pcdata->classpoints[CP_CURRENT]==points);
+    descriptor_list=saved_descriptors;descriptor.next=NULL;
+    for(int i=0;i<4;++i)extract_char(people[i],TRUE);
+    free_string(actor->clan);actor->clan=old_house;
+    actor->deaf=deaf;actor->position=position;
+    puts("Native Drow sign: class/staff routing across houses, mute persistence, "
+         "sender silence, login state and literal message checks passed.");
+}
+
 int main(int argc,char **argv)
 {
     char cwd[4096],from[8192],to[16384],name[256];
@@ -632,8 +745,11 @@ int main(int argc,char **argv)
     else if(argc==2&&!strcmp(argv[1],"--house-commands")) {
         prayers();house_commands();
     }
+    else if(argc==2&&!strcmp(argv[1],"--communication")) {
+        prayers();communication();
+    }
     else {
-        prayers();equipment_use();toggles();training_and_reports();prayer_menu();house_training();house_commands();
+        prayers();equipment_use();toggles();training_and_reports();prayer_menu();house_training();house_commands();communication();
         if(argc==2&&!strcmp(argv[1],"--spider"))spider();
         else {equipment();dual_wield();combat_and_travel();spider();}
     }
