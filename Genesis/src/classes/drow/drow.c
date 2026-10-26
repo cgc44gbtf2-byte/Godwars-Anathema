@@ -200,8 +200,12 @@ void do_summonspider( CHAR_DATA *ch, char *argument )
 {
     char buf [MAX_INPUT_LENGTH];
     CHAR_DATA *victim;
+    MOB_INDEX_DATA *prototype;
     AFFECT_DATA af;
     long sn;
+
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL || ch->in_room == NULL)
+        return;
 
     if (!IS_DROW(ch))
     {
@@ -215,15 +219,22 @@ void do_summonspider( CHAR_DATA *ch, char *argument )
 	return;
     }
  
-    if (ch->pcdata->followers >= 1)
+    if (ch->pcdata->followers != 0)
     {
 	stc("Nothing happens.\n\r",ch);
 	return;
     }
 
-    ch->pcdata->followers++;
-    victim = create_mobile(get_mob_index(MOB_VNUM_GUARDIAN));
-    char_to_room(victim,get_room_index(ROOM_VNUM_DISCONNECTION));
+    /* Validate dependencies before reserving a follower or creating a mob.
+     * create_mobile(NULL) terminates the process; no staging room is needed. */
+    prototype = get_mob_index(MOB_VNUM_GUARDIAN);
+    sn = skill_lookup("guardian");
+    if (prototype == NULL || sn < 0)
+    {
+        stc("The spider summon is unavailable; please tell staff.\n\r",ch);
+        return;
+    }
+    victim = create_mobile(prototype);
     free_string(victim->lord);
     victim->lord = str_dup(ch->name);
     free_string(victim->name);
@@ -244,21 +255,9 @@ void do_summonspider( CHAR_DATA *ch, char *argument )
     victim->hitroll = char_hitroll(ch) - 50;
     victim->damroll = char_damroll(ch) - 50;
     victim->armor = char_ac(ch) - 50;
-    char_from_room(victim);
     char_to_room(victim,ch->in_room);
 
-    strcpy(buf,"Come forth, minion of Lloth, and serve me!");
-    do_say(ch, buf);
-
-    stc("A spider skitters out of the shadows and kneels before you.\n\r", ch);
-    act("$N skitters out of the shadows and kneels before $n.", ch, NULL, victim, TO_ROOM);
-
-    if ((sn = skill_lookup("guardian")) < 0)
-    {
-	stc("Bug - please inform Akuma.\n\r", ch);
-	return;
-    }
-    
+    ch->pcdata->followers++;
     add_follower(victim, ch);
     af.type      = sn;
     af.duration  = 6666;
@@ -266,6 +265,12 @@ void do_summonspider( CHAR_DATA *ch, char *argument )
     af.modifier  = 0;
     af.bitvector = AFF_CHARM;
     affect_to_char(victim, &af);
+    stc("A spider skitters out of the shadows and kneels before you.\n\r", ch);
+    act("$N skitters out of the shadows and kneels before $n.", ch, NULL, victim, TO_ROOM);
+    /* Speech can execute room-text callbacks. Finish ownership/charm first,
+     * and never dereference the summoner or pet after the callback. */
+    strcpy(buf,"Come forth, minion of Lloth, and serve me!");
+    do_say(ch, buf);
     return;
 
 }
@@ -338,8 +343,10 @@ void do_drowarmor( CHAR_DATA *ch, char *argument )
     OBJ_INDEX_DATA *pObjIndex;
     OBJ_DATA *obj;
     char arg[MAX_INPUT_LENGTH];
-    long vnum = 0;
+    long vnum = 0, wear_flag = 0;
 
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL || ch->in_room == NULL)
+        return;
     argument = one_argument(argument, arg);
 
     if (!IS_DROW(ch))
@@ -367,11 +374,11 @@ stc("  Bolts [1-20]: 100 Drow points each, no quest points.\n\r", ch);
 	return;
     }
 
-    if (!str_cmp(arg,"cloak")) vnum = 29652;
-    else if (!str_cmp(arg,"helmet")) vnum = 29653;
-    else if (!str_cmp(arg,"breastplate")) vnum = 29654;
-    else if (!str_cmp(arg,"bracer")) vnum = 29655;
-    else if (!str_cmp(arg,"crossbow")) vnum = OBJ_VNUM_DROW_CROSSBOW;
+    if (!str_cmp(arg,"cloak")) {vnum = 29652; wear_flag = ITEM_WEAR_ABOUT;}
+    else if (!str_cmp(arg,"helmet")) {vnum = 29653; wear_flag = ITEM_WEAR_HEAD;}
+    else if (!str_cmp(arg,"breastplate")) {vnum = 29654; wear_flag = ITEM_WEAR_BODY;}
+    else if (!str_cmp(arg,"bracer")) {vnum = 29655; wear_flag = ITEM_WEAR_WRIST;}
+    else if (!str_cmp(arg,"crossbow")) {vnum = OBJ_VNUM_DROW_CROSSBOW; wear_flag = ITEM_WEAR_HOLD;}
     else
     {
 	do_drowarmor(ch,"");
@@ -382,6 +389,20 @@ stc("  Bolts [1-20]: 100 Drow points each, no quest points.\n\r", ch);
     {
 	stc("Missing object, please inform Akuma.\n\r", ch);
 	return;
+    }
+
+    if (pObjIndex->item_type != (vnum == OBJ_VNUM_DROW_CROSSBOW ? ITEM_MISSILE : ITEM_ARMOR) ||
+        !IS_SET(pObjIndex->wear_flags,ITEM_TAKE) ||
+        !IS_SET(pObjIndex->wear_flags,wear_flag) || pObjIndex->weight < 0)
+    {
+        stc("The Drow relic template is invalid; please tell staff.\n\r",ch);
+        return;
+    }
+    if (ch->carry_number < 0 || ch->carry_number == LONG_MAX ||
+        ch->carry_weight < 0 || ch->carry_weight > LONG_MAX - pObjIndex->weight)
+    {
+        stc("You cannot safely carry that Drow relic.\n\r",ch);
+        return;
     }
 
     obj = create_object(pObjIndex, 50);

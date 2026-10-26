@@ -50,6 +50,7 @@ TESTS += tests/test_guardian_lifecycle
 TESTS += tests/test_hybrid_monk_training
 TESTS += tests/test_hybrid_highlander_training
 TESTS += tests/test_hybrid_drow_training
+TESTS += tests/test_native_drow
 TESTS += tests/test_hybrid_acidbolt
 TESTS += tests/test_hybrid_web
 TESTS += tests/test_hybrid_drow_aura
@@ -190,6 +191,7 @@ check-layout:
 	python3 tests/test_hybrid_drow_training_catalog.py
 	python3 tests/test_hybrid_darkness_catalog.py
 	python3 tests/test_hybrid_darkvision_catalog.py
+	python3 tests/test_native_drow_catalog.py
 	python3 tests/test_hybrid_acidbolt_catalog.py
 	python3 tests/test_hybrid_web_catalog.py
 	python3 tests/test_hybrid_drow_aura_catalog.py
@@ -332,6 +334,9 @@ tests/test_hybrid_highlander_training: tests/test_hybrid_highlander_training.c $
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_hybrid_drow_training: tests/test_hybrid_drow_training.c $(ENGINE_OBJECTS)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
+tests/test_native_drow: tests/test_native_drow.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_hybrid_acidbolt: tests/test_hybrid_acidbolt.c $(ENGINE_OBJECTS)

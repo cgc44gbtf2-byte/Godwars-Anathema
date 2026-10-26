@@ -19,6 +19,8 @@ if (upkeep==0)
 '''
 
 def without_drow_globe_stage(text):
+    from native_drow_source import without_native_drow_stage
+    text=without_native_drow_stage(text)
     from drow_night_source import without_drow_night_stage
     text=without_drow_night_stage(text)
     text = text.replace(

@@ -84,6 +84,12 @@ static OBJ_INDEX_DATA *index_for(long vnum, long type)
     p->name = intern("gear"); p->short_descr = intern("a piece of gear");
     p->description = intern("Some gear is here.");
     p->wear_flags = ITEM_TAKE | ITEM_WEAR_BODY | ITEM_WEAR_HOLD;
+    /* Native Drow recipes validate their actual relic slots, not a generic
+     * synthetic body/hold template. Match the shipped relic.are definitions. */
+    if(vnum==29652)p->wear_flags=ITEM_TAKE|ITEM_WEAR_ABOUT;
+    if(vnum==29653)p->wear_flags=ITEM_TAKE|ITEM_WEAR_HEAD;
+    if(vnum==29654)p->wear_flags=ITEM_TAKE|ITEM_WEAR_BODY;
+    if(vnum==29655)p->wear_flags=ITEM_TAKE|ITEM_WEAR_WRIST;
     p->weight = 1;
     if (type == ITEM_WEAPON) { p->value[1] = 10; p->value[2] = 20; p->value[3] = TYPE_SLASH; }
     p->next = obj_index_hash[vnum % MAX_KEY_HASH];
