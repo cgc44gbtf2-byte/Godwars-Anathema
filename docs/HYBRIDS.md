@@ -958,6 +958,8 @@ selfbrid drow speed
 selfbrid drow speed learn
 selfbrid drow darkness
 selfbrid drow darkness learn
+selfbrid drow darkvision
+selfbrid drow darkvision learn
 ```
 
 The listing/details are read-only. `learn` buys exactly one existing flag:
@@ -990,14 +992,30 @@ activation toggle. Rank4 preview reports the cap; another purchase is refused.
 Speed training is saved through the same checked transaction and does not
 change native Drow speed or the primary class.
 
-Only these ten integrated one-time powers and the four Speed ranks are offered
+Only these twelve integrated one-time powers and the four Speed ranks are offered
 by this trainer in this stage.
 Other Drow unlocks remain backend-only pending their complete runtime and
 learning review; backend storage is not permission to expose an unadapted
 power. No compatibility change: record4/save epoch4/handoff2. Conversion and
 live hybrid forms remain disabled.
 
+### Secondary Drow Darkvision
+
+For an existing validated secondary Drow record, preview with
+`selfbrid drow darkvision`, then buy `selfbrid drow darkvision learn` for
+**5,000 secondary DP**, matching native prayer. `darkvision` and `nightsight`
+are aliases for one free shared night-sight toggle. The learned Drow grant
+does not require a second grant from the original parent's Protean, Metis,
+Dragon skill or Mage Forces. Without it, the original class checks still apply.
+Native messages, the Vampire beast's existing deactivation restriction,
+visibility rules and ordinary save/reload of the existing effect are unchanged.
+
+No extra sight bonus is stacked, no flag provenance is inferred, and losing a
+training record does not automatically migrate or erase a legacy shared flag.
+No save-schema or conversion change is included.
+
 ### Secondary Drow Toughness
+
 
 Preview `selfbrid drow toughness`, then use `selfbrid drow toughness learn`
 to buy the native unlock for **8,000 secondary DP**. The existing checked

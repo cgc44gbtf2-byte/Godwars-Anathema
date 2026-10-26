@@ -189,6 +189,7 @@ check-layout:
 	python3 tests/test_hybrid_monk_training_catalog.py
 	python3 tests/test_hybrid_drow_training_catalog.py
 	python3 tests/test_hybrid_darkness_catalog.py
+	python3 tests/test_hybrid_darkvision_catalog.py
 	python3 tests/test_hybrid_acidbolt_catalog.py
 	python3 tests/test_hybrid_web_catalog.py
 	python3 tests/test_hybrid_drow_aura_catalog.py

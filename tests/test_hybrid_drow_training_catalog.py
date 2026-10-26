@@ -24,9 +24,9 @@ class HybridDrowTrainingCatalog(unittest.TestCase):
         self.assertIn("request.parent=CLASS_DROW", ui)
         self.assertIn('!strcmp(args[1],"speed")', ui)
         self.assertIn('{"darkness",DROW_DARK,9500}', ui)
+        self.assertIn('{"darkvision",DROW_NIGHT,5000}', ui)
         for unsupported in ("DROW_BITE", "DROW_DUALWIELD",
                             "DROW_SPIDER",
-                            "DROW_NIGHT",
                             "DROW_SKIP", "DROW_MIGHT"):
             self.assertNotIn(unsupported, ui)
 

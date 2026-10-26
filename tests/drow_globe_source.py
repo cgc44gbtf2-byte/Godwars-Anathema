@@ -19,6 +19,8 @@ if (upkeep==0)
 '''
 
 def without_drow_globe_stage(text):
+    from drow_night_source import without_drow_night_stage
+    text=without_drow_night_stage(text)
     text = text.replace(
         "\tif (!IS_VAMPIRE(ich) && !IS_DROW(ich))\n\t{\n"
         "\t    /* Only the owned secondary Globe is dispelled; do not run native\n"

@@ -186,33 +186,36 @@ void do_nightsight( CHAR_DATA *ch, char *argument )
 
     if (IS_NPC(ch)) return;
 
-    if (!IS_VAMPIRE(ch) && !IS_WEREWOLF(ch) && !IS_DROW(ch) && !IS_DRAGON(ch) && !IS_MAGE(ch) )
+    /* A learned secondary grant supplies this same toggle, not a second
+     * effect or permission to use any other original-parent power. */
+    const bool drow_ready = hybrid_power_drow(ch, DROW_NIGHT);
+    if (!drow_ready && !IS_VAMPIRE(ch) && !IS_WEREWOLF(ch) && !IS_DROW(ch) && !IS_DRAGON(ch) && !IS_MAGE(ch) )
     {
 	send_to_char("Huh?\n\r",ch);
 	return;
     }
 
-    if (IS_WEREWOLF(ch) && get_breed(ch, BREED_METIS) < 3)
+    if (!drow_ready && IS_WEREWOLF(ch) && get_breed(ch, BREED_METIS) < 3)
     {
 	send_to_char("You require the level 1 Metis power to use Eyes of the Cat.\n\r",ch);
 	return;
     }
-    else if (IS_VAMPIRE(ch) && get_disc(ch,DISC_PROTEAN) < 1)
+    else if (!drow_ready && IS_VAMPIRE(ch) && get_disc(ch,DISC_PROTEAN) < 1)
     {
 	send_to_char("You require level 1 Protean to use Gleam of Red Eyes.\n\r",ch);
 	return;
     }
-    else if (IS_DROW(ch) && !get_drow(ch, DROW_NIGHT))
+    else if (!drow_ready && IS_DROW(ch) && !get_drow(ch, DROW_NIGHT))
     {
         stc("You need to obtain darkvision first.\n\r",ch);
         return;
     }
-    else if (IS_DRAGON(ch) && !IS_DRAGAFF(ch, DRAG_NIGHT))
+    else if (!drow_ready && IS_DRAGON(ch) && !IS_DRAGAFF(ch, DRAG_NIGHT))
     {
 	stc("You need to learn Nightsight first.\n\r",ch);
 	return;
     }
-    else if (IS_MAGE(ch) && ch->spheres[MFOR] < 1)
+    else if (!drow_ready && IS_MAGE(ch) && ch->spheres[MFOR] < 1)
     {
 	stc("You do not have enough knowledge of the forces sphere.\n\r",ch);
 	return;

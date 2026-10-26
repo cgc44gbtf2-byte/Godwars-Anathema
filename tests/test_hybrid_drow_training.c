@@ -251,6 +251,90 @@ static void supported_utilities(void)
     assert(purchases==63);
 }
 
+static void darkvision_lessons(void)
+{
+    for(size_t i=0;i<sizeof(originals)/sizeof(originals[0]);++i) {
+        CHAR_DATA *ch=fresh(originals[i],CLASS_DROW,5000);
+        PC_DATA before=*ch->pcdata;
+        long mana=ch->mana,primal=ch->primal,exp=ch->exp;
+        interpret(ch,"darkvision");
+        assert(!IS_VAMPAFF(ch,VAM_NIGHTSIGHT));
+        assert(!memcmp(&before,ch->pcdata,sizeof before));
+        command(ch,"drow darkvision");
+        assert(strstr(output,"darkvision: available"));
+        command(ch,"drow darkvision learn");
+        assert(strstr(output,"learned and saved"));
+        assert(hybrid_power_drow(ch,DROW_NIGHT));
+        assert(hybrid_live_secondary(ch)->secondary_classpoints[CP_CURRENT]==0);
+        unchanged(ch,"drow darkvision learn");
+        before=*ch->pcdata;
+        CHAR_DATA target={0};
+        target.name="Nighttarget";
+        target.in_room=&room;
+        target.act=ACT_IS_NPC;
+        OBJ_DATA object={0};
+        object.item_type=ITEM_WEAPON;
+        object.in_room=&room;
+        SET_BIT(room.room_flags,ROOM_DARK);
+        assert(!can_see(ch,&target)&&!can_see_obj(ch,&object));
+        interpret(ch,"darkvision");
+        assert(IS_VAMPAFF(ch,VAM_NIGHTSIGHT));
+        assert(can_see(ch,&target)&&can_see_obj(ch,&object));
+        SET_BIT(ch->affected_by,AFF_BLIND);
+        assert(!can_see(ch,&target)&&!can_see_obj(ch,&object));
+        REMOVE_BIT(ch->affected_by,AFF_BLIND);
+        SET_BIT(room.added_flags,ROOM2_DARKNESS);
+        assert(!can_see(ch,&target));
+        REMOVE_BIT(room.added_flags,ROOM2_DARKNESS);
+        REMOVE_BIT(room.room_flags,ROOM_DARK);
+        assert(!memcmp(&before,ch->pcdata,sizeof before));
+        assert(ch->mana==mana&&ch->primal==primal&&ch->exp==exp);
+        assert(ch->pcdata->classpoints[CP_CURRENT]==321);
+        assert(save_char_obj_checked(ch));
+        for(int short_load=0;short_load<2;++short_load) {
+            DESCRIPTOR_DATA reload={0};
+            assert(short_load?load_char_short(&reload,"Drowfixture"):
+                              load_char_obj(&reload,"Drowfixture"));
+            assert(hybrid_power_drow(reload.character,DROW_NIGHT));
+            assert(IS_VAMPAFF(reload.character,VAM_NIGHTSIGHT));
+            do_nightsight(reload.character,"");
+            assert(!IS_VAMPAFF(reload.character,VAM_NIGHTSIGHT));
+            free_char(reload.character);
+        }
+        /* Aliases operate one shared toggle, not two stacked effects. */
+        interpret(ch,"nightsight");
+        assert(!IS_VAMPAFF(ch,VAM_NIGHTSIGHT));
+        /* Sorcerer-owned sight is independent and survives the Drow toggle. */
+        if(ch->class==CLASS_SORCERER) {
+            sorcerer_vision_toggle(ch);
+            assert(effective_nightsight(ch));
+            interpret(ch,"darkvision");
+            assert(IS_VAMPAFF(ch,VAM_NIGHTSIGHT));
+            interpret(ch,"darkvision");
+            assert(!IS_VAMPAFF(ch,VAM_NIGHTSIGHT)&&effective_nightsight(ch));
+            sorcerer_vision_toggle(ch);
+            assert(!effective_nightsight(ch));
+        }
+        interpret(ch,"darkvision");
+        assert(IS_VAMPAFF(ch,VAM_NIGHTSIGHT));
+        if(ch->class==CLASS_VAMPIRE) {
+            ch->pcdata->wolf=1;
+            interpret(ch,"darkvision");
+            assert(IS_VAMPAFF(ch,VAM_NIGHTSIGHT));
+            ch->pcdata->wolf=0;
+        }
+        /* A pre-existing native effect remains toggleable, not duplicated. */
+        interpret(ch,"darkvision");
+        assert(!IS_VAMPAFF(ch,VAM_NIGHTSIGHT));
+        assert(!memcmp(&before,ch->pcdata,sizeof before));
+        release(ch);
+        ch=fresh(originals[i],CLASS_DROW,4999);
+        unchanged(ch,"drow darkvision learn");
+        assert(!hybrid_power_drow(ch,DROW_NIGHT));
+        release(ch);
+    }
+}
+
 static void darkness_lessons(void)
 {
     for(size_t i=0;i<sizeof(originals)/sizeof(originals[0]);++i){
@@ -660,6 +744,7 @@ int main(void)
     room.description="";
     room_index_hash[901%MAX_KEY_HASH]=&room;
     supported_utilities();
+    darkvision_lessons();
     darkness_lessons();
     poison_lessons();
     blindfight_lessons();
@@ -672,6 +757,7 @@ int main(void)
     utility_save_faults("drow heighten learn",DROW_SIGHT,20000);
     utility_save_faults("drow spidereyes learn",DROW_EYES,7500);
     utility_save_faults("drow darkness learn",DROW_DARK,9500);
+    utility_save_faults("drow darkvision learn",DROW_NIGHT,5000);
     utility_save_faults("drow poisonimmunity learn",DROW_PIMM,5000);
     utility_save_faults("drow blindfight learn",DROW_BFIGHT,5000);
     utility_save_faults("drow toughness learn",DROW_TOUGH,8000);
@@ -679,7 +765,7 @@ int main(void)
     assert(!char_list&&!room.people&&!fclose(fpReserve));
     assert(!chdir("..")&&!rmdir("player")&&!rmdir("backup")&&
            !rmdir("run")&&!chdir(cwd)&&!rmdir(root));
-    printf("Secondary Drow UI: %u existing paid powers plus nine Darkness lessons, "
+    printf("Secondary Drow UI: %u existing paid powers plus nine Darkness and nine Darkvision lessons, "
            "atomic reloads, DP isolation, adapter use and refusal paths passed.\n",
            purchases);
     return 0;

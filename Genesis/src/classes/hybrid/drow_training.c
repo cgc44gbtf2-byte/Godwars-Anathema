@@ -20,6 +20,7 @@ static const struct drow_utility utilities[] = {
     {"acidbolt",DROW_ACID,5000},
     {"llothsweb",DROW_WEB,8000},
     {"darkness",DROW_DARK,9500},
+    {"darkvision",DROW_NIGHT,5000},
     {"readaura",DROW_READ,6000},
     {"heighten",DROW_SIGHT,20000},
     {"spidereyes",DROW_EYES,7500},
@@ -51,7 +52,7 @@ static const struct drow_utility *find_utility(const char *name)
 
 static void usage(CHAR_DATA *ch)
 {
-    send_to_char("Use: selfbrid drow | selfbrid drow <attunement|faeriefire|acidbolt|llothsweb|darkness|readaura|heighten|spidereyes|poisonimmunity|blindfight|toughness|speed>\n\r"
+    send_to_char("Use: selfbrid drow | selfbrid drow <attunement|faeriefire|acidbolt|llothsweb|darkness|darkvision|readaura|heighten|spidereyes|poisonimmunity|blindfight|toughness|speed>\n\r"
         "Learn an integrated power: selfbrid drow <power> learn; Speed: selfbrid drow speed learn\n\r"
         "Globe of Darkness: globedarkness (500 DP to activate, 150 DP per upkeep tick).\n\r"
         "Other secondary Drow powers are not available yet; conversion remains disabled.\n\r",

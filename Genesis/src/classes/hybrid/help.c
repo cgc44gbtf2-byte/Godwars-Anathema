@@ -112,6 +112,8 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
                      "Darkness costs 9,500 DP to learn; globedarkness toggles "
                      "the learned Globe for 500 DP activation and 150 DP "
                      "per upkeep tick from the secondary Drow bank. "
+                     "Darkvision costs 5,000 DP to learn; darkvision or "
+                     "nightsight toggles one shared night-sight effect for free. "
                      "Learn these through "
                      "selfbrid drow <power> learn. Other Drow powers are not "
                      "yet offered by this trainer.\n\r",ch);
