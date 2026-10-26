@@ -63,6 +63,7 @@ def once(text, new, old):
     return text.replace(new, old, 1)
 
 def without_native_drow_stage(text):
+    text = without_native_drow_speed(text)
     if "void do_summonspider(" not in text:
         return text
     text = without_native_drow_reports(text)
@@ -100,6 +101,32 @@ def without_native_drow_stage(text):
         body = once(body, RELIC_GUARDS, "")
         text = text[:start]+body+text[end:]
     return text
+
+SPEED_GETTER = """/* Do not turn malformed player data into combat bonuses or arithmetic UB.
+ * Preserve the stored rank for staff inspection; only 0..4 is trainable. */
+long get_drow_speed( CHAR_DATA *ch )
+{
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL || !IS_DROW(ch))
+        return 0;
+    long rank = ch->pcdata->drow[DROW_SPEED];
+    return rank >= 0 && rank <= 4 ? rank : 0;
+}
+
+"""
+
+def without_native_drow_speed(text):
+    """Undo only the native getter and its five reviewed combat reads."""
+    calls = text.count("get_drow_speed(ch)")
+    if calls:
+        expected = (1 if "long char_damroll(" in text else
+                    2 if "long avoidblow(" in text else
+                    1 if "long get_damcap(" in text else
+                    1 if "long get_speed(" in text else 0)
+        assert calls == expected, ("Unreviewed native Speed reads", calls, expected)
+    if SPEED_GETTER in text:
+        text = once(text, SPEED_GETTER, "")
+    text = text.replace("long get_drow_speed args( ( CHAR_DATA *ch ) );\n", "")
+    return text.replace("get_drow_speed(ch)", "ch->pcdata->drow[DROW_SPEED]")
 
 INVALID_SPEED = """if (victim->pcdata->drow[DROW_SPEED] < 0 || victim->pcdata->drow[DROW_SPEED] > 4)
 {

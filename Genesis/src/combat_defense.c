@@ -173,7 +173,7 @@ long avoidblow( CHAR_DATA *ch )
 	    break;
 	case CLASS_DROW:/*50*/
 	    if (get_drow(ch, DROW_SKIP)) chance += 10;
-	    chance += ch->pcdata->drow[DROW_SPEED] * 2.5;
+	    chance += get_drow_speed(ch) * 2.5;
 	    break;
 	case CLASS_HIGHLANDER:/*65*/
 	    if (ch->pcdata->celerity > 0) chance += 5;
@@ -247,7 +247,7 @@ long breakavoid( CHAR_DATA *ch )
 	    break;
 	case CLASS_DROW:/*65*/
 	    if (get_drow(ch, DROW_EYES)) chance += 10;
-	    chance += ch->pcdata->drow[DROW_SPEED] * 5;
+	    chance += get_drow_speed(ch) * 5;
 	    break;
 	case CLASS_HIGHLANDER:/*60*/
 	    chance += get_highland(ch, HIGH_WEAPON) * 5;

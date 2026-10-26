@@ -69,7 +69,7 @@ long get_speed( CHAR_DATA *ch )
 		break;
 	    case CLASS_DROW:
 		if (get_drow(ch, DROW_SKIP)) count -= 3;
-                count -= ch->pcdata->drow[DROW_SPEED];
+                count -= get_drow_speed(ch);
 		break;
 	    case CLASS_HIGHLANDER:
 		count -= get_highland(ch, HIGH_ATTACK);

@@ -3098,6 +3098,7 @@ long	get_highland	args( ( CHAR_DATA *ch, long power ) );
 long	get_ninja	args( ( CHAR_DATA *ch, long power ) );
 long	get_monk	args( ( CHAR_DATA *ch, long power ) );
 bool	get_drow	args( ( CHAR_DATA *ch, long power ) );
+long get_drow_speed args( ( CHAR_DATA *ch ) );
 long	get_style	args( ( CHAR_DATA *ch, long style ) );
 
 /* act_move.c */

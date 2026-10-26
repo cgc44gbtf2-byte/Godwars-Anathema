@@ -5,9 +5,10 @@ from test_class_layout import ROOT,SRC,make_values
 
 class ToughnessCatalog(unittest.TestCase):
     def test_no_combat_formula_changes(self):
-        # Whole runtime files, not weakened or normalized source pins.
+        # Original whole-file pins after only the exact later native Speed fix.
+        from native_drow_source import without_native_drow_speed
         for path,digest in RUNTIME_SHA.items():
-            data=(SRC/path).read_bytes()
+            data=without_native_drow_speed((SRC/path).read_text()).encode()
             actual=hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest()
             self.assertEqual(actual,digest,path)
 

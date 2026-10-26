@@ -50,5 +50,34 @@ class NativeDrowCatalog(unittest.TestCase):
             self.assertIn(token,fixture)
         self.assertIn('assert(!memcmp(&before,actor->pcdata,sizeof before))',fixture)
 
+    def test_only_reviewed_native_speed_runtime_edits(self):
+        from native_drow_source import without_native_drow_speed
+        baseline={
+            "act_info.c":"1f75e52e5570adb1ec1f485da4c6448b94c0b08b",
+            "combat_initiative.c":"fdb6313d65d875db0b035079a27705c65a7b6639",
+            "combat_defense.c":"85870c3e786e30f58a484a6fbf6f8d4b53b2cd78",
+            "combat_damage.c":"8ef28ea0e6107f77b8512f9ca40a50305ab709f0",
+            "merc.h":"c7a99891b0f580cad130dc7e479672c62957cf25",
+        }
+        calls=0
+        for path,expected in baseline.items():
+            text=(SRC/path).read_text()
+            self.assertEqual(blob(without_native_drow_speed(text)),expected,path)
+            calls+=text.count("get_drow_speed(ch)")
+            for old,new in (("* 50;","* 49;"),("* 100;","* 99;"),
+                            ("rank <= 4 ? rank : 0","rank <= 5 ? rank : 0")):
+                if old in text:
+                    changed=text.replace(old,new,1)
+                    self.assertNotEqual(blob(without_native_drow_speed(changed)),expected)
+        self.assertEqual(calls,5)
+
+    def test_native_speed_profiles_and_corrupt_data_checks(self):
+        test=(ROOT/"tests/test_combat_calculations.c").read_text()
+        for token in ("rows==120","2722730096019922979ULL","refusals==96",
+                      "const long bad[]={-1,LONG_MIN,5,LONG_MAX}",
+                      "assert(!memcmp(&before,&pa,sizeof pa))",
+                      "assert(get_drow_speed(NULL)==0)"):
+            self.assertIn(token,test)
+
 if __name__ == "__main__":
     unittest.main()

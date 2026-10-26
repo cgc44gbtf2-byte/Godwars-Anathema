@@ -1,5 +1,6 @@
 /* Real combat calculations, synthetic actors, fixed RNG seeds; no live data. */
 #include <assert.h>
+#include <limits.h>
 #include <stdio.h>
 #include <string.h>
 #include "../Genesis/src/merc.h"
@@ -312,6 +313,60 @@ static void philodox_not_tribe(void)
     assert(get_damcap(&a) == baseline);
 }
 
+static void drow_metrics(long values[5])
+{
+    values[0]=get_speed(&a);values[1]=char_damroll(&a);
+    values[2]=get_damcap(&a);values[3]=avoidblow(&a);
+    values[4]=breakavoid(&a);
+}
+
+static void drow_speed_profiles(int invalid)
+{
+    const long styles[]={STYLE_UNARMED,STYLE_NATURAL,STYLE_ONEHAND,
+                         STYLE_SHIELD,STYLE_TWOHAND,STYLE_TWOWEAPON};
+    const long bad[]={-1,LONG_MIN,5,LONG_MAX};
+    unsigned long long hash=1469598103934665603ULL;
+    unsigned rows=0,refusals=0;
+    for(int wounded=0;wounded<2;++wounded)
+    for(int skip=0;skip<2;++skip)
+    for(unsigned style=0;style<sizeof styles/sizeof *styles;++style)
+    for(long rank=0;rank<=4;++rank) {
+        fixture();a.class=CLASS_DROW;a.damroll=250;
+        a.style[0]=styles[style];a.style[styles[style]]=100;
+        if(wounded)a.hit=5000;
+        if(skip)SET_BIT(pa.drow[DROW_POWERS],DROW_SKIP);
+        pa.drow[DROW_SPEED]=rank;
+        long expected[5];drow_metrics(expected);
+        for(unsigned k=0;k<5;++k) {
+            unsigned long long n=(unsigned long long)expected[k];
+            for(unsigned byte=0;byte<8;++byte) {
+                hash^=(n>>(byte*8))&255U;hash*=1099511628211ULL;
+            }
+        }
+        rows++;
+        if(invalid&&rank==0)
+        for(unsigned bad_rank=0;bad_rank<sizeof bad/sizeof *bad;++bad_rank) {
+            long actual[5];pa.drow[DROW_SPEED]=bad[bad_rank];
+            PC_DATA before=pa;drow_metrics(actual);
+            assert(!memcmp(&before,&pa,sizeof pa));
+            for(unsigned k=0;k<5;++k)assert(actual[k]==expected[k]);
+            assert(pa.drow[DROW_SPEED]==bad[bad_rank]);
+            refusals++;
+        }
+    }
+    printf("native Drow Speed: rows=%u hash=%llu invalid projections=%u\n",
+           rows,hash,refusals);
+    assert(rows==120&&hash==2722730096019922979ULL);
+    assert(!invalid||refusals==96);
+    assert(get_drow_speed(NULL)==0);
+    fixture();a.class=CLASS_DROW;
+    a.pcdata=NULL;assert(get_drow_speed(&a)==0);a.pcdata=&pa;
+    pa.drow[DROW_SPEED]=4;assert(get_drow_speed(&a)==4);
+    a.class=CLASS_NONE;assert(get_drow_speed(&a)==0);
+    SET_BIT(a.act,ACT_IS_NPC);a.class=CLASS_DROW;
+    assert(get_drow_speed(&a)==0);
+}
+
 int main(int argc, char **argv)
 {
     assist_room_chain();
@@ -321,12 +376,23 @@ int main(int argc, char **argv)
     assert(gsn_brittle_bones >= 0 && gsn_friction_curse >= 0 && gsn_alter_weight >= 0);
     if (argc > 1 && !strcmp(argv[1], "--expiry")) { brittle_expiry(); return 0; }
     if (argc > 1 && !strcmp(argv[1], "--philodox")) { philodox_not_tribe(); return 0; }
+    if(argc>1&&!strcmp(argv[1],"--drow-speed-golden")) { drow_speed_profiles(0);return 0; }
+    if(argc>1&&!strcmp(argv[1],"--drow-speed")) { drow_speed_profiles(1);return 0; }
+    if(argc>1&&!strcmp(argv[1],"--drow-speed-overflow")) {
+        fixture();a.class=CLASS_DROW;pa.drow[DROW_SPEED]=LONG_MAX;
+        (void)char_damroll(&a);return 0;
+    }
+    if(argc>1&&!strcmp(argv[1],"--drow-speed-min")) {
+        fixture();a.class=CLASS_DROW;pa.drow[DROW_SPEED]=LONG_MIN;
+        (void)get_speed(&a);return 0;
+    }
     profiles();
     stance_and_truncation();
     npc_boundaries_and_rng();
     if (argc <= 1 || strcmp(argv[1], "--baseline")) {
         brittle_expiry();
         philodox_not_tribe();
+        drow_speed_profiles(1);
     }
     puts("native combat profiles, truncation, stance suppression and RNG checks passed");
     return 0;

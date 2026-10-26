@@ -99,3 +99,17 @@ possible hostile room-text callback are not newly audited here. A cross-player
 prayer still uses ordinary separate player saves, not an atomic two-player
 transaction. The existing
 shared flag/follower conventions are retained rather than replaced.
+
+### Native Speed combat validation
+
+All five native Speed combat reads now use a single rank getter. Legal ranks
+0–4 keep their existing timing, damage roll, damage cap, avoidance and
+avoidance-breaking formulas. Invalid ranks contribute zero Speed benefit and
+remain stored unchanged for staff review; no automatic player-file repair or
+save-format migration is performed.
+
+The combat regression pins 120 legal profiles across six equipment styles,
+Skip Disc on/off and wounded/unwounded states to the original engine's results.
+It also checks 96 invalid-rank projections against the matching untrained
+profile, including `LONG_MIN` and `LONG_MAX`. The old engine reproduced signed
+overflow in damage roll and attack timing before this repair.

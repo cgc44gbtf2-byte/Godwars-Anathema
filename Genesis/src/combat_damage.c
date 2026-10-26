@@ -382,7 +382,7 @@ long get_damcap( CHAR_DATA *ch )
 	    case CLASS_DROW:
 		if (get_drow(ch, DROW_MIGHT)) max_dam += 600;
 		if (get_drow(ch, DROW_BITE)) max_dam += 200;
-		max_dam += ch->pcdata->drow[DROW_SPEED] * 100;
+		max_dam += get_drow_speed(ch) * 100;
 		break;
 	    case CLASS_NINJA:
 		max_dam += ch->pcdata->wolf * 4;

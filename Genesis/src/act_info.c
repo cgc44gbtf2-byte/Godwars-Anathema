@@ -366,6 +366,16 @@ bool get_drow( CHAR_DATA *ch, long power )
     else return FALSE;
 }
 
+/* Do not turn malformed player data into combat bonuses or arithmetic UB.
+ * Preserve the stored rank for staff inspection; only 0..4 is trainable. */
+long get_drow_speed( CHAR_DATA *ch )
+{
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL || !IS_DROW(ch))
+        return 0;
+    long rank = ch->pcdata->drow[DROW_SPEED];
+    return rank >= 0 && rank <= 4 ? rank : 0;
+}
+
 long char_hitroll( CHAR_DATA *ch )
 {
     long hr = GET_HITROLL(ch);
@@ -446,7 +456,7 @@ long char_damroll( CHAR_DATA *ch )
 	if (IS_WEREWOLF(ch) && get_tribe(ch, TRIBE_STARGAZERS) >= 2)
 	    dr += get_tribe(ch, TRIBE_STARGAZERS) * 10;
         if (IS_DROW(ch))
-            dr += ch->pcdata->drow[DROW_SPEED] * 50;
+            dr += get_drow_speed(ch) * 50;
 	dr = hybrid_secondary_passive(ch,HYBRID_PASSIVE_DAMROLL,dr);
 	if (IS_ITEMAFF(ch, ITEMA_AURA)) dr += (ch->pcdata->powers[ELEM_SUN]*ch->pcdata->powers[ELEM_SUN]*2.5);
 	if (IS_POLYAFF(ch, POLY_WOLF)) dr += 200;
