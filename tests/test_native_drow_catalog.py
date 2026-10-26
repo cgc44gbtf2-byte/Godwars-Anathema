@@ -120,5 +120,26 @@ class NativeDrowCatalog(unittest.TestCase):
                       "for(int i=0;i<6;++i)shooting_context(i)"):
             self.assertIn(token,ammo)
 
+    def test_house_audit_uses_real_input_and_saved_players(self):
+        fixture=(ROOT/"tests/test_native_drow.c").read_text()
+        for token in ('interpret(who,d->incomm)','"--house-commands"',
+                      '"dinduct HouseMember"','"promotion HouseMember"',
+                      '"failure HouseMember"','"outcast HouseMember"',
+                      '"clan transfer HouseMember"','"clan accept NativeDrow"',
+                      'save_char_obj_checked(people[0])',
+                      'assert(load_char_obj(&peers[0],"HouseMember"))',
+                      'assert(!people[0]->clan[0]&&people[0]->class==CLASS_DROW',
+                      'actor->pcdata->rank==rank',
+                      'assert(!strcmp(before,after))'):
+            self.assertIn(token,fixture)
+
+    def test_house_audit_keeps_atomic_failure_and_recovery_checks(self):
+        fixture=(ROOT/"tests/test_clans.c").read_text()
+        for token in ('faults(CLASS_MAGE)','faults(CLASS_DROW)',
+                      'SAVE_FAULT_CREATE','SAVE_FAULT_FLUSH','SAVE_FAULT_SYNC',
+                      'SAVE_FAULT_CLOSE','SAVE_FAULT_RENAME','SAVE_FAULT_DIRSYNC',
+                      '"clanadmin retry"','role(0, "Leader"); role(1, "Member")'):
+            self.assertIn(token,fixture)
+
 if __name__ == "__main__":
     unittest.main()

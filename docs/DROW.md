@@ -44,6 +44,43 @@ Already learned gifts are not charged again. Speed has four ranks.
 `drowupkeep` lists learned gifts. `dimensiondoor <target>` retains native room
 and target restrictions. House and communication commands are unchanged.
 
+## Houses and clan commands
+
+House roles are separate from learned Drow gifts, Speed and class ranks.
+Promoting or removing a house member does not grant or erase class training.
+Staff first create a managed house with
+`clanadmin create <online-Drow-leader> <house name>`. An existing legacy house
+name must be adopted using that same name; a cached label alone is not a
+managed leader/officer role.
+
+| Command | Purpose |
+|---|---|
+| `clan info` / `clan roster [page]` | See your managed house, role and registered members, including offline members |
+| `dinduct <player>` | Leader/officer offers membership to an available Drow in the same room |
+| `clan accept <inviter>` / `clan decline` | Recipient explicitly accepts the named offer or declines it |
+| `promotion <member>` / `failure <member>` | Leader appoints or removes an officer |
+| `outcast <member>` | Remove a lower-ranked member of your own house, online or offline |
+| `clan transfer <member>` | Leader offers leadership; the member must accept |
+| `clan leave` / `clan disband confirm` | Leave as a non-leader, or explicitly disband as leader |
+
+Offers expire after 120 seconds and are cleared on registry reload/server
+restart. Inviter and recipient must use their own awake, standing,
+out-of-combat sessions; eligibility and authority are checked again at
+acceptance. Being in another house, on another plane or hidden from each
+other prevents an offer.
+
+The atomic clan registry is authoritative. Offline removals override stale
+player-file house labels on the next load. A failed save before replacement
+keeps the old roles; uncertain durability after replacement freezes further
+writes until staff repair the storage issue and use `clanadmin retry`.
+Do not edit live player files to assign managed roles.
+
+The native-house regression uses real interpreter input, saved players,
+registry reloads, offline removal/relogin, leadership transfer and unchanged
+Drow training. Atomic-save failures and recovery are also tested explicitly
+for Drow, in addition to the existing ten-class governance checks. This audit
+does not change runtime permissions, ranks, costs or save formats.
+
 ## Class equipment
 
 The crafting command is **`drowarmor`**, not `classeq`.

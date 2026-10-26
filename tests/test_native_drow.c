@@ -469,6 +469,131 @@ static void house_training(void)
     extract_char(other,TRUE);
 }
 
+/* Unlike ordinary command tests, governance must receive the player's actual
+ * descriptor input buffer. Do not bypass the interpreter's consent guard. */
+static void house_input(CHAR_DATA *who,const char *text)
+{
+    DESCRIPTOR_DATA *d=who->desc;
+    assert(d&&strlen(text)<sizeof d->incomm);
+    d->outtop=0;d->outbuf[0]='\0';d->fcommand=TRUE;
+    strcpy(d->incomm,text);interpret(who,d->incomm);++checks;
+}
+
+static char *house_registry(void)
+{
+    FILE *fp=fopen("../clans/Registry","rb");assert(fp);
+    char *text=calloc(262145,1);assert(text);
+    size_t n=fread(text,1,262144,fp);
+    assert(n<262144&&!ferror(fp)&&!fclose(fp));return text;
+}
+
+static void house_refusal(CHAR_DATA *who,const char *text)
+{
+    char *before=house_registry();house_input(who,text);
+    char *after=house_registry();assert(!strcmp(before,after));
+    free(before);free(after);
+}
+
+static long house_role(CHAR_DATA *who,const char *role)
+{
+    char expected[64];long id=0;
+    house_input(who,"clan info");
+    snprintf(expected,sizeof expected,"your role: %s.",role);
+    assert(strstr(who->desc->outbuf,expected));
+    assert(sscanf(who->desc->outbuf,"Clan ID %ld:",&id)==1&&id>0);
+    return id;
+}
+
+static void house_commands(void)
+{
+    DESCRIPTOR_DATA peers[3]={0};char buffers[3][16384]={0};
+    const char *names[]={"HouseMember","HouseRival","HouseStaff"};
+    CHAR_DATA *people[3];
+    long powers=actor->pcdata->drow[DROW_POWERS];
+    long speed=actor->pcdata->drow[DROW_SPEED];
+    long points=actor->pcdata->classpoints[CP_CURRENT],rank=actor->pcdata->rank;
+    assert(!actor->clan[0]);actor->wait=0;
+    for(int i=0;i<3;++i) {
+        assert(!load_char_obj(&peers[i],(char *)names[i]));
+        peers[i].outbuf=buffers[i];peers[i].outsize=sizeof buffers[i];
+        peers[i].connected=CON_PLAYING;people[i]=peers[i].character;
+        people[i]->class=i==2?CLASS_NONE:CLASS_DROW;
+        people[i]->level=i==2?LEV_IMM:LEV_AWA;
+        people[i]->position=POS_STANDING;people[i]->desc=&peers[i];
+        people[i]->next=char_list;char_list=people[i];char_to_room(people[i],&arena);
+    }
+    people[0]->pcdata->drow[DROW_POWERS]=DROW_WEB;
+    people[0]->pcdata->drow[DROW_SPEED]=2;
+    people[0]->pcdata->classpoints[CP_CURRENT]=123456;
+    house_input(people[2],"clanadmin create NativeDrow AuditHouse");
+    assert(!strcmp(actor->clan,"AuditHouse"));house_role(actor,"Leader");
+    house_input(people[2],"clanadmin create HouseRival RivalHouse");
+    long rival_id=house_role(people[1],"Leader");
+    house_refusal(actor,"dinduct HouseRival");
+    house_refusal(actor,"outcast HouseRival");
+    house_refusal(people[2],"clanadmin create HouseMember AuditHouse");
+    people[0]->class=CLASS_MAGE;
+    house_refusal(actor,"dinduct HouseMember");people[0]->class=CLASS_DROW;
+    SET_BIT(people[0]->affected_by,AFF_SHADOWPLANE);
+    house_refusal(actor,"dinduct HouseMember");
+    REMOVE_BIT(people[0]->affected_by,AFF_SHADOWPLANE);
+    peers[0].outtop=0;buffers[0][0]='\0';
+    house_input(actor,"dinduct HouseMember");
+    assert(strstr(buffers[0],"clan accept Nativedrow")&&!people[0]->clan[0]);
+    house_refusal(people[0],"clan accept HouseRival");
+    house_input(people[0],"clan accept NativeDrow");
+    assert(!strcmp(people[0]->clan,"AuditHouse"));house_role(people[0],"Member");
+    house_refusal(people[0],"promotion NativeDrow");
+    house_refusal(people[0],"clanadmin create HouseMember Stolen");
+    house_input(actor,"promotion HouseMember");house_role(people[0],"Officer");
+    house_refusal(people[0],"outcast NativeDrow");
+    house_input(actor,"failure HouseMember");house_role(people[0],"Member");
+    house_refusal(actor,"clan leave");
+    house_input(actor,"clan roster 1");
+    assert(strstr(output,"Nativedrow")&&strstr(output,"Housemember"));
+    assert(save_char_obj_checked(actor)&&save_char_obj_checked(people[0]));
+    clan_registry_close();assert(clan_load_registry());
+    house_role(actor,"Leader");house_role(people[0],"Member");
+    DESCRIPTOR_DATA reload={0};assert(load_char_obj(&reload,"NativeDrow"));
+    assert(!strcmp(reload.character->clan,"AuditHouse")&&
+           reload.character->pcdata->drow[DROW_POWERS]==powers&&
+           reload.character->pcdata->drow[DROW_SPEED]==speed);
+    free_char(reload.character);
+    extract_char(people[0],TRUE);people[0]=NULL; /* Actually offline, not a stale pointer. */
+    house_input(actor,"outcast HouseMember");
+    clan_registry_close();assert(clan_load_registry());
+    assert(load_char_obj(&peers[0],"HouseMember"));
+    people[0]=peers[0].character;
+    assert(!people[0]->clan[0]&&people[0]->class==CLASS_DROW&&
+           people[0]->pcdata->drow[DROW_POWERS]==DROW_WEB&&
+           people[0]->pcdata->drow[DROW_SPEED]==2&&
+           people[0]->pcdata->classpoints[CP_CURRENT]==123456);
+    peers[0].connected=CON_PLAYING;people[0]->desc=&peers[0];
+    people[0]->position=POS_STANDING;people[0]->wait=0;
+    people[0]->next=char_list;char_list=people[0];char_to_room(people[0],&arena);
+    house_input(actor,"dinduct HouseMember");
+    house_input(people[0],"clan accept NativeDrow");house_role(people[0],"Member");
+    house_input(actor,"clan transfer HouseMember");house_role(actor,"Leader");
+    house_input(people[0],"clan accept NativeDrow");
+    house_role(actor,"Officer");house_role(people[0],"Leader");
+    house_refusal(actor,"outcast HouseMember");
+    house_input(people[0],"failure NativeDrow");house_role(actor,"Member");
+    house_refusal(actor,"promotion HouseMember");
+    house_input(people[0],"clan disband confirm");
+    assert(!actor->clan[0]&&!people[0]->clan[0]);
+    char line[128];snprintf(line,sizeof line,"clanadmin disband %ld confirm",rival_id);
+    house_input(people[2],line);assert(!people[1]->clan[0]);
+    assert(actor->pcdata->drow[DROW_POWERS]==powers&&
+           actor->pcdata->drow[DROW_SPEED]==speed&&
+           actor->pcdata->classpoints[CP_CURRENT]==points&&actor->pcdata->rank==rank);
+    assert(people[0]->pcdata->drow[DROW_POWERS]==DROW_WEB&&
+           people[0]->pcdata->drow[DROW_SPEED]==2&&
+           people[0]->pcdata->classpoints[CP_CURRENT]==123456);
+    for(int i=0;i<3;++i)extract_char(people[i],TRUE);
+    puts("Native Drow houses: real input, named consent, cross-house/rank refusals, "
+         "registry reload, offline outcast/relogin, transfer and class-training retention passed.");
+}
+
 int main(int argc,char **argv)
 {
     char cwd[4096],from[8192],to[16384],name[256];
@@ -504,12 +629,16 @@ int main(int argc,char **argv)
     else if(argc==2&&!strcmp(argv[1],"--equipment-use")) {
         prayers();equipment();equipment_use();
     }
+    else if(argc==2&&!strcmp(argv[1],"--house-commands")) {
+        prayers();house_commands();
+    }
     else {
-        prayers();equipment_use();toggles();training_and_reports();prayer_menu();house_training();
+        prayers();equipment_use();toggles();training_and_reports();prayer_menu();house_training();house_commands();
         if(argc==2&&!strcmp(argv[1],"--spider"))spider();
         else {equipment();dual_wield();combat_and_travel();spider();}
     }
     extract_char(actor,TRUE);actor=NULL;
+    clan_registry_close();
     assert(!fclose(fpReserve)&&!chdir(cwd));
     for(size_t i=0;i<6;++i){
         snprintf(from,sizeof from,"%s/%s",scratch,dirs[i]);DIR *dir=opendir(from);assert(dir);

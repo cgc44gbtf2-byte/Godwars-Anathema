@@ -261,18 +261,18 @@ static void class_cycle(long class_id)
     assert(!clan_identity_reserved("Leader"));
 }
 
-static void faults(void)
+static void faults(long class_id)
 {
     const enum atomic_save_fault failures[] = {SAVE_FAULT_CREATE, SAVE_FAULT_FLUSH,
         SAVE_FAULT_SYNC, SAVE_FAULT_CLOSE, SAVE_FAULT_RENAME};
-    fixture(CLASS_MAGE);
+    fixture(class_id);
     run(4, "clanadmin create Leader Order");
     actors[0].vampgen = 1;
     actors[2].class = CLASS_WEREWOLF;
     unchanged(0, "favour Other elder");
     assert(pcs[2].rank == 1 && actors[2].vampgen == 9);
     actors[0].vampgen = 9;
-    actors[2].class = CLASS_MAGE;
+    actors[2].class = class_id;
     run(0, "clan invite Member");
     run(1, "clan accept Leader");
     run(0, "clan transfer Member");
@@ -434,7 +434,8 @@ int main(void)
     assert(clan_load_registry()); /* No write merely to read an unconfigured installation. */
     assert(access("../clans", F_OK) != 0);
     for (size_t i = 0; i < sizeof(classes)/sizeof(classes[0]); ++i) class_cycle(classes[i]);
-    faults();
+    faults(CLASS_MAGE);
+    faults(CLASS_DROW);
     corrupt_files();
     limits_and_admin();
     clan_registry_close();
