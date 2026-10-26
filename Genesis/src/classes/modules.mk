@@ -40,6 +40,7 @@ CLASS_MODULE_SOURCES = \
   classes/hybrid/build.c \
   classes/hybrid/training.c \
    classes/hybrid/access.c \
+  classes/hybrid/drow_globe.c \
    classes/hybrid/passives.c \
   classes/hybrid/resources.c \
   classes/hybrid/progression.c \

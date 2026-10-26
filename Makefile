@@ -94,7 +94,7 @@ TESTS += tests/test_werewolf_reversion
 TESTS += tests/test_class_reset
 # Real validators/effective access for older isolated native fixtures too.
 # Never replace hybrid access with permissive stubs just to satisfy linking.
-HYBRID_ACCESS_SOURCES = $(addprefix Genesis/src/classes/hybrid/,registry.c state.c player.c build.c progression.c specialization.c access.c passives.c books.c forms.c) Genesis/src/classes/sorcerer/vision.c Genesis/src/classes/monk/favour.c Genesis/src/guardian.c
+HYBRID_ACCESS_SOURCES = $(addprefix Genesis/src/classes/hybrid/,registry.c state.c player.c build.c progression.c specialization.c access.c drow_globe.c passives.c books.c forms.c) Genesis/src/classes/sorcerer/vision.c Genesis/src/classes/monk/favour.c Genesis/src/guardian.c
 
 all:
 	$(MAKE) -C Genesis/src
@@ -188,6 +188,7 @@ check-layout:
 	python3 tests/test_guardian_lifecycle_catalog.py
 	python3 tests/test_hybrid_monk_training_catalog.py
 	python3 tests/test_hybrid_drow_training_catalog.py
+	python3 tests/test_hybrid_darkness_catalog.py
 	python3 tests/test_hybrid_acidbolt_catalog.py
 	python3 tests/test_hybrid_web_catalog.py
 	python3 tests/test_hybrid_drow_aura_catalog.py

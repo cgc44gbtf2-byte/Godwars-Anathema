@@ -34,6 +34,7 @@
 #include "merc.h"
 #include "auxiliary_save.h"
 #include "classes/hybrid/resources.h"
+#include "classes/hybrid/access.h"
 
 
 
@@ -428,6 +429,18 @@ void mobile_update( void )
 		        stc("You are unable to maintain your globe of darkness.\n\r", ch);
 		        act("Darkness fades from the room as $n relaxes.", ch, NULL, NULL, TO_ROOM);
 		    }
+		}
+	    }
+
+	    /* A hybrid's Drow upkeep is independent of its original-class update
+	     * branch; it must run even when that primary class has its own upkeep. */
+	    if (!IS_DROW(ch) && hybrid_drow_globe_active(ch))
+	    {
+		int upkeep=hybrid_drow_globe_upkeep(ch,150);
+		if (upkeep==0)
+		{
+		    stc("You are unable to maintain your globe of darkness.\n\r",ch);
+		    act("Darkness fades from the room as $n relaxes.",ch,NULL,NULL,TO_ROOM);
 		}
 	    }
 
@@ -1563,7 +1576,7 @@ void paradox( CHAR_DATA *ch )
     do_visible(ch, "");
     if (IS_AFFECTED(ch, AFF_SHADOWPLANE)) REMOVE_BIT(ch->affected_by, AFF_SHADOWPLANE);
     if (IS_AFFECTED(ch, AFF_DEEPUMBRA)) REMOVE_BIT(ch->affected_by, AFF_DEEPUMBRA);
-    if (get_drow(ch, DROW_GLOBE)) REMOVE_BIT(ch->pcdata->drow[DROW_POWERS], DROW_GLOBE);
+    if (hybrid_drow_globe_active(ch)) hybrid_drow_globe_set(ch,0);
     SET_BIT(ch->extra, TIED_UP);
     SET_BIT(ch->extra, GAGGED);
     SET_BIT(ch->extra, BLINDFOLDED);

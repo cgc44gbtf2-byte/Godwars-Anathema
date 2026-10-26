@@ -14,6 +14,7 @@
 
 extern char *string_space,*top_string;
 extern void init_mm(void);
+extern void mobile_update(void);
 
 static ROOM_INDEX_DATA room;
 static AREA_DATA area;
@@ -248,6 +249,90 @@ static void supported_utilities(void)
         release(ch);
     }
     assert(purchases==63);
+}
+
+static void darkness_lessons(void)
+{
+    for(size_t i=0;i<sizeof(originals)/sizeof(originals[0]);++i){
+        CHAR_DATA *ch=fresh(originals[i],CLASS_DROW,10500);
+        command(ch,"drow");
+        assert(strstr(output,"darkness: available"));
+        assert(strstr(output,"500 DP activation, 150 DP upkeep"));
+        command(ch,"drow darkness learn");
+        assert(strstr(output,"learned and saved"));
+        assert(hybrid_power_drow(ch,DROW_DARK));
+        assert(hybrid_drow_points_current(ch)==1000);
+        unchanged(ch,"drow darkness learn");
+        shell.outtop=0;output[0]='\0';
+        interpret(ch,"globedarkness");
+        assert(hybrid_drow_globe_active(ch));
+        assert(hybrid_drow_points_current(ch)==500);
+        CHAR_DATA watcher={0};
+        PC_DATA watcher_pc={0};
+        DESCRIPTOR_DATA watcher_desc={0};
+        char watcher_output[4096]={0};
+        watcher.pcdata=&watcher_pc;
+        watcher.name="Watcher";
+        watcher.position=POS_STANDING;
+        watcher.level=LEV_AWA;
+        watcher.in_room=&room;
+        watcher.desc=&watcher_desc;
+        watcher_desc.character=&watcher;
+        watcher_desc.connected=CON_PLAYING;
+        watcher_desc.outbuf=watcher_output;
+        watcher_desc.outsize=sizeof watcher_output;
+        assert(!can_see(&watcher,ch));
+        do_look(&watcher,"auto");
+        assert(strstr(watcher_output,"pitch black darkness pervades"));
+        assert(ch->pcdata->drow[DROW_POWERS]==0);
+        assert(ch->pcdata->classpoints[CP_CURRENT]==321);
+        assert(save_char_obj_checked(ch));
+        for(int short_file=0;short_file<2;short_file++){
+            DESCRIPTOR_DATA reload={0};
+            assert(short_file?load_char_short(&reload,"Drowfixture"):
+                              load_char_obj(&reload,"Drowfixture"));
+            assert(hybrid_power_drow(reload.character,DROW_DARK));
+            assert(hybrid_drow_globe_active(reload.character));
+            assert(hybrid_drow_points_current(reload.character)==500);
+            free_char(reload.character);
+        }
+        interpret(ch,"globedarkness");
+        assert(!hybrid_drow_globe_active(ch));
+        assert(hybrid_drow_points_current(ch)==500);
+        assert(hybrid_drow_points_set_current(ch,499));
+        interpret(ch,"globedarkness");
+        assert(!hybrid_drow_globe_active(ch));
+        assert(hybrid_drow_points_current(ch)==499);
+        assert(hybrid_drow_points_set_current(ch,151));
+        assert(hybrid_drow_globe_set(ch,1));
+        assert(hybrid_drow_globe_upkeep(ch,150)==1);
+        assert(hybrid_drow_points_current(ch)==1);
+        assert(hybrid_drow_globe_active(ch));
+        assert(hybrid_drow_globe_upkeep(ch,150)==0);
+        assert(hybrid_drow_points_current(ch)==0);
+        assert(!hybrid_drow_globe_active(ch));
+        assert(hybrid_drow_points_set_current(ch,151));
+        assert(hybrid_drow_globe_set(ch,1));
+        mobile_update();
+        assert(hybrid_drow_points_current(ch)==1);
+        assert(hybrid_drow_globe_active(ch));
+        mobile_update();
+        assert(hybrid_drow_points_current(ch)==0);
+        assert(!hybrid_drow_globe_active(ch));
+        assert(hybrid_drow_points_set_current(ch,150));
+        assert(hybrid_drow_globe_set(ch,1));
+        assert(hybrid_drow_globe_upkeep(ch,150)==0);
+        assert(hybrid_drow_points_current(ch)==0);
+        assert(!hybrid_drow_globe_active(ch));
+        assert(hybrid_drow_globe_set(ch,1));
+        ch->hit=0;
+        update_pos(ch);
+        assert(!hybrid_drow_globe_active(ch));
+        ch->hit=50000;
+        assert(ch->pcdata->classpoints[CP_CURRENT]==321);
+        assert(ch->pcdata->drow[DROW_POWERS]==0);
+        release(ch);
+    }
 }
 
 static void poison_lessons(void)
@@ -575,6 +660,7 @@ int main(void)
     room.description="";
     room_index_hash[901%MAX_KEY_HASH]=&room;
     supported_utilities();
+    darkness_lessons();
     poison_lessons();
     blindfight_lessons();
     toughness_lessons();
@@ -585,6 +671,7 @@ int main(void)
     utility_save_faults("drow readaura learn",DROW_READ,6000);
     utility_save_faults("drow heighten learn",DROW_SIGHT,20000);
     utility_save_faults("drow spidereyes learn",DROW_EYES,7500);
+    utility_save_faults("drow darkness learn",DROW_DARK,9500);
     utility_save_faults("drow poisonimmunity learn",DROW_PIMM,5000);
     utility_save_faults("drow blindfight learn",DROW_BFIGHT,5000);
     utility_save_faults("drow toughness learn",DROW_TOUGH,8000);
@@ -592,7 +679,7 @@ int main(void)
     assert(!char_list&&!room.people&&!fclose(fpReserve));
     assert(!chdir("..")&&!rmdir("player")&&!rmdir("backup")&&
            !rmdir("run")&&!chdir(cwd)&&!rmdir(root));
-    printf("Secondary Drow UI: %u paid powers across nine original parents, "
+    printf("Secondary Drow UI: %u existing paid powers plus nine Darkness lessons, "
            "atomic reloads, DP isolation, adapter use and refusal paths passed.\n",
            purchases);
     return 0;

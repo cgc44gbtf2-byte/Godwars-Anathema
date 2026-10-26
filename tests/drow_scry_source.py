@@ -11,6 +11,8 @@ GRANT="""    /* Spider Eyes grants the same use, not extra range or shield bypas
 """
 
 def without_drow_scry_stage(text):
+    from drow_globe_source import without_drow_globe_stage
+    text=without_drow_globe_stage(text)
     if "void do_scry(" not in text:return text
     start=text.index("void do_scry(")
     end=text.index("\nvoid do_readaura(",start)

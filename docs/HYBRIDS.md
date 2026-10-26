@@ -956,6 +956,8 @@ selfbrid drow toughness
 selfbrid drow toughness learn
 selfbrid drow speed
 selfbrid drow speed learn
+selfbrid drow darkness
+selfbrid drow darkness learn
 ```
 
 The listing/details are read-only. `learn` buys exactly one existing flag:
@@ -969,6 +971,15 @@ secondary Drow bank through the existing checked save transaction; original
 class identity, primary Drow storage, other currencies and save format are
 unchanged. Primary Drow characters continue using native `prayer`; this UI
 does not intercept or alter it.
+
+Darkness is a separate toggle lesson costing **9,500 secondary DP**. After
+learning it, `globedarkness` costs **500 secondary DP** to activate and
+**150 secondary DP per update tick** to maintain; toggling it off is free.
+The active globe follows the character between rooms and uses the existing
+darkness visibility rules. Upkeep exhaustion, death and existing dispel
+paths clear it. Its active flag and points remain in the secondary Drow
+record, including saves and reloads; the original parent's bank is untouched.
+This adapter does not enable selfbrid conversion.
 
 Speed is a separate ranked lesson: each next rank costs **10,000 secondary DP**,
 up to rank4, matching native Drow advancement. Each rank uses the existing

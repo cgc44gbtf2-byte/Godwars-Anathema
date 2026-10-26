@@ -19,6 +19,7 @@ static const struct drow_utility utilities[] = {
     {"faeriefire",DROW_FIRE,5000},
     {"acidbolt",DROW_ACID,5000},
     {"llothsweb",DROW_WEB,8000},
+    {"darkness",DROW_DARK,9500},
     {"readaura",DROW_READ,6000},
     {"heighten",DROW_SIGHT,20000},
     {"spidereyes",DROW_EYES,7500},
@@ -50,8 +51,9 @@ static const struct drow_utility *find_utility(const char *name)
 
 static void usage(CHAR_DATA *ch)
 {
-    send_to_char("Use: selfbrid drow | selfbrid drow <attunement|faeriefire|acidbolt|llothsweb|readaura|heighten|spidereyes|poisonimmunity|blindfight|toughness|speed>\n\r"
+    send_to_char("Use: selfbrid drow | selfbrid drow <attunement|faeriefire|acidbolt|llothsweb|darkness|readaura|heighten|spidereyes|poisonimmunity|blindfight|toughness|speed>\n\r"
         "Learn an integrated power: selfbrid drow <power> learn; Speed: selfbrid drow speed learn\n\r"
+        "Globe of Darkness: globedarkness (500 DP to activate, 150 DP per upkeep tick).\n\r"
         "Other secondary Drow powers are not available yet; conversion remains disabled.\n\r",
         ch);
 }
@@ -83,8 +85,13 @@ static void show(CHAR_DATA *ch,const struct drow_utility *u)
 {
     char line[192];
     int learned=hybrid_power_drow(ch,u->flag);
-    snprintf(line,sizeof(line),"%s: %s; %ld DP to learn. Activation has no "
-        "additional charge.\n\r",u->name,learned?"learned":"available",u->cost);
+    if(u->flag==DROW_DARK)
+        snprintf(line,sizeof(line),"%s: %s; %ld DP to learn. "
+            "globedarkness: 500 DP activation, 150 DP upkeep per tick; "
+            "free to deactivate.\n\r",u->name,learned?"learned":"available",u->cost);
+    else
+        snprintf(line,sizeof(line),"%s: %s; %ld DP to learn. Activation has no "
+            "additional charge.\n\r",u->name,learned?"learned":"available",u->cost);
     send_to_char(line,ch);
 }
 
@@ -119,6 +126,11 @@ int hybrid_drow_training_command(CHAR_DATA *ch,const char *argument)
         return 1;
     }
     if(!*args[1]) {
+        char points[128];
+        snprintf(points,sizeof(points),"Secondary Drow points: %ld%s.\n\r",
+            hybrid_drow_points_current(ch),
+            hybrid_drow_globe_active(ch)?"; Globe of Darkness is active":"");
+        send_to_char(points,ch);
         for(size_t i=0;i<sizeof(utilities)/sizeof(utilities[0]);++i)
             show(ch,&utilities[i]);
         show_speed(ch,s);

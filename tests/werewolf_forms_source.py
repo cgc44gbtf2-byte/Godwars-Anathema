@@ -23,6 +23,8 @@ EDITS={
 }
 
 def without_werewolf_forms_stage(text):
+    from drow_globe_source import without_drow_globe_stage
+    text=without_drow_globe_stage(text)
     for name,(before,after,edits) in EDITS.items():
         match=re.search(r"void do_"+name+r"\s*\(.*?(?=\nvoid do_|\Z)",text,re.S)
         if not match:continue

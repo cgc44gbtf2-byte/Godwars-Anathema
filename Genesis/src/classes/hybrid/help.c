@@ -109,6 +109,9 @@ int hybrid_help_topic(CHAR_DATA *ch, const char *argument)
                       "Drow Speed costs 10,000 DP per rank, up to rank 4. "
                       "Learn with selfbrid drow speed learn; it improves the "
                       "existing Drow speed calculations. "
+                     "Darkness costs 9,500 DP to learn; globedarkness toggles "
+                     "the learned Globe for 500 DP activation and 150 DP "
+                     "per upkeep tick from the secondary Drow bank. "
                      "Learn these through "
                      "selfbrid drow <power> learn. Other Drow powers are not "
                      "yet offered by this trainer.\n\r",ch);

@@ -44,7 +44,8 @@ class HybridWebCatalog(unittest.TestCase):
     def test_training_help_and_compatibility(self):
         ui=(SRC/"classes/hybrid/drow_training.c").read_text()
         self.assertIn('{"llothsweb",DROW_WEB,8000}',ui)
-        for token in ("DROW_DARK","DROW_SPIDER","DROW_SKIP"):
+        self.assertIn('{"darkness",DROW_DARK,9500}',ui)
+        for token in ("DROW_SPIDER","DROW_SKIP"):
             self.assertNotIn(token,ui)
         helptext=(SRC/"classes/hybrid/help.c").read_text()
         self.assertIn("Lloth's Web costs",helptext)

@@ -643,35 +643,39 @@ void do_drowupkeep( CHAR_DATA *ch, char *argument )
 
 void do_globedark( CHAR_DATA *ch, char *argument )
 {
-    if (!IS_DROW(ch))
+    if (!hybrid_power_parent(ch,CLASS_DROW))
     {
 	stc("Huh?\n\r", ch);
 	return;
     }
 
-    if (!get_drow(ch, DROW_DARK))
+    if (!hybrid_power_drow(ch, DROW_DARK))
     {
 	stc("You need to obtain darkness first.\n\r", ch);
 	return;
     }
 
-    if (get_drow(ch, DROW_GLOBE))
+    if (hybrid_drow_globe_active(ch))
     {
-	REMOVE_BIT(ch->pcdata->drow[DROW_POWERS], DROW_GLOBE);
+hybrid_drow_globe_set(ch,0);
 	stc("You banish your globe of darkness.\n\r", ch);
 	act("Darkness fades from the room as $n relaxes.", ch, NULL, NULL, TO_ROOM);
     }
     else
     {
-	if (ch->pcdata->classpoints[CP_CURRENT] < 500)
+if (hybrid_drow_points_current(ch) < 500)
 	{
 	    stc("You do not have enough drow points to activate globe of darkness.\n\r", ch);
 	    return;
 	}
+if (!hybrid_drow_points_charge(ch,500) ||
+    !hybrid_drow_globe_set(ch,1))
+{
+    stc("The globe cannot be activated right now.\n\r",ch);
+    return;
+}
 	stc("You summon a globe of darkness!\n\r", ch);
 	act("$n concentrates as the room fades into darkness!", ch, NULL, NULL, TO_ROOM);
-	SET_BIT(ch->pcdata->drow[DROW_POWERS], DROW_GLOBE);
-	ch->pcdata->classpoints[CP_CURRENT] -= 500;
     }
     return;
 }

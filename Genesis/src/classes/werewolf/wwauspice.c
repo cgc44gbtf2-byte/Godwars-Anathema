@@ -9,6 +9,7 @@
 #include <time.h>
 #include <limits.h>
 #include "merc.h"
+#include "classes/hybrid/access.h"
 
 void do_blur( CHAR_DATA *ch, char *argument )
 {
@@ -695,7 +696,13 @@ void do_wyrmcall( CHAR_DATA *ch, char *argument )
 	if (IS_NPC(ich)) continue;
 	if (ich->pcdata == NULL || ich->hit <= 0 || ich->position == POS_DEAD) continue;
         if (IS_VAMPIRE(ich) && ich->beast == 0) continue;
-	if (!IS_VAMPIRE(ich) && !IS_DROW(ich)) continue;
+	if (!IS_VAMPIRE(ich) && !IS_DROW(ich))
+	{
+	    /* Only the owned secondary Globe is dispelled; do not run native
+	     * Vampire/Drow transformation cleanup on the original parent. */
+	    if (hybrid_drow_globe_active(ich)) hybrid_drow_globe_set(ich,0);
+	    continue;
+	}
     
 	affect_strip ( ich, gsn_invis                   );
 	affect_strip ( ich, gsn_mass_invis              );

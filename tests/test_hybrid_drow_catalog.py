@@ -13,6 +13,8 @@ def between(text,name,next_name):
 class HybridDrowCatalog(unittest.TestCase):
     def test_native_bodies_preserved_except_owned_permission_checks(self):
         text=(SRC/"classes/drow/drow.c").read_text()
+        from drow_globe_source import without_drow_globe_stage
+        text=without_drow_globe_stage(text)
         from drow_poison_source import without_drow_poison_stage
         text=without_drow_poison_stage(text)
         self.assertEqual(text.count('#include "classes/hybrid/access.h"\n'),1)
@@ -43,6 +45,8 @@ class HybridDrowCatalog(unittest.TestCase):
 
     def test_other_drow_handlers_remain_native(self):
         text=(SRC/"classes/drow/drow.c").read_text()
+        from drow_globe_source import without_drow_globe_stage
+        text=without_drow_globe_stage(text)
         for name,next_name in (("do_drowarmor","do_door"),
                                ("do_door","do_prayer"),
                                ("do_globedark","do_shoot")):

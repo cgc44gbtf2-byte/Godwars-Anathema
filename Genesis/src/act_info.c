@@ -38,6 +38,7 @@
 #include "progress_metrics.h"
 #include "classes/hybrid/passives.h"
 #include "classes/hybrid/hybrid.h"
+#include "classes/hybrid/access.h"
 
 
 
@@ -1210,7 +1211,7 @@ void do_look( CHAR_DATA *ch, char *argument )
     {
 	for (vch = ch->in_room->people; vch != NULL; vch = vch->next_in_room)
 	{
-	    if (IS_DROW(vch) && get_drow(ch, DROW_GLOBE))
+	    if (hybrid_drow_globe_active(vch))
 	    {
 		stc("A pitch black darkness pervades the room.\n\r", ch);
 		return;
@@ -1860,7 +1861,7 @@ void do_score( CHAR_DATA *ch, char *argument )
 	{
 	    sprintf(buf, "You currently have %li drow points.\n\rYou have earned a total of %li drow points in your lifetime.\n\r", ch->pcdata->classpoints[CP_CURRENT], ch->pcdata->classpoints[CP_TOTAL]);
 	    stc(buf, ch);
-	    if (get_drow(ch, DROW_GLOBE)) stc("You are currently using Globe of Darkness.\n\r", ch);
+    if (hybrid_drow_globe_active(ch)) stc("You are currently using Globe of Darkness.\n\r", ch);
 	}
 	if (IS_NINJA(ch))
 	{

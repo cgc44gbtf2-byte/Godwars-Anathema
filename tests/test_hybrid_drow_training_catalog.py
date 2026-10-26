@@ -23,8 +23,8 @@ class HybridDrowTrainingCatalog(unittest.TestCase):
         self.assertIn("request.action=HYBRID_LESSON_DROW_SPEED", ui)
         self.assertIn("request.parent=CLASS_DROW", ui)
         self.assertIn('!strcmp(args[1],"speed")', ui)
-        for unsupported in ("DROW_DARK",
-                            "DROW_BITE", "DROW_DUALWIELD",
+        self.assertIn('{"darkness",DROW_DARK,9500}', ui)
+        for unsupported in ("DROW_BITE", "DROW_DUALWIELD",
                             "DROW_SPIDER",
                             "DROW_NIGHT",
                             "DROW_SKIP", "DROW_MIGHT"):
@@ -64,6 +64,8 @@ class HybridDrowTrainingCatalog(unittest.TestCase):
         self.assertIn("{DROW_SIGHT,20000,0}", trainer)
         self.assertIn('arg2, "spidereyes")) {grant = DROW_EYES; cost = 7500;}', native)
         self.assertIn("{DROW_EYES,7500,0}", trainer)
+        self.assertIn('arg2, "darkness")) {grant = DROW_DARK; cost = 9500;}', native)
+        self.assertIn("{DROW_DARK,9500,0}", trainer)
         self.assertIn("{DROW_ATTUNE,1000,0}", trainer)
         self.assertIn("case HYBRID_LESSON_DROW_SPEED:", trainer)
         self.assertIn("lesson.secondary_dp_cost=10000", trainer)

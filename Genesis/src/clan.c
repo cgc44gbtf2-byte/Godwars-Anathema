@@ -1192,11 +1192,11 @@ void do_scry( CHAR_DATA *ch, char *argument )
 	do_look(ch,"auto");
 	REMOVE_BIT(ch->affected_by, AFF_SHADOWPLANE);
     }
-    else if (get_drow(ch, DROW_GLOBE))
+    else if (hybrid_drow_globe_active(ch))
     {
-	REMOVE_BIT(ch->pcdata->drow[DROW_POWERS], DROW_GLOBE);
+	hybrid_drow_globe_set(ch,0);
 	do_look(ch, "auto");
-	SET_BIT(ch->pcdata->drow[DROW_POWERS], DROW_GLOBE);
+	hybrid_drow_globe_set(ch,1);
     }
     else
 	do_look(ch,"auto");

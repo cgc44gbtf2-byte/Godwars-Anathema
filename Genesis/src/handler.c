@@ -33,6 +33,7 @@
 #include <time.h>
 #include "merc.h"
 #include "progress_metrics.h"
+#include "classes/hybrid/access.h"
 
 
 
@@ -439,7 +440,7 @@ void char_from_room( CHAR_DATA *ch )
 	REMOVE_BIT(ch->affected_by, AFF_HIDE);
 	send_to_char("You step from the shadows.\n\r",ch);
     }
-    if (IS_DROW(ch) && get_drow(ch, DROW_GLOBE))
+    if (hybrid_drow_globe_active(ch))
 	act("Darkness fades from the room.", ch, NULL, NULL, TO_ROOM);
 
     if ( ch == ch->in_room->people )
@@ -512,7 +513,7 @@ void char_to_room( CHAR_DATA *ch, ROOM_INDEX_DATA *pRoomIndex )
 	act("The room is filled with silence.",ch,NULL,NULL,TO_ROOM);
     }
 
-    if (IS_DROW(ch) && get_drow(ch, DROW_GLOBE))
+    if (hybrid_drow_globe_active(ch))
 	act("Darkness fills the room.", ch, NULL, NULL, TO_ROOM);
 
     return;
@@ -2081,7 +2082,7 @@ bool can_see( CHAR_DATA *ch, CHAR_DATA *victim )
      * cannot inspect an unplaced observer or target during world lookup. */
     if (ch->in_room == NULL || victim->in_room == NULL) return FALSE;
    for (vch = victim->in_room->people; vch != NULL; vch = vch->next_in_room)
-	if ((IS_DROW(vch) && get_drow(vch, DROW_GLOBE))) return FALSE;
+if (hybrid_drow_globe_active(vch)) return FALSE;
 
     if (IS_SET(ch->in_room->added_flags, ROOM2_DARKNESS))
     {

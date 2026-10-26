@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "merc.h"
+#include "classes/hybrid/access.h"
 
 /* Death templates accept names (%s, at most two) and literal percent (%%).
  * Never give a persisted format string to printf as executable formatting. */
@@ -77,10 +78,10 @@ void update_pos( CHAR_DATA *victim )
 victim->hit = UMAX(1, victim->max_hit / 5);
     }
 
-    if (victim->hit <= 0 && IS_DROW(victim) && get_drow(victim, DROW_GLOBE))
+    if (victim->hit <= 0 && hybrid_drow_globe_active(victim))
     {
 	act("Darkness fades from the room.", victim, NULL, NULL, TO_ROOM);
-	REMOVE_BIT(victim->pcdata->drow[DROW_POWERS], DROW_GLOBE);
+hybrid_drow_globe_set(victim,0);
     }
 
     if (!IS_NPC(victim) && victim->hit <= -10)

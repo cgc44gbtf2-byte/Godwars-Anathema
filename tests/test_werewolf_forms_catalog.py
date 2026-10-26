@@ -21,6 +21,8 @@ class FormsCatalog(unittest.TestCase):
 
     def test_source_scope_and_policy(self):
         source=SOURCE.read_text()
+        from drow_globe_source import without_drow_globe_stage
+        source=without_drow_globe_stage(source)
         def body(name):
             return re.search(r"void do_"+name+r"\s*\(.*?(?=\nvoid do_|\Z)",source,re.S)[0]
         wyrm=body("wyrmcall");song=body("songrage")

@@ -10,6 +10,8 @@ def replace_once(text,new,old):
     return text.replace(new,old,1)
 
 def without_aux_writers_update(text):
+    from drow_globe_source import without_drow_globe_stage
+    text=without_drow_globe_stage(text)
     hook="    save_notes();\n    retry_leaderboard_save();\n"
     if hook not in text:return text
     text=replace_once(text,'#include "auxiliary_save.h"\n',"")
