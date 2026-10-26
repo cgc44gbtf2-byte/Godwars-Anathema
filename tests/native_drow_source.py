@@ -64,6 +64,7 @@ def once(text, new, old):
 
 def without_native_drow_stage(text):
     text = without_native_drow_speed(text)
+    text = without_native_drow_shoot_context(text)
     if "void do_summonspider(" not in text:
         return text
     text = without_native_drow_prayer_menu(text)
@@ -102,6 +103,16 @@ def without_native_drow_stage(text):
         body = once(body, RELIC_GUARDS, "")
         text = text[:start]+body+text[end:]
     return text
+
+SHOOT_CONTEXT = """    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL) return;
+    if (argument == NULL) argument = "";
+
+"""
+
+def without_native_drow_shoot_context(text):
+    if SHOOT_CONTEXT not in text:
+        return text
+    return once(text,SHOOT_CONTEXT,"")
 
 PRAYER_MENU = """stc("Prayer grants a power to a Drow; no deity or trainer is required.\\n\\r", ch);
 stc("Learn for yourself: prayer self <power>\\n\\r", ch);

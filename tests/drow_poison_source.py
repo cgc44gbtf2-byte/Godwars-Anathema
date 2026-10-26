@@ -1,5 +1,6 @@
 """Reverse only the two exact reviewed Drow poison-immunity predicates."""
 import hashlib
+from native_drow_source import without_native_drow_shoot_context
 
 PINS=(
     ("void spell_poison(","void spell_protection(",
@@ -15,6 +16,7 @@ PINS=(
 )
 
 def without_drow_poison_stage(text):
+    text=without_native_drow_shoot_context(text)
     for start,end,old,new,grant,original in PINS:
         if start not in text:continue
         a=text.index(start);b=text.index(end,a) if end else len(text)

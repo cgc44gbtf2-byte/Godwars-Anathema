@@ -90,6 +90,25 @@ compatibility, ranged safety, resource use and persistence.
 An exact source inverse preserves the previous complete Drow source hash; its
 negative tests reject unrelated stat/cost/guard changes.
 
+### Equipment-use follow-up
+
+The real-world suite now attunes all five crafted relics and checks ownership,
+loyalty and the correct worn slot after reload. Repeated attunement is refused
+without a charge; ammunition cannot be attuned.
+
+Crossbow checks use the shipped bow and bolt recipes in all six directions:
+twelve hits keep their original damage/RNG snapshot, consume one bolt and
+500 DP each, apply existing sleep poison, and restore the shooter's room view
+without cancelling stealth, Globe or silence. Protected targets consume neither
+DP nor ammunition. Existing tests retain miss/barrier costs and compatibility,
+owner, crafting and persistence rules.
+
+`shoot` now refuses missing characters/player data before dereferencing them;
+a null argument follows the normal syntax response. Three unsafe direct calls
+were reproduced under UBSan before this guard was added. This is defensive
+handler validation, not evidence of a reported live-server crash. Normal player
+shooting, costs, damage and equipment rules are unchanged.
+
 ### Native Speed training/reporting follow-up
 
 `drowupkeep` now shows Speed even if it is the only trained gift and always ends

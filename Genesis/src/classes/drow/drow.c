@@ -756,6 +756,9 @@ void do_shoot( CHAR_DATA *ch, char *argument )
     int door;
     long sn, damage;
 
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL) return;
+    if (argument == NULL) argument = "";
+
     argument = one_argument(argument, arg1);
     argument = one_argument(argument, arg2);
 

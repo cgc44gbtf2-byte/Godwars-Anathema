@@ -115,7 +115,7 @@ static void learned_cases(void)
 int main(int argc,char **argv)
 {
     int dump=argc==2&&!strcmp(argv[1],"--native-dump");
-    if(!dump)assert(!ammunition_original_main());
+    if(!dump)assert(!ammunition_original_main(0,NULL));
     else {
         string_space=malloc(1024*1024);assert(string_space);
         top_string=string_space;*top_string='\0';current_time=2000000000;init_mm();

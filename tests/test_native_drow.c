@@ -12,6 +12,8 @@
 #include <sys/stat.h>
 #include "merc.h"
 
+extern void init_mm(void);
+
 static CHAR_DATA *actor;
 static DESCRIPTOR_DATA descriptor;
 static ROOM_INDEX_DATA arena;
@@ -102,10 +104,12 @@ static void equipment(void)
         assert(o&&o->pIndexData->vnum==pieces[i].vnum);
         assert(!str_cmp(o->questowner,actor->name)&&!str_cmp(o->questmaker,actor->name));
         assert(actor->pcdata->classpoints[CP_CURRENT]==0&&actor->pcdata->quest==0);
-        if(i==0) {
-            command("attunement piwafwi");
-            assert(IS_SET(o->extra_flags,ITEM_LOYAL));
-        }
+        snprintf(line,sizeof line,"attunement %s",pieces[i].wear);
+        command(line);
+        assert(IS_SET(o->extra_flags,ITEM_LOYAL));
+        long points=actor->pcdata->classpoints[CP_CURRENT];
+        command(line);assert(strstr(output,"already attuned"));
+        assert(actor->pcdata->classpoints[CP_CURRENT]==points);
         snprintf(line,sizeof line,"wear %s",pieces[i].wear);
         command(line);
         if(get_eq_char(actor,pieces[i].slot)!=o)
@@ -117,6 +121,9 @@ static void equipment(void)
         assert(load_char_obj(&reload,"NativeDrow"));
         OBJ_DATA *saved=get_eq_char(reload.character,pieces[i].slot);
         assert(saved&&saved->pIndexData->vnum==pieces[i].vnum);
+        assert(IS_SET(saved->extra_flags,ITEM_LOYAL)&&
+               !str_cmp(saved->questowner,actor->name)&&
+               !str_cmp(saved->questmaker,actor->name));
         free_char(reload.character);
         extract_obj(o);
     }
@@ -183,6 +190,75 @@ static void combat_and_travel(void)
     assert(actor->in_room==&destination);
     char_from_room(actor);char_to_room(actor,&arena);
     extract_char(target,TRUE);
+}
+
+static long projectile_count(void)
+{
+    long count=0;
+    for(OBJ_DATA *o=actor->carrying;o;o=o->next_content)
+        if(o->pIndexData->vnum==OBJ_VNUM_DROW_BOLT)++count;
+    return count;
+}
+
+static void equipment_use(void)
+{
+    const char *dirs[]={"north","east","south","west","up","down"};
+    unsigned long long hash=1469598103934665603ULL;
+    time_t old_time=current_time;current_time=2000000000;init_mm();
+    long old_damroll=actor->damroll;actor->damroll=10;
+    long old_points=actor->pcdata->classpoints[CP_CURRENT],old_quest=actor->pcdata->quest;
+    actor->pcdata->classpoints[CP_CURRENT]=8000;actor->pcdata->quest=400;
+    command("drowarmor crossbow");
+    OBJ_DATA *bow=actor->carrying;
+    assert(bow&&bow->pIndexData->vnum==OBJ_VNUM_DROW_CROSSBOW);
+    command("attunement crossbow");command("wear crossbow");
+    assert(get_eq_char(actor,WEAR_HOLD)==bow&&IS_SET(bow->extra_flags,ITEM_LOYAL));
+    long old_flags=actor->affected_by,old_more=actor->more;
+    SET_BIT(actor->affected_by,AFF_HIDE);SET_BIT(actor->more,MORE_DARKNESS|MORE_SILENCE);
+    for(int dir=0;dir<6;++dir) {
+        ROOM_INDEX_DATA destination={0};EXIT_DATA exit={0},*old_exit=arena.exit[dir];
+        destination.vnum=999902+dir;destination.name="Drow crossbow range";
+        destination.description="";destination.area=&area;destination.light=1;
+        exit.to_room=&destination;arena.exit[dir]=&exit;
+        CHAR_DATA *target=create_mobile(get_mob_index(MOB_VNUM_GUARDIAN));
+        free_string(target->name);target->name=str_dup("NativeBoltTarget");
+        target->act=ACT_IS_NPC;target->position=POS_STANDING;
+        target->hit=target->max_hit=100000000;
+        char_to_room(target,&destination);
+        actor->pcdata->classpoints[CP_CURRENT]=1200;
+        command("drowarmor bolts 2");
+        assert(projectile_count()==2&&actor->pcdata->classpoints[CP_CURRENT]==1000);
+        command("attunement bolt");
+        assert(strstr(output,"cannot attune")&&projectile_count()==2);
+        char line[128];snprintf(line,sizeof line,"shoot %s NativeBoltTarget",dirs[dir]);
+        SET_BIT(destination.room_flags,ROOM_SAFE);command(line);
+        assert(projectile_count()==2&&actor->pcdata->classpoints[CP_CURRENT]==1000&&
+               target->hit==target->max_hit);
+        REMOVE_BIT(destination.room_flags,ROOM_SAFE);
+        /* World boot fuzzes mob template levels. Isolate the shot stream
+         * after real target/ammunition construction, not those boot draws. */
+        current_time=2000000000+dir;init_mm();
+        for(int shot=0;shot<2;++shot) {
+            long before=target->hit;command(line);
+            assert(target->hit<before&&IS_AFFECTED(target,AFF_SLEEP));
+            assert(projectile_count()==1-shot&&
+                   actor->pcdata->classpoints[CP_CURRENT]==500*(1-shot));
+            assert(actor->in_room==&arena&&arena.people==actor&&
+                   target->in_room==&destination&&destination.people==target);
+            assert(IS_AFFECTED(actor,AFF_HIDE)&&
+                   IS_MORE(actor,MORE_DARKNESS)&&IS_MORE(actor,MORE_SILENCE));
+            hash=(hash^(unsigned long long)target->hit)*1099511628211ULL;
+            hash=(hash^(unsigned long long)actor->pcdata->classpoints[CP_CURRENT])*
+                 1099511628211ULL;
+        }
+        hash=(hash^(unsigned long long)number_mm())*1099511628211ULL;
+        arena.exit[dir]=old_exit;extract_char(target,TRUE);
+    }
+    actor->affected_by=old_flags;actor->more=old_more;actor->damroll=old_damroll;
+    actor->pcdata->classpoints[CP_CURRENT]=old_points;actor->pcdata->quest=old_quest;
+    current_time=old_time;extract_obj(bow);
+    assert(hash==6470082533908826985ULL);
+    printf("Native Drow shipped crossbow: 12 hits/six directions hash=%llu; safe-target refusals, DP/bolts, poison, stealth and room lists passed.\n",hash);
 }
 
 static void dual_wield(void)
@@ -425,8 +501,11 @@ int main(int argc,char **argv)
     else if(argc==2&&!strcmp(argv[1],"--report-extreme"))upkeep_check(DROW_ACID,LONG_MAX);
     else if(argc==2&&!strcmp(argv[1],"--training-bounds"))training_and_reports();
     else if(argc==2&&!strcmp(argv[1],"--prayer-menu"))prayer_menu();
+    else if(argc==2&&!strcmp(argv[1],"--equipment-use")) {
+        prayers();equipment();equipment_use();
+    }
     else {
-        prayers();toggles();training_and_reports();prayer_menu();house_training();
+        prayers();equipment_use();toggles();training_and_reports();prayer_menu();house_training();
         if(argc==2&&!strcmp(argv[1],"--spider"))spider();
         else {equipment();dual_wield();combat_and_travel();spider();}
     }

@@ -357,7 +357,36 @@ static void bolt_crafting(void)
     free_char(loaded.character);
 }
 
-int main(void)
+static void shooting_context(int which)
+{
+    fixture();bolt(1);
+    PC_DATA before=pc;
+    if(which==0)do_shoot(NULL,"north target");
+    else if(which==1) {
+        actor.pcdata=NULL;do_shoot(&actor,"north target");actor.pcdata=&pc;
+    }
+    else if(which==2) {
+        do_shoot(&actor,NULL);assert(strstr(output,"Syntax: shoot"));
+    }
+    else if(which==3) {
+        actor.in_room=NULL;do_shoot(&actor,"north target");actor.in_room=&home;
+    }
+    else if(which==4) {
+        SET_BIT(actor.act,ACT_IS_NPC);actor.pcdata=NULL;
+        do_shoot(&actor,"north target");
+        actor.pcdata=&pc;REMOVE_BIT(actor.act,ACT_IS_NPC);
+    }
+    else {
+        actor.class=CLASS_MAGE;do_shoot(&actor,"north target");
+        actor.class=CLASS_DROW;
+    }
+    assert(!memcmp(&before,&pc,sizeof pc));
+    assert(bolts(&actor)==1&&get_eq_char(&actor,WEAR_HOLD)==crossbow);
+    assert(actor.in_room==&home&&home.people==&actor&&away.people==&target);
+    assert(target.hit==100000&&!target.affected);
+}
+
+int main(int argc,char **argv)
 {
     char root[] = "/tmp/anathema-ammo-XXXXXX", original[4096];
     assert(getcwd(original, sizeof(original)) && mkdtemp(root) && chdir(root) == 0);
@@ -370,8 +399,17 @@ int main(void)
     prototype(2, 9315, ITEM_AMMO); prototype(3, 72010, ITEM_MISSILE);
     prototype(4, 72011, ITEM_TRASH); prototype(5, 72012, ITEM_CONTAINER);
     mobile.short_descr = "a target";
-    dry_and_success(); rejection_and_misses(); ownership_and_compatibility();
-    bolt_crafting(); crafting_and_persistence();
+    if(argc==2) {
+        const char *modes[]={"--null-caster","--missing-player","--null-argument"};
+        int mode=-1;
+        for(int i=0;i<3;++i)if(!strcmp(argv[1],modes[i]))mode=i;
+        assert(mode>=0);shooting_context(mode);
+    }
+    else {
+        for(int i=0;i<6;++i)shooting_context(i);
+        dry_and_success(); rejection_and_misses(); ownership_and_compatibility();
+        bolt_crafting(); crafting_and_persistence();
+    }
     fixture();
     while (actor.carrying) extract_obj(actor.carrying);
     clan_registry_close(); char_list = NULL; descriptor_list = NULL;

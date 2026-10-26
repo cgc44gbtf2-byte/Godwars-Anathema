@@ -92,5 +92,33 @@ class NativeDrowCatalog(unittest.TestCase):
                         ("grant = DROW_ACID","grant = DROW_WEB")):
             self.assertNotEqual(blob(without_native_drow_stage(text.replace(old,new,1))),BASE)
 
+    def test_equipment_followup_only_adds_shoot_context_guards(self):
+        from native_drow_source import without_native_drow_shoot_context
+        text=(SRC/"classes/drow/drow.c").read_text()
+        prior="cf1244d5a43ebf6e54dcd50802c44866a1962b2b"
+        self.assertEqual(blob(without_native_drow_shoot_context(text)),prior)
+        for old,new in (("ch->pcdata == NULL","ch->pcdata != NULL"),
+                        ("ch->pcdata->classpoints[CP_CURRENT] -= 500;",
+                         "ch->pcdata->classpoints[CP_CURRENT] -= 5;")):
+            changed=text.replace(old,new)
+            self.assertNotEqual(changed,text)
+            try: restored=without_native_drow_shoot_context(changed)
+            except AssertionError: continue
+            self.assertNotEqual(blob(restored),prior)
+
+    def test_equipment_followup_exercises_real_recipes_and_invalid_contexts(self):
+        native=(ROOT/"tests/test_native_drow.c").read_text()
+        for token in ('command("drowarmor crossbow")','command("drowarmor bolts 2")',
+                      'command("attunement bolt")',"dir<6","shot<2",
+                      "6470082533908826985ULL","target->hit<before",
+                      "ITEM_LOYAL","saved->questmaker"):
+            self.assertIn(token,native)
+        ammo=(ROOT/"tests/test_drow_ammo.c").read_text()
+        for token in ('"--null-caster"','"--missing-player"','"--null-argument"',
+                      'do_shoot(NULL,"north target")','do_shoot(&actor,NULL)',
+                      "assert(!memcmp(&before,&pc,sizeof pc))",
+                      "for(int i=0;i<6;++i)shooting_context(i)"):
+            self.assertIn(token,ammo)
+
 if __name__ == "__main__":
     unittest.main()
