@@ -124,6 +124,23 @@ boundaries. It uses real saved/reloaded player targets, checks Guardian notices,
 room-list membership and unchanged HP/mana/DP/training. This is test coverage,
 not a new travel policy or a blanket restriction on travel out of origin rooms.
 
+## Skip Disc
+
+After learning `prayer self skipdisc`, use `skipdisc` to toggle flight.
+The native toggle costs no DP or mana, including at zero DP. Air and deep-water
+exits use the existing movement checks: flight lets you cross, and switching it
+off can prevent leaving that terrain until you fly again. Other exit restrictions
+still apply.
+
+The learned initiative and avoidance bonuses do not require the flight toggle
+to be on. Learning and flight state survive normal player saves. Skip Disc uses
+the existing shared flight flag; it does not track a separate flight source, so
+using it while already flying turns that shared flag off.
+
+The real-world audit checks class/training gates, unchanged resources, both saved
+flight states and all six movement directions through air and deep water.
+This adds coverage without changing travel rules, costs or flight ownership.
+
 ## Class equipment
 
 The crafting command is **`drowarmor`**, not `classeq`.

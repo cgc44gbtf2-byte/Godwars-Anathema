@@ -355,6 +355,90 @@ static void toggles(void)
     command("readaura");command("scry");
 }
 
+static void skipdisc_travel(void)
+{
+    long original_class=actor->class,original_powers=actor->pcdata->drow[DROW_POWERS];
+    long original_affects=actor->affected_by,original_points=actor->pcdata->classpoints[CP_CURRENT];
+    long original_sector=arena.sector_type;
+    long mana=actor->mana,hit=actor->hit;
+    const long classes[]={CLASS_DROW,CLASS_MAGE};
+    const long points[]={0,123456};
+    for(unsigned cls=0;cls<2;++cls)
+        for(int learned=0;learned<2;++learned)
+            for(int flying=0;flying<2;++flying)
+                for(unsigned funds=0;funds<2;++funds) {
+                    actor->class=classes[cls];
+                    actor->pcdata->drow[DROW_POWERS]=learned?DROW_SKIP:0;
+                    actor->affected_by=original_affects&~AFF_FLYING;
+                    if(flying)SET_BIT(actor->affected_by,AFF_FLYING);
+                    actor->pcdata->classpoints[CP_CURRENT]=points[funds];
+                    long before_speed=get_speed(actor);
+                    command("skipdisc");
+                    bool permitted=cls==0&&learned;
+                    assert(!!IS_AFFECTED(actor,AFF_FLYING)==(permitted?!flying:flying));
+                    assert(actor->affected_by==((original_affects&~AFF_FLYING)|
+                           ((permitted?!flying:flying)?AFF_FLYING:0)));
+                    assert(actor->pcdata->drow[DROW_POWERS]==(learned?DROW_SKIP:0));
+                    assert(actor->pcdata->classpoints[CP_CURRENT]==points[funds]);
+                    assert(actor->mana==mana&&actor->hit==hit&&get_speed(actor)==before_speed);
+                    if(cls)assert(strstr(output,"Huh?"));
+                    else if(!learned)assert(strstr(output,"obtain skip disc first"));
+                    else assert(strstr(output,flying?"leap off":"leap onto"));
+                }
+    actor->class=CLASS_DROW;actor->pcdata->drow[DROW_POWERS]=original_powers|DROW_SKIP;
+    actor->pcdata->classpoints[CP_CURRENT]=0;
+    actor->affected_by=original_affects&~AFF_FLYING;
+    /* The learned speed bonus is independent of whether flight is toggled on. */
+    long learned_speed=get_speed(actor);
+    REMOVE_BIT(actor->pcdata->drow[DROW_POWERS],DROW_SKIP);
+    assert(get_speed(actor)==learned_speed+3);
+    SET_BIT(actor->pcdata->drow[DROW_POWERS],DROW_SKIP);
+    for(int flying=0;flying<2;++flying) {
+        if(flying)SET_BIT(actor->affected_by,AFF_FLYING);
+        else REMOVE_BIT(actor->affected_by,AFF_FLYING);
+        assert(save_char_obj_checked(actor));
+        DESCRIPTOR_DATA reload={0};assert(load_char_obj(&reload,"NativeDrow"));
+        assert(reload.character->class==CLASS_DROW);
+        assert(get_drow(reload.character,DROW_SKIP));
+        assert(!!IS_AFFECTED(reload.character,AFF_FLYING)==flying);
+        assert(reload.character->pcdata->classpoints[CP_CURRENT]==0);
+        free_char(reload.character);
+    }
+    REMOVE_BIT(actor->affected_by,AFF_FLYING);
+    const char *directions[]={"north","east","south","west","up","down"};
+    const int reverse[]={2,3,0,1,5,4};
+    const long sectors[]={SECT_AIR,SECT_WATER_NOSWIM};
+    for(unsigned terrain=0;terrain<2;++terrain)
+        for(int dir=0;dir<6;++dir) {
+            ROOM_INDEX_DATA destination={0};EXIT_DATA outward={0},homeward={0};
+            destination.vnum=999904;destination.name="Skip Disc travel audit";
+            destination.description="";destination.area=&area;destination.light=1;
+            destination.sector_type=sectors[terrain];arena.sector_type=SECT_INSIDE;
+            EXIT_DATA *saved=arena.exit[dir];outward.to_room=&destination;
+            homeward.to_room=&arena;arena.exit[dir]=&outward;
+            destination.exit[reverse[dir]]=&homeward;
+            command(directions[dir]);assert(actor->in_room==&arena);
+            assert(strstr(output,terrain?"need a boat":"can't fly"));
+            command("skipdisc");assert(IS_AFFECTED(actor,AFF_FLYING));
+            command(directions[dir]);assert(actor->in_room==&destination);
+            command("skipdisc");assert(!IS_AFFECTED(actor,AFF_FLYING));
+            command(directions[reverse[dir]]);assert(actor->in_room==&destination);
+            assert(strstr(output,terrain?"need a boat":"can't fly"));
+            command("skipdisc");assert(IS_AFFECTED(actor,AFF_FLYING));
+            command(directions[reverse[dir]]);assert(actor->in_room==&arena);
+            command("skipdisc");assert(!IS_AFFECTED(actor,AFF_FLYING));
+            assert(destination.people==NULL);
+            assert(actor->pcdata->classpoints[CP_CURRENT]==0&&actor->mana==mana&&actor->hit==hit);
+            assert(get_speed(actor)==learned_speed);
+            arena.exit[dir]=saved;
+        }
+    actor->class=original_class;actor->pcdata->drow[DROW_POWERS]=original_powers;
+    actor->affected_by=original_affects;actor->pcdata->classpoints[CP_CURRENT]=original_points;
+    arena.sector_type=original_sector;
+    puts("Native Drow Skip Disc: class/training gates, zero-DP toggles, saved flight, "
+         "learned speed bonus and all six air/deep-water exit directions passed.");
+}
+
 static void upkeep_check(long powers,long speed)
 {
     actor->pcdata->drow[DROW_POWERS]=powers;
@@ -865,8 +949,11 @@ int main(int argc,char **argv)
     else if(argc==2&&!strcmp(argv[1],"--dimensional-travel")) {
         prayers();dimensional_travel();
     }
+    else if(argc==2&&!strcmp(argv[1],"--skipdisc-travel")) {
+        prayers();skipdisc_travel();
+    }
     else {
-        prayers();equipment_use();toggles();training_and_reports();prayer_menu();house_training();house_commands();communication();dimensional_travel();
+        prayers();equipment_use();toggles();training_and_reports();prayer_menu();house_training();house_commands();communication();dimensional_travel();skipdisc_travel();
         if(argc==2&&!strcmp(argv[1],"--spider"))spider();
         else {equipment();dual_wield();combat_and_travel();spider();}
     }

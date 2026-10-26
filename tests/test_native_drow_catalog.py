@@ -169,5 +169,15 @@ class NativeDrowCatalog(unittest.TestCase):
                       'assert(destination.people==NULL)'):
             self.assertIn(token,fixture)
 
+    def test_skipdisc_travel_uses_real_movement_and_saved_state(self):
+        fixture=(ROOT/"tests/test_native_drow.c").read_text()
+        for token in ('"--skipdisc-travel"','CLASS_DROW,CLASS_MAGE',
+                      'SECT_AIR,SECT_WATER_NOSWIM','dir<6',
+                      'command(directions[dir])','command(directions[reverse[dir]])',
+                      'get_speed(actor)==learned_speed+3',
+                      'assert(!!IS_AFFECTED(reload.character,AFF_FLYING)==flying)',
+                      'points[]={0,123456}','assert(destination.people==NULL)'):
+            self.assertIn(token,fixture)
+
 if __name__ == "__main__":
     unittest.main()
