@@ -579,6 +579,7 @@ void game_loop_mac_msdos( void )
 	DESCRIPTOR_DATA *d;
 
         combat_status_update();
+        gargoyle_reflection_pulse();
 
 	/*
 	 * Process input.
@@ -814,6 +815,7 @@ void game_loop_unix( int control )
 	long maxdesc;
 
         combat_status_update();
+        gargoyle_reflection_pulse();
 
 #if defined(MALLOC_DEBUG)
 	if ( malloc_verify( ) != 1 )

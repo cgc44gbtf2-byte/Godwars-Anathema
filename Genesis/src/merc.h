@@ -1534,6 +1534,7 @@ struct	char_data
     long		wait;
     /* Transient combat state; never serialized into player saves. */
     long                combat_pause;
+    unsigned long       gargoyle_reflection_id; /* Runtime only; clear_char resets it. */
     long                stun_immunity;
     long                highland_guard;
     long                highland_riposte;
@@ -3290,6 +3291,7 @@ bool	is_safe		args( ( CHAR_DATA *ch, CHAR_DATA *victim ) );
 bool	auto_safe	args( ( CHAR_DATA *ch, CHAR_DATA *victim ) );
 bool	hurt_fighting	args( ( CHAR_DATA *ch, CHAR_DATA *victim ) );
 void	hurt_person	args( ( CHAR_DATA *ch, CHAR_DATA *victim, long dam ) );
+void gargoyle_reflection_pulse(void);
 void	killperson	args( ( CHAR_DATA *ch, CHAR_DATA *victim ) );
 void	death_message	args( ( CHAR_DATA *ch, CHAR_DATA *victim ) );
 long	dambonus	args( ( CHAR_DATA *ch, CHAR_DATA *victim, long dam ) );

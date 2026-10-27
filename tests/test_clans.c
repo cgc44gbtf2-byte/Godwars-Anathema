@@ -1068,6 +1068,150 @@ static void gargoyle(void)
     }
 }
 
+static void reflection_fixture(long rank, bool stone)
+{
+    fixture(CLASS_VAMPIRE);
+    pcs[0].cland[0] = VAMPIRE_BUILD_GARGOYLE;
+    pcs[0].powers[DISC_THAUMATURGY] = rank;
+    if (stone) SET_BIT(actors[0].polyaff, POLY_GARGOYLE_STATUE);
+    actors[0].fighting = &actors[1];
+    actors[1].fighting = &actors[0];
+    actors[0].position = actors[1].position = POS_FIGHTING;
+}
+
+static void gargoyle_reflection(void)
+{
+    const long amounts[] = {0, 1, 3, 7, 8, 99, 1000, 1001};
+    for (long rank = -1; rank <= 6; ++rank)
+        for (int stone = 0; stone <= 1; ++stone)
+            for (int wrapped = 0; wrapped <= 1; ++wrapped)
+                for (size_t n = 0; n < sizeof amounts / sizeof amounts[0]; ++n) {
+                    reflection_fixture(rank, stone);
+                    long taken = gargoyle_damage(&actors[0], amounts[n]);
+                    long reflected = rank == 5 && stone ? taken / 4 : 0;
+                    if (wrapped) damage(&actors[1], &actors[0], amounts[n],
+                                        TYPE_UNARMED, "test reflection");
+                    else hurt_person(&actors[1], &actors[0], amounts[n]);
+                    assert(actors[0].hit == 10000 - taken);
+                    assert(actors[1].hit == 10000); /* Never inside the attack stack. */
+                    gargoyle_reflection_pulse();
+                    assert(actors[1].hit == 10000 - reflected);
+                    gargoyle_reflection_pulse();
+                    assert(actors[1].hit == 10000 - reflected);
+                }
+
+    reflection_fixture(5, TRUE);
+    hurt_person(&actors[0], &actors[0], 1000);
+    hurt_person(&actors[1], &actors[0], -100);
+    gargoyle_reflection_pulse();
+    assert(actors[0].hit == 9100 && actors[1].hit == 10000);
+
+    reflection_fixture(5, TRUE);
+    hurt_person(&actors[1], &actors[0], 1000);
+    hurt_person(&actors[1], &actors[0], 1000);
+    gargoyle_reflection_pulse();
+    assert(actors[0].hit == 9000 && actors[1].hit == 9750);
+
+    reflection_fixture(5, TRUE);
+    pcs[1].cland[0] = VAMPIRE_BUILD_GARGOYLE;
+    pcs[1].powers[DISC_THAUMATURGY] = 5;
+    actors[1].polyaff = POLY_GARGOYLE_STATUE;
+    hurt_person(&actors[1], &actors[0], 1000);
+    gargoyle_reflection_pulse();
+    assert(actors[0].hit == 9500 && actors[1].hit == 9938);
+    gargoyle_reflection_pulse(); /* Two statues never reflect reflections. */
+    assert(actors[0].hit == 9500 && actors[1].hit == 9938);
+
+    reflection_fixture(5, TRUE);
+    actors[0].max_hit = actors[1].hit = actors[1].max_hit = LONG_MAX;
+    for (int n = 0; n < 20; ++n) {
+        actors[0].hit = LONG_MAX;
+        hurt_person(&actors[1], &actors[0], LONG_MAX);
+    }
+    gargoyle_reflection_pulse(); /* Saturating accumulation, never signed overflow. */
+    assert(actors[1].hit == 0);
+
+    for (int invalid = 0; invalid < 7; ++invalid) {
+        reflection_fixture(5, TRUE);
+        hurt_person(&actors[1], &actors[0], 1000);
+        switch (invalid) {
+        case 0: actors[0].polyaff = 0; break;
+        case 1: pcs[0].powers[DISC_THAUMATURGY] = 4; break;
+        case 2: actors[1].in_room = &elsewhere; break;
+        case 3: char_list = &actors[1]; break;
+        case 4: SET_BIT(room.room_flags, ROOM_SAFE); break;
+        case 5: actors[1].hit = 0; actors[1].position = POS_DEAD; break;
+        case 6: actors[0].hit = 0; actors[0].position = POS_STUNNED; break;
+        }
+        gargoyle_reflection_pulse();
+        assert(actors[1].hit == (invalid == 5 ? 0 : 10000));
+    }
+
+    reflection_fixture(5, TRUE);
+    hurt_person(&actors[1], &actors[0], 1000);
+    unsigned long old_id = actors[1].gargoyle_reflection_id;
+    CHAR_DATA replacement = actors[1];
+    clear_char(&actors[1]); /* Pooled address reuse must invalidate old events. */
+    assert(actors[1].gargoyle_reflection_id == 0);
+    replacement.gargoyle_reflection_id = actors[1].gargoyle_reflection_id;
+    actors[1] = replacement;
+    hurt_person(&actors[1], &actors[0], 1000);
+    assert(actors[1].gargoyle_reflection_id != old_id);
+    gargoyle_reflection_pulse();
+    assert(actors[1].hit == 9875);
+
+    /* A reflected killing blow extracts a real pooled NPC. Another queued
+     * reflection at the same freed pointer must be discarded, not dereferenced. */
+    reflection_fixture(5, TRUE);
+    static MOB_INDEX_DATA index;
+    static OBJ_INDEX_DATA corpse;
+    memset(&index, 0, sizeof index);
+    memset(&corpse, 0, sizeof corpse);
+    index.vnum = 30991;
+    /* Real mobile prototypes borrow strings from the boot string arena. */
+    const char *prototype_strings[] = {"reflectiondummy", "a reflection dummy",
+                                      "A reflection dummy stands here.", ""};
+    char **prototype_fields[] = {&index.player_name, &index.short_descr,
+                                &index.long_descr, &index.description};
+    for (size_t n = 0; n < 4; ++n) {
+        strcpy(top_string, prototype_strings[n]);
+        *prototype_fields[n] = top_string;
+        top_string += strlen(top_string) + 1;
+    }
+    index.act = ACT_IS_NPC; index.level = 1;
+    corpse.vnum = OBJ_VNUM_CORPSE_NPC;
+    corpse.name = "corpse";
+    corpse.short_descr = "the corpse of %s";
+    corpse.description = "The corpse of %s lies here.";
+    corpse.item_type = ITEM_CORPSE_NPC;
+    OBJ_INDEX_DATA *old_corpse = obj_index_hash[corpse.vnum % MAX_KEY_HASH];
+    corpse.next = old_corpse;
+    obj_index_hash[corpse.vnum % MAX_KEY_HASH] = &corpse;
+    ROOM_INDEX_DATA *old_disconnect =
+        room_index_hash[ROOM_VNUM_DISCONNECTION % MAX_KEY_HASH];
+    elsewhere.vnum = ROOM_VNUM_DISCONNECTION;
+    elsewhere.next = old_disconnect;
+    room_index_hash[ROOM_VNUM_DISCONNECTION % MAX_KEY_HASH] = &elsewhere;
+    exp_info.exp = 100; exp_info.bit = 0;
+    CHAR_DATA *npc = create_mobile(&index);
+    char_to_room(npc, &room);
+    npc->hit = npc->max_hit = 10;
+    npc->position = POS_FIGHTING;
+    pcs[2].cland[0] = VAMPIRE_BUILD_GARGOYLE;
+    pcs[2].powers[DISC_THAUMATURGY] = 5;
+    actors[2].polyaff = POLY_GARGOYLE_STATUE;
+    hurt_person(npc, &actors[0], 1000);
+    hurt_person(npc, &actors[2], 1000);
+    gargoyle_reflection_pulse();
+    for (CHAR_DATA *live = char_list; live != NULL; live = live->next)
+        assert(live != npc);
+    assert(index.count == 0);
+    while (room.contents != NULL) extract_obj(room.contents);
+    obj_index_hash[corpse.vnum % MAX_KEY_HASH] = old_corpse;
+    room_index_hash[ROOM_VNUM_DISCONNECTION % MAX_KEY_HASH] = old_disconnect;
+    puts("Gargoyle reflection: 256 rank/form/path/rounding pairs and lifecycle guards passed");
+}
+
 int main(void)
 {
     char root[] = "/tmp/anathema-clans-XXXXXX", original[4096];
@@ -1092,6 +1236,7 @@ int main(void)
     enrollment_recovery();
     nightstalker();
     gargoyle();
+    gargoyle_reflection();
     clan_registry_close();
     char_list = NULL; descriptor_list = NULL;
     for (int i = 0; i < 5; ++i) free_string(actors[i].clan);

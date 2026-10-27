@@ -31,6 +31,95 @@
 
 void dam_message( CHAR_DATA *ch, CHAR_DATA *victim, long dam, long type, char *message );
 
+/* Retaliation is deferred until the next input-loop boundary: legacy callers
+ * may still use the attacker after hurt_person returns. Never free it there. */
+struct gargoyle_reflection {
+    struct gargoyle_reflection *next;
+    CHAR_DATA *source, *target;
+    ROOM_INDEX_DATA *room;
+    unsigned long source_id, target_id;
+    long amount;
+};
+static struct gargoyle_reflection *gargoyle_reflections;
+static unsigned long gargoyle_next_reflection_id = 1;
+static bool gargoyle_dispatching_reflection;
+
+static unsigned long gargoyle_reflection_id(CHAR_DATA *ch)
+{
+    if (ch->gargoyle_reflection_id == 0 && gargoyle_next_reflection_id != 0) {
+        ch->gargoyle_reflection_id = gargoyle_next_reflection_id;
+        gargoyle_next_reflection_id = gargoyle_next_reflection_id == ULONG_MAX ?
+            0 : gargoyle_next_reflection_id + 1;
+    }
+    return ch->gargoyle_reflection_id;
+}
+
+static CHAR_DATA *gargoyle_reflection_live(CHAR_DATA *candidate, unsigned long id)
+{
+    CHAR_DATA *ch;
+    /* Establish membership before dereferencing a possibly recycled pointer. */
+    for (ch = char_list; ch != NULL; ch = ch->next)
+        if (ch == candidate)
+            return id != 0 && ch->gargoyle_reflection_id == id ? ch : NULL;
+    return NULL;
+}
+
+static void gargoyle_reflect_later(CHAR_DATA *source, CHAR_DATA *target, long amount)
+{
+    struct gargoyle_reflection *entry;
+    unsigned long source_id, target_id;
+    if (amount <= 0 || !combat_pair_in_room(source->in_room, source, target)) return;
+    source_id = gargoyle_reflection_id(source);
+    target_id = gargoyle_reflection_id(target);
+    if (source_id == 0 || target_id == 0) return; /* Never wrap an identity. */
+    /* Coalesce hits per live pair and pulse, rather than allocate per hit. */
+    for (entry = gargoyle_reflections; entry != NULL; entry = entry->next)
+        if (entry->source == source && entry->target == target &&
+            entry->source_id == source_id && entry->target_id == target_id &&
+            entry->room == source->in_room) {
+            entry->amount = entry->amount > LONG_MAX - amount ?
+                LONG_MAX : entry->amount + amount;
+            return;
+        }
+    entry = malloc(sizeof(*entry));
+    if (entry == NULL) return;
+    entry->source = source;
+    entry->target = target;
+    entry->room = source->in_room;
+    entry->source_id = source_id;
+    entry->target_id = target_id;
+    entry->amount = amount;
+    entry->next = gargoyle_reflections;
+    gargoyle_reflections = entry;
+}
+
+void gargoyle_reflection_pulse(void)
+{
+    struct gargoyle_reflection *entry;
+    if (gargoyle_dispatching_reflection) return;
+    gargoyle_dispatching_reflection = TRUE;
+    while ((entry = gargoyle_reflections) != NULL) {
+        CHAR_DATA *source, *target;
+        ROOM_INDEX_DATA *room = entry->room;
+        long amount = entry->amount;
+        gargoyle_reflections = entry->next;
+        source = gargoyle_reflection_live(entry->source, entry->source_id);
+        target = gargoyle_reflection_live(entry->target, entry->target_id);
+        free(entry);
+        if (source == NULL || target == NULL ||
+            !combat_pair_in_room(room, source, target) ||
+            !gargoyle_statue(source) || gargoyle_visceratika(source) != 5 ||
+            is_safe(source, target)) continue;
+        act("Your stone body reflects damage back at $N.", source, NULL, target, TO_CHAR);
+        act("$n's stone body reflects damage back at you!", source, NULL, target, TO_VICT);
+        /* Direct HP path retains normal mitigation/death credit, but suppresses
+         * all new reflection events throughout this dispatch (no bounce loops).
+         * Either actor can be extracted here: do not touch them afterwards. */
+        hurt_person(source, target, amount);
+    }
+    gargoyle_dispatching_reflection = FALSE;
+}
+
 void damage( CHAR_DATA *ch, CHAR_DATA *victim, long dam, long dt, char *message )
 {
     ROOM_INDEX_DATA *combat_room;
@@ -190,7 +279,9 @@ bool hurt_fighting( CHAR_DATA *ch, CHAR_DATA *victim )
 void hurt_person( CHAR_DATA *ch, CHAR_DATA *victim, long dam )
 {
     ROOM_INDEX_DATA *actor_room = ch != NULL ? ch->in_room : NULL;
+    long hit_before;
     if (ch == NULL || victim == NULL) return;
+    hit_before = victim->hit > 0 ? victim->hit : 0;
     /* Shared HP boundary covers melee and direct book/spell damage once.
      * Never discount signed healing or self-inflicted costs. */
     if (ch != victim) dam = gargoyle_damage(victim, dam);
@@ -202,6 +293,11 @@ void hurt_person( CHAR_DATA *ch, CHAR_DATA *victim, long dam )
     if (IS_IMM(victim) && victim->hit < 1) victim->hit = victim->max_hit;
 
     update_pos(victim);
+
+    if (!gargoyle_dispatching_reflection && ch != victim && dam > 0 &&
+        gargoyle_statue(victim) && gargoyle_visceratika(victim) == 5 &&
+        victim->hit > 0 && victim->hit < hit_before)
+        gargoyle_reflect_later(victim, ch, (hit_before - victim->hit) / 4);
 
     switch(victim->position)
     {

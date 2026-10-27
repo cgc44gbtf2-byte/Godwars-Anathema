@@ -4,6 +4,8 @@ def once(text,new,old=""):
     return text.replace(new,old,1)
 
 def without_aux_shutdown_stage(text):
+    from gargoyle_reflection_source import without_gargoyle_reflection
+    text = without_gargoyle_reflection(text)
     from note_editor_source import without_note_editor_stage
     text=without_note_editor_stage(text)
     scopes=(

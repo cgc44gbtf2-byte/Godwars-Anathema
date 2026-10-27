@@ -3,6 +3,7 @@ import hashlib
 from pathlib import Path
 import unittest
 from gargoyle_source import PROOFS, without_gargoyle_stage
+from gargoyle_reflection_source import PROOFS as REFLECTION_PROOFS, without_gargoyle_reflection
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -11,6 +12,28 @@ def blob(text):
     return hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
 
 class GargoyleCatalog(unittest.TestCase):
+    def test_reflection_native_inverse_and_mutation_guards(self):
+        self.assertEqual(len(REFLECTION_PROOFS), 3)
+        for path, expected, hunks in REFLECTION_PROOFS:
+            text = (ROOT / path).read_text()
+            self.assertEqual(blob(without_gargoyle_reflection(text)), expected)
+            self.assertEqual(without_gargoyle_reflection(
+                without_gargoyle_reflection(text)), without_gargoyle_reflection(text))
+            for new, _ in hunks:
+                self.assertEqual(text.count(new), 2 if path.endswith("/comm.c") else 1)
+                mutated = text.replace(new, new + "\n/* mutation */\n", 1)
+                self.assertNotEqual(blob(without_gargoyle_reflection(mutated)), expected)
+
+    def test_reflection_is_rank_five_actual_damage_and_deferred(self):
+        damage = (ROOT / "Genesis/src/combat_damage.c").read_text()
+        for part in ("gargoyle_visceratika(victim) == 5", "(hit_before - victim->hit) / 4",
+                     "!gargoyle_dispatching_reflection", "gargoyle_reflection_live",
+                     "entry->source_id == source_id", "LONG_MAX - amount"):
+            self.assertIn(part, damage)
+        comm = (ROOT / "Genesis/src/comm.c").read_text()
+        self.assertEqual(comm.count("        gargoyle_reflection_pulse();"), 2)
+        self.assertIn("gargoyle_reflection();", (ROOT / "tests/test_clans.c").read_text())
+
     def test_thirteen_native_modules_restore_exact_base(self):
         self.assertEqual(len(PROOFS), 13)
         for path, expected, _ in PROOFS:

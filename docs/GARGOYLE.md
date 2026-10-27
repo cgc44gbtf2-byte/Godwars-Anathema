@@ -38,7 +38,22 @@ apply **only in this form**, once—not as another stacked passive defense.
 `stoneform off` returns to flesh; `stoneform status` reports the state.
 Entry and exit have 12 ticks of action recovery, with no additional resource
 charge. Entry can occur during combat but does not stop opponents attacking.
-It grants no extra healing, teleport immunity, flight or offensive bonus.
+It grants no extra healing, teleport immunity or flight.
+
+At **Visceratika 5**, a surviving statue passively reflects **25% of HP damage
+actually taken after mitigation**, rounded down per hit. This is retaliation,
+not another damage reduction. Healing, self-inflicted costs, zero damage and
+lower ranks do not trigger it. Shared HP-path defenses, including another
+statue's mitigation, still apply; reflection is not a weapon attack.
+Reflections cannot themselves trigger reflection or attack-proc chains.
+
+Retaliation resolves at the next game-input pulse, outside the original attack
+stack, and can kill an attacker with normal kill credit. Hits against the same
+pair are coalesced. Both characters must still be valid, in the original room,
+and eligible under normal combat safety; the defender must still be a trained
+stone statue. Leaving stone form, losing training or becoming incapacitated
+cancels pending retaliation. Runtime identities reject extracted/recycled actors.
+Pending retaliation is transient and is not saved across logout or copyover.
 
 While petrified, voluntary movement (including following), weapon attacks and
 active powers are blocked. Read-only commands, save/quit, chat/tell/reply and
