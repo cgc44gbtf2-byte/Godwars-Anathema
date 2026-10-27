@@ -48,6 +48,7 @@ void combat_status_update(void)
     for (ch = char_list; ch != NULL; ch = ch->next)
     {
         guardian_reconcile(ch);
+        gargoyle_reconcile(ch);
         if (ch->combat_pause > 0) --ch->combat_pause;
         if (ch->stun_immunity > 0) --ch->stun_immunity;
         if (ch->highland_guard > 0) --ch->highland_guard;

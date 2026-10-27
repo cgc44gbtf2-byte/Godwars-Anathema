@@ -1794,6 +1794,32 @@ void do_fetishdoll( CHAR_DATA *ch, char *argument )
 
 void do_camouflage( CHAR_DATA *ch, char *argument )
 {
+    if (IS_GARGOYLE(ch))
+    {
+        if (ch->in_room == NULL || ch->hit <= 0 || ch->wait > 0 ||
+            ch->position < POS_FIGHTING || IS_MORE(ch, MORE_NPC) ||
+            IS_MORE(ch, MORE_HEAD) || IS_EXTRA(ch, EXTRA_OSWITCH) ||
+            IS_COMBAT_PAUSED(ch))
+        {
+            stc("You cannot camouflage in your current state.\n\r", ch);
+            return;
+        }
+        if (gargoyle_visceratika(ch) < 1)
+        {
+            stc("Visceratika 1 is required for Skin of the Chameleon.\n\r", ch);
+            return;
+        }
+        if (IS_AFFECTED(ch, AFF_HIDE))
+        {
+            stc("You are already camouflaging yourself.\n\r", ch);
+            return;
+        }
+        act("$n's skin changes texture and colour.", ch, NULL, NULL, TO_ROOM);
+        stc("You activate Skin of the Chameleon.\n\r", ch);
+        SET_BIT(ch->affected_by, AFF_HIDE);
+        WAIT_STATE(ch, 12);
+        return;
+    }
     if (!IS_WEREWOLF(ch))
     {
 	stc("Huh?\n\r", ch);

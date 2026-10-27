@@ -222,6 +222,7 @@ long get_disc( CHAR_DATA *ch, long disc )
     long max = 7;
 
     if (!IS_VAMPIRE(ch)) return 0;
+    if (IS_GARGOYLE(ch) && disc == DISC_THAUMATURGY) return 0;
 
     if (disc < DISC_ANIMALISM || disc > DISC_MAX)
     {
@@ -236,6 +237,7 @@ long get_disc( CHAR_DATA *ch, long disc )
 long get_truedisc( CHAR_DATA *ch, long disc )
 {
     if (!IS_VAMPIRE(ch)) return 0;
+    if (IS_GARGOYLE(ch) && disc == DISC_THAUMATURGY) return 0;
 
     if (disc < DISC_ANIMALISM || disc > DISC_MAX)
     {
@@ -962,6 +964,8 @@ void show_char_to_char_1( CHAR_DATA *victim, CHAR_DATA *ch )
     buf[0] = UPPER(buf[0]);
     send_to_char( buf, ch );
 
+    if (gargoyle_statue(victim))
+        act("$N stands motionless as a defensive stone statue.", ch, NULL, victim, TO_CHAR);
     if (IS_WEREWOLF(victim))
     {
 	if (IS_MORE(victim, MORE_BRISTLES) && IS_SET(victim->act, PLR_WOLFMAN))

@@ -115,3 +115,5 @@ by this stage**. No existing character is automatically converted. Do not
 advertise Fae or the remaining variants as playable yet. Nightstalker is the
 first native variant; its explicit selection and consent recruitment are
 described in [NIGHTSTALKER.md](NIGHTSTALKER.md).
+Gargoyle is the native Vampire variant with replacement Visceratika progression;
+see [GARGOYLE.md](GARGOYLE.md) for commands, recruitment and downgrade limits.

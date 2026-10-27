@@ -588,6 +588,7 @@
    { "watercontrol",    do_watercontrol,POS_FIGHTING,	LEV_AWA,  LOG_NORMAL	},
    { "windblades",      do_windblades,	POS_FIGHTING,	LEV_AWA,  LOG_NORMAL	},
    { "stoneblast",      do_stoneblast,	POS_FIGHTING,	LEV_AWA,  LOG_NORMAL	},
+   { "stoneform",       do_stoneform, POS_FIGHTING, LEV_AWA, LOG_NORMAL },
    { "localquake",      do_localquake,	POS_FIGHTING,	LEV_AWA,  LOG_NORMAL	},
    { "solarflash",      do_solarflash,	POS_FIGHTING,	LEV_AWA,  LOG_NORMAL	},
    { "holyaura",        do_holyaura,	POS_STANDING,	LEV_AWA,  LOG_NORMAL	},
@@ -2659,6 +2660,7 @@
       direct_input = ch->desc != NULL && ch->desc->character == ch
           && ch->desc->original == NULL && ch->desc->connected == CON_PLAYING
           && argument == ch->desc->incomm;
+      gargoyle_reconcile(ch);
       if (IS_COMBAT_PAUSED(ch))
       {
          send_to_char("You are still recovering from a combat interruption.\n\r", ch);
@@ -2963,6 +2965,22 @@
          }
       }
    
+      if (gargoyle_statue(ch))
+      {
+         const char *name = found ? cmd_table[cmd].name : "";
+         if (str_cmp(name, "stoneform") && str_cmp(name, "look") &&
+             str_cmp(name, "score") && str_cmp(name, "help") &&
+             str_cmp(name, "who") && str_cmp(name, "save") &&
+             str_cmp(name, "quit") && str_cmp(name, "copyover") &&
+             str_cmp(name, "inventory") &&
+             str_cmp(name, "equipment") && str_cmp(name, "exits") &&
+             str_cmp(name, "time") && str_cmp(name, "commands") &&
+             str_cmp(name, "afk") && str_cmp(name, "chat") &&
+             str_cmp(name, "tell") && str_cmp(name, "reply")) {
+            stc("You cannot act while a stone statue; use stoneform off.\n\r", ch);
+            return;
+         }
+      }
       if ( !found )
       {
       /*

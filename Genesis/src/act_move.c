@@ -68,6 +68,11 @@ void move_char( CHAR_DATA *ch, long door )
     char leave [20];
     long revdoor;
 
+    if (gargoyle_statue(ch)) {
+        stc("You cannot move while a stone statue.\n\r", ch);
+        return;
+    }
+
     if (IS_NPC(ch)) strcpy(dispname,ch->short_descr);
     else if (ch->morph[0] == '\0') strcpy(dispname,ch->name);
     else strcpy(dispname,ch->morph);

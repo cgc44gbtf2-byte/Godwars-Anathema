@@ -51,7 +51,7 @@ void one_hit( CHAR_DATA *ch, CHAR_DATA *victim, long dt, char *message )
     ROOM_INDEX_DATA *combat_room;
     long weapon_slot = WEAR_NONE;
 
-    if (ch == NULL || IS_COMBAT_PAUSED(ch)) return;
+    if (ch == NULL || IS_COMBAT_PAUSED(ch) || gargoyle_statue(ch)) return;
 
     /*
      * Can't beat a dead char!
@@ -711,7 +711,8 @@ void do_punch( CHAR_DATA *ch, char *argument )
     if (dam <= 0) dam = 1;
 
     if ((IS_WEREWOLF(victim) && get_tribe(victim, TRIBE_GET_OF_FENRIS) >= 5) 
-     || (IS_VAMPIRE(victim) && get_disc(victim, DISC_FORTITUDE) >= 7))
+     || (IS_VAMPIRE(victim) && get_disc(victim, DISC_FORTITUDE) >= 7)
+     || (gargoyle_statue(victim) && gargoyle_visceratika(victim) >= 4))
 	dam = 0;
 
     if (highlander_counter_parry(ch, victim, NULL, TYPE_BLUNT)) return;

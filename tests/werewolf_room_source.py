@@ -34,6 +34,8 @@ EDITS={
 }
 
 def without_werewolf_room_stage(text):
+    from gargoyle_source import without_gargoyle_stage
+    text = without_gargoyle_stage(text)
     changed=False
     for name,(before,after,edits) in EDITS.items():
         match=re.search(r"void do_"+name+r"\(.*?(?=\nvoid do_|\Z)",text,re.S)

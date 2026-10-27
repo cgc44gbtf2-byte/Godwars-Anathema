@@ -141,7 +141,8 @@ void multi_hit( CHAR_DATA *ch, CHAR_DATA *victim )
     long sn, dt, style;
     ROOM_INDEX_DATA *combat_room;
 
-    if (ch == NULL || victim == NULL || IS_COMBAT_PAUSED(ch)) return;
+    if (ch == NULL || victim == NULL || IS_COMBAT_PAUSED(ch) ||
+        gargoyle_statue(ch)) return;
     if (ch->position < POS_SLEEPING || is_safe(ch, victim)) return;
     combat_room = ch->in_room;
 

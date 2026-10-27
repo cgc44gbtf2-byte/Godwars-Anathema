@@ -317,7 +317,7 @@ void do_clandisc( CHAR_DATA *ch, char *argument )
 
     if ( IS_NPC(ch) ) return;
 
-    if ( !IS_VAMPIRE(ch) || !str_cmp(ch->clan, "Panders") || !str_cmp(ch->clan, "Caitiff") )
+    if ( !IS_VAMPIRE(ch) || IS_GARGOYLE(ch) || !str_cmp(ch->clan, "Panders") || !str_cmp(ch->clan, "Caitiff") )
     {
 	send_to_char( "Huh?\n\r", ch );
 	return;
@@ -562,6 +562,59 @@ void do_mask( CHAR_DATA *ch, char *argument )
     return;
 }
 
+void do_stoneform(CHAR_DATA *ch, char *argument)
+{
+    char arg[MAX_INPUT_LENGTH];
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL) return;
+    one_argument(argument, arg);
+    if (!str_cmp(arg, "status")) {
+        stc(gargoyle_statue(ch) ? "Stone form: immobile defensive statue.\n\r" :
+            "Stone form: inactive.\n\r", ch);
+        return;
+    }
+    if (arg[0] && str_cmp(arg, "on") && str_cmp(arg, "off")) {
+        stc("Syntax: stoneform [on|off|status].\n\r", ch);
+        return;
+    }
+    /* Exit never requires retained class/training, mana, blood or a valid room. */
+    if (!str_cmp(arg, "off") ||
+        (!arg[0] && IS_SET(ch->polyaff, POLY_GARGOYLE_STATUE))) {
+        if (!IS_SET(ch->polyaff, POLY_GARGOYLE_STATUE)) {
+            stc("You are not in stone form.\n\r", ch);
+            return;
+        }
+        REMOVE_BIT(ch->polyaff, POLY_GARGOYLE_STATUE);
+        stc("Your stone body returns to flesh.\n\r", ch);
+        if (ch->in_room != NULL) {
+            act("$n's stone body returns to flesh.", ch, NULL, NULL, TO_ROOM);
+            do_autosave(ch, "");
+        }
+        WAIT_STATE(ch, 12);
+        return;
+    }
+    if (gargoyle_statue(ch)) {
+        stc("You are already a stone statue.\n\r", ch);
+        return;
+    }
+    if (!IS_GARGOYLE(ch) || gargoyle_visceratika(ch) < 1) {
+        stc("Gargoyle Visceratika 1 is required for stone form.\n\r", ch);
+        return;
+    }
+    if (ch->in_room == NULL || ch->hit <= 0 || ch->wait > 0 ||
+        ch->position < POS_FIGHTING || IS_COMBAT_PAUSED(ch) ||
+        IS_MORE(ch, MORE_NPC) || IS_MORE(ch, MORE_HEAD) ||
+        IS_EXTRA(ch, EXTRA_OSWITCH) || ch->polyaff != 0 ||
+        IS_AFFECTED(ch, AFF_POLYMORPH)) {
+        stc("You cannot enter stone form in your current state or another form.\n\r", ch);
+        return;
+    }
+    SET_BIT(ch->polyaff, POLY_GARGOYLE_STATUE);
+    stc("You become an immobile defensive stone statue.\n\r", ch);
+    act("$n becomes a motionless stone statue.", ch, NULL, NULL, TO_ROOM);
+    WAIT_STATE(ch, 12);
+    do_autosave(ch, "");
+}
+
 void do_change( CHAR_DATA *ch, char *argument )
 {
     char arg [MAX_INPUT_LENGTH]; 
@@ -569,6 +622,11 @@ void do_change( CHAR_DATA *ch, char *argument )
     argument = one_argument( argument, arg ); 
 
     if (IS_NPC(ch)) return;
+
+    if (gargoyle_statue(ch)) {
+        stc("Leave stone form before changing shape.\n\r", ch);
+        return;
+    }
 
     if (!IS_VAMPIRE(ch))
     {
@@ -2816,7 +2874,7 @@ void do_discipline( CHAR_DATA *ch, char *argument )
 	send_to_char("Huh?\n\r",ch);
 	return;
     }
-    if(!str_cmp(ch->clan, "Caitiff") || !str_cmp(ch->clan, "Panders"))
+    if(!IS_GARGOYLE(ch) && (!str_cmp(ch->clan, "Caitiff") || !str_cmp(ch->clan, "Panders")))
 	max_d = 6;
     if ( arg[0] == '\0' )
     {
@@ -2875,7 +2933,7 @@ void do_discipline( CHAR_DATA *ch, char *argument )
 		    strcpy(disc,"Serpentis"); 
 		    break;
 		case DISC_THAUMATURGY: 
-		    strcpy(disc,"Thaumaturgy"); 
+		    strcpy(disc, IS_GARGOYLE(ch) ? "Visceratika" : "Thaumaturgy");
 		    break;
 		case DISC_VICISSITUDE: 
 		    strcpy(disc,"Vicissitude"); 
@@ -2885,7 +2943,8 @@ void do_discipline( CHAR_DATA *ch, char *argument )
 		capitalize( disc );
 
 	    sprintf( buf, "%-15s: %-2li       ",
-		disc, get_disc(ch, sn) );
+		disc, IS_GARGOYLE(ch) && sn == DISC_THAUMATURGY ?
+                    gargoyle_visceratika(ch) : get_disc(ch, sn) );
 	    send_to_char( buf, ch );
 	    if ( ++col % 3 == 0 ) send_to_char( "\n\r", ch );
 	    got_disc = TRUE;
@@ -2911,7 +2970,8 @@ void do_discipline( CHAR_DATA *ch, char *argument )
     else if (!str_cmp(arg,"protean")) improve = DISC_PROTEAN;
     else if (!str_cmp(arg,"quietus")) improve = DISC_QUIETUS;
     else if (!str_cmp(arg,"serpentis")) improve = DISC_SERPENTIS;
-    else if (!str_cmp(arg,"thaumaturgy")) improve = DISC_THAUMATURGY;
+    else if (!IS_GARGOYLE(ch) && !str_cmp(arg,"thaumaturgy")) improve = DISC_THAUMATURGY;
+    else if (IS_GARGOYLE(ch) && !str_cmp(arg,"visceratika")) improve = DISC_THAUMATURGY;
     else if (!str_cmp(arg,"vicissitude")) improve = DISC_VICISSITUDE;
     else
     {	send_to_char("You know of no such discipline.\n\r",ch);
@@ -2939,8 +2999,8 @@ void do_discipline( CHAR_DATA *ch, char *argument )
 
     else if (ch->pcdata->cland[0] == improve || 
 	ch->pcdata->cland[1] == improve || 
-	ch->pcdata->cland[2] == improve || !str_cmp(ch->clan, "Caitiff") 
-|| !str_cmp(ch->clan, "Panders"))
+	ch->pcdata->cland[2] == improve || (!IS_GARGOYLE(ch) &&
+        (!str_cmp(ch->clan, "Caitiff") || !str_cmp(ch->clan, "Panders"))))
     {
 	if (ch->pcdata->powers[improve] == -1) 
 	    cost = 5;
@@ -4473,6 +4533,7 @@ stc("   Camarilla:   Ventrue, Nosferatu, Brujah\n\r", ch);
 stc("   Independent: Assamite, Gangrel, Ravnos\n\r", ch);
 	stc("#pMage#n: Akashic, Celestial, Ecstasy, Dreamspeakers, Euthanatos, Hermes, Ether, Verbena, Virtual, Hollow\n\r", ch);
 stc("Ninja variant: autoclass ninja nightstalker (permanent class build).\n\r", ch);
+stc("Vampire variant: autoclass vampire gargoyle (Visceratika replaces Thaumaturgy).\n\r", ch);
 
 	return;
     }
@@ -4486,7 +4547,14 @@ stc("Ninja variant: autoclass ninja nightstalker (permanent class build).\n\r", 
 	    return;
 	}
 
-	if (!str_cmp(arg2, "ventrue"))
+        if (!str_cmp(arg2, "gargoyle"))
+        {
+            clan = "";
+            ch->pcdata->cland[0] = VAMPIRE_BUILD_GARGOYLE;
+            ch->pcdata->cland[1] = ch->pcdata->cland[2] = -1;
+            ch->pcdata->powers[DISC_THAUMATURGY] = -1;
+        }
+	else if (!str_cmp(arg2, "ventrue"))
 	{
     clan = "Ventrue";
 	    ch->pcdata->cland[0] = DISC_DOMINATE;
@@ -4574,7 +4642,8 @@ ch->class = CLASS_VAMPIRE;
 	ch->pcdata->powers[DISC_OBFUSCATE] = -1;
 	ch->pcdata->powers[DISC_POTENCE] = -1;
 	ch->pcdata->powers[DISC_PRESENCE] = -1;
-	stc("You are now a #rVampire#n.\n\r", ch);
+	stc(IS_GARGOYLE(ch) ? "You are now a Gargoyle.\n\r" :
+            "You are now a #rVampire#n.\n\r", ch);
     }
     else if (!str_cmp(arg1, "werewolf"))
     {

@@ -150,6 +150,7 @@ tests/test_class_runtime: tests/test_class_runtime.c $(ENGINE_SOURCES) $(ENGINE_
 
 check-layout:
 	python3 tests/test_nightstalker_catalog.py
+	python3 tests/test_gargoyle_catalog.py
 	python3 tests/test_class_layout.py
 	python3 tests/test_hybrid_training_catalog.py
 	python3 tests/test_hybrid_werewolf_training_catalog.py

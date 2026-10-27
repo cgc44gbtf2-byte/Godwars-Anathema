@@ -833,6 +833,241 @@ static void nightstalker(void)
     }
 }
 
+static void gargoyle(void)
+{
+    fixture(CLASS_VAMPIRE);
+    actors[0].class = CLASS_NONE;
+    for (int i = 0; i < 5; ++i) actors[0].stats[i] = 4;
+    run(0, "autoclass vampire gargoyle");
+    assert(IS_GARGOYLE(&actors[0]) && actors[0].vampgen == 9);
+    do_clandisc(&actors[0], "fortitude");
+    assert(pcs[0].cland[0] == VAMPIRE_BUILD_GARGOYLE &&
+           pcs[0].cland[1] == -1 && pcs[0].cland[2] == -1);
+    assert(!IS_GARGOYLE(NULL) && !IS_GARGOYLE(&actors[1]));
+    assert(pcs[0].cland[1] == -1 && pcs[0].cland[2] == -1);
+    assert(pcs[0].powers[DISC_THAUMATURGY] == -1);
+    actors[0].primal = 1000;
+    run(0, "discipline");
+    assert(strstr(outputs[0], "Visceratika") && !strstr(outputs[0], "Thaumaturgy"));
+    run(0, "discipline thaumaturgy");
+    assert(actors[0].primal == 1000);
+    for (long rank = 1; rank <= 5; ++rank) {
+        long before = actors[0].primal;
+        run(0, "discipline visceratika");
+        assert(gargoyle_visceratika(&actors[0]) == rank);
+        assert(actors[0].primal == before - rank * 15);
+        assert(get_disc(&actors[0], DISC_THAUMATURGY) == 0);
+        assert(get_truedisc(&actors[0], DISC_THAUMATURGY) == 0);
+        actors[0].hit = actors[0].max_hit;
+        assert(gargoyle_damage(&actors[0], 1000) == 1000);
+        SET_BIT(actors[0].polyaff, POLY_GARGOYLE_STATUE);
+        hurt_person(&actors[1], &actors[0], 1000);
+        assert(actors[0].hit == 10000 - 100 * (10 - rank));
+        REMOVE_BIT(actors[0].polyaff, POLY_GARGOYLE_STATUE);
+    }
+    long primal = actors[0].primal;
+    run(0, "discipline visceratika");
+    assert(gargoyle_visceratika(&actors[0]) == 5 && actors[0].primal == primal);
+    run(0, "teachdisc");
+    assert(strstr(outputs[0], "visceratika") && !strstr(outputs[0], "thaumaturgy"));
+
+    const long amounts[] = {LONG_MIN, -1, 0, 1, 9, 10, 11, 99, 100, 1000, LONG_MAX};
+    SET_BIT(actors[0].polyaff, POLY_GARGOYLE_STATUE);
+    for (long rank = -2; rank <= 8; ++rank) {
+        pcs[0].powers[DISC_THAUMATURGY] = rank;
+        for (size_t i = 0; i < sizeof amounts/sizeof amounts[0]; ++i) {
+            long expected = amounts[i];
+            if (rank >= 1 && rank <= 5 && expected > 0)
+                expected = (long)((__int128)expected * (10 - rank) / 10);
+            assert(gargoyle_damage(&actors[0], amounts[i]) == expected);
+            assert(gargoyle_damage(&actors[1], amounts[i]) == amounts[i]);
+        }
+    }
+    pcs[0].powers[DISC_THAUMATURGY] = 5;
+    actors[0].hit = actors[1].hit = 10000;
+    hurt_person(&actors[0], &actors[0], 1000);
+    hurt_person(&actors[0], &actors[1], 1000);
+    assert(actors[0].hit == 9000 && actors[1].hit == 9000);
+    hurt_person(&actors[1], &actors[0], -100);
+    assert(actors[0].hit == 9100);
+    pcs[0].player_load_failed = TRUE;
+    assert(!IS_GARGOYLE(&actors[0]) && gargoyle_damage(&actors[0], 1000) == 1000);
+    pcs[0].player_load_failed = FALSE;
+    REMOVE_BIT(actors[0].polyaff, POLY_GARGOYLE_STATUE);
+
+    for (long rank = 0; rank <= 5; ++rank) {
+        pcs[0].powers[DISC_THAUMATURGY] = rank;
+        actors[0].affected_by = 0; actors[0].wait = 0;
+        run(0, "camouflage");
+        assert(!!IS_AFFECTED(&actors[0], AFF_HIDE) == (rank > 0));
+        assert(actors[0].wait == (rank > 0 ? 12 : 0));
+    }
+    actors[0].affected_by = 0;
+    run(0, "camouflage"); /* Still recovering: no nested-command bypass. */
+    assert(!IS_AFFECTED(&actors[0], AFF_HIDE));
+    actors[0].wait = 0;
+    actors[0].in_room = NULL;
+    run(0, "camouflage");
+    assert(!IS_AFFECTED(&actors[0], AFF_HIDE));
+    actors[0].in_room = &room;
+
+    SET_BIT(pcs[0].flag, FLAG_PK); SET_BIT(pcs[1].flag, FLAG_PK);
+    SET_BIT(actors[0].polyaff, POLY_GARGOYLE_STATUE);
+    actors[0].hit = actors[0].max_hit;
+    damage(&actors[1], &actors[0], 1000, TYPE_BLUNT, "stone test");
+    assert(actors[0].hit == 9500); /* Exactly once, not at both damage boundaries. */
+    stop_fighting(&actors[0], TRUE);
+    for (long rank = 3; rank <= 5; ++rank) {
+        pcs[0].powers[DISC_THAUMATURGY] = rank;
+        actors[0].hit = actors[0].max_hit;
+        actors[0].position = actors[1].position = POS_STANDING;
+        actors[1].wait = 0;
+        run(1, "punch Leader");
+        if (rank >= 4) {
+            assert(actors[0].hit == actors[0].max_hit);
+            assert(actors[0].position != POS_STUNNED);
+        } else assert(actors[0].position == POS_STUNNED);
+        stop_fighting(&actors[0], TRUE);
+    }
+    actors[0].position = actors[1].position = POS_STANDING;
+    REMOVE_BIT(actors[0].polyaff, POLY_GARGOYLE_STATUE);
+    REMOVE_BIT(pcs[0].flag, FLAG_PK); REMOVE_BIT(pcs[1].flag, FLAG_PK);
+    free_string(actors[0].clan); actors[0].clan = str_dup("Caitiff");
+    pcs[0].powers[DISC_THAUMATURGY] = -1; actors[0].primal = 14;
+    run(0, "discipline visceratika");
+    assert(pcs[0].powers[DISC_THAUMATURGY] == -1 && actors[0].primal == 14);
+    actors[0].primal = 15;
+    run(0, "discipline visceratika");
+    assert(gargoyle_visceratika(&actors[0]) == 1 && actors[0].primal == 0);
+    free_string(actors[0].clan); actors[0].clan = str_dup("");
+    pcs[0].powers[DISC_THAUMATURGY] = 5;
+
+    /* Statue mode is defensive, not another attack/escape form. */
+    actors[0].wait = 0;
+    run(0, "stoneform on");
+    assert(gargoyle_statue(&actors[0]) && actors[0].wait == 12);
+    long stone_primal = actors[0].primal;
+    actors[0].wait = 0;
+    run(0, "discipline fortitude");
+    assert(strstr(outputs[0], "stone statue") && actors[0].primal == stone_primal);
+    ROOM_INDEX_DATA *stone_room = actors[0].in_room;
+    run(0, "north");
+    move_char(&actors[0], 0); /* Also block following/internal walking. */
+    assert(actors[0].in_room == stone_room);
+    long stone_hp = actors[1].hit;
+    multi_hit(&actors[0], &actors[1]);
+    one_hit(&actors[0], &actors[1], TYPE_UNARMED, "stone attack");
+    assert(actors[1].hit == stone_hp);
+    assert(gargoyle_saved_polyaff(&actors[0]) == POLY_GARGOYLE_STATUE);
+    run(0, "stoneform off");
+    assert(!gargoyle_statue(&actors[0]) && actors[0].polyaff == 0);
+    actors[0].wait = 0;
+    SET_BIT(actors[0].polyaff, POLY_BAT);
+    run(0, "stoneform on");
+    assert(!gargoyle_statue(&actors[0]) && actors[0].polyaff == POLY_BAT);
+    actors[0].polyaff = POLY_GARGOYLE_STATUE;
+    pcs[0].powers[DISC_THAUMATURGY] = 0;
+    assert(gargoyle_saved_polyaff(&actors[0]) == 0);
+    assert(actors[0].polyaff == POLY_GARGOYLE_STATUE); /* Save projection is pure. */
+    combat_status_update();
+    assert(actors[0].polyaff == 0);
+    pcs[0].powers[DISC_THAUMATURGY] = 5;
+
+    /* One physical rank slot, but no cross-build Thaumaturgy/Visceratika lesson. */
+    pcs[2].cland[0] = VAMPIRE_BUILD_GARGOYLE;
+    pcs[2].powers[DISC_THAUMATURGY] = pcs[1].powers[DISC_THAUMATURGY] = 0;
+    run(0, "teachdisc Member visceratika");
+    assert(pcs[1].teach_until == 0);
+    pcs[1].powers[DISC_THAUMATURGY] = 3;
+    run(1, "teachdisc Other thaumaturgy");
+    assert(pcs[2].teach_until == 0);
+    run(0, "teachdisc Other visceratika");
+    assert(pcs[2].teach_until > current_time);
+    pcs[0].cland[0] = -1; /* Revalidate a teacher who changed builds after offering. */
+    run(2, "teachdisc accept Leader visceratika");
+    assert(pcs[2].powers[DISC_THAUMATURGY] == 0);
+    pcs[0].cland[0] = VAMPIRE_BUILD_GARGOYLE;
+    run(2, "teachdisc accept Leader visceratika");
+    assert(pcs[2].powers[DISC_THAUMATURGY] == -1);
+    pcs[0].powers[DISC_THAUMATURGY] = 5;
+    const char *blood[] = {"tasteblood Member", "bloodrage", "potency",
+                          "theftvitae Member", "cauldronblood Member"};
+    for (size_t i = 0; i < sizeof blood/sizeof blood[0]; ++i) {
+        long hp = actors[1].hit, mana = actors[0].mana;
+        actors[0].wait = 0;
+        run(0, blood[i]);
+        assert(strstr(outputs[0], "not trained high enough"));
+        assert(actors[1].hit == hp && actors[0].mana == mana);
+    }
+
+    run(4, "clanadmin create Leader StoneOrder");
+    actors[2].class = CLASS_NONE;
+    memset(pcs[2].powers, 0, sizeof pcs[2].powers);
+    for (int i = 0; i < 5; ++i) actors[2].stats[i] = 4;
+    run(0, "clan recruit Other");
+    assert(actors[2].class == CLASS_NONE && strstr(outputs[2], "vampire gargoyle"));
+    run(2, "clan accept Leader");
+    assert(IS_GARGOYLE(&actors[2]) && actors[2].vampgen == 9);
+    assert(pcs[2].powers[DISC_THAUMATURGY] == -1 && clan_member_role(&actors[2]) == 1);
+    run(0, "clan kick Other");
+    assert(IS_GARGOYLE(&actors[2]) && !strcmp(clan_affiliation(&actors[2]), "Exiled"));
+    run(0, "clan invite Other"); run(2, "clan accept Leader");
+    run(2, "clan leave");
+    assert(IS_GARGOYLE(&actors[2]) && !strcmp(clan_affiliation(&actors[2]), "Loner"));
+    assert(save_char_obj_checked(&actors[2]));
+    DESCRIPTOR_DATA reload = {0};
+    assert(load_char_obj(&reload, "Other") && IS_GARGOYLE(reload.character));
+    assert(reload.character->pcdata->powers[DISC_THAUMATURGY] == -1);
+    free_char(reload.character);
+    if (fpReserve != NULL) { fclose(fpReserve); fpReserve = NULL; }
+    memset(&reload, 0, sizeof reload);
+    assert(load_char_short(&reload, "Other") && IS_GARGOYLE(reload.character));
+    free_char(reload.character);
+    if (fpReserve != NULL) { fclose(fpReserve); fpReserve = NULL; }
+    actors[2].polyaff = POLY_GARGOYLE_STATUE;
+    for (long rank = 0; rank <= 1; ++rank) {
+        pcs[2].powers[DISC_THAUMATURGY] = rank;
+        assert(save_char_obj_checked(&actors[2]));
+        assert(actors[2].polyaff == POLY_GARGOYLE_STATUE);
+        memset(&reload, 0, sizeof reload);
+        assert(load_char_obj(&reload, "Other"));
+        assert(gargoyle_statue(reload.character) == (rank == 1));
+        assert(reload.character->polyaff == (rank ? POLY_GARGOYLE_STATUE : 0));
+        free_char(reload.character);
+        if (fpReserve != NULL) { fclose(fpReserve); fpReserve = NULL; }
+        memset(&reload, 0, sizeof reload);
+        assert(load_char_short(&reload, "Other"));
+        assert(gargoyle_statue(reload.character) == (rank == 1));
+        assert(reload.character->polyaff == (rank ? POLY_GARGOYLE_STATUE : 0));
+        free_char(reload.character);
+        if (fpReserve != NULL) { fclose(fpReserve); fpReserve = NULL; }
+    }
+    pcs[2].conding = pcs[2].love = pcs[2].covenant =
+        pcs[2].cov_time = pcs[2].leader = pcs[2].vleader = str_dup("");
+    actors[4].level = LEV_IMP;
+    run(4, "clearclass Other");
+    assert(actors[2].class == CLASS_NONE && !IS_GARGOYLE(&actors[2]));
+    assert(actors[2].polyaff == 0);
+    assert(pcs[2].cland[0] == 0 && pcs[2].powers[DISC_THAUMATURGY] == 0);
+    actors[4].level = LEV_IMM;
+    disband_admin();
+
+    for (int want_gargoyle = 0; want_gargoyle < 2; ++want_gargoyle) {
+        fixture(CLASS_VAMPIRE);
+        pcs[1].cland[0] = want_gargoyle ? DISC_DOMINATE : VAMPIRE_BUILD_GARGOYLE;
+        char intent[256];
+        snprintf(intent, sizeof intent, "AnathemaClans 3 2\nC 1 %ld 4f72646572\n"
+                 "M 1 %ld 3 Leader 0 0\nM 1 %ld 1 Member 0 %d\nEnd\n",
+                 (long)CLASS_VAMPIRE, (long)CLASS_VAMPIRE, (long)CLASS_VAMPIRE,
+                 want_gargoyle ? 34 : 1);
+        write_text(intent);
+        assert(clan_load_registry());
+        clan_sync_player(&actors[1]);
+        assert(pcs[1].player_load_failed);
+        disband_admin();
+    }
+}
+
 int main(void)
 {
     char root[] = "/tmp/anathema-clans-XXXXXX", original[4096];
@@ -856,6 +1091,7 @@ int main(void)
     native_recruitment();
     enrollment_recovery();
     nightstalker();
+    gargoyle();
     clan_registry_close();
     char_list = NULL; descriptor_list = NULL;
     for (int i = 0; i < 5; ++i) free_string(actors[i].clan);
@@ -863,6 +1099,7 @@ int main(void)
     assert(unlink("../clans/Registry") == 0 && unlink("../clans/Lock") == 0);
     unlink("../player/Other"); unlink("../backup/Other");
     unlink("../player/Member"); unlink("../backup/Member");
+    unlink("../player/Leader"); unlink("../backup/Leader");
     assert(chdir("..") == 0);
     assert(rmdir("area") == 0 && rmdir("player") == 0 &&
            rmdir("backup") == 0 && rmdir("clans") == 0);

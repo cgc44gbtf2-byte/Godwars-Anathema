@@ -92,7 +92,8 @@ static const struct {
     {CLASS_MAGE, "mage verbena", "Verbena"},
     {CLASS_MAGE, "mage virtual", "Virtual Adepts"},
     {CLASS_MAGE, "mage hollow", "Hollow Ones"},
-    {CLASS_NINJA, "ninja nightstalker", NULL}
+    {CLASS_NINJA, "ninja nightstalker", NULL},
+    {CLASS_VAMPIRE, "vampire gargoyle", NULL}
 };
 
 static long recipe_class(long recipe)
@@ -461,6 +462,10 @@ void clan_sync_player(CHAR_DATA *ch)
             return;
         }
         if (ch->class != registry.members[m].class_id ||
+            (ch->class == CLASS_VAMPIRE &&
+             IS_GARGOYLE(ch) !=
+             !strcmp(recruit_recipes[registry.members[m].recruit_recipe - 1].command,
+                     "vampire gargoyle")) ||
             (ch->class == CLASS_NINJA &&
              IS_NIGHTSTALKER(ch) !=
              !strcmp(recruit_recipes[registry.members[m].recruit_recipe - 1].command,
@@ -694,6 +699,10 @@ static bool settle_enrollment(CHAR_DATA *ch)
     }
     if (!player_ready(ch) || uncertain || ch->pcdata->player_load_failed ||
         ch->class != registry.members[m].class_id ||
+        (ch->class == CLASS_VAMPIRE &&
+         IS_GARGOYLE(ch) !=
+         !strcmp(recruit_recipes[registry.members[m].recruit_recipe - 1].command,
+                 "vampire gargoyle")) ||
         (ch->class == CLASS_NINJA &&
          IS_NIGHTSTALKER(ch) !=
          !strcmp(recruit_recipes[registry.members[m].recruit_recipe - 1].command,

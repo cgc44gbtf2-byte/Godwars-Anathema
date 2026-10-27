@@ -119,7 +119,7 @@ void damage( CHAR_DATA *ch, CHAR_DATA *victim, long dam, long dt, char *message 
             victim = temp;
         }
 
-	dam_message(ch, victim, dam, dt, message);
+	dam_message(ch, victim, gargoyle_damage(victim, dam), dt, message);
 	if (victim == NULL || victim->position == POS_DEAD) return;
     }
 #ifdef COMBAT_CALLBACK_TESTING
@@ -191,6 +191,9 @@ void hurt_person( CHAR_DATA *ch, CHAR_DATA *victim, long dam )
 {
     ROOM_INDEX_DATA *actor_room = ch != NULL ? ch->in_room : NULL;
     if (ch == NULL || victim == NULL) return;
+    /* Shared HP boundary covers melee and direct book/spell damage once.
+     * Never discount signed healing or self-inflicted costs. */
+    if (ch != victim) dam = gargoyle_damage(victim, dam);
     /* Preserve legacy signed healing without overflowing the HP subtraction. */
     if (dam > 0 && victim->hit < LONG_MIN + dam) victim->hit = LONG_MIN;
     else if (dam < 0 && victim->hit > LONG_MAX + dam) victim->hit = LONG_MAX;

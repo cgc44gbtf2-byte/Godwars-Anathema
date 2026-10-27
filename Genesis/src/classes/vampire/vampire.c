@@ -27,9 +27,12 @@ static const struct {
     {"thaumaturgy", DISC_THAUMATURGY}, {"vicissitude", DISC_VICISSITUDE}
 };
 
-static long discipline_id(const char *name)
+static long discipline_id(CHAR_DATA *ch, const char *name)
 {
     size_t i;
+    if (IS_GARGOYLE(ch) && !str_cmp(name, "visceratika"))
+        return DISC_THAUMATURGY;
+    if (IS_GARGOYLE(ch) && !str_cmp(name, "thaumaturgy")) return -1;
     for (i = 0; i < sizeof(disciplines) / sizeof(disciplines[0]); ++i)
         if (!str_cmp(name, disciplines[i].name)) return disciplines[i].id;
     return -1;
@@ -99,7 +102,9 @@ void do_teachdisc(CHAR_DATA *ch, char *argument)
         for (i = 0; i < sizeof(disciplines) / sizeof(disciplines[0]); ++i)
             if (ch->pcdata->powers[disciplines[i].id] >= 3)
             {
-                snprintf(buf, sizeof(buf), "  %s\n\r", disciplines[i].name);
+                snprintf(buf, sizeof(buf), "  %s\n\r",
+                    IS_GARGOYLE(ch) && disciplines[i].id == DISC_THAUMATURGY ?
+                    "visceratika" : disciplines[i].name);
                 stc(buf, ch);
             }
         return;
@@ -111,7 +116,7 @@ void do_teachdisc(CHAR_DATA *ch, char *argument)
         stc("Syntax: teachdisc <student> <discipline>, or teachdisc accept <teacher> <discipline>.\n\r", ch);
         return;
     }
-    disc = discipline_id(accepting ? third : second);
+    disc = discipline_id(ch, accepting ? third : second);
     if (disc < 0)
     {
         stc("That is not a supported Anathema discipline.\n\r", ch);
@@ -124,6 +129,12 @@ void do_teachdisc(CHAR_DATA *ch, char *argument)
         || !can_see(student, teacher))
     {
         stc("Both vampires must be here, visible, standing and outside combat.\n\r", ch);
+        return;
+    }
+    if (disc == DISC_THAUMATURGY &&
+        IS_GARGOYLE(teacher) != IS_GARGOYLE(student))
+    {
+        stc("Visceratika replaces Thaumaturgy; those lessons cannot cross builds.\n\r", ch);
         return;
     }
     if (teacher->pcdata->powers[disc] < 3)

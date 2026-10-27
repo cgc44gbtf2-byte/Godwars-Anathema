@@ -791,6 +791,8 @@ extern CHAR_DATA Score_ch;      /* Score_ch */
 /* Class-discriminated build slot, already persisted as Cland. Ninja never
  * indexes disciplines through it. Clan membership/labels are NOT identity. */
 #define NINJA_BUILD_NIGHTSTALKER 1001L
+#define VAMPIRE_BUILD_GARGOYLE 1002L
+#define POLY_GARGOYLE_STATUE 2097152L
 
 /*
  * Elementalist Bits
@@ -2044,6 +2046,51 @@ static inline bool is_nightstalker(const CHAR_DATA *ch)
         ch->pcdata->cland[0] == NINJA_BUILD_NIGHTSTALKER;
 }
 #define IS_NIGHTSTALKER(ch) is_nightstalker(ch)
+
+/* Gargoyles reserve their first clan-discipline slot for build identity;
+ * no Gargoyle in-clan discipline indexes are stored there. The shared rank
+ * slot replaces Thaumaturgy, rather than granting both disciplines. */
+static inline bool is_gargoyle(const CHAR_DATA *ch)
+{
+    return ch != NULL && IS_VAMPIRE(ch) && ch->pcdata != NULL &&
+        !ch->pcdata->player_load_failed &&
+        ch->pcdata->cland[0] == VAMPIRE_BUILD_GARGOYLE;
+}
+#define IS_GARGOYLE(ch) is_gargoyle(ch)
+static inline long gargoyle_visceratika(const CHAR_DATA *ch)
+{
+    if (!IS_GARGOYLE(ch)) return 0;
+    long rank = ch->pcdata->powers[DISC_THAUMATURGY];
+    return rank >= 1 && rank <= 5 ? rank : 0;
+}
+static inline bool gargoyle_statue(const CHAR_DATA *ch)
+{
+    return gargoyle_visceratika(ch) > 0 &&
+        IS_SET(ch->polyaff, POLY_GARGOYLE_STATUE) &&
+        !(ch->polyaff & ~POLY_GARGOYLE_STATUE) &&
+        !IS_SET(ch->affected_by, AFF_POLYMORPH);
+}
+static inline long gargoyle_damage(const CHAR_DATA *ch, long damage)
+{
+    long rank = gargoyle_visceratika(ch);
+    if (damage <= 0 || !gargoyle_statue(ch)) return damage;
+    /* floor(damage * (10-rank) / 10), without overflowing LONG_MAX. */
+    return damage / 10 * (10 - rank) +
+        damage % 10 * (10 - rank) / 10;
+}
+static inline long gargoyle_saved_polyaff(const CHAR_DATA *ch)
+{
+    if (ch == NULL) return 0;
+    if (IS_NPC(ch) || ch->pcdata == NULL) return ch->polyaff;
+    return gargoyle_statue(ch) ? ch->polyaff :
+        ch->polyaff & ~POLY_GARGOYLE_STATUE;
+}
+static inline void gargoyle_reconcile(CHAR_DATA *ch)
+{
+    if (ch != NULL && !IS_NPC(ch) && ch->pcdata != NULL)
+        ch->polyaff = gargoyle_saved_polyaff(ch);
+}
+void do_stoneform(CHAR_DATA *ch, char *argument);
 #define IS_DRAGON(ch)		((ch)->class == CLASS_DRAGON && !IS_NPC(ch))
 #define IS_MAGE(ch)		((ch)->class == CLASS_MAGE && !IS_NPC(ch))
 #define IS_MONK(ch)             ((ch)->class == CLASS_MONK && !IS_NPC(ch))

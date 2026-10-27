@@ -1,0 +1,64 @@
+"""Gargoyle replacement boundaries and strict native-source preservation."""
+import hashlib
+from pathlib import Path
+import unittest
+from gargoyle_source import PROOFS, without_gargoyle_stage
+
+ROOT = Path(__file__).resolve().parents[1]
+
+def blob(text):
+    data = text.encode()
+    return hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
+
+class GargoyleCatalog(unittest.TestCase):
+    def test_thirteen_native_modules_restore_exact_base(self):
+        self.assertEqual(len(PROOFS), 13)
+        for path, expected, _ in PROOFS:
+            with self.subTest(path=path):
+                text = (ROOT / path).read_text()
+                old = without_gargoyle_stage(text)
+                self.assertEqual(blob(old), expected)
+                self.assertEqual(without_gargoyle_stage(old), old)
+                self.assertNotEqual(blob(without_gargoyle_stage(text + "\n/* unrelated */\n")), expected)
+
+    def test_guard_mutations_remain_visible(self):
+        mutations = 0
+        for path, expected, hunks in PROOFS:
+            for new, _ in hunks:
+                for needle in ("1002", "rank <= 5", "Visceratika", "IS_GARGOYLE"):
+                    if needle not in new:
+                        continue
+                    text = (ROOT / path).read_text()
+                    mutated = text.replace(new, new.replace(needle, "MUTATION", 1), 1)
+                    self.assertNotEqual(blob(without_gargoyle_stage(mutated)), expected)
+                    mutations += 1
+        self.assertGreater(mutations, 10)
+
+    def test_identity_and_shared_slot_are_not_social_labels(self):
+        header = (ROOT / "Genesis/src/merc.h").read_text()
+        predicate = header.split("static inline bool is_gargoyle(", 1)[1].split(
+            "#define IS_GARGOYLE", 1)[0]
+        for part in ("IS_VAMPIRE(ch)", "player_load_failed", "VAMPIRE_BUILD_GARGOYLE"):
+            self.assertIn(part, predicate)
+        self.assertNotIn("ch->clan", predicate)
+        info = (ROOT / "Genesis/src/act_info.c").read_text()
+        self.assertEqual(info.count(
+            "if (IS_GARGOYLE(ch) && disc == DISC_THAUMATURGY) return 0;"), 2)
+        clans = (ROOT / "Genesis/src/clans.c").read_text()
+        self.assertEqual(clans.count('!strcmp(recruit_recipes[registry.members[m].recruit_recipe - 1].command,\n'
+                                    '                     "vampire gargoyle")'), 1)
+
+    def test_real_engine_and_wire_tests_are_kept(self):
+        tests = (ROOT / "tests/test_clans.c").read_text()
+        for part in ("gargoyle();", "LONG_MAX", "__int128", "teachdisc accept Leader visceratika",
+                     '"punch Leader"', '"clan leave"', "load_char_short(&reload",
+                     'damage(&actors[1], &actors[0], 1000', '"clearclass Other"'):
+            self.assertIn(part, tests)
+        ci = (ROOT / ".github/workflows/ci.yml").read_text()
+        self.assertEqual(ci.count("python3 tests/smoke_gargoyle.py"), 2)
+        docs = (ROOT / "docs/GARGOYLE.md").read_text()
+        for part in ("generation 9", "15 × next rank", "pre-Gargoyle", "not imported"):
+            self.assertIn(part, docs)
+
+if __name__ == "__main__":
+    unittest.main()

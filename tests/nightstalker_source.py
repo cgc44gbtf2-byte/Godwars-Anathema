@@ -38,6 +38,8 @@ MARKERS = {
 }
 
 def without_nightstalker_stage(text):
+    from gargoyle_source import without_gargoyle_stage
+    text = without_gargoyle_stage(text)
     for path, _, hunks in PROOFS:
         if MARKERS[path.rsplit("/", 1)[-1]] not in text:
             continue

@@ -4,6 +4,7 @@ import json
 import unittest
 from test_class_layout import ROOT,SRC,make_values
 from progress_metrics_source import without_progress_metrics_stage
+from gargoyle_source import without_gargoyle_stage
 
 def once(text,old,new):
     assert text.count(old)==1,repr(old)
@@ -44,7 +45,7 @@ class GuardianLifecycleCatalog(unittest.TestCase):
         self.assertEqual(blob(without_hybrid_forms_save(
             without_guardian_lifecycle_save((SRC/"save.c").read_text()))),
                          "1f3317263a45d1a886db411d4c0a52a5bba92909")
-        text=(SRC/"combat_status.c").read_text()
+        text=without_gargoyle_stage((SRC/"combat_status.c").read_text())
         text=once(text,'#include "guardian.h"\n',"")
         text=once(text,'#include "classes/hybrid/access.h"\n',"")
         text=once(text,"        guardian_reconcile(ch);\n","")

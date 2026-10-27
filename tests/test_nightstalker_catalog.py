@@ -3,6 +3,7 @@ import hashlib
 from pathlib import Path
 import unittest
 from nightstalker_source import PROOFS, without_nightstalker_stage
+from gargoyle_source import without_gargoyle_stage
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -25,7 +26,10 @@ class NightstalkerCatalog(unittest.TestCase):
             for new, _ in hunks:
                 needle = "60" if "60" in new else "1001" if "1001" in new else None
                 if needle is not None:
-                    text = (ROOT / path).read_text()
+                    # Mutate the earlier stage after undoing the later,
+                    # separately pinned edits whose context may overlap it.
+                    text = without_gargoyle_stage((ROOT / path).read_text())
+                    self.assertIn(new, text)
                     changed = text.replace(new, new.replace(needle, "9999", 1), 1)
                     self.assertNotEqual(blob(without_nightstalker_stage(changed)), expected)
 

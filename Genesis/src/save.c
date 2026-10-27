@@ -357,7 +357,7 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
     fprintf( fp, "Sex          %li\n",	ch->sex			);
     fprintf( fp, "Status       %li\n",	ch->status		);
     fprintf( fp, "Class        %li\n",	ch->class		);
-    fprintf( fp, "Polyaff      %li\n",	ch->polyaff		);
+    fprintf( fp, "Polyaff      %li\n", gargoyle_saved_polyaff(ch));
     fprintf( fp, "Itemaffect   %li\n",	ch->itemaffect		);
     fprintf( fp, "Vampaff      %li\n",	ch->vampaff		);
     fprintf( fp, "Beast        %li\n",	ch->beast		);
@@ -1680,6 +1680,7 @@ for ( ; num && numbers_ok; num--) /* for each of the board saved */
                 normalize_combat_training(ch);
                 monk_favour_reconcile(ch, &time_info);
                 guardian_reconcile(ch);
+                gargoyle_reconcile(ch);
                 return;
             }
 	    KEY( "Exp",		ch->exp,		fread_number( fp ) );
