@@ -658,6 +658,7 @@ static bool recruit_together(CHAR_DATA *sponsor, CHAR_DATA *student)
 {
     const long planes = AFF_ETHEREAL | AFF_DEEPUMBRA | AFF_SHADOWPLANE;
     return player_ready(sponsor) && session_ready(student) && sponsor != student &&
+        !gargoyle_statue(sponsor) &&
         student->class == CLASS_NONE && !student->pcdata->hybrid_present &&
         !student->pcdata->player_load_failed &&
         (student->clan == NULL || !student->clan[0]) &&

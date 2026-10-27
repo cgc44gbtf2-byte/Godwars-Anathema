@@ -6,6 +6,7 @@ from gargoyle_source import PROOFS, without_gargoyle_stage
 from gargoyle_reflection_source import PROOFS as REFLECTION_PROOFS, without_gargoyle_reflection
 from gargoyle_menu_source import PROOFS as MENU_PROOFS, without_gargoyle_menu
 from gargoyle_teaching_source import PATH as TEACH_PATH, BASE_BLOB as TEACH_BASE, NEW as TEACH_NEW, without_gargoyle_teaching
+from gargoyle_recruit_source import PATH as RECRUIT_PATH, BASE_BLOB as RECRUIT_BASE, NEW as RECRUIT_NEW, without_gargoyle_recruit
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -14,6 +15,13 @@ def blob(text):
     return hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
 
 class GargoyleCatalog(unittest.TestCase):
+    def test_recruit_guard_exact_inverse(self):
+        text = (ROOT / RECRUIT_PATH).read_text()
+        self.assertEqual(text.count(RECRUIT_NEW), 1)
+        self.assertEqual(blob(without_gargoyle_recruit(text)), RECRUIT_BASE)
+        self.assertNotEqual(blob(without_gargoyle_recruit(
+            text.replace("!gargoyle_statue(sponsor)", "TRUE", 1))), RECRUIT_BASE)
+
     def test_teaching_guard_exact_inverse_and_regression(self):
         text = (ROOT / TEACH_PATH).read_text()
         self.assertEqual(text.count(TEACH_NEW), 1)

@@ -1006,6 +1006,18 @@ static void gargoyle(void)
     for (int i = 0; i < 5; ++i) actors[2].stats[i] = 4;
     run(0, "clan recruit Other");
     assert(actors[2].class == CLASS_NONE && strstr(outputs[2], "vampire gargoyle"));
+    run(0, "stoneform on");
+    assert(gargoyle_statue(&actors[0]));
+    actors[0].wait = 0; /* Recheck after entry recovery, not merely action lag. */
+    char *recruit_before = snapshot();
+    run(2, "clan accept Leader");
+    assert(actors[2].class == CLASS_NONE && clan_member_role(&actors[2]) == 0);
+    char *recruit_after = snapshot();
+    assert(!strcmp(recruit_before, recruit_after));
+    free(recruit_before);
+    free(recruit_after);
+    run(0, "stoneform off");
+    actors[0].wait = 0;
     run(2, "clan accept Leader");
     assert(IS_GARGOYLE(&actors[2]) && actors[2].vampgen == 9);
     assert(pcs[2].powers[DISC_THAUMATURGY] == -1 && clan_member_role(&actors[2]) == 1);

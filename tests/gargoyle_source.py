@@ -29,6 +29,8 @@ MARKERS = {
 }
 
 def without_gargoyle_stage(text):
+    from gargoyle_recruit_source import without_gargoyle_recruit
+    text = without_gargoyle_recruit(text)
     from gargoyle_teaching_source import without_gargoyle_teaching
     text = without_gargoyle_teaching(text)
     from gargoyle_menu_source import without_gargoyle_menu

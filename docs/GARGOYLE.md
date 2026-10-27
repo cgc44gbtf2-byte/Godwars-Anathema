@@ -74,6 +74,8 @@ statues. Normal class reset clears them.
 A Gargoyle clan sponsor recruits a willing unclassed player through
 `clan recruit <name>` / `clan accept <sponsor>`. The recipient receives the
 Gargoyle build and Member role, not the sponsor's earned ranks.
+The sponsor must be in flesh when offering recruitment and when it is accepted.
+An unexpired offer remains usable after the sponsor leaves stone form.
 Leaving becomes Loner; removal becomes Exiled; neither erases the build.
 Pending enrollments cannot recover as the wrong Vampire variant.
 
