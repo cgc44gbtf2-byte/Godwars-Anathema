@@ -851,8 +851,16 @@ return;
 	return;
     }
   
-	SET_BIT(ch->act, PLR_HOLYLIGHT);
-	stc("Your senses increase to incredible proportions.\n\r", ch);
+    /* Nightstalker awareness activates for 60 Ki; dismissal above is free. */
+    if (IS_NIGHTSTALKER(ch)) {
+        if (ch->pcdata->ninja[NINJA_KI] < 60) {
+            stc("You need 60 Ki to heighten your Nightstalker senses.\n\r", ch);
+            return;
+        }
+        ch->pcdata->ninja[NINJA_KI] -= 60;
+    }
+SET_BIT(ch->act, PLR_HOLYLIGHT);
+stc("Your senses increase to incredible proportions.\n\r", ch);
 	WAIT_STATE(ch, 6);
     return;
 }
@@ -4464,6 +4472,7 @@ stc("   Camarilla:   Ventrue, Nosferatu, Brujah\n\r", ch);
 	stc("   Sabbat:      Serpentsofthelight, Lasombra, Tzimisce \n\r", ch);
 stc("   Independent: Assamite, Gangrel, Ravnos\n\r", ch);
 	stc("#pMage#n: Akashic, Celestial, Ecstasy, Dreamspeakers, Euthanatos, Hermes, Ether, Verbena, Virtual, Hollow\n\r", ch);
+stc("Ninja variant: autoclass ninja nightstalker (permanent class build).\n\r", ch);
 
 	return;
     }
@@ -4649,6 +4658,11 @@ ch->class = CLASS_VAMPIRE;
     }
     else if (!str_cmp(arg1, "ninja"))
     {
+if (arg2[0] && str_cmp(arg2, "nightstalker"))
+{
+    stc("Syntax: autoclass ninja [nightstalker]\n\r", ch);
+    return;
+}
 	if (raw_stat(ch, STAT_STR) < 3 || raw_stat(ch, STAT_DEX) < 4 || raw_stat(ch, STAT_CON) < 2
 	 || raw_stat(ch, STAT_INT) < 2 || raw_stat(ch, STAT_WIS) < 1)
 	{
@@ -4658,7 +4672,9 @@ ch->class = CLASS_VAMPIRE;
 
 	ch->class = CLASS_NINJA;
 	ch->vampgen = 4;
-	stc("You are now a #0Ninja#n.\n\r", ch);
+ch->pcdata->cland[0] = arg2[0] ? NINJA_BUILD_NIGHTSTALKER : 0;
+stc(arg2[0] ? "You are now a #0Nightstalker#n.\n\r" :
+    "You are now a #0Ninja#n.\n\r", ch);
     }
     else if (!str_cmp(arg1, "drow"))
     {

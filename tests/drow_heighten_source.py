@@ -9,6 +9,8 @@ GRANT="""    /* Independent learned sources share one toggle and one native wait
 """
 
 def without_drow_heighten_stage(text):
+    from nightstalker_source import without_nightstalker_stage
+    text = without_nightstalker_stage(text)
     from drow_scry_source import without_drow_scry_stage
     text=without_drow_scry_stage(text)
     if "void do_truesight(" not in text:return text

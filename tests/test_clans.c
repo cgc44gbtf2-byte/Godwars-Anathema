@@ -3,6 +3,7 @@
  */
 #define ATOMIC_SAVE_TESTING
 #include <assert.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,6 +16,7 @@
 
 extern char *string_space, *top_string;
 extern void init_mm(void);
+extern void mobile_update(void);
 static CHAR_DATA actors[5];
 static PC_DATA pcs[5];
 static DESCRIPTOR_DATA descriptors[5];
@@ -671,6 +673,166 @@ static void enrollment_recovery(void)
     disband_admin();
 }
 
+static void nightstalker(void)
+{
+    fixture(CLASS_NINJA);
+    actors[0].class = CLASS_NONE;
+    for (int i = 0; i < 5; ++i) actors[0].stats[i] = 4;
+    run(0, "autoclass ninja nonsense");
+    assert(actors[0].class == CLASS_NONE);
+    run(0, "autoclass ninja nightstalker");
+    assert(IS_NIGHTSTALKER(&actors[0]));
+    assert(!IS_NIGHTSTALKER(NULL) && !IS_NIGHTSTALKER(&actors[1]));
+    run(4, "clanadmin create Leader ShadowOrder");
+    assert(clan_member_role(&actors[0]) == 3);
+    actors[2].class = CLASS_NONE;
+    for (int i = 0; i < 5; ++i) actors[2].stats[i] = 4;
+    run(0, "clan recruit Other");
+    assert(actors[2].class == CLASS_NONE);
+    assert(strstr(outputs[2], "ninja nightstalker"));
+    run(2, "clan accept Leader");
+    assert(IS_NIGHTSTALKER(&actors[2]) && clan_member_role(&actors[2]) == 1);
+    run(0, "clan kick Other");
+    assert(IS_NIGHTSTALKER(&actors[2]));
+    assert(!strcmp(clan_affiliation(&actors[2]), "Exiled"));
+    run(0, "clan invite Other"); run(2, "clan accept Leader");
+    run(2, "clan leave");
+    assert(IS_NIGHTSTALKER(&actors[2]));
+    assert(!strcmp(clan_affiliation(&actors[2]), "Loner"));
+    assert(save_char_obj_checked(&actors[2]));
+    DESCRIPTOR_DATA reloaded;
+    memset(&reloaded, 0, sizeof reloaded);
+    assert(load_char_obj(&reloaded, "Other"));
+    assert(!reloaded.character->pcdata->player_load_failed);
+    assert(IS_NIGHTSTALKER(reloaded.character));
+    free_char(reloaded.character);
+    memset(&reloaded, 0, sizeof reloaded);
+    assert(load_char_short(&reloaded, "Other"));
+    assert(!reloaded.character->pcdata->player_load_failed);
+    assert(IS_NIGHTSTALKER(reloaded.character));
+    free_char(reloaded.character);
+    /* The reset handler owns these strings; unlike this compact fixture's
+     * other read-only placeholders, real loaded players use engine strings. */
+    pcs[2].conding = pcs[2].love = pcs[2].covenant =
+        pcs[2].cov_time = pcs[2].leader = pcs[2].vleader = str_dup("");
+    actors[4].level = LEV_IMP;
+    run(4, "clearclass Other");
+    actors[4].level = LEV_IMM;
+    assert(actors[2].class == CLASS_NONE && pcs[2].cland[0] == 0);
+
+    /* A clan label alone cannot convert an ordinary Ninja. */
+    free_string(actors[1].clan);
+    actors[1].clan = str_dup("Nightstalkers");
+    assert(!IS_NIGHTSTALKER(&actors[1]));
+    pcs[0].ninja[NINJA_SORA] = pcs[0].ninja[NINJA_CHIKYU] = 10;
+    pcs[0].ninja[NINJA_KI] = 100;
+    run(0, "michi");
+    assert(pcs[0].wolf == 0 && pcs[0].ninja[NINJA_KI] == 100);
+    run(0, "principle sora");
+    assert(!strstr(outputs[0], "1 : Michi") && strstr(outputs[0], "60 Ki"));
+    for (int ki = 0; ki <= 60; ++ki) {
+        actors[0].affected_by = 0;
+        pcs[0].ninja[NINJA_KI] = ki;
+        run(0, "kakusu");
+        assert(!!IS_AFFECTED(&actors[0], AFF_KAKUSU) == (ki == 60));
+        assert(pcs[0].ninja[NINJA_KI] == (ki == 60 ? 0 : ki));
+    }
+    run(0, "kakusu"); /* Free dismissal, even with no remaining Ki. */
+    assert(!IS_AFFECTED(&actors[0], AFF_KAKUSU));
+    for (int ki = 0; ki <= 60; ++ki) {
+        actors[0].act = 0;
+        pcs[0].ninja[NINJA_KI] = ki;
+        run(0, "heighten");
+        assert(!!IS_SET(actors[0].act, PLR_HOLYLIGHT) == (ki == 60));
+        assert(pcs[0].ninja[NINJA_KI] == (ki == 60 ? 0 : ki));
+    }
+    run(0, "heighten");
+    assert(!IS_SET(actors[0].act, PLR_HOLYLIGHT));
+    pcs[1].ninja[NINJA_SORA] = 1;
+    pcs[1].ninja[NINJA_KI] = 100;
+    run(1, "michi");
+    assert(pcs[1].wolf == 25 && pcs[1].ninja[NINJA_KI] == 0);
+    pcs[1].ninja[NINJA_SORA] = 6;
+    pcs[1].ninja[NINJA_KI] = 20;
+    run(1, "kakusu");
+    assert(IS_AFFECTED(&actors[1], AFF_KAKUSU));
+    assert(pcs[1].ninja[NINJA_KI] == 0);
+    actors[1].affected_by = 0;
+
+    actors[3].class = CLASS_VAMPIRE;
+    actors[3].vampaff = VAM_OBFUSCATE;
+    pcs[3].powers[DISC_OBFUSCATE] = 5;
+    assert(can_see(&actors[0], &actors[3]));
+    assert(!can_see(&actors[1], &actors[3]));
+    actors[0].affected_by = AFF_BLIND;
+    assert(!can_see(&actors[0], &actors[3]));
+    actors[0].affected_by = 0;
+    actors[3].affected_by = AFF_SHADOWPLANE;
+    assert(!can_see(&actors[0], &actors[3]));
+    actors[3].affected_by = 0;
+    actors[0].extra = BLINDFOLDED;
+    assert(!can_see(&actors[0], &actors[3]));
+    actors[0].extra = 0;
+    room.added_flags = ROOM2_DARKNESS;
+    assert(can_see(&actors[0], &actors[3]));
+    assert(!can_see(&actors[1], &actors[3]));
+    room.added_flags = 0;
+
+    /* Exercise the real main pulse, not a model of the recovery formulas. */
+    actors[3].class = CLASS_NINJA;
+    actors[3].vampaff = 0;
+    actors[0].hit = actors[0].max_hit;
+    actors[0].mana = actors[0].max_mana;
+    pcs[0].wolf = 200;
+    pcs[0].ninja[NINJA_KI] = pcs[1].ninja[NINJA_KI] = 100;
+    mobile_update();
+    assert(pcs[0].wolf == 0);
+    assert(pcs[0].ninja[NINJA_KI] == 101 && pcs[1].ninja[NINJA_KI] == 102);
+    actors[0].position = actors[1].position = POS_MEDITATING;
+    mobile_update();
+    assert(pcs[0].ninja[NINJA_KI] == 104 && pcs[1].ninja[NINJA_KI] == 107);
+    actors[0].affected_by = actors[1].affected_by = AFF_KAKUSU;
+    mobile_update();
+    assert(pcs[0].ninja[NINJA_KI] == 104 && pcs[1].ninja[NINJA_KI] == 107);
+    actors[0].affected_by = actors[1].affected_by = 0;
+    actors[0].position = actors[1].position = POS_STANDING;
+    pcs[0].ninja[NINJA_KI] = 299;
+    mobile_update();
+    assert(pcs[0].ninja[NINJA_KI] == 300);
+
+    actors[0].hit = 9001; actors[0].max_hit = 10001;
+    actors[0].mana = 8001;
+    run(0, "harakiri");
+    assert(actors[0].hit == 4500 && actors[0].mana == 4000);
+    assert(pcs[0].ninja[NINJA_HARAKIRI] == 30);
+    run(0, "harakiri"); /* No stacking/repeat sacrifice. */
+    assert(actors[0].hit == 4500);
+    pcs[0].ninja[NINJA_HARAKIRI] = 0;
+    actors[0].hit = actors[0].max_hit = LONG_MAX;
+    actors[0].mana = LONG_MAX;
+    run(0, "harakiri");
+    assert(pcs[0].ninja[NINJA_HARAKIRI] == INT_MAX);
+    disband_admin();
+
+    /* A pending Nightstalker intent must not silently settle as normal Ninja,
+     * and a pending normal Ninja must not settle as Nightstalker. */
+    for (int want_night = 0; want_night < 2; ++want_night) {
+        fixture(CLASS_NINJA);
+        pcs[1].cland[0] = want_night ? 0 : NINJA_BUILD_NIGHTSTALKER;
+        char intent[256];
+        snprintf(intent, sizeof intent, "AnathemaClans 3 2\nC 1 %ld 4f72646572\n"
+                 "M 1 %ld 3 Leader 0 0\nM 1 %ld 1 Member 0 %d\nEnd\n",
+                 (long)CLASS_NINJA, (long)CLASS_NINJA, (long)CLASS_NINJA,
+                 want_night ? 33 : 20);
+        write_text(intent);
+        assert(clan_load_registry());
+        clan_sync_player(&actors[1]);
+        assert(pcs[1].player_load_failed);
+        assert(pcs[1].cland[0] == (want_night ? 0 : NINJA_BUILD_NIGHTSTALKER));
+        disband_admin();
+    }
+}
+
 int main(void)
 {
     char root[] = "/tmp/anathema-clans-XXXXXX", original[4096];
@@ -693,6 +855,7 @@ int main(void)
     limits_and_admin();
     native_recruitment();
     enrollment_recovery();
+    nightstalker();
     clan_registry_close();
     char_list = NULL; descriptor_list = NULL;
     for (int i = 0; i < 5; ++i) free_string(actors[i].clan);

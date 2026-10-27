@@ -149,6 +149,7 @@ tests/test_class_runtime: tests/test_class_runtime.c $(ENGINE_SOURCES) $(ENGINE_
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< Genesis/src/classes/elemental/elemental.c Genesis/src/classes/monk/monk.c Genesis/src/classes/ninja/ninja.c Genesis/src/classes/dragon/dragon.c Genesis/src/classes/drow/drow.c Genesis/src/classes/highlander/highland.c Genesis/src/classes/werewolf/wwtribe.c Genesis/src/combat_status.c tests/runtime_info.o $(HYBRID_ACCESS_SOURCES) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 check-layout:
+	python3 tests/test_nightstalker_catalog.py
 	python3 tests/test_class_layout.py
 	python3 tests/test_hybrid_training_catalog.py
 	python3 tests/test_hybrid_werewolf_training_catalog.py

@@ -6,6 +6,8 @@ GRANT = """    /* A learned secondary grant supplies this same toggle, not a sec
 """
 
 def without_drow_night_stage(text):
+    from nightstalker_source import without_nightstalker_stage
+    text = without_nightstalker_stage(text)
     if "void do_nightsight(" not in text:
         return text
     start = text.index("void do_nightsight(")

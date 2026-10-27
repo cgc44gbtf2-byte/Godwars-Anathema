@@ -2084,7 +2084,7 @@ bool can_see( CHAR_DATA *ch, CHAR_DATA *victim )
    for (vch = victim->in_room->people; vch != NULL; vch = vch->next_in_room)
 if (hybrid_drow_globe_active(vch)) return FALSE;
 
-    if (IS_SET(ch->in_room->added_flags, ROOM2_DARKNESS))
+    if (IS_SET(ch->in_room->added_flags, ROOM2_DARKNESS) && !IS_NIGHTSTALKER(ch))
     {
 	if (IS_BUI(ch) || IS_ITEMAFF(ch, ITEMA_VISION) || get_disc(ch, DISC_OBTENEBRATION) >= 1
 	 || get_tribe(ch, TRIBE_UKTENA) >= 1)
@@ -2092,7 +2092,7 @@ if (hybrid_drow_globe_active(vch)) return FALSE;
 	else return FALSE;
     }
 
-    if (IS_VAMPAFF(victim, VAM_OBFUSCATE))
+    if (IS_VAMPAFF(victim, VAM_OBFUSCATE) && !IS_NIGHTSTALKER(ch))
     {
 	if (get_disc(victim, DISC_OBFUSCATE) <= get_disc(ch, DISC_AUSPEX)
 	 || get_disc(victim, DISC_OBFUSCATE) <= get_tribe(ch, TRIBE_STARGAZERS))
@@ -2103,7 +2103,7 @@ if (hybrid_drow_globe_active(vch)) return FALSE;
     if (!IS_NPC(ch) && effective_holylight(ch)) return TRUE;
     if (IS_AFFECTED(ch, AFF_BLIND) && !effective_shadowsight(ch))
 	return FALSE;
-    if (room_is_dark(ch->in_room) && !IS_AFFECTED(ch, AFF_INFRARED) && !effective_nightsight(ch))
+    if (room_is_dark(ch->in_room) && !IS_AFFECTED(ch, AFF_INFRARED) && !effective_nightsight(ch) && !IS_NIGHTSTALKER(ch))
 	return FALSE;
     if (IS_AFFECTED(victim, AFF_HIDE))
 	return FALSE;
@@ -2150,7 +2150,7 @@ bool can_see_obj( CHAR_DATA *ch, OBJ_DATA *obj )
 	return TRUE;
 
     if ( room_is_dark( ch->in_room ) && !IS_AFFECTED(ch, AFF_INFRARED) 
-	&& !effective_nightsight(ch) )
+&& !effective_nightsight(ch) && !IS_NIGHTSTALKER(ch) )
 	return FALSE;
 
     if ( !IS_NPC(ch) && IS_MORE(ch, MORE_HEAD) &&

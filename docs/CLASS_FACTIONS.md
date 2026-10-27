@@ -41,7 +41,7 @@ enroll their targets. No active character is automatically migrated.
 - Fae: separate class, with training, forms, powers and class equipment.
 - Marauder: an alternative **Mage** progression, not Sorcerer.
 - Gargoyle: an alternative Vampire progression.
-- Nightstalker: an alternative Ninja progression.
+- Nightstalker: an alternative Ninja progression; see [its native implementation](NIGHTSTALKER.md).
 - Ninja factions: Bishamon, Hotei, Jurojin, Mudevi and Kotaro.
 
 Variants replace the relevant parent progression rather than stacking every
@@ -65,7 +65,8 @@ in the same room and plane, visible to each other and using their own input.
 Native stat and class prerequisites are checked again on acceptance.
 Sponsor membership and native build are also rechecked. New recruits become
 Members, never officers or leaders, and do not inherit trained power ranks.
-Vampire bloodlines, Mage traditions and Dragon colors follow the sponsor's
+Vampire bloodlines, Mage traditions, Dragon colors and the Ninja/Nightstalker
+build follow the sponsor's
 native build; custom social clan names do not change that build.
 
 The eligible unclassed player is saved first. A durable registry intent then
@@ -109,6 +110,8 @@ progression are reused, not replaced. `autoclass` cannot bypass an unresolved
 accepted enrollment. Existing combat embrace and class equipment are unchanged.
 
 Faction-specific eligibility binding beyond the native recruitment build,
-legacy migration and the EM class/variant additions above are **not implemented
+legacy migration and the remaining EM class/variant additions above are **not implemented
 by this stage**. No existing character is automatically converted. Do not
-advertise Fae or the requested variants as playable yet.
+advertise Fae or the remaining variants as playable yet. Nightstalker is the
+first native variant; its explicit selection and consent recruitment are
+described in [NIGHTSTALKER.md](NIGHTSTALKER.md).

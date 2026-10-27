@@ -332,15 +332,17 @@ void mobile_update( void )
 		    int ki;
 
 		    if (IS_AFFECTED(ch, AFF_KAKUSU)) ki = 0;
-		    else if (ch->position == POS_MEDITATING) ki = 5;
-		    else ki = 2;
+    else if (ch->position == POS_MEDITATING) ki = IS_NIGHTSTALKER(ch) ? 3 : 5;
+    else ki = IS_NIGHTSTALKER(ch) ? 1 : 2;
 
 		    ch->pcdata->ninja[NINJA_KI] += ki;
 		    if (ch->pcdata->ninja[NINJA_KI] > 300) ch->pcdata->ninja[NINJA_KI] = 300;
 		}
 
 		if (ch->pcdata->ninja[NINJA_HARAKIRI] > 0) ch->pcdata->ninja[NINJA_HARAKIRI]--;
-		if (ch->pcdata->wolf > 0)
+/* Nightstalker replaces Michi, including stale bonuses in an imported save. */
+if (IS_NIGHTSTALKER(ch) && ch->pcdata->wolf > 0) ch->pcdata->wolf = 0;
+if (ch->pcdata->wolf > 0)
 		{
 		    if (ch->position != POS_FIGHTING) ch->pcdata->wolf--;
 		    else if (ch->pcdata->wolf < get_ninja(ch, NINJA_SORA) * 25) ch->pcdata->wolf++;

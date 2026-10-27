@@ -63,6 +63,8 @@ def once(text, new, old):
     return text.replace(new, old, 1)
 
 def without_native_drow_stage(text):
+    from nightstalker_source import without_nightstalker_stage
+    text = without_nightstalker_stage(text)
     text = without_native_drow_speed(text)
     text = without_native_drow_shoot_context(text)
     if "void do_summonspider(" not in text:
@@ -140,6 +142,8 @@ long get_drow_speed( CHAR_DATA *ch )
 """
 
 def without_native_drow_speed(text):
+    from nightstalker_source import without_nightstalker_stage
+    text = without_nightstalker_stage(text)
     """Undo only the native getter and its five reviewed combat reads."""
     calls = text.count("get_drow_speed(ch)")
     if calls:

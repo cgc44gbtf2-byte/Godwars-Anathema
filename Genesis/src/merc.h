@@ -788,6 +788,10 @@ extern CHAR_DATA Score_ch;      /* Score_ch */
 #define NINJA_KI		3
 #define NINJA_HARAKIRI		4
 
+/* Class-discriminated build slot, already persisted as Cland. Ninja never
+ * indexes disciplines through it. Clan membership/labels are NOT identity. */
+#define NINJA_BUILD_NIGHTSTALKER 1001L
+
 /*
  * Elementalist Bits
  */
@@ -2033,6 +2037,13 @@ extern  long    gsn_brittle_bones;
 #define IS_HIGHLANDER(ch)	((ch)->class == CLASS_HIGHLANDER && !IS_NPC(ch))
 #define IS_DROW(ch)		((ch)->class == CLASS_DROW && !IS_NPC(ch))
 #define IS_NINJA(ch)            ((ch)->class == CLASS_NINJA && !IS_NPC(ch))
+static inline bool is_nightstalker(const CHAR_DATA *ch)
+{
+    return ch != NULL && IS_NINJA(ch) && ch->pcdata != NULL &&
+        !ch->pcdata->player_load_failed &&
+        ch->pcdata->cland[0] == NINJA_BUILD_NIGHTSTALKER;
+}
+#define IS_NIGHTSTALKER(ch) is_nightstalker(ch)
 #define IS_DRAGON(ch)		((ch)->class == CLASS_DRAGON && !IS_NPC(ch))
 #define IS_MAGE(ch)		((ch)->class == CLASS_MAGE && !IS_NPC(ch))
 #define IS_MONK(ch)             ((ch)->class == CLASS_MONK && !IS_NPC(ch))

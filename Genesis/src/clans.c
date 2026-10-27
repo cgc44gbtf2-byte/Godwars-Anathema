@@ -91,7 +91,8 @@ static const struct {
     {CLASS_MAGE, "mage ether", "Sons of Ether"},
     {CLASS_MAGE, "mage verbena", "Verbena"},
     {CLASS_MAGE, "mage virtual", "Virtual Adepts"},
-    {CLASS_MAGE, "mage hollow", "Hollow Ones"}
+    {CLASS_MAGE, "mage hollow", "Hollow Ones"},
+    {CLASS_NINJA, "ninja nightstalker", NULL}
 };
 
 static long recipe_class(long recipe)
@@ -459,7 +460,11 @@ void clan_sync_player(CHAR_DATA *ch)
             bug("Clan enrollment recovery could not initialize native class", 0);
             return;
         }
-        if (ch->class != registry.members[m].class_id) {
+        if (ch->class != registry.members[m].class_id ||
+            (ch->class == CLASS_NINJA &&
+             IS_NIGHTSTALKER(ch) !=
+             !strcmp(recruit_recipes[registry.members[m].recruit_recipe - 1].command,
+                     "ninja nightstalker"))) {
             ch->pcdata->player_load_failed = 1;
             bug("Clan enrollment conflicts with saved class; review required", 0);
             return;
@@ -673,6 +678,8 @@ static long sponsor_recipe(CHAR_DATA *sponsor, int m)
             player.cland[0] != sponsor->pcdata->cland[0]) continue;
         if (sponsor->class == CLASS_DRAGON &&
             player.dragcol != sponsor->pcdata->dragcol) continue;
+        if (sponsor->class == CLASS_NINJA &&
+            IS_NIGHTSTALKER(&preview) != IS_NIGHTSTALKER(sponsor)) continue;
         return (long)i + 1;
     }
     return 0;
@@ -686,7 +693,11 @@ static bool settle_enrollment(CHAR_DATA *ch)
         return TRUE;
     }
     if (!player_ready(ch) || uncertain || ch->pcdata->player_load_failed ||
-        ch->class != registry.members[m].class_id) {
+        ch->class != registry.members[m].class_id ||
+        (ch->class == CLASS_NINJA &&
+         IS_NIGHTSTALKER(ch) !=
+         !strcmp(recruit_recipes[registry.members[m].recruit_recipe - 1].command,
+                 "ninja nightstalker"))) {
         stc("Class enrollment requires staff review or registry retry.\n\r", ch);
         return FALSE;
     }

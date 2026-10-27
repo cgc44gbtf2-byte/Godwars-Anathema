@@ -65,6 +65,7 @@ jobs:
           python3 tests/smoke_shutdown.py
           python3 tests/smoke_copyover.py
           python3 tests/smoke_copyover.py --vision
+          python3 tests/smoke_nightstalker.py
           python3 tests/smoke_owner.py
           python3 tests/smoke_numbers.py
           python3 tests/smoke_words.py
@@ -89,6 +90,7 @@ jobs:
             python3 tests/smoke_shutdown.py &&
             python3 tests/smoke_copyover.py &&
             python3 tests/smoke_copyover.py --vision &&
+            python3 tests/smoke_nightstalker.py &&
             python3 tests/smoke_owner.py &&
             python3 tests/smoke_numbers.py &&
             python3 tests/smoke_words.py &&

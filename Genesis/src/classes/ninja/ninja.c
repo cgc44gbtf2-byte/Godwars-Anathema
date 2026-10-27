@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <limits.h>
 #include "merc.h"
 
 void do_principles( CHAR_DATA *ch, char *argument )
@@ -49,6 +50,9 @@ void do_principles( CHAR_DATA *ch, char *argument )
 
     if (arg1[0] == '\0')
     {
+if (IS_NIGHTSTALKER(ch))
+    stc("Nightstalker: no Michi; shadow cloak/heighten cost 60 Ki.\n\r"
+        "Darkness and Obfuscate sight; Harakiri halves current HP/Mana.\n\r", ch);
 	sprintf(buf, "Principles: Sora (%li), Chikyu (%li), Ningenno (%li).\n\r",
 	 get_ninja(ch, NINJA_SORA), get_ninja(ch, NINJA_CHIKYU), get_ninja(ch, NINJA_NINGENNO));
 	stc(buf, ch);
@@ -59,15 +63,21 @@ void do_principles( CHAR_DATA *ch, char *argument )
     {
 	if (!str_cmp(arg1, "sora"))
 	{
-	    stc("Sora - *Heaven*.  Each level adds 25 to max Michi.\n\r\n\r", ch);
+    stc(IS_NIGHTSTALKER(ch) ?
+        "Sora - *Heaven*. Nightstalkers replace Michi with shadow senses.\n\r\n\r" :
+        "Sora - *Heaven*.  Each level adds 25 to max Michi.\n\r\n\r", ch);
 	    if (get_ninja(ch, NINJA_SORA) < 1) 
 		stc("You have none of the Sora principles.\n\r", ch);
-	    if (get_ninja(ch, NINJA_SORA) >= 1)
+    if (get_ninja(ch, NINJA_SORA) >= 1 && !IS_NIGHTSTALKER(ch))
 		stc("1 : Michi       - Improves combat abilities. (michi) <100 ki>\n\r", ch);
 	    if (get_ninja(ch, NINJA_SORA) >= 4)
-                stc("4 : Kanzuite    - Raises your awareness. (heighten/readaura/scry)\n\r", ch);
+                stc(IS_NIGHTSTALKER(ch) ?
+                    "4 : Kanzuite    - Awareness (heighten: 60 Ki; readaura/scry unchanged).\n\r" :
+                    "4 : Kanzuite    - Raises your awareness. (heighten/readaura/scry)\n\r", ch);
 	    if (get_ninja(ch, NINJA_SORA) >= 6)
-		stc("6 : Kakusu      - Cloaks you in shadow. (kakusu) <20 ki, movement drains>\n\r", ch);
+stc(IS_NIGHTSTALKER(ch) ?
+    "6 : Kakusu      - Cloaks you in shadow. (kakusu) <60 ki>\n\r" :
+    "6 : Kakusu      - Cloaks you in shadow. (kakusu) <20 ki, movement drains>\n\r", ch);
 	    if (get_ninja(ch, NINJA_SORA) >= 8)
 		stc("8 : Bomuzite    - Renders opponents unconcious. (bomuzite) <20 ki>\n\r", ch);
             if (get_ninja(ch, NINJA_SORA) >= 10)
@@ -175,6 +185,10 @@ void do_demote( CHAR_DATA *ch, char *argument )
 
 void do_michi( CHAR_DATA *ch, char *argument )
 {
+    if (IS_NIGHTSTALKER(ch)) {
+        stc("Nightstalkers cannot enter Michi.\n\r", ch);
+        return;
+    }
     if (!IS_NINJA(ch) || get_ninja(ch, NINJA_SORA) < 1)
     {
 	stc("Huh?\n\r", ch);
@@ -200,6 +214,7 @@ void do_michi( CHAR_DATA *ch, char *argument )
 
 void do_kakusu( CHAR_DATA *ch, char *argument )
 {
+    const long shadow_cost = IS_NIGHTSTALKER(ch) ? 60 : 20;
     if (!IS_NINJA(ch) || get_ninja(ch, NINJA_SORA) < 6)
     {
 	stc("Huh?\n\r", ch);
@@ -214,7 +229,7 @@ void do_kakusu( CHAR_DATA *ch, char *argument )
     }
     else
     {
-	if (ch->pcdata->ninja[NINJA_KI] < 20)
+if (ch->pcdata->ninja[NINJA_KI] < shadow_cost)
 	{
 	    stc("You don't have enough Ki.\n\r", ch);
 	    return;
@@ -222,7 +237,7 @@ void do_kakusu( CHAR_DATA *ch, char *argument )
 	stc("You disappear into the shadows.\n\r", ch);
 	act("$n disappears into the shadows.", ch, NULL, NULL, TO_ROOM);
 	SET_BIT(ch->affected_by, AFF_KAKUSU);
-	ch->pcdata->ninja[NINJA_KI] -= 20;
+ch->pcdata->ninja[NINJA_KI] -= shadow_cost;
 	WAIT_STATE(ch, 12);
     }
     return;
@@ -480,6 +495,22 @@ void do_harakiri( CHAR_DATA *ch, char *argument )
     {
 	stc("You are still under the influence of the last blood ritual you performed.\n\r", ch);
 	return;
+    }
+
+    if (IS_NIGHTSTALKER(ch)) {
+        if (ch->max_hit <= 0 || ch->hit <= 0 ||
+            ch->hit < ch->max_hit / 10 || ch->mana < 0) {
+            stc("You are hurt too badly for the Nightstalker blood ritual.\n\r", ch);
+            return;
+        }
+        long duration = 25 + ch->hit / 2000 + ch->mana / 5000;
+        ch->hit /= 2;
+        ch->mana /= 2;
+        ch->pcdata->ninja[NINJA_HARAKIRI] =
+            duration > INT_MAX ? INT_MAX : duration;
+        stc("Your blood ritual sacrifices half your current HP and Mana.\n\r", ch);
+        act("$n cuts $s finger and invokes the power of HaraKiri.", ch, NULL, NULL, TO_ROOM);
+        return;
     }
 
     if (ch->hit < ch->max_hit / 5)
