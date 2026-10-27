@@ -16,6 +16,7 @@ static ROOM_INDEX_DATA home, away, staging;
 static AREA_DATA area;
 static MOB_INDEX_DATA prototype;
 static char output[65536];
+static long gargoyle_rank;
 
 static void cleanup(void)
 {
@@ -57,6 +58,12 @@ static void fresh(long class)
     actor.blood[0] = 100; actor.blood[1] = 50;
     for (int i = STAT_STR; i <= STAT_WIS; ++i) actor.stats[i] = 20;
     player.cland[0] = player.cland[1] = player.cland[2] = -1;
+    if (class == CLASS_VAMPIRE && gargoyle_rank != 0)
+    {
+        player.cland[0] = VAMPIRE_BUILD_GARGOYLE;
+        player.powers[DISC_THAUMATURGY] = gargoyle_rank;
+        assert(IS_GARGOYLE(&actor));
+    }
     player.love = player.conding = "";
     visitor.name = visitor.short_descr = "visitor"; visitor.pcdata = &guest;
     visitor.level = LEV_AWA; guest.love = guest.conding = "";
@@ -258,14 +265,65 @@ static void test_class_guards(void)
     REMOVE_BIT(actor.act, ACT_IS_NPC); actor.pcdata = &player;
 }
 
+static void test_gargoyle_inherited_ranks(void)
+{
+    fresh(CLASS_VAMPIRE);
+    for (long disc = DISC_ANIMALISM; disc <= DISC_MAX; ++disc)
+        for (long rank = -1; rank <= 8; ++rank)
+        {
+            player.powers[disc] = rank;
+            long expected = disc == DISC_THAUMATURGY && gargoyle_rank ? 0 : rank;
+            assert(get_disc(&actor, disc) == (expected > 7 ? 7 : expected));
+            assert(get_truedisc(&actor, disc) == expected);
+            assert(player.powers[disc] == rank); /* Access must not rewrite training. */
+        }
+}
+
+static void test_gargoyle_statue_commands(void)
+{
+    const char *commands[] = {"regenerate", "earthmeld", "vanish all",
+        "summoning visitor", "possession mobile", "mirrorimage",
+        "controlillusion mobile", "change bat"};
+    assert(gargoyle_rank == 1 || gargoyle_rank == 5);
+    for (size_t i = 0; i < sizeof(commands) / sizeof(commands[0]); ++i)
+    {
+        fresh(CLASS_VAMPIRE);
+        for (long disc = DISC_ANIMALISM; disc <= DISC_MAX; ++disc)
+            if (disc != DISC_THAUMATURGY) player.powers[disc] = 7;
+        CHAR_DATA *mob = mobile("mobile", &home);
+        SET_BIT(mob->extra, EXTRA_ILLUSION);
+        SET_BIT(visitor.extra, EXTRA_SUMMON);
+        SET_BIT(actor.polyaff, POLY_GARGOYLE_STATUE);
+        PC_DATA before = player;
+        int count = prototype.count;
+        command(commands[i]);
+        assert(strstr(output, "You cannot act while a stone statue"));
+        assert(gargoyle_statue(&actor) && actor.wait == 0);
+        assert(actor.polyaff == POLY_GARGOYLE_STATUE && actor.vampaff == 0);
+        assert(actor.affected_by == 0 && visitor.in_room == &away);
+        assert(mob->wizard == NULL && prototype.count == count);
+        assert(memcmp(&before, &player, sizeof(player)) == 0);
+        resources();
+    }
+}
+
 int main(void)
 {
     string_space = calloc(1, 1024 * 1024);
     assert(string_space); top_string = string_space;
     current_time = 123456; init_mm();
-    test_states(); test_obfuscate(); test_summoning();
-    test_possession(); test_illusions(); test_class_guards();
+    const long profiles[] = {0, 1, 5};
+    for (size_t i = 0; i < sizeof(profiles) / sizeof(profiles[0]); ++i)
+    {
+        gargoyle_rank = profiles[i];
+        test_states(); test_obfuscate(); test_summoning();
+        test_possession(); test_illusions(); test_class_guards();
+        test_gargoyle_inherited_ranks();
+        if (gargoyle_rank) test_gargoyle_statue_commands();
+    }
     cleanup();
     puts("vampire module extraction full-engine regressions passed");
+    puts("Gargoyle inherited modules: native/rank-1/rank-5 access, resources, "
+         "rank projections and 16 statue-command denials passed");
     return 0;
 }

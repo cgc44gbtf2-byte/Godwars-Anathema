@@ -28,6 +28,12 @@ requirements and generation 9, not EM's generation-2 grant.
   `varmor mark`, `varmor trenchcoat` and `varmor vest` retain the native cost of
   100 primal plus 400 quest points per item.
 
+Inherited-module regression tests replay regeneration, Earthmeld, Vanish,
+Summoning, Possession, Mirror Image and Control Illusion as ordinary Vampires
+and rank-1/rank-5 Gargoyles. They check existing rank/resource rules and blocked
+active commands while petrified; this is not a complete audit of every Vampire
+power or live PvP balance.
+
 Thaumaturgy's five blood powers remain unavailable even though the saved rank
 slot is shared. Quietus is separate. `teachdisc` names the replacement correctly:
 Gargoyles can teach Visceratika to Gargoyles, not Thaumaturgy to ordinary
