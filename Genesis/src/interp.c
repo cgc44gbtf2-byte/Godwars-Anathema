@@ -2970,6 +2970,7 @@
          const char *name = found ? cmd_table[cmd].name : "";
          if (str_cmp(name, "stoneform") && str_cmp(name, "look") &&
              str_cmp(name, "score") && str_cmp(name, "help") &&
+             str_cmp(name, "powers") &&
              str_cmp(name, "who") && str_cmp(name, "save") &&
              str_cmp(name, "quit") && str_cmp(name, "copyover") &&
              str_cmp(name, "inventory") &&

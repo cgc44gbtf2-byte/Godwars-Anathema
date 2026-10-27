@@ -1068,6 +1068,39 @@ static void gargoyle(void)
     }
 }
 
+static void gargoyle_power_menu(void)
+{
+    for (long rank = -1; rank <= 6; ++rank) {
+        fixture(CLASS_VAMPIRE);
+        pcs[0].cland[0] = VAMPIRE_BUILD_GARGOYLE;
+        pcs[0].powers[DISC_THAUMATURGY] = rank;
+        long before_hit = actors[0].hit, before_mana = actors[0].mana;
+        long before_primal = actors[0].primal, before_quest = pcs[0].quest;
+        run(0, "powers");
+        bool learned = rank >= 1 && rank <= 5;
+        assert(!!strstr(outputs[0], "Visceratika:") == learned);
+        assert(!strstr(outputs[0], "Thaumaturgy:"));
+        if (learned) {
+            assert(strstr(outputs[0], "Camouflage") && strstr(outputs[0], "Stoneform"));
+            assert(!strstr(outputs[0], "You have no disciplines"));
+            assert(!strstr(outputs[0], "All your discipline powers are automatic"));
+            assert(!!strstr(outputs[0], "Punch resistance") == (rank >= 4));
+            assert(!!strstr(outputs[0], "25% reflected HP damage") == (rank == 5));
+            SET_BIT(actors[0].polyaff, POLY_GARGOYLE_STATUE);
+            run(0, "powers");
+            assert(strstr(outputs[0], "Visceratika:") &&
+                   !strstr(outputs[0], "cannot act while a stone statue"));
+        }
+        assert(actors[0].hit == before_hit && actors[0].mana == before_mana &&
+               actors[0].primal == before_primal && pcs[0].quest == before_quest);
+    }
+    fixture(CLASS_VAMPIRE);
+    pcs[0].powers[DISC_THAUMATURGY] = 5;
+    run(0, "powers");
+    assert(strstr(outputs[0], "Thaumaturgy: Tasteblood") &&
+           !strstr(outputs[0], "Visceratika:"));
+}
+
 static void reflection_fixture(long rank, bool stone)
 {
     fixture(CLASS_VAMPIRE);
@@ -1236,6 +1269,7 @@ int main(void)
     enrollment_recovery();
     nightstalker();
     gargoyle();
+    gargoyle_power_menu();
     gargoyle_reflection();
     clan_registry_close();
     char_list = NULL; descriptor_list = NULL;

@@ -29,6 +29,8 @@ MARKERS = {
 }
 
 def without_gargoyle_stage(text):
+    from gargoyle_menu_source import without_gargoyle_menu
+    text = without_gargoyle_menu(text)
     from gargoyle_reflection_source import without_gargoyle_reflection
     text = without_gargoyle_reflection(text)
     for path, _, hunks in PROOFS:

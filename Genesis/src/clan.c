@@ -2590,6 +2590,18 @@ case DISC_POTENCE:
     send_to_char( "--------------------------------------------------------------------------------\n\r", ch );
     send_to_char("                            -= Discipline Commands =-\n\r",ch);
     send_to_char( "--------------------------------------------------------------------------------\n\r", ch );
+    if (gargoyle_visceratika(ch) > 0) {
+        long rank = gargoyle_visceratika(ch);
+        any_powers = any_commands = TRUE;
+        stc("Visceratika: Camouflage, Stoneform [on|off|status].\n\r", ch);
+        snprintf(buf, sizeof(buf),
+            "  Stone-form passives: %ld%% damage reduction.\n\r", rank * 10);
+        stc(buf, ch);
+        if (rank >= 4)
+            stc("  Punch resistance (stone form only).\n\r", ch);
+        if (rank == 5)
+            stc("  25% reflected HP damage (surviving stone-form hits; next pulse).\n\r", ch);
+    }
     if (get_disc(ch,DISC_ANIMALISM) > 0)
     {
 	strcpy(buf,"Animalism: Pigeon");

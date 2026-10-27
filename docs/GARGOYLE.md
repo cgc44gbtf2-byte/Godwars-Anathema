@@ -8,6 +8,9 @@ requirements and generation 9, not EM's generation-2 grant.
 ## Progression and commands
 
 - `discipline`: Visceratika replaces Thaumaturgy in the menu.
+- `powers`: lists trained Visceratika commands separately from stone-form
+  passives, including rank-4 punch resistance and rank-5 reflection. This
+  read-only menu remains available while petrified.
 - `discipline visceratika`: ranks 1–5; **15 × next rank** primal, including
   15 primal to start. No clan-name discount or extra in-clan discipline slots.
 - Visceratika reduces positive incoming damage by 10/20/30/40/50%, after

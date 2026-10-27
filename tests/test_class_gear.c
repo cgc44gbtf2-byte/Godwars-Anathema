@@ -186,6 +186,53 @@ static void craft_boundaries(void)
     }
 }
 
+static void gargoyle_equipment(void)
+{
+    const long masks[] = {ITEM_WEAR_NECK, ITEM_WEAR_ABOUT, ITEM_WEAR_BODY};
+    const long shipped_masks[] = {5, 1025, 9};
+    const long slots[] = {WEAR_NECK_1, WEAR_ABOUT, WEAR_BODY};
+    for (int recipe = 0; recipe < 3; ++recipe) {
+        const struct craft *c = &crafts[recipe];
+        OBJ_INDEX_DATA *p = index_for(c->vnum, ITEM_ARMOR);
+        long old_mask = p->wear_flags;
+        p->wear_flags = ITEM_TAKE | masks[recipe]; /* Shipped relic.are slots. */
+        assert(p->wear_flags == shipped_masks[recipe]);
+        for (int profile = 0; profile < 3; ++profile) {
+            fixture(CLASS_VAMPIRE);
+            if (profile) {
+                pc.cland[0] = VAMPIRE_BUILD_GARGOYLE;
+                pc.powers[DISC_THAUMATURGY] = profile == 1 ? 1 : 5;
+            }
+            actor.primal = 100; pc.quest = 400;
+            invoke(do_vamparmor, c->arg);
+            OBJ_DATA *item = actor.carrying;
+            assert(item && item->pIndexData == p && item->item_type == ITEM_ARMOR);
+            assert(IS_SET(item->spectype, SITEM_VAMPIRE));
+            assert(!str_cmp(item->questowner, actor.name) &&
+                   !str_cmp(item->questmaker, actor.name));
+            assert(actor.primal == 0 && pc.quest == 0);
+            invoke(do_wear, "gear");
+            assert(get_eq_char(&actor, slots[recipe]) == item);
+            if (profile) actor.polyaff = POLY_GARGOYLE_STATUE;
+            assert(save_char_obj_checked(&actor));
+            DESCRIPTOR_DATA loaded = {0};
+            assert(load_char_obj(&loaded, "Gearhero"));
+            assert(IS_GARGOYLE(loaded.character) == (profile != 0));
+            assert(gargoyle_statue(loaded.character) == (profile != 0));
+            OBJ_DATA *restored = get_eq_char(loaded.character, slots[recipe]);
+            assert(restored && restored->pIndexData == p &&
+                   !str_cmp(restored->questowner, "Gearhero") &&
+                   loaded.character->primal == 0 &&
+                   loaded.character->pcdata->quest == 0);
+            while (loaded.character->carrying) extract_obj(loaded.character->carrying);
+            free_char(loaded.character);
+        }
+        p->wear_flags = old_mask;
+    }
+    puts("Gargoyle gear: three recipes, native Vampire and rank-1/rank-5 "
+         "Gargoyles, exact costs/ownership/real slots and worn statue reloads passed");
+}
+
 static void missing_sorcerer(void)
 {
     /* The original missing-template branch exits the entire game process. */
@@ -709,7 +756,7 @@ int main(int argc, char **argv)
         else if (!strcmp(argv[1],"conjured")) conjured_supplies();
         else abort();
     } else {
-        missing_sorcerer(); craft_boundaries(); sorcerer(); forge(); upgraded_forge();
+        missing_sorcerer(); craft_boundaries(); gargoyle_equipment(); sorcerer(); forge(); upgraded_forge();
         mage_costs(); equipment(); class_restrictions(); dragon_persistence();
         consumable_market(); market_sales(); conjured_supplies(); fetish_crafting();
     }

@@ -28,6 +28,15 @@ def until(client, needle):
         assert len(data) < 2_000_000
     return data
 
+def power_menu(client):
+    client.sendall(b"powers\n")
+    data = until(client, b"next pulse")
+    assert b"Visceratika:" in data and b"Camouflage" in data and b"Stoneform" in data
+    assert b"50% damage reduction" in data and b"Punch resistance" in data
+    assert b"25% reflected HP damage" in data
+    assert b"Thaumaturgy:" not in data and b"You have no disciplines" not in data
+    assert b"cannot act while a stone statue" not in data
+
 with tempfile.TemporaryDirectory(prefix="anathema-gargoyle-") as directory:
     runtime = pathlib.Path(directory)
     for name in ("area", "player", "backup", "notes", "log", "clans"):
@@ -63,6 +72,7 @@ with tempfile.TemporaryDirectory(prefix="anathema-gargoyle-") as directory:
                 if after_exec:
                     client.sendall(b"stoneform status\n")
                     until(client, b"Stone form: immobile defensive statue")
+                    power_menu(client)
                     client.sendall(b"stoneform off\n")
                     until(client, b"returns to flesh")
                 if not after_exec:
@@ -71,10 +81,12 @@ with tempfile.TemporaryDirectory(prefix="anathema-gargoyle-") as directory:
                 client.sendall(b"discipline\n")
                 output = until(client, b"To improve a discipline rating")
                 assert b"Visceratika" in output and b"Thaumaturgy" not in output
+                power_menu(client)
                 client.sendall(b"tasteblood self\n")
                 until(client, b"not trained high enough")
                 client.sendall(b"stoneform on\n")
                 until(client, b"immobile defensive stone statue")
+                power_menu(client)
                 client.sendall(b"north\n")
                 until(client, b"cannot act while a stone statue")
                 client.sendall(b"save\n"); until(client, b"Saved.")
