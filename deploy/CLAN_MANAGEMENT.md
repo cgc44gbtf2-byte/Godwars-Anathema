@@ -63,8 +63,10 @@ for acceptance regardless of blanket `vampire` consent flags.
 clan info
 clan roster [page]
 clan invite Bob
+clan recruit Bob
 clan accept Alice
 clan decline
+clan settle
 clan promote Bob
 clan demote Bob
 clan kick Bob
@@ -97,6 +99,16 @@ leave without transferring or explicitly disbanding. Staff recovery can use
 offline ones. No gameplay currency is charged for governance operations.
 
 ## Persistence and recovery
+
+All ten current native classes can use named class-and-clan recruitment for a
+willing unclassed player. Registered Members can sponsor this ritual, but
+ordinary invitations and promotions still require the appropriate office.
+Vampires can use `clan embrace`; Mages can use `clan teach`. Combat bites and
+ordinary power lessons do not perform classing.
+
+See [class factions and recovery](../docs/CLASS_FACTIONS.md) for native
+prerequisites, affiliation labels (**Loner**/**Exiled**), enrollment intents,
+rollback restrictions and the requested EM imports that remain pending.
 
 `clans/Registry` is the authority, not the `Clan` string cached in a player
 file. Each accepted change validates the entire proposed registry, writes a

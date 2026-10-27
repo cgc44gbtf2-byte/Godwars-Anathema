@@ -3095,6 +3095,10 @@
          send_to_char("Clan commands require the player's own input.\n\r", ch);
          return;
       }
+      /* An accepted class ritual may be waiting for durable recovery. */
+      if (cmd_table[cmd].do_fun == do_autoclass && ch->class == CLASS_NONE &&
+          clan_block_class_change(ch))
+         return;
       (*cmd_table[cmd].do_fun) ( ch, argument );
       tail_chain( );
       /* Commands such as quit may have freed ch; do not dereference it here. */

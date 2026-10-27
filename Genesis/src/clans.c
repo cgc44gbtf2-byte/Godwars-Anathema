@@ -16,6 +16,7 @@
 #include <time.h>
 #include "merc.h"
 #include "atomic_save.h"
+#include "class_factions.h"
 
 #define CLAN_LIMIT 64
 #define MEMBER_LIMIT 1024
@@ -29,7 +30,7 @@
 
 struct clan_entry { long id, class_id; char label[LABEL_LIMIT + 1]; };
 struct clan_member {
-    long id, class_id, role;
+    long id, class_id, role, exiled, recruit_recipe;
     char name[NAME_LIMIT + 1];
 };
 struct clan_registry {
@@ -38,7 +39,7 @@ struct clan_registry {
     struct clan_member members[MEMBER_LIMIT];
 };
 struct clan_invite {
-    long id, class_id, transfer;
+    long id, class_id, transfer, recruit_recipe;
     time_t created;
     char from[NAME_LIMIT + 1], to[NAME_LIMIT + 1];
 };
@@ -50,6 +51,85 @@ static int lock_fd = -1;
 static dev_t lock_device;
 static ino_t lock_directory;
 static int write_registry(FILE *fp, void *context);
+
+/* Stable native autoclass recipes. These are initial class builds, NOT copies
+ * of a sponsor's earned training. Extend only with a corresponding live class
+ * implementation; donor class IDs and unimplemented variants are not recipes.
+ */
+static const struct {
+    long class_id;
+    const char *command, *faction;
+} recruit_recipes[] = {
+    {CLASS_VAMPIRE, "vampire ventrue", "Ventrue"},
+    {CLASS_VAMPIRE, "vampire nosferatu", "Nosferatu"},
+    {CLASS_VAMPIRE, "vampire brujah", "Brujah"},
+    {CLASS_VAMPIRE, "vampire assamite", "Assamite"},
+    {CLASS_VAMPIRE, "vampire gangrel", "Gangrel"},
+    {CLASS_VAMPIRE, "vampire serpentsofthelight", "Serpents of the Light"},
+    {CLASS_VAMPIRE, "vampire lasombra", "Lasombra"},
+    {CLASS_VAMPIRE, "vampire tzimisce", "Tzimisce"},
+    {CLASS_VAMPIRE, "vampire ravnos", "Ravnos"},
+    {CLASS_WEREWOLF, "werewolf", NULL},
+    {CLASS_SORCERER, "sorcerer", NULL},
+    {CLASS_MONK, "monk", NULL},
+    {CLASS_DRAGON, "dragon bronze", NULL},
+    {CLASS_DRAGON, "dragon red", NULL},
+    {CLASS_DRAGON, "dragon blue", NULL},
+    {CLASS_DRAGON, "dragon silver", NULL},
+    {CLASS_DRAGON, "dragon gold", NULL},
+    {CLASS_DRAGON, "dragon black", NULL},
+    {CLASS_HIGHLANDER, "highlander", NULL},
+    {CLASS_NINJA, "ninja", NULL},
+    {CLASS_DROW, "drow", NULL},
+    {CLASS_ELEM, "elementalist", NULL},
+    {CLASS_MAGE, "mage akashic", "Akashic Brotherhood"},
+    {CLASS_MAGE, "mage celestial", "Celestial Chorus"},
+    {CLASS_MAGE, "mage ecstasy", "Cult of Ecstasy"},
+    {CLASS_MAGE, "mage dreamspeakers", "Dreamspeakers"},
+    {CLASS_MAGE, "mage euthanatos", "Euthanatos"},
+    {CLASS_MAGE, "mage hermes", "Order of Hermes"},
+    {CLASS_MAGE, "mage ether", "Sons of Ether"},
+    {CLASS_MAGE, "mage verbena", "Verbena"},
+    {CLASS_MAGE, "mage virtual", "Virtual Adepts"},
+    {CLASS_MAGE, "mage hollow", "Hollow Ones"}
+};
+
+static long recipe_class(long recipe)
+{
+    return recipe > 0 && (unsigned long)recipe <=
+        sizeof(recruit_recipes) / sizeof(recruit_recipes[0]) ?
+        recruit_recipes[recipe - 1].class_id : CLASS_NONE;
+}
+
+/* Preview the real native initializer on private numeric state. The only
+ * string changed by autoclass is clan, so it has its own owned copy. Existing
+ * prerequisites and initial generation/level/branch choices remain native.
+ */
+static bool recruit_project(CHAR_DATA *ch, long recipe, bool apply)
+{
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL ||
+        ch->class != CLASS_NONE || ch->pcdata->hybrid_present ||
+        ch->pcdata->player_load_failed || recipe_class(recipe) == CLASS_NONE)
+        return FALSE;
+    CHAR_DATA projected = *ch;
+    PC_DATA player = *ch->pcdata;
+    char command[80];
+    projected.pcdata = &player;
+    projected.desc = NULL;
+    projected.clan = str_dup(ch->clan != NULL ? ch->clan : "");
+    snprintf(command, sizeof(command), "%s", recruit_recipes[recipe - 1].command);
+    do_autoclass(&projected, command);
+    bool valid = projected.class == recipe_class(recipe);
+    free_string(projected.clan);
+    if (valid && apply) {
+        *ch->pcdata = player;
+        ch->class = projected.class;
+        ch->vampgen = projected.vampgen;
+        ch->level = projected.level;
+        ch->arete = projected.arete;
+    }
+    return valid;
+}
 
 static bool supported(long id)
 {
@@ -134,12 +214,16 @@ static bool valid_registry(const struct clan_registry *r)
         if (!m->name[0]) continue;
         if (!canonical_name(m->name, name) || strcmp(name, m->name) ||
             !supported(m->class_id)) return FALSE;
+        if (m->recruit_recipe != 0 && recipe_class(m->recruit_recipe) != m->class_id)
+            return FALSE;
         if (m->id == 0) {
             if (m->role != 0) return FALSE; /* Persistent removal tombstone. */
+            if (m->exiled != 0 && m->exiled != 1) return FALSE;
         } else {
             c = clan_index(r, m->id);
             if (c < 0 || r->clans[c].class_id != m->class_id ||
-                m->role < MEMBER_ROLE || m->role > LEADER_ROLE) return FALSE;
+                m->role < MEMBER_ROLE || m->role > LEADER_ROLE ||
+                m->exiled != 0) return FALSE;
         }
         for (int j = i + 1; j < MEMBER_LIMIT; ++j)
             if (r->members[j].name[0] &&
@@ -240,6 +324,7 @@ bool clan_load_registry(void)
     struct stat st;
     FILE *fp = NULL;
     int dir, fd, nc = 0, nm = 0, line_no = 0;
+    long version = 0;
     bool ended = FALSE, good = TRUE;
     char line[256];
     loaded = TRUE; healthy = FALSE; uncertain = FALSE;
@@ -278,23 +363,44 @@ bool clan_load_registry(void)
         if (ended || w != NULL) { good = FALSE; break; }
         if (line_no++ == 0) {
             if (n != 3 || strcmp(words[0], "AnathemaClans") ||
-                strcmp(words[1], "1") || !number(words[2], &candidate.next_id))
+                !number(words[1], &version) || version < 1 || version > 3 ||
+                !number(words[2], &candidate.next_id))
                 { good = FALSE; break; }
         } else if (!strcmp(words[0], "C") && n == 4 && nc < CLAN_LIMIT) {
             struct clan_entry *c = &candidate.clans[nc++];
             if (!number(words[1], &c->id) || c->id < 1 ||
                 !number(words[2], &c->class_id) || !decode_label(words[3], c->label))
                 { good = FALSE; break; }
-        } else if (!strcmp(words[0], "M") && n == 5 && nm < MEMBER_LIMIT) {
+        } else if (!strcmp(words[0], "M") && n == (version == 3 ? 7 : version == 2 ? 6 : 5) &&
+                   nm < MEMBER_LIMIT) {
             struct clan_member *m = &candidate.members[nm++];
             if (!number(words[1], &m->id) || !number(words[2], &m->class_id) ||
                 !number(words[3], &m->role) ||
-                !canonical_name(words[4], m->name) || strcmp(words[4], m->name))
+                !canonical_name(words[4], m->name) || strcmp(words[4], m->name) ||
+                (version >= 2 && !number(words[5], &m->exiled)) ||
+                (version == 3 && !number(words[6], &m->recruit_recipe)))
                 { good = FALSE; break; }
         } else if (!strcmp(words[0], "End") && n == 1) ended = TRUE;
         else { good = FALSE; break; }
     }
     if (ferror(fp)) good = FALSE;
+    if (good && ended && valid_registry(&candidate)) {
+        bool pending = FALSE;
+        for (int i = 0; i < MEMBER_LIMIT; ++i)
+            if (candidate.members[i].recruit_recipe) pending = TRUE;
+        if (pending) {
+            /* A process restart may follow an uncertain rename without a
+             * machine reboot. Confirm both file and directory durability
+             * before a read intent can grant a class to a saved player. */
+            if (fsync(fileno(fp)) != 0) good = FALSE;
+            int directory = open_directory(FALSE);
+            if (directory < 0) good = FALSE;
+            else {
+                if (fsync(directory) != 0) good = FALSE;
+                close(directory);
+            }
+        }
+    }
     if (fclose(fp) != 0) good = FALSE;
     fp = NULL;
     if (!good || !ended || !valid_registry(&candidate)) goto failed;
@@ -315,27 +421,51 @@ static bool available(CHAR_DATA *ch, bool writing)
     return TRUE;
 }
 
-static bool player_ready(CHAR_DATA *ch)
+static bool session_ready(CHAR_DATA *ch)
 {
     char name[NAME_LIMIT + 1];
     return ch != NULL && !IS_NPC(ch) && ch->pcdata != NULL &&
-        supported(ch->class) && ch->level >= LEV_AWA &&
+        ch->level >= LEV_AWA &&
         canonical_name(ch->name, name) && ch->desc != NULL &&
         ch->desc->original == NULL && ch->desc->connected == CON_PLAYING &&
         ch->position >= POS_STANDING && ch->in_room != NULL &&
         ch->fighting == NULL && ch->combat_pause == 0 && ch->wait == 0;
 }
 
+static bool player_ready(CHAR_DATA *ch)
+{
+    return session_ready(ch) && supported(ch->class);
+}
+
 void clan_sync_player(CHAR_DATA *ch)
 {
     int m, c;
     const char *label;
-    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL || !supported(ch->class))
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL ||
+        (!supported(ch->class) && ch->class != CLASS_NONE))
         return;
     if (!loaded) clan_load_registry();
     if (!healthy) return; /* Never grant permissions from cached clan strings. */
     m = member_index(&registry, ch->name);
-    if (m < 0 || registry.members[m].class_id != ch->class) return;
+    if (m < 0) return;
+    /* A durable accepted enrollment is a recovery intent, not merely a cached
+     * clan label. Never repeat the initializer on an already-classed player.
+     * An uncertain directory commit must be settled before granting a class.
+     */
+    if (registry.members[m].recruit_recipe && !uncertain) {
+        if (ch->class == CLASS_NONE &&
+            !recruit_project(ch, registry.members[m].recruit_recipe, TRUE)) {
+            ch->pcdata->player_load_failed = 1;
+            bug("Clan enrollment recovery could not initialize native class", 0);
+            return;
+        }
+        if (ch->class != registry.members[m].class_id) {
+            ch->pcdata->player_load_failed = 1;
+            bug("Clan enrollment conflicts with saved class; review required", 0);
+            return;
+        }
+    }
+    if (registry.members[m].class_id != ch->class) return;
     c = clan_index(&registry, registry.members[m].id);
     label = c < 0 ? "" : registry.clans[c].label;
     if (ch->clan == NULL || strcmp(ch->clan, label)) {
@@ -353,7 +483,12 @@ static int write_registry(FILE *fp, void *context)
 {
     const struct clan_registry *r = context;
     static const char hex[] = "0123456789abcdef";
-    fprintf(fp, "AnathemaClans 1 %ld\n", r->next_id);
+    int version = 1;
+    for (int i = 0; i < MEMBER_LIMIT; ++i)
+        if (r->members[i].name[0] && r->members[i].exiled) version = 2;
+    for (int i = 0; i < MEMBER_LIMIT; ++i)
+        if (r->members[i].name[0] && r->members[i].recruit_recipe) version = 3;
+    fprintf(fp, "AnathemaClans %d %ld\n", version, r->next_id);
     for (int i = 0; i < CLAN_LIMIT; ++i) if (r->clans[i].id) {
         const struct clan_entry *c = &r->clans[i];
         fprintf(fp, "C %ld %ld ", c->id, c->class_id);
@@ -364,7 +499,10 @@ static int write_registry(FILE *fp, void *context)
     }
     for (int i = 0; i < MEMBER_LIMIT; ++i) if (r->members[i].name[0]) {
         const struct clan_member *m = &r->members[i];
-        fprintf(fp, "M %ld %ld %ld %s\n", m->id, m->class_id, m->role, m->name);
+        fprintf(fp, "M %ld %ld %ld %s", m->id, m->class_id, m->role, m->name);
+        if (version >= 2) fprintf(fp, " %ld", m->exiled);
+        if (version == 3) fprintf(fp, " %ld", m->recruit_recipe);
+        fputc('\n', fp);
     }
     return fprintf(fp, "End\n") < 0 || ferror(fp) ? -1 : 0;
 }
@@ -412,6 +550,10 @@ bool clan_block_class_change(CHAR_DATA *ch)
         return TRUE;
     }
     m = member_index(&registry, ch->name);
+    if (m >= 0 && registry.members[m].recruit_recipe) {
+        stc("Complete class enrollment recovery with 'clan settle' first.\n\r", ch);
+        return TRUE;
+    }
     if (m >= 0 && registry.members[m].id != 0) {
         stc("Leave the managed clan first; leaders must transfer or disband it.\n\r", ch);
         return TRUE;
@@ -425,7 +567,7 @@ bool clan_identity_reserved(const char *name)
     if (!loaded) clan_load_registry();
     if (!healthy || uncertain) return TRUE;
     m = member_index(&registry, name);
-    return m >= 0 && registry.members[m].id != 0;
+    return m >= 0 && (registry.members[m].id != 0 || registry.members[m].recruit_recipe);
 }
 
 bool clan_block_name_change(CHAR_DATA *ch, const char *label)
@@ -439,16 +581,58 @@ bool clan_block_name_change(CHAR_DATA *ch, const char *label)
     return FALSE;
 }
 
-static int active_member(CHAR_DATA *ch)
+static int active_member(const CHAR_DATA *ch)
 {
     int m = member_index(&registry, ch->name);
     return m >= 0 && registry.members[m].id != 0 &&
         registry.members[m].class_id == ch->class ? m : -1;
 }
 
+/* The registry is the sole source of social/class-faction authority.  In
+ * particular, generation, gift ranks, class power and cached clan/lord
+ * strings do not confer a role. Read access is safe during an uncertain
+ * commit: the visible registry is still authoritative; writes stay frozen.
+ */
+int clan_member_role(const CHAR_DATA *ch)
+{
+    int m;
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL ||
+        ch->name == NULL || ch->pcdata->player_load_failed ||
+        !supported(ch->class)) return 0;
+    if (!loaded) clan_load_registry();
+    if (!healthy || (m = active_member(ch)) < 0) return 0;
+    return (int)registry.members[m].role;
+}
+
+const char *clan_leader_name(const CHAR_DATA *ch)
+{
+    int m;
+    if (clan_member_role(ch) == 0 || (m = active_member(ch)) < 0) return NULL;
+    for (int i = 0; i < MEMBER_LIMIT; ++i)
+        if (registry.members[i].id == registry.members[m].id &&
+            registry.members[i].role == LEADER_ROLE)
+            return registry.members[i].name;
+    return NULL;
+}
+
 static const char *role_name(long role)
 {
     return role == LEADER_ROLE ? "Leader" : role == OFFICER_ROLE ? "Officer" : "Member";
+}
+
+const char *clan_affiliation(const CHAR_DATA *ch)
+{
+    int m, role;
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL ||
+        ch->pcdata->player_load_failed) return "Unavailable";
+    if (ch->class == CLASS_NONE) return "Unclassed";
+    if (!supported(ch->class)) return "Unavailable";
+    if (!loaded) clan_load_registry();
+    if (!healthy) return "Unavailable";
+    if ((role = clan_member_role(ch)) != 0) return role_name(role);
+    m = member_index(&registry, ch->name);
+    return m >= 0 && registry.members[m].class_id == ch->class &&
+        registry.members[m].exiled ? "Exiled" : "Loner";
 }
 
 static bool together(CHAR_DATA *a, CHAR_DATA *b)
@@ -458,6 +642,145 @@ static bool together(CHAR_DATA *a, CHAR_DATA *b)
         a->class == b->class && a->in_room == b->in_room &&
         (a->affected_by & planes) == (b->affected_by & planes) &&
         can_see(a, b) && can_see(b, a);
+}
+
+static bool recruit_together(CHAR_DATA *sponsor, CHAR_DATA *student)
+{
+    const long planes = AFF_ETHEREAL | AFF_DEEPUMBRA | AFF_SHADOWPLANE;
+    return player_ready(sponsor) && session_ready(student) && sponsor != student &&
+        student->class == CLASS_NONE && !student->pcdata->hybrid_present &&
+        !student->pcdata->player_load_failed &&
+        (student->clan == NULL || !student->clan[0]) &&
+        sponsor->in_room == student->in_room &&
+        (sponsor->affected_by & planes) == (student->affected_by & planes) &&
+        can_see(sponsor, student) && can_see(student, sponsor);
+}
+
+static long sponsor_recipe(CHAR_DATA *sponsor, int m)
+{
+    int c = clan_index(&registry, registry.members[m].id);
+    if (c < 0) return 0;
+    for (size_t i = 0; i < sizeof(recruit_recipes)/sizeof(recruit_recipes[0]); ++i) {
+        if (recruit_recipes[i].class_id != sponsor->class) continue;
+        CHAR_DATA preview = *sponsor;
+        PC_DATA player = *sponsor->pcdata;
+        preview.pcdata = &player;
+        preview.class = CLASS_NONE;
+        if (!recruit_project(&preview, (long)i + 1, TRUE)) continue;
+        if (sponsor->class == CLASS_VAMPIRE &&
+            memcmp(player.cland, sponsor->pcdata->cland, sizeof(player.cland))) continue;
+        if (sponsor->class == CLASS_MAGE &&
+            player.cland[0] != sponsor->pcdata->cland[0]) continue;
+        if (sponsor->class == CLASS_DRAGON &&
+            player.dragcol != sponsor->pcdata->dragcol) continue;
+        return (long)i + 1;
+    }
+    return 0;
+}
+
+static bool settle_enrollment(CHAR_DATA *ch)
+{
+    int m = member_index(&registry, ch->name);
+    if (m < 0 || !registry.members[m].recruit_recipe) {
+        stc("No class enrollment recovery is pending.\n\r", ch);
+        return TRUE;
+    }
+    if (!player_ready(ch) || uncertain || ch->pcdata->player_load_failed ||
+        ch->class != registry.members[m].class_id) {
+        stc("Class enrollment requires staff review or registry retry.\n\r", ch);
+        return FALSE;
+    }
+    /* The replay intent is retired only after the initialized player file is
+     * confirmed durable. If either write fails, the intent remains replayable
+     * without ever granting a second class or resetting earned training.
+     */
+    if (!save_char_obj_checked(ch)) {
+        stc("Enrollment recovery retained: player save was not confirmed. Use clan settle.\n\r", ch);
+        return FALSE;
+    }
+    struct clan_registry next = registry;
+    next.members[m].recruit_recipe = 0;
+    return commit_registry(ch, &next);
+}
+
+static void offer_recruit(CHAR_DATA *ch, int m, const char *name)
+{
+    CHAR_DATA *student = get_char_room(ch, (char *)name);
+    long recipe = sponsor_recipe(ch, m);
+    int t, slot = -1, c = clan_index(&registry, registry.members[m].id);
+    char who[NAME_LIMIT + 1], from[NAME_LIMIT + 1], buf[MAX_STRING_LENGTH];
+    if (!recipe || !recruit_together(ch, student) ||
+        !canonical_name(student->name, who) || !canonical_name(ch->name, from) ||
+        !recruit_project(student, recipe, FALSE)) {
+        stc("Recruitment needs a willing unclassed player here with native class prerequisites.\n\r"
+            "Your native class build must identify a supported recruitment path.\n\r", ch);
+        return;
+    }
+    t = member_index(&registry, who);
+    if (t >= 0 && (registry.members[t].id || registry.members[t].recruit_recipe)) {
+        stc("That player already has a clan or unresolved class enrollment.\n\r", ch);
+        return;
+    }
+    for (int i = 0; i < INVITE_LIMIT; ++i) {
+        if (!str_cmp(invites[i].to, who)) { slot = i; break; }
+        if (slot < 0 && (invites[i].id == 0 || current_time < invites[i].created ||
+            difftime(current_time, invites[i].created) > 120)) slot = i;
+    }
+    if (slot < 0) { stc("Too many pending clan offers; try later.\n\r", ch); return; }
+    struct clan_invite *p = &invites[slot];
+    memset(p, 0, sizeof(*p));
+    p->id = registry.members[m].id;
+    p->class_id = recipe_class(recipe);
+    p->recruit_recipe = recipe;
+    p->created = current_time;
+    strcpy(p->from, from); strcpy(p->to, who);
+    snprintf(buf, sizeof(buf),
+        "%s offers class recruitment (%s) AND membership in %s as a Member.\n\r"
+        "Accept both with 'clan accept %s' within 120 seconds, or 'clan decline'.\n\r",
+        from, recruit_recipes[recipe - 1].command, registry.clans[c].label, from);
+    stc(buf, student);
+    stc("Named class-and-clan offer sent; no class or membership has changed.\n\r", ch);
+}
+
+static void accept_recruit(CHAR_DATA *ch, struct clan_invite *p)
+{
+    CHAR_DATA *sponsor = get_char_room(ch, p->from);
+    int m = sponsor != NULL ? active_member(sponsor) : -1;
+    int t = member_index(&registry, ch->name);
+    if (current_time < p->created || difftime(current_time, p->created) > 120 ||
+        p->transfer || recipe_class(p->recruit_recipe) != p->class_id ||
+        !recruit_together(sponsor, ch) || m < 0 ||
+        registry.members[m].id != p->id ||
+        sponsor_recipe(sponsor, m) != p->recruit_recipe ||
+        (t >= 0 && (registry.members[t].id || registry.members[t].recruit_recipe)) ||
+        !recruit_project(ch, p->recruit_recipe, FALSE)) {
+        stc("No valid class-and-clan offer. Ask for a new one.\n\r", ch);
+        return;
+    }
+    struct clan_registry next = registry;
+    if (t < 0) for (int i = 0; i < MEMBER_LIMIT; ++i)
+        if (!next.members[i].name[0]) { t = i; break; }
+    if (t < 0) { stc("Clan registry member capacity reached.\n\r", ch); return; }
+    /* Save the eligible, still-unclassed state first. The following atomic
+     * registry commit is the durable consent/recovery record for BOTH changes.
+     */
+    if (!save_char_obj_checked(ch)) {
+        stc("Recruitment stopped: your existing player state could not be saved safely.\n\r", ch);
+        return;
+    }
+    canonical_name(ch->name, next.members[t].name);
+    next.members[t].id = p->id;
+    next.members[t].class_id = p->class_id;
+    next.members[t].role = MEMBER_ROLE;
+    next.members[t].exiled = 0;
+    next.members[t].recruit_recipe = p->recruit_recipe;
+    if (!commit_registry(ch, &next)) return;
+    p->id = 0;
+    if (!uncertain) {
+        clan_sync_player(ch);
+        settle_enrollment(ch);
+    }
+    stc("Your named class-and-clan recruitment was accepted.\n\r", sponsor);
 }
 
 static void offer(CHAR_DATA *ch, int m, const char *name, bool transfer)
@@ -506,6 +829,7 @@ static void accept_offer(CHAR_DATA *ch, const char *from)
     for (int i = 0; i < INVITE_LIMIT; ++i)
         if (invites[i].id && !str_cmp(invites[i].to, ch->name) &&
             !str_cmp(invites[i].from, from)) { p = &invites[i]; break; }
+    if (p != NULL && p->recruit_recipe) { accept_recruit(ch, p); return; }
     if (p == NULL || current_time < p->created ||
         difftime(current_time, p->created) > 120 ||
         p->class_id != ch->class || (c = clan_index(&registry, p->id)) < 0 ||
@@ -533,6 +857,7 @@ static void accept_offer(CHAR_DATA *ch, const char *from)
         canonical_name(ch->name, next.members[t].name);
         next.members[t].id = p->id; next.members[t].class_id = ch->class;
         next.members[t].role = MEMBER_ROLE;
+        next.members[t].exiled = 0;
     }
     if (commit_registry(ch, &next)) {
         p->id = 0;
@@ -546,6 +871,7 @@ static void disband(struct clan_registry *next, long id)
     if (c >= 0) memset(&next->clans[c], 0, sizeof(next->clans[c]));
     for (int i = 0; i < MEMBER_LIMIT; ++i) if (next->members[i].id == id) {
         next->members[i].id = 0; next->members[i].role = 0;
+        next->members[i].exiled = 0;
     }
 }
 
@@ -559,15 +885,22 @@ void do_clan(CHAR_DATA *ch, char *argument)
     argument = one_argument(argument, target);
     one_argument(argument, extra);
     if (!available(ch, FALSE)) return;
+    clan_sync_player(ch);
     m = active_member(ch);
     if (!action[0] || !str_cmp(action, "info") || !str_cmp(action, "roster")) {
         if (m < 0) {
+            snprintf(buf, sizeof(buf), "Clan affiliation: %s.\n\r", clan_affiliation(ch));
+            stc(buf, ch);
             stc("No managed clan membership. Staff can create/adopt a class clan.\n\r", ch);
         } else {
             c = clan_index(&registry, registry.members[m].id);
             snprintf(buf, sizeof(buf), "Clan ID %ld: %s (class %ld); your role: %s.\n\r",
                      registry.clans[c].id, registry.clans[c].label, ch->class,
                      role_name(registry.members[m].role));
+            stc(buf, ch);
+            const char *faction_leader = clan_leader_name(ch);
+            snprintf(buf, sizeof(buf), "Faction and clan leader: %s.\n\r",
+                     faction_leader != NULL ? faction_leader : "Unavailable");
             stc(buf, ch);
             if (!str_cmp(action, "roster")) {
                 long page = 1;
@@ -595,15 +928,21 @@ void do_clan(CHAR_DATA *ch, char *argument)
                 }
             }
         }
+        int record = member_index(&registry, ch->name);
+        if (record >= 0 && registry.members[record].recruit_recipe)
+            stc("Class enrollment recovery is pending: use 'clan settle'; staff retry if frozen.\n\r", ch);
         stc("Clan: info, roster [page], invite <player>, accept <inviter>, decline,\n\r"
-            "promote/demote/kick <member>, transfer <member>, leave, disband confirm.\n\r", ch);
+            "recruit <unclassed player>, settle, promote/demote/kick <member>,\n\r"
+            "transfer <member>, leave, disband confirm.\n\r", ch);
         return;
     }
-    if (!player_ready(ch) || !available(ch, TRUE)) {
+    if (!session_ready(ch) || (!supported(ch->class) && ch->class != CLASS_NONE) ||
+        !available(ch, TRUE)) {
         stc("Use your own awake, out-of-combat player session for clan changes.\n\r", ch);
         return;
     }
     if (extra[0]) { stc("Too many clan arguments.\n\r", ch); return; }
+    if (!str_cmp(action, "settle") && !target[0]) { settle_enrollment(ch); return; }
     if (!str_cmp(action, "decline") && !target[0]) {
         for (int i = 0; i < INVITE_LIMIT; ++i)
             if (!str_cmp(invites[i].to, ch->name)) invites[i].id = 0;
@@ -611,6 +950,11 @@ void do_clan(CHAR_DATA *ch, char *argument)
     }
     if (!str_cmp(action, "accept") && target[0]) { accept_offer(ch, target); return; }
     if (m < 0) { stc("You are not a registered clan member.\n\r", ch); return; }
+    if ((!str_cmp(action, "recruit") ||
+         (!str_cmp(action, "embrace") && ch->class == CLASS_VAMPIRE) ||
+         (!str_cmp(action, "teach") && ch->class == CLASS_MAGE)) && target[0]) {
+        offer_recruit(ch, m, target); return;
+    }
     if ((!str_cmp(action, "invite") || !str_cmp(action, "transfer")) && target[0]) {
         offer(ch, m, target, !str_cmp(action, "transfer")); return;
     }
@@ -620,6 +964,7 @@ void do_clan(CHAR_DATA *ch, char *argument)
             stc("Transfer leadership or use 'clan disband confirm' first.\n\r", ch); return;
         }
         next.members[m].id = next.members[m].role = 0;
+        next.members[m].exiled = 0;
     } else if (!str_cmp(action, "disband") && !str_cmp(target, "confirm")) {
         if (registry.members[m].role != LEADER_ROLE) {
             stc("Only the clan leader may disband it.\n\r", ch); return;
@@ -634,7 +979,10 @@ void do_clan(CHAR_DATA *ch, char *argument)
             registry.members[m].role < OFFICER_ROLE) {
             stc("You may only manage lower-ranked members of your own clan.\n\r", ch); return;
         }
-        if (!str_cmp(action, "kick")) next.members[t].id = next.members[t].role = 0;
+        if (!str_cmp(action, "kick")) {
+            next.members[t].id = next.members[t].role = 0;
+            next.members[t].exiled = 1;
+        }
         else {
             if (registry.members[m].role != LEADER_ROLE) {
                 stc("Only the leader appoints or removes officers.\n\r", ch); return;
@@ -722,5 +1070,6 @@ void do_clanadmin(CHAR_DATA *ch, char *argument)
     next.members[m].id = next.clans[c].id;
     next.members[m].class_id = leader->class;
     next.members[m].role = LEADER_ROLE;
+    next.members[m].exiled = 0;
     commit_registry(ch, &next);
 }

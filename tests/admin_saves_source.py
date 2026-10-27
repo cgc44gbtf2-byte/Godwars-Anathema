@@ -18,6 +18,8 @@ def restore(text, start, end, name):
     return text[:a] + zlib.decompress(base64.b64decode(OLD[name])).decode() + text[b:]
 
 def without_admin_saves_stage(text):
+    from class_factions_source import without_class_recruitment_guard
+    text = without_class_recruitment_guard(text)
     from werewolf_source import without_werewolf_stage
     text=without_werewolf_stage(text)
     from aux_shutdown_source import without_aux_shutdown_stage

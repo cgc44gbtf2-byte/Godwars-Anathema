@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include "merc.h"
 #include "atomic_save.h"
+#include "class_factions.h"
 
 extern char *string_space, *top_string;
 extern void init_mm(void);
@@ -139,7 +140,35 @@ static void class_cycle(long class_id)
     fixture(class_id);
     run(4, "clanadmin create Leader Order");
     assert(!strcmp(actors[0].clan, "Order"));
+    assert(clan_member_role(NULL) == 0 && clan_leader_name(NULL) == NULL);
+    assert(clan_member_role(&actors[0]) == 3);
+    assert(!strcmp(clan_leader_name(&actors[0]), "Leader"));
+    long original_class = actors[0].class;
+    actors[0].class = CLASS_NONE;
+    assert(clan_member_role(&actors[0]) == 0);
+    assert(clan_leader_name(&actors[0]) == NULL);
+    actors[0].class = original_class;
+    SET_BIT(actors[0].act, ACT_IS_NPC);
+    assert(clan_member_role(&actors[0]) == 0);
+    assert(clan_leader_name(&actors[0]) == NULL);
+    REMOVE_BIT(actors[0].act, ACT_IS_NPC);
+    assert(clan_member_role(&actors[1]) == 0);
+    assert(clan_leader_name(&actors[1]) == NULL);
+    assert(!strcmp(clan_affiliation(&actors[1]), "Loner"));
+    assert(!strcmp(clan_affiliation(&actors[4]), "Unclassed"));
+    /* Cached labels, legacy lord names and maximum power never grant office. */
+    actors[2].clan = str_dup("Order");
+    char *old_lord = actors[2].lord;
+    actors[2].lord = (char *)"Leader";
+    actors[2].vampgen = 1;
+    assert(clan_member_role(&actors[2]) == 0);
+    assert(clan_leader_name(&actors[2]) == NULL);
+    actors[2].vampgen = 9;
+    actors[2].lord = old_lord;
+    free_string(actors[2].clan);
+    actors[2].clan = str_dup("");
     role(0, "Leader");
+    assert(strstr(outputs[0], "Faction and clan leader: Leader."));
     unchanged(0, "clan leave");
     unchanged(1, "clanadmin create Member Stolen");
     unchanged(1, "clan promote Leader");
@@ -186,6 +215,9 @@ static void class_cycle(long class_id)
     run(0, "clan invite Member");
     run(1, "clan accept Leader");
     assert(!strcmp(actors[1].clan, "Order"));
+    assert(clan_member_role(&actors[1]) == 1);
+    assert(!strcmp(clan_affiliation(&actors[1]), "Member"));
+    assert(!strcmp(clan_leader_name(&actors[1]), "Leader"));
     role(1, "Member");
     unchanged(1, "clan invite Other");
     unchanged(1, "clan kick Leader");
@@ -196,6 +228,12 @@ static void class_cycle(long class_id)
     default: run(0, "clan promote Member"); break;
     }
     role(1, "Officer");
+    assert(clan_member_role(&actors[1]) == 2);
+    /* Leadership resolves by registry name even with no online leader. */
+    CHAR_DATA *old_head = char_list;
+    char_list = &actors[1];
+    assert(!strcmp(clan_leader_name(&actors[1]), "Leader"));
+    char_list = old_head;
     if (class_id == CLASS_NINJA || class_id == CLASS_DROW) {
         run(0, class_id == CLASS_NINJA ? "demote Member" : "failure Member");
         role(1, "Member");
@@ -224,10 +262,12 @@ static void class_cycle(long class_id)
         run(1, "favour Other outcast");
     else run(1, "outcast Other");
     assert(!strcmp(actors[2].clan, "Order")); /* Not mutated through a stale pointer. */
+    assert(!strcmp(clan_affiliation(&actors[2]), "Exiled"));
     assert(clan_load_registry());
     DESCRIPTOR_DATA reloaded = {0};
     assert(load_char_obj(&reloaded, "Other"));
     assert(!reloaded.character->clan[0]);
+    assert(!strcmp(clan_affiliation(reloaded.character), "Exiled"));
     free_char(reloaded.character);
     if (fpReserve != NULL) { fclose(fpReserve); fpReserve = NULL; }
     clan_sync_player(&actors[2]);
@@ -247,6 +287,17 @@ static void class_cycle(long class_id)
     assert(!strcmp(actors[3].clan, "Order"));
     run(3, "clan leave");
     assert(!actors[3].clan[0]);
+    assert(!strcmp(clan_affiliation(&actors[3]), "Loner"));
+    /* Voluntary return to a different leader and re-admission clear exile.
+     * A pending offer alone does not clear it. */
+    run(1, "clan invite Other");
+    assert(!strcmp(clan_affiliation(&actors[2]), "Exiled"));
+    run(2, "clan accept Member");
+    assert(!strcmp(clan_affiliation(&actors[2]), "Member"));
+    run(2, "clan leave");
+    assert(!strcmp(clan_affiliation(&actors[2]), "Loner"));
+    assert(clan_load_registry());
+    assert(!strcmp(clan_affiliation(&actors[2]), "Loner"));
     unchanged(1, "clan disband");
     for (int i = 0; i < 4; ++i) {
         assert(actors[i].vampgen == 9 && pcs[i].rank == 1);
@@ -314,7 +365,19 @@ static void write_text(const char *text)
 static void corrupt_files(void)
 {
     static const char *bad[] = {
-        "", "AnathemaClans 2 2\nEnd\n",
+        "", "AnathemaClans 4 2\nEnd\n",
+        "AnathemaClans 3 2\nM 0 32 0 Other 0 0 extra\nEnd\n",
+        "AnathemaClans 3 2\nM 0 32 0 Other 0 -1\nEnd\n",
+        "AnathemaClans 3 2\nM 0 32 0 Other 0 9999999999999999999999\nEnd\n",
+        "AnathemaClans 3 2\nM 0 32 0 Other 0 33\nEnd\n",
+        "AnathemaClans 3 2\nM 0 32 0 Other 0 1\nEnd\n",
+        "AnathemaClans 3 2\nM 0 32 0 Other 0\nEnd\n",
+        "AnathemaClans 2 2\nM 0 32 0 Other -1\nEnd\n",
+        "AnathemaClans 2 2\nM 0 32 0 Other 2\nEnd\n",
+        "AnathemaClans 2 2\nM 0 32 0 Other 99999999999999999999999\nEnd\n",
+        "AnathemaClans 2 2\nM 0 32 0 Other\nEnd\n",
+        "AnathemaClans 1 2\nM 0 32 0 Other 1\nEnd\n",
+        "AnathemaClans 2 2\nC 1 32 4f72646572\nM 1 32 3 Leader 1\nEnd\n",
         "AnathemaClans 1 999999999999999999999999999\nEnd\n",
         "AnathemaClans 1 1\nC 1 32 4f72646572\nM 1 32 3 Leader\nEnd\n",
         "AnathemaClans 1 2\nC 1 3 4f72646572\nM 1 3 3 Leader\nEnd\n",
@@ -418,6 +481,196 @@ static void limits_and_admin(void)
     disband_admin();
 }
 
+static void native_recruitment(void)
+{
+    const struct { long id; const char *command; } cases[] = {
+        {CLASS_VAMPIRE,"vampire ventrue"}, {CLASS_VAMPIRE,"vampire nosferatu"},
+        {CLASS_VAMPIRE,"vampire brujah"}, {CLASS_VAMPIRE,"vampire assamite"},
+        {CLASS_VAMPIRE,"vampire gangrel"}, {CLASS_VAMPIRE,"vampire serpentsofthelight"},
+        {CLASS_VAMPIRE,"vampire lasombra"}, {CLASS_VAMPIRE,"vampire tzimisce"},
+        {CLASS_VAMPIRE,"vampire ravnos"}, {CLASS_WEREWOLF,"werewolf"},
+        {CLASS_SORCERER,"sorcerer"}, {CLASS_MONK,"monk"},
+        {CLASS_DRAGON,"dragon bronze"}, {CLASS_DRAGON,"dragon red"},
+        {CLASS_DRAGON,"dragon blue"}, {CLASS_DRAGON,"dragon silver"},
+        {CLASS_DRAGON,"dragon gold"}, {CLASS_DRAGON,"dragon black"},
+        {CLASS_HIGHLANDER,"highlander"}, {CLASS_NINJA,"ninja"},
+        {CLASS_DROW,"drow"}, {CLASS_ELEM,"elementalist"},
+        {CLASS_MAGE,"mage akashic"}, {CLASS_MAGE,"mage celestial"},
+        {CLASS_MAGE,"mage ecstasy"}, {CLASS_MAGE,"mage dreamspeakers"},
+        {CLASS_MAGE,"mage euthanatos"}, {CLASS_MAGE,"mage hermes"},
+        {CLASS_MAGE,"mage ether"}, {CLASS_MAGE,"mage verbena"},
+        {CLASS_MAGE,"mage virtual"}, {CLASS_MAGE,"mage hollow"}
+    };
+    for (size_t n = 0; n < sizeof(cases)/sizeof(cases[0]); ++n) {
+        fixture(cases[n].id);
+        char command[160];
+        for (int i = 0; i < 4; ++i)
+            for (int s = 0; s < 5; ++s) actors[i].stats[s] = 4;
+        actors[0].class = actors[1].class = actors[2].class = CLASS_NONE;
+        snprintf(command, sizeof(command), "autoclass %s", cases[n].command);
+        run(0, command); run(2, command);
+        assert(actors[0].class == cases[n].id && actors[2].class == cases[n].id);
+        snprintf(command, sizeof(command), "clanadmin create Leader %s",
+            actors[0].clan[0] ? actors[0].clan : "Order");
+        run(4, command);
+        assert(clan_member_role(&actors[0]) == 3);
+        run(0, "clan invite Other");
+        assert(strstr(outputs[2], "clan accept Leader"));
+        run(2, "clan accept Leader");
+        assert(clan_member_role(&actors[2]) == 1);
+        if (n == 0) {
+            /* Social labels are not bloodlines: retain the native build after
+             * leaving Ventrue, then sponsor into a custom-named clan. */
+            disband_admin();
+            run(4, "clanadmin create Leader Order");
+            run(0, "clan invite Other"); run(2, "clan accept Leader");
+            assert(clan_member_role(&actors[2]) == 1);
+        }
+        unchanged(2, "clan invite Visitor"); /* Classing is a specific exception. */
+
+        CHAR_DATA native = actors[1];
+        PC_DATA native_pc = pcs[1];
+        native.pcdata = &native_pc;
+        native.clan = str_dup("");
+        native.desc = NULL;
+        snprintf(command, sizeof(command), "%s", cases[n].command);
+        do_autoclass(&native, command);
+        assert(native.class == cases[n].id);
+        free_string(native.clan);
+
+        const char *offer = cases[n].id == CLASS_VAMPIRE ? "clan embrace Member" :
+            cases[n].id == CLASS_MAGE ? "clan teach Member" : "clan recruit Member";
+        pcs[1].hybrid_present = 1;
+        unchanged(2, offer);
+        pcs[1].hybrid_present = 0;
+        run(2, offer);
+        assert(actors[1].class == CLASS_NONE && !actors[1].clan[0]);
+        assert(strstr(outputs[1], cases[n].command) &&
+               strstr(outputs[1], "clan accept Other") &&
+               strstr(outputs[1], "as a Member"));
+        run(0, "clan kick Other");
+        unchanged(1, "clan accept Other"); /* Revoked sponsors cannot class anyone. */
+        run(0, "clan invite Other");
+        run(2, "clan accept Leader");
+        run(2, offer);
+        unchanged(1, "clan accept Leader");
+        char forced[] = "clan accept Other";
+        descriptors[1].incomm[0] = '\0';
+        interpret(&actors[1], forced);
+        assert(actors[1].class == CLASS_NONE);
+        assert(strstr(outputs[1], "own input"));
+        actors[1].affected_by = AFF_SHADOWPLANE;
+        unchanged(1, "clan accept Other");
+        actors[1].affected_by = 0;
+        actors[1].fighting = &actors[3];
+        unchanged(1, "clan accept Other");
+        actors[1].fighting = NULL;
+        actors[1].in_room = &elsewhere;
+        unchanged(1, "clan accept Other");
+        actors[1].in_room = &room;
+        for (int s = 0; s < 5; ++s) actors[1].stats[s] = 0;
+        unchanged(1, "clan accept Other"); /* Prerequisites rechecked at acceptance. */
+        assert(actors[1].class == CLASS_NONE);
+        for (int s = 0; s < 5; ++s) actors[1].stats[s] = 4;
+        current_time += 121;
+        unchanged(1, "clan accept Other");
+        run(2, offer);
+        atomic_save_test_fault = SAVE_FAULT_CREATE;
+        unchanged(1, "clan accept Other");
+        atomic_save_test_fault = SAVE_FAULT_NONE;
+        assert(actors[1].class == CLASS_NONE && clan_member_role(&actors[1]) == 0);
+        run(1, "clan accept Other");
+        assert(actors[1].class == native.class && actors[1].level == native.level &&
+               actors[1].vampgen == native.vampgen && actors[1].arete == native.arete);
+        assert(!memcmp(pcs[1].powers, native_pc.powers, sizeof(pcs[1].powers)));
+        assert(!memcmp(pcs[1].cland, native_pc.cland, sizeof(pcs[1].cland)));
+        assert(!memcmp(pcs[1].tgift, native_pc.tgift, sizeof(pcs[1].tgift)));
+        assert(pcs[1].rank == native_pc.rank && pcs[1].dragcol == native_pc.dragcol);
+        assert(actors[1].hit == 10000 && actors[1].mana == 10000);
+        assert(clan_member_role(&actors[1]) == 1);
+        assert(!strcmp(clan_leader_name(&actors[1]), "Leader"));
+        unchanged(2, offer); /* Never overwrite an existing class/training. */
+        DESCRIPTOR_DATA reload = {0};
+        assert(load_char_obj(&reload, "Member"));
+        assert(!reload.character->pcdata->player_load_failed &&
+               reload.character->class == cases[n].id);
+        assert(clan_member_role(reload.character) == 1);
+        free_char(reload.character);
+        if (fpReserve != NULL) { fclose(fpReserve); fpReserve = NULL; }
+        disband_admin();
+    }
+}
+
+static void enrollment_recovery(void)
+{
+    fixture(CLASS_VAMPIRE);
+    actors[1].class = CLASS_NONE;
+    for (int s = 0; s < 5; ++s) actors[1].stats[s] = 4;
+    assert(save_char_obj_checked(&actors[1]));
+    /* Crash boundary: consent/intent durable, initialized player not saved.
+     * Only this owner's synthetic registry is edited; no real account loads. */
+    write_text("AnathemaClans 3 2\nC 1 1 56656e74727565\n"
+               "M 1 1 3 Leader 0 0\nM 1 1 1 Member 0 1\nEnd\n");
+    assert(clan_load_registry());
+    DESCRIPTOR_DATA reload = {0};
+    assert(load_char_obj(&reload, "Member"));
+    assert(reload.character->class == CLASS_VAMPIRE &&
+           !reload.character->pcdata->player_load_failed);
+    assert(reload.character->pcdata->cland[0] == DISC_DOMINATE);
+    free_char(reload.character);
+    if (fpReserve != NULL) { fclose(fpReserve); fpReserve = NULL; }
+    clan_sync_player(&actors[1]);
+    assert(actors[1].class == CLASS_VAMPIRE && clan_block_class_change(&actors[1]));
+    pcs[1].powers[DISC_DOMINATE] = 4;
+    clan_sync_player(&actors[1]);
+    assert(pcs[1].powers[DISC_DOMINATE] == 4); /* Recovery is not retraining. */
+    atomic_save_test_fault = SAVE_FAULT_CREATE;
+    unchanged(1, "clan settle");
+    atomic_save_test_fault = SAVE_FAULT_NONE;
+    assert(clan_block_class_change(&actors[1]));
+    run(1, "clan settle");
+    char *saved = snapshot();
+    assert(strstr(saved, "AnathemaClans 1 ") && !strstr(saved, "AnathemaClans 3 "));
+    free(saved);
+    assert(load_char_obj(&reload, "Member"));
+    assert(reload.character->pcdata->powers[DISC_DOMINATE] == 4);
+    free_char(reload.character);
+    if (fpReserve != NULL) { fclose(fpReserve); fpReserve = NULL; }
+    /* A conflicting saved class is rejected, never overwritten. */
+    actors[1].class = CLASS_MAGE;
+    assert(save_char_obj_checked(&actors[1]));
+    write_text("AnathemaClans 3 2\nC 1 1 56656e74727565\n"
+               "M 1 1 3 Leader 0 0\nM 1 1 1 Member 0 1\nEnd\n");
+    assert(clan_load_registry() && load_char_obj(&reload, "Member"));
+    assert(reload.character->class == CLASS_MAGE &&
+           reload.character->pcdata->player_load_failed);
+    free_char(reload.character);
+    if (fpReserve != NULL) { fclose(fpReserve); fpReserve = NULL; }
+    /* Restore the synthetic conflict, then settle and cleanly disband. */
+    actors[1].class = CLASS_VAMPIRE;
+    run(1, "clan settle");
+    disband_admin();
+
+    /* Uncertain registry writes cannot be bypassed through autoclass. */
+    fixture(CLASS_VAMPIRE);
+    actors[1].class = CLASS_NONE;
+    for (int s = 0; s < 5; ++s) actors[1].stats[s] = 4;
+    assert(save_char_obj_checked(&actors[1]));
+    write_text("AnathemaClans 3 2\nC 1 1 56656e74727565\n"
+               "M 1 1 3 Leader 0 0\nM 1 1 1 Member 0 1\nEnd\n");
+    assert(clan_load_registry());
+    atomic_save_test_fault = SAVE_FAULT_DIRSYNC;
+    run(4, "clanadmin retry");
+    atomic_save_test_fault = SAVE_FAULT_NONE;
+    assert(actors[1].class == CLASS_NONE);
+    unchanged(1, "autoclass monk");
+    assert(actors[1].class == CLASS_NONE);
+    run(4, "clanadmin retry");
+    assert(actors[1].class == CLASS_VAMPIRE);
+    run(1, "clan settle");
+    disband_admin();
+}
+
 int main(void)
 {
     char root[] = "/tmp/anathema-clans-XXXXXX", original[4096];
@@ -438,12 +691,15 @@ int main(void)
     faults(CLASS_DROW);
     corrupt_files();
     limits_and_admin();
+    native_recruitment();
+    enrollment_recovery();
     clan_registry_close();
     char_list = NULL; descriptor_list = NULL;
     for (int i = 0; i < 5; ++i) free_string(actors[i].clan);
     if (fpReserve != NULL) { fclose(fpReserve); fpReserve = NULL; }
     assert(unlink("../clans/Registry") == 0 && unlink("../clans/Lock") == 0);
     unlink("../player/Other"); unlink("../backup/Other");
+    unlink("../player/Member"); unlink("../backup/Member");
     assert(chdir("..") == 0);
     assert(rmdir("area") == 0 && rmdir("player") == 0 &&
            rmdir("backup") == 0 && rmdir("clans") == 0);

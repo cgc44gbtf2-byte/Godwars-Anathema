@@ -468,6 +468,29 @@ def snapshot(value, record, online):
     return folder.name
 
 
+def require_legacy_clan_rollback():
+    """Older backup records do not declare a clan-registry reader version.
+
+    Be conservative: never infer compatibility from the player save epoch,
+    which did not change when the independent clan registry gained intents.
+    A reviewed maintenance recovery can choose a known-compatible executable.
+    """
+    folder = DATA / "clans"
+    if not os.path.lexists(folder):
+        return
+    protected(folder, directory=True)
+    registry = folder / "Registry"
+    if not os.path.lexists(registry):
+        return
+    protected(registry)
+    with registry.open("rb") as source:
+        header = source.readline(80)
+    require(re.fullmatch(rb"AnathemaClans 1 [0-9]+\n", header) is not None,
+            "Clan registry requires a reviewed rollback: older backup records "
+            "cannot prove support for affiliation/enrollment formats. "
+            "Current player data and registry must be preserved.")
+
+
 def backup_binary(identifier):
     require(isinstance(identifier, str) and BACKUP_ID.fullmatch(identifier),
             "Use a backup ID, not a path")
@@ -482,6 +505,7 @@ def backup_binary(identifier):
     value = read_binary(folder / "merc", 0)
     require(hashlib.sha256(value).hexdigest() == record["binary_sha256"],
             "Backup executable checksum mismatch")
+    require_legacy_clan_rollback()
     return value, dict(record, status="active")
 
 
@@ -505,6 +529,10 @@ def deploy(value, next_record, mode, adopt=False, recovering=False):
         if mode == "restart":
             stopped = True
             stop()
+            if recovering:
+                # Players can change the registry after backup validation.
+                # Recheck only after the live writer has actually stopped.
+                require_legacy_clan_rollback()
         backup = snapshot(old, previous, mode == "copyover")
         # Rename can succeed before directory fsync fails; recovery must cover both.
         replaced = True
@@ -529,12 +557,14 @@ def deploy(value, next_record, mode, adopt=False, recovering=False):
                                   "data were not restored.") from error
             try:
                 stop()
+                require_legacy_clan_rollback()
                 atomic_bytes(BINARY, old, 0o755)
                 write_record(previous)
                 start_checked()
             except Exception as recovery_error:
                 raise UpdateError("Update failed; automatic binary recovery also failed. "
                                   "Backup ID: " + str(backup) +
+                                  ". " + str(recovery_error) +
                                   ". Inspect service/storage before explicit rollback.") from recovery_error
             raise UpdateError("Update failed; previous binary restored and greeting checked. "
                               "Backup ID: " + str(backup)) from error

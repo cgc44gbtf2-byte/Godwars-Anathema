@@ -214,6 +214,29 @@ class CITests(unittest.TestCase):
 
 
 class FilesystemTests(unittest.TestCase):
+    def test_clan_registry_rollback_requires_explicit_compatibility_review(self):
+        with tempfile.TemporaryDirectory() as temporary, \
+                mock.patch.object(u, "DATA", Path(temporary)), \
+                mock.patch.object(u, "protected") as protected:
+            folder = u.DATA / "clans"
+            u.require_legacy_clan_rollback()
+            folder.mkdir()
+            u.require_legacy_clan_rollback()
+            registry = folder / "Registry"
+            registry.write_bytes(b"AnathemaClans 1 2\nEnd\n")
+            u.require_legacy_clan_rollback()
+            protected.assert_any_call(folder, directory=True)
+            protected.assert_any_call(registry)
+            for value in (b"AnathemaClans 2 2\nEnd\n",
+                          b"AnathemaClans 3 2\nEnd\n", b"",
+                          b"AnathemaClans 999 2\n", b"x" * 256,
+                          b"AnathemaClans 1 2 extra\n"):
+                registry.write_bytes(value)
+                with self.subTest(value=value[:30]), \
+                        self.assertRaisesRegex(u.UpdateError, "reviewed rollback"):
+                    u.require_legacy_clan_rollback()
+                self.assertEqual(registry.read_bytes(), value)
+
     def test_binary_reader_rejects_links_and_non_elf(self):
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / "merc"
@@ -596,6 +619,51 @@ class DeployTests(unittest.TestCase):
         self.assertEqual(self.binary.read_bytes(), OLD)
         self.assertEqual(self.run_mock.call_count, 0)
         self.assertFalse(u.STORE.exists())
+
+    def test_failed_activation_cannot_restore_unproven_clan_reader(self):
+        folder = self.data / "clans"
+        folder.mkdir()
+        registry = folder / "Registry"
+        value = "AnathemaClans 3 2\nEnd\n"
+        registry.write_text(value)
+        self.fail_new = True
+        with self.assertRaisesRegex(u.UpdateError, "reviewed rollback"):
+            self.install()
+        self.assertEqual(self.binary.read_bytes(), NEW)
+        self.assertFalse(self.online)
+        self.assertEqual(registry.read_text(), value)
+        self.assertEqual((self.data / "player/Luto").read_text(), "fixture progress")
+
+    def test_explicit_rollback_checks_clan_format_before_deploy(self):
+        backup = self.install()
+        folder = self.data / "clans"
+        folder.mkdir()
+        registry = folder / "Registry"
+        registry.write_text("AnathemaClans 2 2\nEnd\n")
+        before = self.run_mock.call_count
+        with self.assertRaisesRegex(u.UpdateError, "reviewed rollback"):
+            u.backup_binary(backup)
+        self.assertEqual(self.run_mock.call_count, before)
+        self.assertEqual(self.binary.read_bytes(), NEW)
+        self.assertTrue(self.online)
+
+    def test_rollback_rechecks_registry_after_stopping_live_writer(self):
+        backup = self.install()
+        folder = self.data / "clans"
+        folder.mkdir()
+        registry = folder / "Registry"
+        registry.write_text("AnathemaClans 1 2\nEnd\n")
+        value, record = u.backup_binary(backup)
+        def race(*args):
+            if args[:2] == ("systemctl", "stop"):
+                registry.write_text("AnathemaClans 3 2\nEnd\n")
+            return self.command(*args)
+        self.run_mock.side_effect = race
+        with self.assertRaisesRegex(u.UpdateError, "reviewed rollback"):
+            u.deploy(value, record, "restart", recovering=True)
+        self.assertEqual(self.binary.read_bytes(), NEW)
+        self.assertTrue(self.online)
+        self.assertEqual(registry.read_text(), "AnathemaClans 3 2\nEnd\n")
 
     def test_failed_epoch_upgrade_never_restarts_legacy(self):
         u.write_record(dict(u.binary_record(OLD), save_epoch=1))
