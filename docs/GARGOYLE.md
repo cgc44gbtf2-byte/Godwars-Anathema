@@ -32,6 +32,8 @@ Thaumaturgy's five blood powers remain unavailable even though the saved rank
 slot is shared. Quietus is separate. `teachdisc` names the replacement correctly:
 Gargoyles can teach Visceratika to Gargoyles, not Thaumaturgy to ordinary
 Vampires or the reverse. Other discipline lessons retain existing rules.
+Pending lessons cannot be accepted while either participant is a stone statue.
+The offer remains valid until its normal expiry; return to flesh before accepting.
 
 ## Stone statue form
 

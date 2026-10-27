@@ -1068,6 +1068,53 @@ static void gargoyle(void)
     }
 }
 
+static void gargoyle_lesson_case(long rank, int discipline)
+{
+    fixture(CLASS_VAMPIRE);
+    pcs[0].cland[0] = pcs[1].cland[0] = VAMPIRE_BUILD_GARGOYLE;
+    pcs[0].powers[DISC_THAUMATURGY] = rank;
+    long disc = discipline ? DISC_AUSPEX : DISC_THAUMATURGY;
+    const char *name = discipline ? "auspex" : "visceratika";
+    pcs[0].powers[disc] = rank;
+    pcs[1].powers[disc] = 0;
+    char offer[128], accept[128];
+    snprintf(offer, sizeof offer, "teachdisc Member %s", name);
+    snprintf(accept, sizeof accept, "teachdisc accept Leader %s", name);
+    long teacher_primal = actors[0].primal, student_primal = actors[1].primal;
+    run(0, offer);
+    assert(pcs[1].teach_until > current_time);
+    time_t until = pcs[1].teach_until;
+    run(0, "stoneform on");
+    assert(gargoyle_statue(&actors[0]));
+    run(1, accept);
+    assert(pcs[1].powers[disc] == 0);
+    assert(pcs[1].teach_until == until);
+    assert(strstr(outputs[1], "Both vampires must be here"));
+    run(0, "stoneform off");
+    if (discipline) {
+        /* Revalidate the student too, including direct handler callers. */
+        pcs[1].powers[DISC_THAUMATURGY] = 1;
+        run(1, "stoneform on");
+        assert(gargoyle_statue(&actors[1]));
+        char direct[128];
+        snprintf(direct, sizeof direct, "accept Leader %s", name);
+        do_teachdisc(&actors[1], direct);
+        assert(pcs[1].powers[disc] == 0 && pcs[1].teach_until == until);
+        run(1, "stoneform off");
+    }
+    run(1, accept);
+    assert(pcs[1].powers[disc] == -1);
+    assert(pcs[1].teach_until == 0);
+    assert(actors[0].primal == teacher_primal && actors[1].primal == student_primal);
+}
+
+static void gargoyle_lesson_lifecycle(void)
+{
+    for (long rank = 3; rank <= 5; ++rank)
+        for (int discipline = 0; discipline < 2; ++discipline)
+            gargoyle_lesson_case(rank, discipline);
+}
+
 static void gargoyle_power_menu(void)
 {
     for (long rank = -1; rank <= 6; ++rank) {
@@ -1270,6 +1317,7 @@ int main(void)
     nightstalker();
     gargoyle();
     gargoyle_power_menu();
+    gargoyle_lesson_lifecycle();
     gargoyle_reflection();
     clan_registry_close();
     char_list = NULL; descriptor_list = NULL;

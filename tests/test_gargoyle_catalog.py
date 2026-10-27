@@ -5,6 +5,7 @@ import unittest
 from gargoyle_source import PROOFS, without_gargoyle_stage
 from gargoyle_reflection_source import PROOFS as REFLECTION_PROOFS, without_gargoyle_reflection
 from gargoyle_menu_source import PROOFS as MENU_PROOFS, without_gargoyle_menu
+from gargoyle_teaching_source import PATH as TEACH_PATH, BASE_BLOB as TEACH_BASE, NEW as TEACH_NEW, without_gargoyle_teaching
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -13,6 +14,16 @@ def blob(text):
     return hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
 
 class GargoyleCatalog(unittest.TestCase):
+    def test_teaching_guard_exact_inverse_and_regression(self):
+        text = (ROOT / TEACH_PATH).read_text()
+        self.assertEqual(text.count(TEACH_NEW), 1)
+        self.assertEqual(blob(without_gargoyle_teaching(text)), TEACH_BASE)
+        self.assertNotEqual(blob(without_gargoyle_teaching(
+            text.replace("!gargoyle_statue(ch)", "TRUE", 1))), TEACH_BASE)
+        tests = (ROOT / "tests/test_clans.c").read_text()
+        self.assertIn("gargoyle_lesson_lifecycle();", tests)
+        self.assertIn("Revalidate the student too, including direct handler callers.", tests)
+
     def test_menu_only_inverse_preserves_native_modules(self):
         self.assertEqual(len(MENU_PROOFS), 2)
         for path, expected, hunks in MENU_PROOFS:

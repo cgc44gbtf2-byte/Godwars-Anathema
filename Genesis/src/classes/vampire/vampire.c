@@ -57,6 +57,7 @@ static bool vampire_ready(CHAR_DATA *ch)
 static bool teaching_ready(CHAR_DATA *ch)
 {
     return vampire_ready(ch) && ch->position == POS_STANDING
+        && !gargoyle_statue(ch)
         && ch->fighting == NULL && ch->desc != NULL
         && ch->desc->connected == CON_PLAYING && ch->desc->original == NULL;
 }
