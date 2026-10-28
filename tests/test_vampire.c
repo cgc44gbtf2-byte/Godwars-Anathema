@@ -27,6 +27,7 @@ static char output[4][65536];
 static ROOM_INDEX_DATA room, elsewhere;
 static AREA_DATA area;
 static char *names[] = {"teacher", "student", "other", "mobile"};
+static long gargoyle_rank;
 
 static void reset(void)
 {
@@ -69,6 +70,12 @@ static void reset(void)
         players[i].marriage = players[i].email = players[i].covenant = "";
         players[i].cov_time = players[i].leader = players[i].vleader = "";
         players[i].cland[0] = players[i].cland[1] = players[i].cland[2] = -1;
+        if (gargoyle_rank != 0)
+        {
+            players[i].cland[0] = VAMPIRE_BUILD_GARGOYLE;
+            players[i].powers[DISC_THAUMATURGY] = gargoyle_rank;
+            assert(IS_GARGOYLE(&chars[i]));
+        }
         descriptors[i].character = &chars[i];
         descriptors[i].connected = CON_PLAYING;
         descriptors[i].outbuf = output[i];
@@ -747,6 +754,29 @@ static void test_native_upkeep_boundaries(void)
     }
 }
 
+static void test_gargoyle_blood_magic_denied(void)
+{
+    DO_FUN *powers[] = {
+        do_tasteblood, do_bloodrage, do_potency,
+        do_theftvitae, do_cauldronblood
+    };
+    for (size_t i = 0; i < sizeof(powers) / sizeof(powers[0]); ++i)
+    {
+        reset();
+        PC_DATA before = players[0];
+        PC_DATA victim_before = players[1];
+        chars[1].extra |= EXTRA_VAMPIRE;
+        powers[i](chars, powers[i] == do_bloodrage ?
+                  "student regenerate" : "student");
+        assert_unchanged();
+        assert(chars[0].affected == NULL && chars[1].affected == NULL);
+        assert(!memcmp(&before, &players[0], sizeof(before)));
+        assert(!memcmp(&victim_before, &players[1], sizeof(victim_before)));
+        assert(strstr(output[0], "not trained high enough") != NULL);
+        assert(players[0].powers[DISC_THAUMATURGY] == gargoyle_rank);
+    }
+}
+
 int main(void)
 {
     char directory[] = "/tmp/anathema-vampire-XXXXXX";
@@ -775,6 +805,15 @@ int main(void)
     test_potency();
     test_buff_save_roundtrip();
     test_object_form_returns();
+    for (gargoyle_rank = 1; gargoyle_rank <= 5; gargoyle_rank += 4)
+    {
+        test_quietus_leech();
+        test_rejections(do_leechblood, 6, DISC_QUIETUS);
+        test_native_upkeep_boundaries();
+        test_object_form_returns();
+        test_gargoyle_blood_magic_denied();
+    }
+    gargoyle_rank = 0;
     reset();
     unlink("../player/Teacher");
     unlink("../player/Student");
@@ -783,5 +822,7 @@ int main(void)
     assert(chdir(cwd) == 0 && rmdir(directory) == 0);
     if (fpReserve != NULL) fclose(fpReserve);
     puts("vampire teaching and Thaumaturgy tests passed");
+    puts("Gargoyle rank-1/rank-5 Quietus, upkeep, object-form returns and "
+         "10 forbidden blood-magic calls passed");
     return 0;
 }

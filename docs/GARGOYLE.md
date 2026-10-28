@@ -34,6 +34,11 @@ and rank-1/rank-5 Gargoyles. They check existing rank/resource rules and blocked
 active commands while petrified; this is not a complete audit of every Vampire
 power or live PvP balance.
 
+Additional rank-1/rank-5 regressions cover Quietus blood-drain permissions and
+resource limits, blood upkeep, and recovery from Plasma Form and Mummify,
+including missing or mismatched object bodies. All five replaced Thaumaturgy
+commands are checked for denial without changing Visceratika training.
+
 Thaumaturgy's five blood powers remain unavailable even though the saved rank
 slot is shared. Quietus is separate. `teachdisc` names the replacement correctly:
 Gargoyles can teach Visceratika to Gargoyles, not Thaumaturgy to ordinary
