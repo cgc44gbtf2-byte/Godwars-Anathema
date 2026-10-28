@@ -5,6 +5,27 @@ that every registered command has been exercised in a live multiplayer game.
 References below are relative to `Genesis/src/`. No historical player data
 was used. Existing gameplay constants and save-file identifiers are preserved.
 
+## Native variants and current audit status
+
+The ten base classes remain unchanged. Variants replace selected parent powers,
+not the primary class ID or social-clan membership.
+
+| Variant | Entry command for eligible unclassed players | Progression and guide |
+| --- | --- | --- |
+| Nightstalker (Ninja) | `autoclass ninja nightstalker` | Existing Ninja principles and costs; replaces Michi. [Commands and limits](../docs/NIGHTSTALKER.md). |
+| Gargoyle (Vampire) | `autoclass vampire gargoyle` | Visceratika replaces Thaumaturgy, ranks 1–5 at 15 × next rank primal. [Commands and limits](../docs/GARGOYLE.md). |
+
+Gargoyle `stoneform` is an immobile defensive statue: ranks grant 10–50%
+mitigation in stone only; rank 5 reflects 25% of actual damage taken on a later
+pulse. `powers` distinguishes active abilities from passives. Native `varmor`
+recipes retain their costs and equipment slots.
+
+The completed Gargoyle checks cover inherited Vampire modules, blood upkeep,
+teaching/recruitment, persistence, 60 equipment combinations, 1,200 melee strikes
+and 50 weapon-proc groups. These are targeted synthetic regressions, not an
+exhaustive skill audit or live PvP balance approval. Selfbrid work remains paused
+while native classes and equipment are checked.
+
 ## Training economy
 
 `next` means the current rating plus one; costs are paid only when the

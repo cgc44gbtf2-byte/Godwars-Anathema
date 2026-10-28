@@ -11,6 +11,8 @@ that every legacy feature is bug-free.
 The ten base classes are **Dragon, Drow, Elementalist, Highlander, Mage, Monk,
 Ninja, Sorcerer, Vampire and Werewolf**.
 
+Native variants: [Nightstalker (Ninja)](docs/NIGHTSTALKER.md) and [Gargoyle (Vampire)](docs/GARGOYLE.md).
+
 Recent work includes:
 
 - Consent-based Vampire teaching and Path of Blood abilities.
@@ -25,6 +27,8 @@ See the [class guide](deploy/CLASS_AUDIT.md) and
 [gear guide](deploy/CLASS_GEAR.md) for commands, costs and known gaps.
 
 ## Hybrid status
+
+**Selfbrid development is paused while native classes and class gear are audited.**
 
 **Players cannot convert into hybrids yet.**
 
