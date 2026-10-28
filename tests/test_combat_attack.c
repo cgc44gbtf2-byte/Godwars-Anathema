@@ -193,6 +193,87 @@ static void bad_procs(void)
     assert(b.hit < b.max_hit && b.hit > 0);
 }
 
+static void gargoyle_melee(void)
+{
+    long armor = skill_lookup("armor");
+    long death = skill_lookup("cause light");
+    long object = skill_lookup("enchant weapon");
+    assert(armor > 0 && death > 0 && object > 0);
+    int strikes = 0, groups = 0;
+    long total_lost = 0, total_reflected = 0;
+    for (long rank = 1; rank <= 5; ++rank)
+        for (int stone = 0; stone <= 1; ++stone)
+            for (long style = STYLE_UNARMED; style <= STYLE_TWOWEAPON; ++style) {
+                fixture(style);
+                b.class = CLASS_VAMPIRE;
+                pb.cland[0] = VAMPIRE_BUILD_GARGOYLE;
+                pb.powers[DISC_THAUMATURGY] = rank;
+                if (stone) b.polyaff = POLY_GARGOYLE_STATUE;
+                for (int hit = 0; hit < 20; ++hit) {
+                    long before = b.hit, attacker = a.hit;
+                    one_hit(&a, &b, TYPE_SLASH, "1");
+                    long lost = before - b.hit;
+                    total_lost += lost;
+                    assert(lost >= 0 && a.hit == attacker);
+                    gargoyle_reflection_pulse();
+                    assert(a.hit == attacker -
+                           (stone && rank == 5 ? lost / 4 : 0));
+                    total_reflected += attacker - a.hit;
+                    long reflected = a.hit;
+                    gargoyle_reflection_pulse();
+                    assert(a.hit == reflected && b.hit == before - lost);
+                    ++strikes;
+                }
+                /* A statue cannot start strikes or reach its weapon proc.
+                 * Check the RNG too: blocked attacks must not consume it. */
+                if (stone) {
+                    long ah = a.hit, bh = b.hit;
+                    b.carrying = &offhand;
+                    offhand.wear_loc = WEAR_WEAPON;
+                    offhand.value[0] = armor;
+                    b.style[0] = STYLE_ONEHAND;
+                    init_mm(); int expected_rng = number_mm(); init_mm();
+                    one_hit(&b, &a, TYPE_UNARMED, "1");
+                    multi_hit(&b, &a);
+                    assert(a.hit == ah && b.hit == bh);
+                    assert(!is_affected(&a, armor));
+                    assert(number_mm() == expected_rng);
+                    b.carrying = NULL;
+                }
+                if (style != STYLE_ONEHAND) continue;
+                const long procs[] = {0, armor, death, object, MAX_SKILL};
+                for (unsigned proc = 0; proc < sizeof procs / sizeof procs[0]; ++proc) {
+                    fixture(style);
+                    b.class = CLASS_VAMPIRE;
+                    pb.cland[0] = VAMPIRE_BUILD_GARGOYLE;
+                    pb.powers[DISC_THAUMATURGY] = rank;
+                    if (stone) b.polyaff = POLY_GARGOYLE_STATUE;
+                    mainhand.value[0] = procs[proc];
+                    multi_hit(&a, &b);
+                    long lost = b.max_hit - b.hit;
+                    assert(lost >= 0 && a.hit == a.max_hit);
+                    assert(is_affected(&b, armor) == (procs[proc] == armor));
+                    gargoyle_reflection_pulse();
+                    long reflected = a.max_hit - a.hit;
+                    if (stone && rank == 5) {
+                        /* Per-event rounding, not a single aggregate refund.
+                         * This group has at most three strikes and one proc. */
+                        assert(reflected <= lost / 4);
+                        assert(reflected >= lost / 4 - 3);
+                    } else assert(reflected == 0);
+                    long hp = a.hit;
+                    gargoyle_reflection_pulse();
+                    assert(a.hit == hp && b.hit == b.max_hit - lost);
+                    assert(pb.powers[DISC_THAUMATURGY] == rank);
+                    ++groups;
+                }
+            }
+    assert(strikes == 1200 && groups == 50);
+    assert(total_lost > 0 && total_reflected > 0);
+    while (b.affected) affect_remove(&b, b.affected);
+    puts("Gargoyle melee: 1200 strikes, 50 proc groups and stone attack/RNG guards passed");
+}
+
 int main(int argc, char **argv)
 {
     gsn_friction_curse = skill_lookup("friction curse");
@@ -207,6 +288,7 @@ int main(int argc, char **argv)
     bad_procs();
     label_lifetime();
     friction_incapacitation();
+    gargoyle_melee();
     puts("native attack pulse/styles/NPC thresholds, proc validation and label reuse passed");
     return 0;
 }

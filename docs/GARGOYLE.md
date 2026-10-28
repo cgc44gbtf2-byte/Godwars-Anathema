@@ -102,6 +102,14 @@ it. Normal class reset clears it. No donor player files or accounts are used.
 
 ## Compatibility and limits
 
+Attack-pipeline regressions cover 1,200 incoming strikes across all six combat
+styles, Visceratika ranks 1–5 and flesh/stone states. Fifty weapon-proc groups
+exercise ordinary attacks, armor and damage spells, rejected object-only spells
+and invalid indexes. Reflection remains deferred and rounds per damage event;
+a second pulse cannot repeat it. Stone-form outgoing strikes and weapon procs
+are blocked without consuming combat RNG. These are synthetic engine tests,
+not live PvP balance or exhaustive weapon-proc coverage.
+
 No save-file grammar or handoff format changes. **Do not run saved Gargoyles on
 a pre-Gargoyle binary:** it would interpret their shared rank as Thaumaturgy.
 Review/reset those characters or restore a matching pre-creation backup before
