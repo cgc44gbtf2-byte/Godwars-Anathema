@@ -39,6 +39,12 @@ resource limits, blood upkeep, and recovery from Plasma Form and Mummify,
 including missing or mismatched object bodies. All five replaced Thaumaturgy
 commands are checked for denial without changing Visceratika training.
 
+Class-equipment regressions also cover all three recipes carried or worn at
+each Visceratika rank, in flesh and stone form (60 combinations). The shared HP
+path applies stone mitigation once and queues rank-5 reflection once; these
+checks preserve equipment ownership, slots, training and paid crafting costs.
+They do not replace live melee/proc or PvP-balance testing.
+
 Thaumaturgy's five blood powers remain unavailable even though the saved rank
 slot is shared. Quietus is separate. `teachdisc` names the replacement correctly:
 Gargoyles can teach Visceratika to Gargoyles, not Thaumaturgy to ordinary

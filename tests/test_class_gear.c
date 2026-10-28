@@ -233,6 +233,72 @@ static void gargoyle_equipment(void)
          "Gargoyles, exact costs/ownership/real slots and worn statue reloads passed");
 }
 
+static void gargoyle_equipment_damage(void)
+{
+    const long masks[] = {ITEM_WEAR_NECK, ITEM_WEAR_ABOUT, ITEM_WEAR_BODY};
+    const long slots[] = {WEAR_NECK_1, WEAR_ABOUT, WEAR_BODY};
+    static CHAR_DATA attacker;
+    static PC_DATA attacker_pc;
+    int cases = 0;
+    for (int recipe = 0; recipe < 3; ++recipe)
+        for (long rank = 1; rank <= 5; ++rank)
+            for (int stone = 0; stone <= 1; ++stone)
+                for (int worn = 0; worn <= 1; ++worn) {
+                    fixture(CLASS_VAMPIRE);
+                    pc.cland[0] = VAMPIRE_BUILD_GARGOYLE;
+                    pc.powers[DISC_THAUMATURGY] = rank;
+                    pc.flag = FLAG_PK;
+                    const struct craft *c = &crafts[recipe];
+                    OBJ_INDEX_DATA *p = index_for(c->vnum, ITEM_ARMOR);
+                    long old_mask = p->wear_flags;
+                    p->wear_flags = ITEM_TAKE | masks[recipe];
+                    actor.primal = 100; pc.quest = 400;
+                    invoke(do_vamparmor, c->arg);
+                    OBJ_DATA *item = actor.carrying;
+                    assert(item && actor.primal == 0 && pc.quest == 0);
+                    if (worn) {
+                        invoke(do_wear, "gear");
+                        assert(get_eq_char(&actor, slots[recipe]) == item);
+                    }
+                    memset(&attacker_pc, 0, sizeof(attacker_pc));
+                    clear_char(&attacker);
+                    attacker.name = "Striker";
+                    attacker.pcdata = &attacker_pc;
+                    attacker.class = CLASS_VAMPIRE;
+                    attacker.level = LEV_AWA;
+                    attacker.hit = attacker.max_hit = 100000;
+                    attacker.in_room = &room;
+                    attacker.position = actor.position = POS_FIGHTING;
+                    attacker_pc.flag = FLAG_PK;
+                    actor.next = actor.next_in_room = &attacker;
+                    attacker.fighting = &actor; actor.fighting = &attacker;
+                    if (stone) actor.polyaff = POLY_GARGOYLE_STATUE;
+                    long expected = stone ? 1001 * (10 - rank) / 10 : 1001;
+                    hurt_person(&attacker, &actor, 1001);
+                    assert(actor.hit == 100000 - expected);
+                    assert(attacker.hit == 100000); /* Deferred, not recursive. */
+                    gargoyle_reflection_pulse();
+                    assert(attacker.hit == 100000 -
+                           (stone && rank == 5 ? expected / 4 : 0));
+                    long reflected_hp = attacker.hit;
+                    gargoyle_reflection_pulse();
+                    assert(attacker.hit == reflected_hp);
+                    assert(actor.hit == 100000 - expected);
+                    assert(item->carried_by == &actor &&
+                           item->wear_loc == (worn ? slots[recipe] : WEAR_NONE));
+                    assert(!str_cmp(item->questowner, actor.name));
+                    assert(pc.powers[DISC_THAUMATURGY] == rank &&
+                           actor.primal == 0 && pc.quest == 0);
+                    actor.fighting = attacker.fighting = NULL;
+                    actor.next = actor.next_in_room = NULL;
+                    p->wear_flags = old_mask;
+                    ++cases;
+                }
+    assert(cases == 60);
+    puts("Gargoyle class gear: 60 rank/form/worn damage and deferred-reflection "
+         "cases passed without extra mitigation, costs or equipment mutation");
+}
+
 static void missing_sorcerer(void)
 {
     /* The original missing-template branch exits the entire game process. */
@@ -756,7 +822,8 @@ int main(int argc, char **argv)
         else if (!strcmp(argv[1],"conjured")) conjured_supplies();
         else abort();
     } else {
-        missing_sorcerer(); craft_boundaries(); gargoyle_equipment(); sorcerer(); forge(); upgraded_forge();
+        missing_sorcerer(); craft_boundaries(); gargoyle_equipment();
+        gargoyle_equipment_damage(); sorcerer(); forge(); upgraded_forge();
         mage_costs(); equipment(); class_restrictions(); dragon_persistence();
         consumable_market(); market_sales(); conjured_supplies(); fetish_crafting();
     }
