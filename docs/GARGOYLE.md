@@ -77,6 +77,14 @@ stone statue. Leaving stone form, losing training or becoming incapacitated
 cancels pending retaliation. Runtime identities reject extracted/recycled actors.
 Pending retaliation is transient and is not saved across logout or copyover.
 
+Cancellation regressions cover 22 interruption/recovery cases: either actor's
+death, nonpositive HP, room departure, missing live-list membership, safe-room
+changes, source incapacitation, real `stoneform off`, lost training/build/class,
+and runtime identity replacement on either side. A dispatch discards invalid
+damage permanently: restoring eligibility cannot replay it, while new eligible
+hits can reflect normally. These controlled engine fixtures complement the
+existing reflected NPC-kill/extraction test; they are not a live PvP audit.
+
 While petrified, voluntary movement (including following), weapon attacks and
 active powers are blocked. Read-only commands, save/quit, chat/tell/reply and
 already-authorized administrative copyover remain available under their normal

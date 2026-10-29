@@ -1171,6 +1171,107 @@ static void reflection_fixture(long rank, bool stone)
     actors[0].position = actors[1].position = POS_FIGHTING;
 }
 
+static void gargoyle_reflection_interruptions(void)
+{
+    unsigned checks = 0;
+    /* Cancel at dispatch, then recover before another pulse. The old damage
+     * must be consumed, not held until the actor becomes eligible again. */
+    for (int who = 0; who < 2; ++who)
+        for (int reason = 0; reason < 8; ++reason) {
+            reflection_fixture(5, TRUE);
+            hurt_person(&actors[1], &actors[0], 1000);
+            CHAR_DATA *ch = &actors[who];
+            switch (reason) {
+            case 0: ch->hit = 0; ch->position = POS_DEAD; break;
+            case 1: ch->hit = -1; ch->position = POS_MORTAL; break;
+            case 2: ch->in_room = &elsewhere; break;
+            case 3: ch->in_room = NULL; break;
+            case 4: /* Still in the room list, but no longer globally live. */
+                if (who == 0) char_list = &actors[1];
+                else actors[0].next = &actors[2];
+                break;
+            case 5: /* Globally live, but removed from the room list. */
+                if (who == 0) room.people = &actors[1];
+                else actors[0].next_in_room = &actors[2];
+                break;
+            case 6: SET_BIT(room.room_flags, ROOM_SAFE); break;
+            case 7:
+                if (who == 0) ch->position = POS_STUNNED;
+                else ch->position = POS_DEAD;
+                break;
+            }
+            long before = actors[1].hit;
+            gargoyle_reflection_pulse();
+            assert(actors[1].hit == before);
+            ch->hit = who == 0 ? 9500 : 10000;
+            ch->position = POS_FIGHTING;
+            ch->in_room = &room;
+            char_list = room.people = &actors[0];
+            actors[0].next = actors[0].next_in_room = &actors[1];
+            actors[1].next = actors[1].next_in_room = &actors[2];
+            REMOVE_BIT(room.room_flags, ROOM_SAFE);
+            gargoyle_reflection_pulse();
+            assert(actors[1].hit == 10000);
+            hurt_person(&actors[1], &actors[0], 1000);
+            gargoyle_reflection_pulse();
+            assert(actors[1].hit == 9875); /* New eligible damage still works. */
+            ++checks;
+        }
+
+    for (int reason = 0; reason < 4; ++reason) {
+        reflection_fixture(5, TRUE);
+        hurt_person(&actors[1], &actors[0], 1000);
+        switch (reason) {
+        case 0:
+            actors[0].wait = 0;
+            run(0, "stoneform off"); /* Real interpreter/exit, not just a bit edit. */
+            assert(!gargoyle_statue(&actors[0]) && actors[0].wait == 12);
+            break;
+        case 1: pcs[0].powers[DISC_THAUMATURGY] = 0; break;
+        case 2: pcs[0].cland[0] = -1; break;
+        case 3: actors[0].class = CLASS_NONE; break;
+        }
+        combat_status_update();
+        gargoyle_reflection_pulse();
+        assert(actors[1].hit == 10000);
+        assert(!IS_SET(actors[0].polyaff, POLY_GARGOYLE_STATUE));
+        actors[0].class = CLASS_VAMPIRE;
+        pcs[0].cland[0] = VAMPIRE_BUILD_GARGOYLE;
+        pcs[0].powers[DISC_THAUMATURGY] = 5;
+        actors[0].wait = 0;
+        run(0, "stoneform on");
+        assert(gargoyle_statue(&actors[0]));
+        gargoyle_reflection_pulse();
+        assert(actors[1].hit == 10000);
+        hurt_person(&actors[1], &actors[0], 1000);
+        gargoyle_reflection_pulse();
+        assert(actors[1].hit == 9875);
+        ++checks;
+    }
+
+    /* Both sides of a pooled address reuse must reject the old event while
+     * accepting newly queued damage under the replacement runtime identity. */
+    for (int who = 0; who < 2; ++who) {
+        reflection_fixture(5, TRUE);
+        hurt_person(&actors[1], &actors[0], 1000);
+        CHAR_DATA replacement = actors[who];
+        unsigned long old_id = replacement.gargoyle_reflection_id;
+        clear_char(&actors[who]);
+        assert(actors[who].gargoyle_reflection_id == 0);
+        replacement.gargoyle_reflection_id = 0;
+        actors[who] = replacement;
+        hurt_person(&actors[1], &actors[0], 1000);
+        assert(actors[who].gargoyle_reflection_id != old_id);
+        gargoyle_reflection_pulse();
+        assert(actors[1].hit == 9875);
+        gargoyle_reflection_pulse();
+        assert(actors[1].hit == 9875);
+        ++checks;
+    }
+    assert(checks == 22);
+    puts("Gargoyle interruptions: 22 cancellation/recovery and recycled-actor cases passed");
+}
+
 static void gargoyle_reflection(void)
 {
     const long amounts[] = {0, 1, 3, 7, 8, 99, 1000, 1001};
@@ -1331,6 +1432,7 @@ int main(void)
     gargoyle_power_menu();
     gargoyle_lesson_lifecycle();
     gargoyle_reflection();
+    gargoyle_reflection_interruptions();
     clan_registry_close();
     char_list = NULL; descriptor_list = NULL;
     for (int i = 0; i < 5; ++i) free_string(actors[i].clan);
