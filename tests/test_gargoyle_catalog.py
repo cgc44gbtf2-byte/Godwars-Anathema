@@ -7,6 +7,7 @@ from gargoyle_reflection_source import PROOFS as REFLECTION_PROOFS, without_garg
 from gargoyle_menu_source import PROOFS as MENU_PROOFS, without_gargoyle_menu
 from gargoyle_teaching_source import PATH as TEACH_PATH, BASE_BLOB as TEACH_BASE, NEW as TEACH_NEW, without_gargoyle_teaching
 from gargoyle_recruit_source import PATH as RECRUIT_PATH, BASE_BLOB as RECRUIT_BASE, NEW as RECRUIT_NEW, without_gargoyle_recruit
+from gargoyle_death_source import BASE as DEATH_BASE, NEW as DEATH_NEW, without_gargoyle_death
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -15,6 +16,19 @@ def blob(text):
     return hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
 
 class GargoyleCatalog(unittest.TestCase):
+    def test_pc_death_cleanup_exact_inverse_and_mutations(self):
+        text = (ROOT / "Genesis/src/combat_death.c").read_text()
+        self.assertEqual(text.count(DEATH_NEW), 1)
+        self.assertEqual(blob(without_gargoyle_death(text)), DEATH_BASE)
+        self.assertEqual(without_gargoyle_death(without_gargoyle_death(text)),
+                         without_gargoyle_death(text))
+        for old, new in (("POLY_GARGOYLE_STATUE);", "POLY_BAT);"),
+                         ("    victim->hit = 1;", "    victim->hit = 2;")):
+            mutated = text.replace(old, new, 1)
+            self.assertNotEqual(blob(without_gargoyle_death(mutated)), DEATH_BASE)
+        self.assertNotEqual(blob(without_gargoyle_death(text + "\n/* mutation */\n")),
+                            DEATH_BASE)
+
     def test_recruit_guard_exact_inverse(self):
         text = (ROOT / RECRUIT_PATH).read_text()
         self.assertEqual(text.count(RECRUIT_NEW), 1)

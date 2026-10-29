@@ -3,6 +3,7 @@ import hashlib
 import unittest
 from test_class_layout import ROOT, SRC, make_values
 from drow_globe_source import without_drow_globe_stage
+from gargoyle_death_source import without_gargoyle_death
 
 BASE = {
     "classes/drow/drow.c": "27c68cdbad00a1fc523212c5d8d94f3bdd9e3c45",
@@ -23,7 +24,7 @@ class DarknessCatalog(unittest.TestCase):
         for path, expected in BASE.items():
             with self.subTest(path=path):
                 self.assertEqual(blob(without_drow_globe_stage(
-                    (SRC/path).read_text())), expected)
+                    without_gargoyle_death((SRC/path).read_text()))), expected)
 
     def test_inverse_does_not_hide_cost_or_target_mutations(self):
         for path, old, new in (

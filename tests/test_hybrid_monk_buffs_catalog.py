@@ -4,6 +4,7 @@ import json
 import unittest
 from test_class_layout import ROOT, SRC, make_values
 from test_favour_expiry_catalog import without_favour_metadata_monk,without_favour_metadata_merc
+from gargoyle_death_source import without_gargoyle_death
 
 BASE_MONK="6b39e0bfa7c961f53a82ce8061044152c2d26809"
 BASE_DEATH="c4dd62ddf5117d3d7f01e788f526b497ee58cf08"
@@ -72,6 +73,7 @@ def without_monk_buff_stage(text):
     return text[:start]+body+text[end:]
 
 def without_cloak_death_stage(text):
+    text=without_gargoyle_death(text)
     text=replace_once(text,
         "if (victim->hit <= 0 && monk_cloak_can_save(victim))",
         "if (victim->hit <= 0 && IS_MONK(victim) && IS_MORE(victim, MORE_CLOAK))")

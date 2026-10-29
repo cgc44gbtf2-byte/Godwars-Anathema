@@ -271,6 +271,9 @@ void raw_kill( CHAR_DATA *victim, CHAR_DATA *ch )
 	return;
     }
      	   
+    /* A revived PC returns to flesh before altar recovery and autosave.
+     * Keep earned Visceratika/build identity and all unrelated form policy. */
+    REMOVE_BIT(victim->polyaff, POLY_GARGOYLE_STATUE);
     victim->hit = 1;
     extract_char(victim, FALSE);
     while (victim->affected)

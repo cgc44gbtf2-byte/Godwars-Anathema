@@ -269,6 +269,85 @@ static void class_reset(void)
     assert(close(peer) == 0);
 }
 
+static void gargoyle_death(void)
+{
+    static OBJ_INDEX_DATA corpse;
+    corpse.vnum = OBJ_VNUM_CORPSE_PC;
+    corpse.name = pooled("corpse");
+    corpse.short_descr = pooled("the corpse of %s");
+    corpse.description = pooled("The corpse of %s lies here.");
+    corpse.item_type = ITEM_CORPSE_PC;
+    unsigned slot = corpse.vnum % MAX_KEY_HASH;
+    OBJ_INDEX_DATA *previous = obj_index_hash[slot];
+    corpse.next = previous;
+    obj_index_hash[slot] = &corpse;
+    for (long rank = 1; rank <= 5; ++rank)
+        for (int state = 0; state < 3; ++state) {
+            CHAR_DATA *owner = player("Stonevictim"), *killer = player("Stonekiller");
+            owner->class = CLASS_VAMPIRE;
+            owner->pcdata->cland[0] = VAMPIRE_BUILD_GARGOYLE;
+            owner->pcdata->cland[1] = owner->pcdata->cland[2] = -1;
+            owner->pcdata->powers[DISC_THAUMATURGY] = rank;
+            owner->polyaff = state ? POLY_GARGOYLE_STATUE : 0;
+            if (state == 2) SET_BIT(owner->polyaff,POLY_BAT);
+            long remaining_form = state == 2 ? POLY_BAT : 0;
+            owner->affected_by = 0;
+            owner->hit = owner->max_hit = 10000;
+            assert(gargoyle_statue(owner) == (state == 1));
+            raw_kill(owner,killer); /* Actual PC corpse/altar/autosave path. */
+            assert(live(owner) && owner->in_room == &altar &&
+                   owner->position == POS_RESTING && owner->hit == 1);
+            assert(owner->polyaff == remaining_form && !gargoyle_statue(owner));
+            assert(IS_GARGOYLE(owner) && gargoyle_visceratika(owner) == rank);
+            for (int short_load = 0; short_load < 2; ++short_load) {
+                DESCRIPTOR_DATA reload = {0};
+                bool found = short_load ? load_char_short(&reload,"Stonevictim") :
+                    load_char_obj(&reload,"Stonevictim");
+                assert(found && reload.character != NULL &&
+                       reload.character->polyaff == remaining_form &&
+                       IS_GARGOYLE(reload.character) &&
+                       gargoyle_visceratika(reload.character) == rank);
+                free_char(reload.character);
+            }
+            cleanup();
+            assert(corpse.count == 0);
+        }
+    obj_index_hash[slot] = previous;
+    puts("Gargoyle death: fifteen real PC deaths and thirty full/short reloads passed");
+}
+
+static void gargoyle_logout(void)
+{
+    for (long rank = 1; rank <= 5; ++rank)
+        for (int stone = 0; stone < 2; ++stone) {
+            CHAR_DATA *owner = player("Stonequitter");
+            owner->class = CLASS_VAMPIRE;
+            owner->pcdata->cland[0] = VAMPIRE_BUILD_GARGOYLE;
+            owner->pcdata->cland[1] = owner->pcdata->cland[2] = -1;
+            owner->pcdata->powers[DISC_THAUMATURGY] = rank;
+            owner->polyaff = stone ? POLY_GARGOYLE_STATUE : 0;
+            owner->affected_by = 0;
+            owner->position = POS_STANDING;
+            owner->hit = owner->max_hit = 10000;
+            int peer = connect_player(owner);
+            do_quit(owner,"");
+            assert(!live(owner) && descriptor_list == NULL);
+            assert(close(peer) == 0);
+            for (int short_load = 0; short_load < 2; ++short_load) {
+                DESCRIPTOR_DATA reload = {0};
+                bool found = short_load ? load_char_short(&reload,"Stonequitter") :
+                    load_char_obj(&reload,"Stonequitter");
+                assert(found && IS_GARGOYLE(reload.character) &&
+                       gargoyle_visceratika(reload.character) == rank &&
+                       gargoyle_statue(reload.character) == stone &&
+                       reload.character->gargoyle_reflection_id == 0);
+                free_char(reload.character);
+            }
+            cleanup();
+        }
+    puts("Gargoyle logout: ten real quits and twenty full/short reloads passed");
+}
+
 static void remove_saves(const char *path)
 {
     DIR *dir = opendir(path);
@@ -325,6 +404,8 @@ int main(int argc, char **argv)
     if (argc == 1 || !strcmp(argv[1],"heads")) heads();
     if (argc == 1 || !strcmp(argv[1],"switch")) switching();
     if (argc == 1 || !strcmp(argv[1],"notes")) note_quit();
+    if (argc == 1 || !strcmp(argv[1],"gargoyle")) gargoyle_death();
+    if (argc == 1 || !strcmp(argv[1],"gargoyle")) gargoyle_logout();
     if (argc == 1 || !strcmp(argv[1],"reset")) class_reset();
     assert(fclose(fpReserve) == 0);
     assert(chdir("..") == 0);

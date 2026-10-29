@@ -77,6 +77,13 @@ stone statue. Leaving stone form, losing training or becoming incapacitated
 cancels pending retaliation. Runtime identities reject extracted/recycled actors.
 Pending retaliation is transient and is not saved across logout or copyover.
 
+Normal player death ends stone form before altar recovery and autosave, without
+erasing Gargoyle identity or earned Visceratika. Regression coverage includes
+15 actual player deaths and 30 full/short reloads across all five ranks,
+including malformed mixed-form state; unrelated legacy form bits are preserved.
+Ten actual quits and 20 reloads verify that ordinary logout instead preserves
+valid trained stone form, with no persisted runtime reflection identity.
+
 Cancellation regressions cover 22 interruption/recovery cases: either actor's
 death, nonpositive HP, room departure, missing live-list membership, safe-room
 changes, source incapacitation, real `stoneform off`, lost training/build/class,
