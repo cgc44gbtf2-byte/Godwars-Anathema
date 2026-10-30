@@ -83,6 +83,9 @@ erasing Gargoyle identity or earned Visceratika. Regression coverage includes
 including malformed mixed-form state; unrelated legacy form bits are preserved.
 Ten actual quits and 20 reloads verify that ordinary logout instead preserves
 valid trained stone form, with no persisted runtime reflection identity.
+Beheading also clears stone form before creating the severed-head state.
+Ten real beheading/head-destruction recovery cases cover all five ranks in
+flesh and stone; build and earned ranks survive, without restoring a stone body.
 
 Cancellation regressions cover 22 interruption/recovery cases: either actor's
 death, nonpositive HP, room departure, missing live-list membership, safe-room

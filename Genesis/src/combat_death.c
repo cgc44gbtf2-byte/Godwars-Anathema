@@ -314,6 +314,8 @@ void behead( CHAR_DATA *victim, CHAR_DATA *ch )
 
     stop_fighting(victim, TRUE);
     make_corpse(victim, ch);
+    /* A severed head cannot remain an immobile stone body. */
+    REMOVE_BIT(victim->polyaff, POLY_GARGOYLE_STATUE);
     extract_char(victim, FALSE);
 
     char_from_room(victim);

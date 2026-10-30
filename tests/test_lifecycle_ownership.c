@@ -316,6 +316,50 @@ static void gargoyle_death(void)
     puts("Gargoyle death: fifteen real PC deaths and thirty full/short reloads passed");
 }
 
+static void gargoyle_beheading(void)
+{
+    static OBJ_INDEX_DATA corpse, head;
+    OBJ_INDEX_DATA *indexes[] = {&corpse,&head};
+    long vnums[] = {OBJ_VNUM_CORPSE_PC,OBJ_VNUM_SEVERED_HEAD};
+    OBJ_INDEX_DATA *previous[2];
+    for (int i = 0; i < 2; ++i) {
+        indexes[i]->vnum = vnums[i];
+        indexes[i]->name = pooled(i ? "head" : "corpse");
+        indexes[i]->short_descr = pooled(i ? "a severed head" : "the corpse of %s");
+        indexes[i]->description = pooled(i ? "A head lies here." : "The corpse of %s lies here.");
+        indexes[i]->item_type = i ? ITEM_TREASURE : ITEM_CORPSE_PC;
+        unsigned slot = vnums[i] % MAX_KEY_HASH;
+        previous[i] = obj_index_hash[slot];
+        indexes[i]->next = previous[i];
+        obj_index_hash[slot] = indexes[i];
+    }
+    for (long rank = 1; rank <= 5; ++rank)
+        for (int stone = 0; stone < 2; ++stone) {
+            CHAR_DATA *owner = player("Stonehead"), *killer = player("Headkiller");
+            owner->class = CLASS_VAMPIRE;
+            owner->pcdata->cland[0] = VAMPIRE_BUILD_GARGOYLE;
+            owner->pcdata->cland[1] = owner->pcdata->cland[2] = -1;
+            owner->pcdata->powers[DISC_THAUMATURGY] = rank;
+            owner->polyaff = stone ? POLY_GARGOYLE_STATUE : 0;
+            owner->hit = owner->max_hit = 10000;
+            behead(owner,killer);
+            assert(live(owner) && owner->in_room == &home &&
+                   IS_MORE(owner,MORE_HEAD) && IS_AFFECTED(owner,AFF_POLYMORPH));
+            assert(!IS_SET(owner->polyaff,POLY_GARGOYLE_STATUE));
+            assert(IS_GARGOYLE(owner) && gargoyle_visceratika(owner) == rank);
+            assert(owner->pcdata->chobj && owner->pcdata->chobj->chobj == owner);
+            extract_obj(owner->pcdata->chobj);
+            assert(owner->in_room == &altar && owner->hit == 1 &&
+                   !IS_MORE(owner,MORE_HEAD) && !IS_AFFECTED(owner,AFF_POLYMORPH) &&
+                   !IS_SET(owner->polyaff,POLY_GARGOYLE_STATUE));
+            cleanup();
+            assert(corpse.count == 0 && head.count == 0);
+        }
+    for (int i = 1; i >= 0; --i)
+        obj_index_hash[vnums[i] % MAX_KEY_HASH] = previous[i];
+    puts("Gargoyle beheading: ten real head creation/recovery paths passed");
+}
+
 static void gargoyle_logout(void)
 {
     for (long rank = 1; rank <= 5; ++rank)
@@ -405,6 +449,7 @@ int main(int argc, char **argv)
     if (argc == 1 || !strcmp(argv[1],"switch")) switching();
     if (argc == 1 || !strcmp(argv[1],"notes")) note_quit();
     if (argc == 1 || !strcmp(argv[1],"gargoyle")) gargoyle_death();
+    if (argc == 1 || !strcmp(argv[1],"beheading")) gargoyle_beheading();
     if (argc == 1 || !strcmp(argv[1],"gargoyle")) gargoyle_logout();
     if (argc == 1 || !strcmp(argv[1],"reset")) class_reset();
     assert(fclose(fpReserve) == 0);
