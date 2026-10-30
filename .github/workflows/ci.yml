@@ -1,0 +1,113 @@
+name: C build and regression tests
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - debian:12
+          - debian:13
+          - ubuntu:22.04
+          - ubuntu:24.04
+          - fedora:43
+          - fedora:44
+    container: ${{ matrix.image }}
+    steps:
+      - name: Install distro toolchain
+        run: |
+          . /etc/os-release
+          case "$ID" in
+            debian|ubuntu)
+              apt-get update
+              apt-get install -y --no-install-recommends ca-certificates git build-essential libcrypt-dev systemd python3 luajit
+              ;;
+            fedora)
+              dnf install -y ca-certificates git gcc make libxcrypt-devel systemd python3 luajit libasan libubsan binutils shadow-utils util-linux
+              ;;
+            *) echo "Unsupported CI distro: $ID" >&2; exit 1 ;;
+          esac
+      - uses: actions/checkout@v4
+      - name: Build
+        run: |
+          log=$(mktemp)
+          if make -j2 >"$log" 2>&1; then
+            echo "Production build passed."
+          else
+            status=$?
+            echo "Production build failed (exit $status):"
+            tail -n 120 "$log" | cut -c1-2000
+            exit "$status"
+          fi
+      - name: Validate systemd unit (does not start service)
+        run: |
+          install -D -m 0755 Genesis/src/merc /opt/anathema/src/merc
+          systemd-analyze verify deploy/anathema.service
+      - name: Regression tests
+        run: |
+          log=$(mktemp)
+          if make test >"$log" 2>&1; then
+            echo "C regression suite passed."
+          else
+            status=$?
+            echo "make test failed (exit $status):"
+            tail -n 120 "$log" | cut -c1-2000
+            exit "$status"
+          fi
+          python3 tests/test_catalog.py
+      - name: Isolated boot and graceful stop
+        run: |
+          python3 tests/smoke_shutdown.py
+          python3 tests/smoke_copyover.py
+          python3 tests/smoke_copyover.py --vision
+          python3 tests/smoke_nightstalker.py
+          python3 tests/smoke_gargoyle.py
+          python3 tests/smoke_owner.py
+          python3 tests/smoke_numbers.py
+          python3 tests/smoke_words.py
+          python3 tests/smoke_strings.py
+          python3 tests/smoke_inventory.py
+          python3 tests/smoke_aux_readers.py
+          python3 tests/smoke_aux_writers.py
+          python3 tests/smoke_admin_config.py
+      - name: Address and undefined-behavior sanitizers
+        env:
+          ASAN_OPTIONS: detect_leaks=0:halt_on_error=1
+          UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+        run: |
+          log=$(mktemp)
+          ulimit -c 0
+          set +e
+          (
+            python3 tests/sanitizer_startup.py &&
+            make sanitize &&
+            make -C Genesis/src clean &&
+            make -j2 CFLAGS="-std=gnu17 -DMERC -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer -fno-pie" LDFLAGS="-fsanitize=address,undefined -no-pie" &&
+            python3 tests/smoke_shutdown.py &&
+            python3 tests/smoke_copyover.py &&
+            python3 tests/smoke_copyover.py --vision &&
+            python3 tests/smoke_nightstalker.py &&
+            python3 tests/smoke_gargoyle.py &&
+            python3 tests/smoke_owner.py &&
+            python3 tests/smoke_numbers.py &&
+            python3 tests/smoke_words.py &&
+            python3 tests/smoke_strings.py &&
+            python3 tests/smoke_inventory.py &&
+            python3 tests/smoke_aux_readers.py &&
+            python3 tests/smoke_aux_writers.py &&
+            python3 tests/smoke_admin_config.py
+          ) >"$log" 2>&1
+          status=$?
+          set -e
+          if [ "$status" -eq 0 ]; then
+            echo "ASan/UBSan and sanitized smoke suites passed."
+          else
+            echo "Sanitizer validation failed (exit $status):"
+            tail -n 120 "$log" | cut -c1-2000
+            exit "$status"
+          fi

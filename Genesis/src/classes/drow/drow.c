@@ -1,0 +1,922 @@
+#if defined(macintosh)
+#include <types.h>
+#else
+#include <sys/types.h>
+#endif
+#include <stdio.h>
+#include <errno.h>
+#include <limits.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include "merc.h"
+#include "classes/hybrid/access.h"
+
+void do_dinduct( CHAR_DATA *ch, char *argument )
+{
+    if (!IS_DROW(ch)) { stc("Huh?\n\r", ch); return; }
+    clan_legacy(ch, "invite", argument);
+}
+
+void do_promotion(CHAR_DATA *ch, char *argument )
+{
+    if (!IS_DROW(ch)) { stc("Huh?\n\r", ch); return; }
+    clan_legacy(ch, "promote", argument);
+}
+        
+void do_failure( CHAR_DATA *ch, char *argument )
+{
+    if (!IS_DROW(ch)) { stc("Huh?\n\r", ch); return; }
+    clan_legacy(ch, "demote", argument);
+}
+
+void do_attune( CHAR_DATA *ch, char *argument )
+{
+    char arg[MAX_INPUT_LENGTH];
+    OBJ_DATA *obj;
+
+    one_argument(argument, arg);
+
+    if (!hybrid_power_parent(ch,CLASS_DROW))
+    {
+	stc("Huh?\n\r",ch);
+	return;
+    }
+    if (!hybrid_power_drow(ch,DROW_ATTUNE))
+    {
+	stc("You need to obtain attune first.\n\r",ch);
+	return;
+    }
+    if (arg[0] == '\0' || (obj = get_obj_carry(ch, arg)) == NULL)
+    {
+	stc("What object do you wish to attune?\n\r", ch);
+	return;
+    }
+    if (obj->item_type == ITEM_QUEST || obj->item_type == ITEM_AMMO || obj->item_type == ITEM_EGG
+     || obj->item_type == ITEM_VOODOO || obj->item_type == ITEM_MONEY || obj->item_type == ITEM_TREASURE
+     || obj->item_type == ITEM_PAGE || IS_SET(obj->quest, QUEST_ARTIFACT))
+    {
+	stc("You cannot attune that item.\n\r", ch);
+	return;
+    }
+    if (str_cmp(ch->name,obj->questowner))
+    {
+	stc("You do not own this object.\n\r", ch);
+	return;
+    }
+    if (IS_SET(obj->extra_flags, ITEM_LOYAL))
+    {
+	stc("This object is already attuned to you.\n\r", ch);
+	return;
+    }
+
+    act("You attune $p to yourself.",ch,obj,NULL,TO_CHAR);
+    SET_BIT(obj->extra_flags, ITEM_LOYAL);
+    return;
+}
+
+void do_acidbolt( CHAR_DATA *ch, char *argument )
+{
+    char arg [MAX_INPUT_LENGTH];
+    CHAR_DATA *victim;
+    ROOM_INDEX_DATA *combat_room;
+
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL || ch->in_room == NULL)
+        return;
+
+    one_argument(argument, arg);
+
+    if (!hybrid_power_parent(ch,CLASS_DROW))
+    {
+	stc("Huh?\n\r",ch);
+	return;
+    }
+
+    if (!hybrid_power_drow(ch,DROW_ACID))
+    {
+	stc("You need to obtain acid bolt first.\n\r",ch);
+	return;
+    }
+
+    if (IS_ITEMAFF(ch, ITEMA_PEACE)) do_majesty(ch,"");
+ 
+    if (arg[0] == '\0' && ch->fighting == NULL)
+    {
+	stc("Who do you wish to use Acid Bolt on?\n\r",ch);
+	return;
+    }
+
+    if ((victim = arg[0] ? get_char_room(ch, arg) : ch->fighting) == NULL)
+    {
+	stc("They aren't here.\n\r", ch);
+	return;
+    }
+    
+    if (is_safe(ch, victim)) return;
+
+    act("You fire a bolt of acid at $N!", ch, NULL, victim, TO_CHAR);
+    act("$n fires a bolt of acid at you!", ch, NULL, victim, TO_VICT);
+    act("$n fires a bolt of acid at $N!", ch, NULL, victim, TO_NOTVICT);
+    combat_room = ch->in_room;
+    one_hit(ch, victim, TYPE_HIT, "acid bolt");
+    if (combat_character_in_room(combat_room, ch)) WAIT_STATE(ch, 8);
+    return;  
+}
+
+void do_faeriefire( CHAR_DATA *ch, char *argument )
+{
+    CHAR_DATA *victim;
+    AFFECT_DATA af;
+    char arg[MAX_INPUT_LENGTH];
+    long sn;
+
+    one_argument(argument, arg);
+
+    if (!hybrid_power_parent(ch,CLASS_DROW))
+    {
+	stc("Huh?\n\r", ch);
+	return;
+    }
+
+    if (!hybrid_power_drow(ch,DROW_FIRE))
+    {
+	stc("You need to obtain faerie fire first.\n\r",ch);
+	return;
+    }
+
+    if (arg[0] == '\0' || (victim = get_char_room(ch, arg)) == NULL)
+    {
+	stc("Who do you wish to use Faerie Fire on?\n\r", ch);
+	return;
+    }
+        
+    if (IS_AFFECTED(victim, AFF_FAERIE_FIRE))
+    {
+	stc("They are already surrounded by faerie fire.\n\r",ch);
+	return;
+    }
+    
+    if (is_safe(ch, victim)) return;
+
+    if (!IS_NPC(victim) && victim->pcdata->atm >= number_percent())
+    {
+	stc("Nothing happens.\n\r", ch);
+	return;
+    }
+
+    if ((sn = skill_lookup("faerie fire")) < 0)
+    {
+	stc("Bug - please inform Akuma.\n\r", ch);
+	return;
+    }
+
+    act("A look of concentration crosses $n's face.", ch, NULL, NULL, TO_ROOM);
+    stc("You are surrounded by a dull red light!\n\r",victim);
+    act("$n is surrounded by a dull red light!", victim, NULL, NULL, TO_ROOM);
+
+    af.type      = sn;   
+    af.duration  = 10;
+    af.location  = APPLY_DAMROLL;
+    af.modifier  = -50;
+    af.bitvector = AFF_FAERIE_FIRE;
+    affect_to_char(victim, &af);
+
+    af.location  = APPLY_HITROLL;
+    af.bitvector = 0;
+    affect_to_char(victim, &af);
+
+    af.location  = APPLY_AC;
+    af.modifier  = -50;
+    affect_to_char(victim, &af);
+
+    stc("You are surrounded by a pink outline.\n\r", victim);
+    act("$n is surrounded by a pink outline.", victim, NULL, NULL, TO_ROOM);
+
+    WAIT_STATE(ch, 12);
+    return;
+}
+
+void do_summonspider( CHAR_DATA *ch, char *argument )
+{
+    char buf [MAX_INPUT_LENGTH];
+    CHAR_DATA *victim;
+    MOB_INDEX_DATA *prototype;
+    AFFECT_DATA af;
+    long sn;
+
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL || ch->in_room == NULL)
+        return;
+
+    if (!IS_DROW(ch))
+    {
+	stc("Huh?\n\r", ch);
+	return;
+    }
+
+    if (!get_drow(ch, DROW_SPIDER))
+    {
+	stc("You need to obtain summon spider first.\n\r", ch);
+	return;
+    }
+ 
+    if (ch->pcdata->followers != 0)
+    {
+	stc("Nothing happens.\n\r",ch);
+	return;
+    }
+
+    /* Validate dependencies before reserving a follower or creating a mob.
+     * create_mobile(NULL) terminates the process; no staging room is needed. */
+    prototype = get_mob_index(MOB_VNUM_GUARDIAN);
+    sn = skill_lookup("guardian");
+    if (prototype == NULL || sn < 0)
+    {
+        stc("The spider summon is unavailable; please tell staff.\n\r",ch);
+        return;
+    }
+    victim = create_mobile(prototype);
+    free_string(victim->lord);
+    victim->lord = str_dup(ch->name);
+    free_string(victim->name);
+    victim->name = str_dup("drow spider");
+    free_string(victim->short_descr);
+    victim->short_descr = str_dup("a fiendish spider");
+    free_string(victim->long_descr);
+    victim->long_descr = str_dup("A fiendish spider is here, awaiting orders.\n\r");
+    victim->sex = 1;
+    free_string(victim->description);
+    victim->description = str_dup("He looks extremely powerful.\n\r");
+     
+    victim->level = 100;
+    victim->hit = 30000;
+    victim->max_hit = 30000;
+    victim->mana = 1000;
+    victim->max_mana = 1000;
+    victim->hitroll = char_hitroll(ch) - 50;
+    victim->damroll = char_damroll(ch) - 50;
+    victim->armor = char_ac(ch) - 50;
+    char_to_room(victim,ch->in_room);
+
+    ch->pcdata->followers++;
+    add_follower(victim, ch);
+    af.type      = sn;
+    af.duration  = 6666;
+    af.location  = APPLY_NONE;
+    af.modifier  = 0;
+    af.bitvector = AFF_CHARM;
+    affect_to_char(victim, &af);
+    stc("A spider skitters out of the shadows and kneels before you.\n\r", ch);
+    act("$N skitters out of the shadows and kneels before $n.", ch, NULL, victim, TO_ROOM);
+    /* Speech can execute room-text callbacks. Finish ownership/charm first,
+     * and never dereference the summoner or pet after the callback. */
+    strcpy(buf,"Come forth, minion of Lloth, and serve me!");
+    do_say(ch, buf);
+    return;
+
+}
+
+/* Consumable recipe, separate from permanent 8000-DP/400-quest relics.
+ * Batch and arithmetic checks are completed before creating or charging. */
+static void craft_drow_bolts(CHAR_DATA *ch, char *argument)
+{
+    char amount[MAX_INPUT_LENGTH], extra[MAX_INPUT_LENGTH], message[160];
+    char *end;
+    long count = 1;
+    argument = one_argument(argument, amount);
+    one_argument(argument, extra);
+    if (extra[0] != '\0') {
+        stc("Syntax: drowarmor bolts [1-20]. Cost: 100 Drow points per bolt.\n\r", ch);
+        return;
+    }
+    if (amount[0] != '\0') {
+        for (const char *p = amount; *p; ++p)
+            if (*p < '0' || *p > '9') {
+                stc("Choose a whole number of bolts from 1 to 20.\n\r", ch);
+                return;
+            }
+        errno = 0;
+        count = strtol(amount, &end, 10);
+        if (errno == ERANGE || *end != '\0' || count < 1 || count > 20) {
+            stc("Choose a whole number of bolts from 1 to 20.\n\r", ch);
+            return;
+        }
+    }
+    long cost = count * 100; /* count is bounded above before multiplication. */
+    if (ch->pcdata->classpoints[CP_CURRENT] < cost) {
+        stc("Crafting bolts costs 100 Drow points each; you do not have enough.\n\r", ch);
+        return;
+    }
+    OBJ_INDEX_DATA *prototype = get_obj_index(OBJ_VNUM_DROW_BOLT);
+    if (prototype == NULL || prototype->item_type != ITEM_AMMO ||
+        prototype->value[3] < 0 || prototype->weight < 0 ||
+        !IS_SET(prototype->wear_flags, ITEM_TAKE)) {
+        stc("The Drow bolt template is unavailable or invalid; please tell staff.\n\r", ch);
+        return;
+    }
+    if (ch->carry_number < 0 || ch->carry_weight < 0 ||
+        ch->carry_number > LONG_MAX - count ||
+        prototype->weight > (LONG_MAX - ch->carry_weight) / count) {
+        stc("You cannot safely carry that batch of bolts.\n\r", ch);
+        return;
+    }
+    for (long i = 0; i < count; ++i) {
+        OBJ_DATA *bolt = create_object(prototype, 0);
+        /* The relic constructor normally assigns a large resale value.
+         * Consumables must not turn renewable class points into shop gold. */
+        bolt->cost = 0;
+        bolt->points = 0;
+        free_string(bolt->questmaker);
+        bolt->questmaker = str_dup(ch->name);
+        /* Leave questowner empty, like other tradable crafted supplies. */
+        obj_to_char(bolt, ch);
+    }
+    ch->pcdata->classpoints[CP_CURRENT] -= cost;
+    snprintf(message, sizeof(message),
+        "You craft %ld Drow bolt%s for %ld Drow points.\n\r",
+        count, count == 1 ? "" : "s", cost);
+    stc(message, ch);
+    act("$n crafts some crossbow bolts.", ch, NULL, NULL, TO_ROOM);
+}
+
+void do_drowarmor( CHAR_DATA *ch, char *argument )
+{
+    OBJ_INDEX_DATA *pObjIndex;
+    OBJ_DATA *obj;
+    char arg[MAX_INPUT_LENGTH];
+    long vnum = 0, wear_flag = 0;
+
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL || ch->in_room == NULL)
+        return;
+    argument = one_argument(argument, arg);
+
+    if (!IS_DROW(ch))
+    {
+	stc("Huh?\n\r", ch);
+	return;
+    }
+
+    if (arg[0] == '\0')
+    {
+	stc("Please specify which piece of drow armor you wish to make:\n\r", ch);
+	stc("  Cloak, Helmet, Breastplate, Bracer, Crossbow.\n\r", ch);
+stc("  Bolts [1-20]: 100 Drow points each, no quest points.\n\r", ch);
+	return;
+    }
+
+    if (!str_cmp(arg, "bolt") || !str_cmp(arg, "bolts")) {
+        craft_drow_bolts(ch, argument);
+        return;
+    }
+
+    if (ch->pcdata->classpoints[CP_CURRENT] < 8000 || ch->pcdata->quest < 400)
+    {
+	stc("It costs 8000 drow points and 400 quest points to create drow armor.\n\r", ch);
+	return;
+    }
+
+    if (!str_cmp(arg,"cloak")) {vnum = 29652; wear_flag = ITEM_WEAR_ABOUT;}
+    else if (!str_cmp(arg,"helmet")) {vnum = 29653; wear_flag = ITEM_WEAR_HEAD;}
+    else if (!str_cmp(arg,"breastplate")) {vnum = 29654; wear_flag = ITEM_WEAR_BODY;}
+    else if (!str_cmp(arg,"bracer")) {vnum = 29655; wear_flag = ITEM_WEAR_WRIST;}
+    else if (!str_cmp(arg,"crossbow")) {vnum = OBJ_VNUM_DROW_CROSSBOW; wear_flag = ITEM_WEAR_HOLD;}
+    else
+    {
+	do_drowarmor(ch,"");
+	return;
+    }
+     
+    if ((pObjIndex = get_obj_index(vnum)) == NULL)
+    {
+	stc("Missing object, please inform Akuma.\n\r", ch);
+	return;
+    }
+
+    if (pObjIndex->item_type != (vnum == OBJ_VNUM_DROW_CROSSBOW ? ITEM_MISSILE : ITEM_ARMOR) ||
+        !IS_SET(pObjIndex->wear_flags,ITEM_TAKE) ||
+        !IS_SET(pObjIndex->wear_flags,wear_flag) || pObjIndex->weight < 0)
+    {
+        stc("The Drow relic template is invalid; please tell staff.\n\r",ch);
+        return;
+    }
+    if (ch->carry_number < 0 || ch->carry_number == LONG_MAX ||
+        ch->carry_weight < 0 || ch->carry_weight > LONG_MAX - pObjIndex->weight)
+    {
+        stc("You cannot safely carry that Drow relic.\n\r",ch);
+        return;
+    }
+
+    obj = create_object(pObjIndex, 50);
+    /* Correct only the known legacy arrow reference. Custom ammunition
+     * configurations remain untouched, as do existing saved objects. */
+    if (vnum == OBJ_VNUM_DROW_CROSSBOW && obj->value[0] == 9315)
+        obj->value[0] = OBJ_VNUM_DROW_BOLT;
+    obj_to_char(obj, ch);
+    ch->pcdata->classpoints[CP_CURRENT] -= 8000;
+    ch->pcdata->quest -= 400;
+    free_string(obj->questmaker);
+    obj->questmaker = str_dup(ch->name);
+    free_string(obj->questowner);
+    obj->questowner = str_dup(ch->name);
+
+    act("$p appears in your hands.",ch,obj,NULL,TO_CHAR);
+    act("$p appears in $n's hands.",ch,obj,NULL,TO_ROOM);
+    return;
+}
+
+void do_door( CHAR_DATA *ch, char *argument )
+{
+    char arg[MAX_INPUT_LENGTH];
+    CHAR_DATA *victim;
+
+    argument = one_argument( argument, arg );
+
+    if (!IS_DROW(ch))
+    {
+	stc("Huh?\n\r", ch);
+	return;
+    }
+
+    if (arg[0] == '\0')
+    {
+	stc("Who do you wish to open the door to?\n\r", ch);
+	return;
+    }
+
+    if ((victim = get_char_world(ch, arg)) == NULL || victim->in_room == NULL || ch->in_room == NULL
+     || (IS_NPC(victim) && victim->pIndexData->vnum == MOB_VNUM_EYE) || victim->in_room == ch->in_room 
+     || victim->level > 800)
+    {
+	stc("Nothing happens.\n\r", ch);
+	return;
+    }
+
+    if (IS_SET(victim->in_room->room_flags, ROOM_SAFE) || IS_SET(victim->in_room->room_flags, ROOM_PRIVATE)
+     || IS_SET(victim->in_room->room_flags, ROOM_SOLITARY) || IS_SET(victim->extra, EXTRA_ILLUSION)
+     || (!IS_NPC(victim) && !IS_EXTRA(victim, EXTRA_SUMMON)))
+    {
+	stc("You are unable to focus on their location.\n\r", ch);
+	if (!IS_NPC(victim) && IS_MORE(victim, MORE_GUARDIAN))
+	{
+	    guardian_message(victim);
+	    act("$n just failed to open a Dimensional Door to you.", ch, NULL, victim, TO_VICT);
+        }
+        return;
+    }
+
+    stc("You step through a dimensional door.\n\r", ch);
+    act("$n steps through a freshly created dimensional door and closes it behind $m.", ch, NULL, NULL, TO_ROOM);
+    char_from_room(ch);
+    char_to_room(ch, victim->in_room);    
+    act("$n steps out of a dimensional door and closes it behind $m.", ch, NULL, NULL, TO_ROOM);
+    do_look(ch, "auto");
+    return;
+}
+
+void do_prayer( CHAR_DATA *ch, char *argument )
+{
+    CHAR_DATA *victim;
+    char arg1[MIL];
+    char arg2[MIL];
+    long grant = 0, cost = 0;
+
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL || ch->in_room == NULL)
+        return;
+    argument = one_argument(argument, arg1);
+    argument = one_argument(argument, arg2);
+
+    if (!IS_DROW(ch))
+    {
+	stc("Huh?\n\r", ch);
+	return;
+    }
+
+    if (arg1[0] == '\0' || arg2[0] == '\0')
+    {
+stc("Prayer grants a power to a Drow; no deity or trainer is required.\n\r", ch);
+stc("Learn for yourself: prayer self <power>\n\r", ch);
+stc("Grant to another Drow in your house: prayer <name> <power>\n\r", ch);
+stc("Examples: prayer self acidbolt   |   prayer self speed\n\r", ch);
+stc("You pay the DP costs below. Speed has four ranks.\n\r", ch);
+	stc("AcidBolt (5000), LlothsWeb (8000), Darkness (9500), FaerieFire (5000),\n\r", ch);
+	stc("SpiderBite (7500), DualWield (10000), Blindfight (5000), SummonSpider (8000),\n\r", ch);
+	stc("SpiderEyes (7500), Readaura (6000), Darkvision (5000), Heighten (20000).\n\r", ch);
+	stc("PoisonImmunity (5000), SkipDisc (5000), Attunement (1000),\n\r", ch);
+	stc("Speed (10000 per increase), Toughness (8000), Might (8000),\n\r", ch);
+	return;
+    }
+
+    if ((victim = get_char_room(ch, arg1)) == NULL)
+    {
+	stc("Nobody by that name.\n\r", ch);
+	return;
+    }
+
+    if (!IS_DROW(victim) || victim->pcdata == NULL)
+    {
+	stc("Only on a drow.\n\r", ch);
+	return;
+    }
+
+    if (victim != ch && (victim->clan[0] == '\0' || ch->clan[0] == '\0' || str_cmp(victim->clan, ch->clan)))
+    {
+	stc("They are not of your house.\n\r", ch);
+	return;
+    }
+
+    if (!str_cmp(arg2, "acidbolt")) {grant = DROW_ACID; cost = 5000;}
+    else if (!str_cmp(arg2, "llothsweb")) {grant = DROW_WEB; cost = 8000;}
+    else if (!str_cmp(arg2, "darkness")) {grant = DROW_DARK; cost = 9500;}
+    else if (!str_cmp(arg2, "faeriefire")) {grant = DROW_FIRE; cost = 5000;}
+    else if (!str_cmp(arg2, "spiderbite")) {grant = DROW_BITE; cost = 7500;}
+    else if (!str_cmp(arg2, "dualwield")) {grant = DROW_DUALWIELD; cost = 10000;}
+    else if (!str_cmp(arg2, "blindfight")) {grant = DROW_BFIGHT; cost = 5000;}
+    else if (!str_cmp(arg2, "summonspider")) {grant = DROW_SPIDER; cost = 8000;}
+    else if (!str_cmp(arg2, "spidereyes")) {grant = DROW_EYES; cost = 7500;}
+    else if (!str_cmp(arg2, "readaura")) {grant = DROW_READ; cost = 6000;}
+    else if (!str_cmp(arg2, "darkvision")) {grant = DROW_NIGHT; cost = 5000;}
+    else if (!str_cmp(arg2, "heighten")) {grant = DROW_SIGHT; cost = 20000;}
+    else if (!str_cmp(arg2, "poisonimmunity")) {grant = DROW_PIMM; cost = 5000;}
+    else if (!str_cmp(arg2, "skipdisc")) {grant = DROW_SKIP; cost = 5000;}
+    else if (!str_cmp(arg2, "attunement")) {grant = DROW_ATTUNE; cost = 1000;}
+    else if (!str_cmp(arg2, "might")) {grant = DROW_MIGHT; cost = 8000;}
+    else if (!str_cmp(arg2, "toughness")) {grant = DROW_TOUGH; cost = 8000;}
+    else if (!str_cmp(arg2, "speed"))
+    {
+	cost = 10000;
+if (victim->pcdata->drow[DROW_SPEED] < 0 || victim->pcdata->drow[DROW_SPEED] > 4)
+{
+    stc("They have an invalid Speed rank; please tell staff.\n\r", ch);
+    return;
+}
+	if (victim->pcdata->drow[DROW_SPEED] >= 4)
+	{
+	    stc("They already move at full speed.\n\r", ch);
+	    return;
+	}
+	if (ch->pcdata->classpoints[CP_CURRENT] < cost)
+	{
+	    stc("You have insufficient power to grant that gift.\n\r", ch);
+	    return;
+	}
+	ch->pcdata->classpoints[CP_CURRENT] -= cost;
+	victim->pcdata->drow[DROW_SPEED]++;
+	if (victim != ch) stc("You have been granted a gift from your patron!\n\r", victim);
+	stc("Ok.\n\r", ch);
+
+	if (victim != ch) do_autosave(ch, "");
+	do_autosave(victim, "");
+	return;
+    }
+    else
+    {
+	do_prayer(ch, "");
+	return;
+    }
+
+    if (get_drow(victim, grant))
+    {
+	stc("They have already got that power.\n\r", ch);
+	return;
+    }
+    if (ch->pcdata->classpoints[CP_CURRENT] < cost)
+    {
+	stc("You have insufficient power to grant that gift.\n\r", ch);
+	return;
+    }
+    SET_BIT(victim->pcdata->drow[DROW_POWERS], grant);
+    ch->pcdata->classpoints[CP_CURRENT] -= cost;
+    if (victim != ch) stc("You have been granted a gift from your patron!\n\r", victim);
+    stc("Ok.\n\r", ch);
+    if (victim != ch) do_autosave(ch, "");
+    do_autosave(victim, "");
+    return;
+}
+
+void do_skipdisc( CHAR_DATA *ch, char *argument )
+{
+    if (!IS_DROW(ch))
+    {
+	stc("Huh?\n\r", ch);
+	return;
+    }
+
+    if (!get_drow(ch, DROW_SKIP))
+    {
+	stc("You need to obtain skip disc first.\n\r", ch );
+	return;
+    }
+
+    if (IS_AFFECTED(ch, AFF_FLYING))
+    {
+	stc("You leap off your skip disc.\n\r", ch);
+	REMOVE_BIT(ch->affected_by, AFF_FLYING);
+    }
+    else
+    {
+	stc("You leap onto your skip disc.\n\r", ch);
+	SET_BIT(ch->affected_by, AFF_FLYING);
+    }
+    return;
+}
+
+void do_drowupkeep( CHAR_DATA *ch, char *argument )
+{
+    char buf[128];
+    int loop, counter = 0;
+
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL) return;
+    if (!IS_DROW(ch))
+    {
+	stc("Huh?\n\r",ch);
+	return;
+    }
+
+    stc("Drow Upkeep\n\r", ch);
+    if (ch->pcdata->drow[DROW_POWERS] == 0 && ch->pcdata->drow[DROW_SPEED] == 0)
+    {
+	stc("You have no drow abilities", ch);
+	return;
+    }
+
+    for (loop = 1; loop <= DROW_MAX; loop *= 2)
+    {
+	if (!get_drow(ch, loop)) continue;
+
+	if (loop == DROW_ACID) stc("Acid bolt         ", ch);
+	else if (loop == DROW_WEB) stc("Lloth's web       ", ch);
+	else if (loop == DROW_DARK) stc("Globe of darkness ", ch);
+	else if (loop == DROW_FIRE) stc("Faerie fire       ", ch);
+	else if (loop == DROW_BITE) stc("Spider bite       ", ch);
+	else if (loop == DROW_DUALWIELD) stc("Dual Wield        ", ch);
+	else if (loop == DROW_BFIGHT) stc("Blind fighting    ", ch);
+	else if (loop == DROW_SPIDER) stc("Summon spider     ", ch);
+	else if (loop == DROW_EYES) stc("Spider eyes       ", ch);
+	else if (loop == DROW_READ) stc("Readaura          ", ch);
+	else if (loop == DROW_NIGHT) stc("Darkvision        ", ch);
+	else if (loop == DROW_SIGHT) stc("Heighten          ", ch);
+	else if (loop == DROW_PIMM) stc("Poison immunity   ", ch);
+	else if (loop == DROW_SKIP) stc("Skip disc         ", ch);
+	else if (loop == DROW_ATTUNE) stc("Attunement        ", ch);
+	else if (loop == DROW_MIGHT) stc("Might             ", ch);
+	else if (loop == DROW_TOUGH) stc("Toughness         ", ch);
+
+	counter++;
+	counter %= 4;
+	if (counter == 0) stc("\n\r", ch);
+    }
+
+    if (ch->pcdata->drow[DROW_SPEED] < 0 || ch->pcdata->drow[DROW_SPEED] > 4)
+    {
+snprintf(buf, sizeof(buf), "Drow data has an invalid Speed rank (%li). Tell staff.\n\r",
+         ch->pcdata->drow[DROW_SPEED]);
+stc(buf, ch);
+    }
+    else if (ch->pcdata->drow[DROW_SPEED] > 0)
+    {
+snprintf(buf, sizeof(buf), "Speed %li\n\r", ch->pcdata->drow[DROW_SPEED]);
+	stc(buf, ch);
+    }
+
+    return;
+}
+
+void do_globedark( CHAR_DATA *ch, char *argument )
+{
+    if (!hybrid_power_parent(ch,CLASS_DROW))
+    {
+	stc("Huh?\n\r", ch);
+	return;
+    }
+
+    if (!hybrid_power_drow(ch, DROW_DARK))
+    {
+	stc("You need to obtain darkness first.\n\r", ch);
+	return;
+    }
+
+    if (hybrid_drow_globe_active(ch))
+    {
+hybrid_drow_globe_set(ch,0);
+	stc("You banish your globe of darkness.\n\r", ch);
+	act("Darkness fades from the room as $n relaxes.", ch, NULL, NULL, TO_ROOM);
+    }
+    else
+    {
+if (hybrid_drow_points_current(ch) < 500)
+	{
+	    stc("You do not have enough drow points to activate globe of darkness.\n\r", ch);
+	    return;
+	}
+if (!hybrid_drow_points_charge(ch,500) ||
+    !hybrid_drow_globe_set(ch,1))
+{
+    stc("The globe cannot be activated right now.\n\r",ch);
+    return;
+}
+	stc("You summon a globe of darkness!\n\r", ch);
+	act("$n concentrates as the room fades into darkness!", ch, NULL, NULL, TO_ROOM);
+    }
+    return;
+}
+
+static OBJ_DATA *drow_shot_ammunition(CHAR_DATA *ch, const OBJ_DATA *weapon)
+{
+    if (weapon->pIndexData == NULL || weapon->value[3] < 0) return NULL;
+    long vnum = weapon->value[0];
+    if (weapon->pIndexData != NULL &&
+        weapon->pIndexData->vnum == OBJ_VNUM_DROW_CROSSBOW && vnum == 9315)
+        vnum = OBJ_VNUM_DROW_BOLT;
+    if (vnum <= 0) return NULL;
+    for (OBJ_DATA *ammo = ch->carrying; ammo != NULL; ammo = ammo->next_content) {
+        if (ammo == weapon || ammo->wear_loc != WEAR_NONE ||
+            ammo->item_type != ITEM_AMMO || ammo->pIndexData == NULL ||
+            ammo->pIndexData->vnum != vnum || ammo->value[3] != weapon->value[3] ||
+            ammo->chobj != NULL || ammo->contains != NULL ||
+            IS_SET(ammo->quest, QUEST_ARTIFACT)) continue;
+        if (ammo->questowner != NULL && ammo->questowner[0] != '\0' &&
+            str_cmp(ammo->questowner, ch->name)) continue;
+        return ammo;
+    }
+    return NULL;
+}
+
+void do_shoot( CHAR_DATA *ch, char *argument )
+{
+    ROOM_INDEX_DATA *location;
+    ROOM_INDEX_DATA *to_room;
+    EXIT_DATA *pexit;
+    CHAR_DATA *victim;
+    CHAR_DATA *live;
+    OBJ_DATA *obj, *ammo;
+    AFFECT_DATA af = {0};
+    char arg1[MIL];
+    char arg2[MIL];
+    char buf[MSL];
+    char revdoor[MIL];
+    int door;
+    long sn, damage;
+
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL) return;
+    if (argument == NULL) argument = "";
+
+    argument = one_argument(argument, arg1);
+    argument = one_argument(argument, arg2);
+
+    if (!IS_DROW(ch))
+    {
+	stc("Huh?\n\r", ch);
+	return;
+    }
+    if (ch->in_room == NULL) return;
+
+    if (ch->pcdata->classpoints[CP_CURRENT] < 500)
+    {
+	stc("You need at least 500 dp to shoot your crossbow.\n\r", ch);
+	return;
+    }
+
+    if ((obj = get_eq_char(ch, WEAR_HOLD)) == NULL || obj->item_type != ITEM_MISSILE)
+    {
+	stc("You are not holding anything to shoot.\n\r", ch);
+	return;
+    }
+
+    if (arg1[0] == '\0' || arg2[0] == '\0' || argument[0] != '\0')
+    {
+	stc("Syntax: shoot <direction> <target>.\n\r", ch);
+	return;
+    }
+
+    if ((get_char_room(ch, arg2)) != NULL)
+    {
+	stc("You can shoot them from here.\n\r", ch);
+	return;
+    }
+
+    if (IS_SET(ch->in_room->room_flags, ROOM_SAFE))
+    {
+	stc("Something in the air prevents you from attacking.\n\r", ch);
+	return;
+    }
+
+    if (!str_cmp(arg1, "n") || !str_cmp(arg1, "north"))
+	{door = 0; sprintf(arg1, "north");}
+    else if (!str_cmp(arg1, "e") || !str_cmp(arg1, "east"))
+	{door = 1; sprintf(arg1, "east");}
+    else if (!str_cmp(arg1, "s") || !str_cmp(arg1, "south"))
+	{door = 2; sprintf(arg1, "south");}
+    else if (!str_cmp(arg1, "w") || !str_cmp(arg1, "west"))
+	{door = 3; sprintf(arg1, "west");}
+    else if (!str_cmp(arg1, "u") || !str_cmp(arg1, "up"))
+	{door = 4; sprintf(arg1, "up");}
+    else if (!str_cmp(arg1, "d") || !str_cmp(arg1, "down"))
+	{door = 5; sprintf(arg1, "down");}
+    else
+    {
+	stc("You can only shoot north, south, east, west, up or down.\n\r", ch);
+	return;
+    }
+
+    if (!str_cmp(arg1, "north")) {door = 0; sprintf(revdoor, "south");}
+    else if (!str_cmp(arg1, "east")) {door = 1; sprintf(revdoor, "west");}
+    else if (!str_cmp(arg1, "south")) {door = 2; sprintf(revdoor, "north");}
+    else if (!str_cmp(arg1, "west")) {door = 3; sprintf(revdoor, "east");}
+    else if (!str_cmp(arg1, "up")) {door = 4; sprintf(revdoor, "down");}
+    else if (!str_cmp(arg1, "down")) {door = 5; sprintf(revdoor, "up");}
+    else return;
+
+    location = ch->in_room;
+    ammo = drow_shot_ammunition(ch, obj);
+    if (ammo == NULL)
+    {
+        stc("You need compatible, unworn ammunition in your inventory.\n\r", ch);
+        return;
+    }
+    /* A protected target is not an attempted shot. Check safety in the
+     * destination view, then restore the real room before paying/extracting.
+     * Missing exits, closed doors and misses retain their old shot costs. */
+    pexit = location->exit[door];
+    to_room = pexit != NULL ? pexit->to_room : NULL;
+    if (to_room != NULL && !IS_SET(pexit->exit_info,
+        EX_CLOSED | EX_WALL_GRANITE | EX_WALL_WATER | EX_WALL_WIND | EX_WALL_FLAME))
+    {
+        ch->in_room = to_room;
+        victim = get_char_room(ch, arg2);
+        bool blocked = victim != NULL && is_safe(ch, victim);
+        ch->in_room = location;
+        if (blocked) return;
+    }
+
+    sprintf(buf, "You point $p %s and shoot.", arg1);
+    act(buf, ch, obj, NULL, TO_CHAR);
+    sprintf(buf, "$n points $p %s and shoots.", arg1);
+    act(buf, ch, obj, NULL, TO_ROOM);
+
+    ch->pcdata->classpoints[CP_CURRENT] -= 500;
+    extract_obj(ammo); /* One object is one projectile; never dereference again. */
+
+    if ((pexit = ch->in_room->exit[door]) == NULL || (to_room = pexit->to_room) == NULL)
+    {
+	act("$n's crossbow bolt bounces off a wall.", ch, NULL, NULL, TO_ROOM);
+	act("Your crossbow bolt bounces off a wall.", ch, NULL, NULL, TO_CHAR);
+	return;
+    }
+
+    pexit = ch->in_room->exit[door];
+    if (IS_SET(pexit->exit_info,
+        EX_CLOSED | EX_WALL_GRANITE | EX_WALL_WATER | EX_WALL_WIND | EX_WALL_FLAME))
+    {
+act("$n's crossbow bolt strikes a barrier.", ch, NULL, NULL, TO_ROOM);
+act("Your crossbow bolt strikes a barrier.", ch, NULL, NULL, TO_CHAR);
+	return;
+    }
+
+    /* Scoped legacy ranged view, not physical travel: movement hooks would
+     * cancel stealth/darkness/silence merely for firing a crossbow. */
+    ch->in_room = to_room;
+
+    if ((victim = get_char_room(ch, arg2)) != NULL)
+    {
+	if (is_safe(ch, victim))
+	{
+	    goto shoot_restore;
+	}
+	sprintf(buf, "A crossbow bolt comes flying in from the %s and strikes $N.", revdoor);
+	act(buf, ch, NULL, victim, TO_NOTVICT);
+	sprintf(buf, "A crossbow bolt comes flying in from the %s and strikes you.", revdoor);
+	act(buf, ch, NULL, victim, TO_VICT);
+
+/* number_range accepts int bounds, even on 64-bit player-stat builds. */
+long damroll = char_damroll(ch);
+damroll = URANGE(0, damroll, INT_MAX / 20);
+damage = number_range((int)(10 * damroll), (int)(20 * damroll));
+	if (!IS_NPC(victim)) damage /= 10;
+
+	hurt_person(ch, victim, damage);
+        for (live = to_room->people; live != NULL && live != victim; live = live->next_in_room)
+            ;
+        if (live == NULL || live->hit <= 0 || live->position == POS_DEAD) goto shoot_restore;
+
+	if (hybrid_power_drow(victim, DROW_PIMM))
+	{
+	    stc("Your poison has been resisted.\n\r", ch);
+	    stc("You were hit by a crossbow bolt, but resisted it's poison.\n\r", victim);
+	}
+	else if (!IS_AFFECTED(victim, AFF_SLEEP))
+	{
+    	    if ((sn = skill_lookup("sleep")) < 0) goto shoot_restore;
+	    do_stance(victim, "");
+    	    af.type = sn;
+    	    af.location = APPLY_NONE;
+    	    af.modifier = 0;
+    	    af.duration = 1;
+    	    af.bitvector = AFF_SLEEP;
+    	    affect_to_char(victim, &af);
+	    victim->position = POS_SLEEPING;
+  	}
+    }
+ 
+shoot_restore:
+    ch->in_room = location;
+    return;
+}

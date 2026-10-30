@@ -1,0 +1,964 @@
+#AREADATA
+Name        Haif    Giant Colony~
+Builders    Haif~
+VNUMs       8000 8028
+End
+
+
+
+#MOBILES
+#8000
+veerbeeg citizen~
+a veerbeeg citizen~
+A veerbeeg citizen is strolling here, wondering what to destroy.
+~
+He is small (for a giant), and skinny. As he strolls along, the ground
+shakes a bit. He doesn't look TOO tough, you're pretty sure you can beat
+him.
+~
+129 0 0 S
+3 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#8001
+veerbeeg rogue~
+a veerbeeg rogue~
+A rogue veerbeeg is here, plotting to kill a citizen.
+~
+This veerbeeg is much skinnier than usual, and pale in complexion.
+It appears that he doesn't get enough food. As you watch him, he eyes
+a nearby citizen disdainly.
+~
+161 0 0 S
+10 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#8002
+rock giant~
+a rock giant~
+A small rock giant is peering about here.
+~
+One of the small rock giants that the veerbeeg have moved in with.
+Though larger than the veerbeeg, it's still pretty small for a giant.
+Hamstringing him would work well.
+~
+81 8 0 S
+14 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#8003
+veerbeeg guard~
+a veerbeeg guard~
+A veerbeeg guard is here, looking extremely bored.
+~
+This guard is watching the citizens walk casually along, and paying
+extra close attention to the rogues, lest they band together.
+~
+161 512 0 S
+17 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#8004
+hill giant~
+a hill giant~
+A large hill giant stands here, being careful not shake the ground.
+~
+He stands out in the crowed, being so much taller than the usual giant.
+Though taller, he still doesn't look very tough.
+~
+161 0 0 S
+12 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#8005
+theif veerbeeg~
+a veerbeeg thief~
+A clumsy veerbeeg thief is standing here.
+~
+A veerbeeg thief, terribly hidden, and very clumsy by the looks of him,
+stands here, watching you carefully.
+~
+161 0 0 S
+18 0 0 0d0+0 0d0+0
+0 0
+0 0 2
+#8006
+veerbeeg soldier~
+a veerbeeg soldier~
+A veerbeeg soldier is patrolling here.
+~
+A veerbeeg soldier is patrolling here. He doesn't look very well armed
+or armored. From the looks of it, he wouldn't even bother calling for help
+if you attack him.
+~
+33 40 0 S
+93 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#8007
+veerbeeg shopkeeper~
+A veerbeeg shopkeeper~
+A small shopkeeper is looking a little nervous.
+~
+The shopkeeper doesn't seem to have anything to sell. Perhaps he's just
+a helper.
+~
+145 552 0 S
+27 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#8008
+veerbeeg business partner~
+A veerbeeg business partner~
+A veerbeeg business partner stands here.
+~
+This business partner is actually human, suprisingly. Very tall and
+muscular, he doesn't seem to stand out too much. Still, you doubt he's
+really very strong.
+~
+209 40 0 S
+29 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#8009
+bored veerbeeg~
+A bored veerbeeg~
+An incredibly bored veerbeeg slouches here.
+~
+He appears to be amazingly bored. He turns his attention to you slightly
+as you watch him. He appears to be considering the effort of walking over
+and hitting you.
+~
+145 0 0 S
+19 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#8010
+chief frost giant~
+Chief of the coloney~
+The Chief of the coloney is standing here, watching over all.
+~
+The Chief is actually a frost giant, and not a veerbeeg. He's much taller
+than all the rest, and looks a bit more powerful, though that can be just
+deception so the others won't kill him.
+~
+33 168 0 S
+92 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#8011
+second command~
+Second in command~
+The Second in command is here, looking bored.
+~
+The second in command is here, female suprisingly, and looks bored.
+Though the second, because of the fearsome appearance of the chief,
+and the non-frightening appearance of her, she doesn't get much work.
+~
+33 40 0 S
+106 0 0 0d0+0 0d0+0
+0 0
+0 0 2
+#8012
+veerbeeg fighter~
+a veerbeeg fighter~
+A casual veerbeeg fighter is here, looking to cause trouble.
+~
+This veerbeeg appears to relish trouble. He snorts at you as you
+watch him, and you begin to consider giving him that trouble.
+~
+81 0 0 S
+1 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#0
+
+
+
+#OBJECTS
+#8000
+large club~
+a large club~
+There is a large wooden club lying here.~
+~
+3 0 16385
+37 10 10 501
+2 0 0
+E
+a large club~
+Standard issue club. With the power of a giant behind it,
+it can do a lot of damage.
+~
+#8001
+knee brace~
+a set of knee brace~
+The usual white knee brace. Used to protect the hamstring of a giant.~
+~
+9 0 33
+0 0 0 0
+3 0 0
+E
+knee brace~
+This is a standard knee brace, white in color, and used completely
+for protecting hamstrings.
+~
+#8002
+piece litter~
+a piece of litter~
+There is a small piece of trash here.~
+~
+26 0 1
+20 0 43 28
+1 0 0
+A
+9 -1
+E
+piece of litter~
+A small piece of litter. You wonder if it tastes good.
+~
+#8003
+slingshot sling shot~
+a slingshot~
+There is a small slingshot here.~
+~
+3 0 16385
+37 10 10 502
+2 0 0
+E
+Slingshot~
+This is a small slingshot. With the right ammo, it looks like it could hurt.
+~
+#8004
+safe~
+the stone safe~
+A large steel safe sits here.~
+~
+15 2 0
+1005 13 8005 0
+1000 0 0
+E
+safe~
+This safe is locked shut. Maybe if you found something you could unlock it
+with.
+~
+#8005
+stone key~
+a stone key~
+A small stone key is sitting here.~
+~
+18 2 16385
+0 0 0 0
+1 0 0
+E
+a stone key~
+The key looks like it would probably fit in a stone safe.
+~
+#8006
+small club~
+a small club~
+A small club rolls around here.~
+~
+5 0 8193
+0 0 0 5
+3 0 0
+E
+A small club~
+This is a small club, appears to be used to bash skulls in.
+You wonder where the giants hold it.
+~
+#8007
+slim scimitar~
+a slim scimitar~
+A slim scimitar is here~
+~
+5 35 8193
+0 0 0 3
+2 0 0
+A
+2 1
+A
+5 1
+A
+19 2
+A
+18 2
+E
+~
+Obviously a very well made scimitar. Silver in color, and appears
+to shimmer in the light.
+~
+#8008
+hoover vacuum cleaner~
+a Hoover vacuum cleaner~
+A Hoover vacuum cleaner is here idling.~
+~
+5 2 8193
+0 0 0 4
+10 0 0
+E
+vacuum cleaner~
+This vacuum looks well built and will last you many years of
+cleaning pleasure.
+~
+#8009
+dagger~
+a dagger~
+A small dagger is glinting here in the light.~
+~
+5 0 8193
+0 0 0 2
+3 0 0
+E
+dagger~
+It is a small dagger. Looks sharp.
+~
+#8010
+thin whip~
+a thin whip~
+A very thin whip is here, looking quite nasty.~
+~
+5 0 8197
+0 0 0 3
+1 0 0
+A
+3 1
+E
+whip~
+It's a black leather whip. Looks painful.
+~
+#8011
+huge club~
+a huge club~
+A huge club is lying here.~
+~
+5 0 8193
+0 0 0 5
+3 0 0
+A
+19 2
+E
+club~
+It's a very large club, that only a giant should be able to lift.
+You wonder how well it would work to bash in people's head.
+~
+#8012
+vault key~
+a vault key~
+A vault key is here.~
+~
+18 2 16385
+0 0 0 0
+1 0 0
+E
+vault key~
+The key looks like it could be useful.
+~
+#8013
+key~
+a key~
+A key is laying here.~
+~
+18 0 16385
+0 0 0 0
+1 0 0
+E
+key~
+It looks like it fits a slot somewhere.
+~
+#0
+
+
+
+#ROOMS
+#8001
+Entrance to a Giant Coloney~
+A road begins here in the glowing sands. It leads straight to a huge
+mountain. There appears to be a collection of caves.
+~
+0 0 1
+D0
+You see the glowing sand of the badlands.
+~
+~
+0 0 5062
+D2
+The stone road continues in this direction.
+~
+~
+0 0 8002
+S
+#8002
+A thin stone road~
+You are on a thin road made of stone. It's pretty easy to navigate.
+~
+0 0 1
+D0
+The entrance to the coloney is here.
+~
+~
+0 0 8001
+D2
+There is an intersection ahead.
+~
+~
+0 0 8003
+S
+#8003
+Intersection of Stone Roads~
+A collection of roads are here, all stone. Little wonder seeing as
+it's a mountain coloney. You wonder which to take.
+~
+0 0 1
+D0
+The stone road continues this way.
+~
+~
+0 0 8002
+D1
+Another stone road is this way.
+~
+~
+0 0 8010
+D2
+A stone road meanders down this way.
+~
+~
+0 0 8004
+D3
+A cave is in this direction.
+~
+~
+0 0 8021
+S
+#8004
+A stone road~
+This is a very crowded street. So many giants, so little room. You are
+careful not to get stepped on.
+~
+0 0 1
+D0
+An intersection lies in this direction.
+~
+~
+0 0 8003
+D2
+The stone road continues in this direction.
+~
+~
+0 0 8005
+S
+#8005
+A stone road~
+The stone road is quite worn here. To the east is a thin road, dark
+from all the buildings surrounding it. You can keep on the stone road
+or decide to go to one of the buildings around. All put inside caves.
+~
+0 0 1
+D0
+The stone road continues in this direction.
+~
+~
+0 0 8004
+D1
+A dark alley lies to the east.
+~
+~
+0 0 8011
+D2
+A square cave is in this direction.
+~
+~
+0 0 8006
+D3
+A medium sized cave is this way.
+~
+~
+0 0 8022
+S
+#8006
+Central Square~
+You are in a central square, looking around. So large, so little time.
+Which do you want to go to? 
+~
+0 0 1
+D0
+The stone road continues this way.
+~
+~
+0 0 8005
+D1
+Another small road for giants goes this way.
+~
+~
+0 0 8012
+D2
+The stone road continues in this direction.
+~
+~
+0 0 8007
+D3
+A small cave is to the west.
+~
+~
+0 0 8023
+S
+#8007
+Another intersection~
+Another major intersection which is made totally out of stone. Too much stone.
+North is back the way you came. To the east is a larger road, and you can
+continue down the stone road.
+~
+0 0 1
+D0
+A square is to the north.
+~
+~
+0 0 8006
+D1
+A large stone road is in this direction.
+~
+~
+0 0 8013
+D2
+The stone road continues in this direction.
+~
+~
+0 0 8008
+D3
+A Cave Block lies to the west.
+~
+~
+0 0 8024
+S
+#8008
+A large stone path~
+As you walk along, you notice that none of these roads have any names anywhere.
+This could make it difficult to find your way around.
+~
+0 0 1
+D0
+The stone road continues in this direction.
+~
+~
+0 0 8007
+D2
+The stone road continues in this direction.
+~
+~
+0 0 8009
+S
+#8009
+The stone road~
+The stone road ends here. Finally. You're getting sick of walking on stone,
+when will they get nice wood in? You look around and realize there are no trees.
+~
+0 0 1
+D0
+The stone road is ahead.
+~
+~
+0 0 8008
+D1
+There is a ruined cave this way.
+~
+~
+0 0 8014
+D2
+There is a ruined cave ahead.
+~
+~
+0 0 8020
+D3
+A very large cave lies to the west.
+~
+~
+0 0 8025
+S
+#8010
+Thin Stone Road~
+A small thin road is meandering here.
+~
+0 0 1
+D1
+An intersection is ahead.
+~
+~
+0 0 8015
+D3
+An intersection is ahead.
+~
+~
+0 0 8003
+S
+#8011
+Dark ally~
+You are in a very dark and seedy alley. This is just the right place for the
+veerbeeg to cause trouble. Maybe you should go back.
+~
+0 1 1
+D1
+An intersection is ahead.
+~
+~
+0 0 8017
+D3
+An intersection is ahead.
+~
+~
+0 0 8005
+S
+#8012
+Thin Stone Road~
+The stone road continues east and west here.
+~
+0 0 1
+D1
+An intersection is ahead.
+~
+~
+0 0 8018
+D3
+A large square is to the west.
+~
+~
+0 0 8006
+S
+#8013
+A Large Stone Road ~
+The stone road goes east and west.
+~
+0 0 1
+D1
+An intersection is ahead.
+~
+~
+0 0 8019
+D3
+An intersection is ahead.
+~
+~
+0 0 8007
+S
+#8014
+A Ruined Cave Site~
+This is a terribly destroyed cave. You wonder what to do.
+~
+0 0 1
+D3
+An intersection is ahead.
+~
+~
+0 0 8009
+S
+#8015
+Corner of Stone Roads~
+There is a second-hand knee brace stall is doing a brisk business with a
+group of veerbeeg on their way to the square.  The stone road goes west and
+the other travels south.
+~
+0 0 1
+D2
+A stone road continues ahead.
+~
+~
+0 0 8016
+D3
+A large stone road is ahead.
+~
+~
+0 0 8010
+S
+#8016
+Large Stone Road~
+The road continues north and south.  There is a cave to the east
+with a sign next to the entrance.
+~
+0 0 1
+E
+sign~
+Veerbeeg shop. Buy anything at any price!
+~
+D0
+An intersection is ahead.
+~
+~
+0 0 8015
+D1
+A doorway to the east bodes ill.
+~
+doorway~
+0 0 8026
+D2
+Stone road continues south.
+~
+~
+0 0 8017
+S
+#8017
+Stone Road~
+The stone road continues north and south.  There is a dark alley to the west.
+~
+0 0 1
+D0
+Stone Road continues north.
+~
+~
+0 0 8016
+D2
+An intersection is ahead.
+~
+~
+0 0 8018
+D3
+A dark alley is west.
+~
+~
+0 0 8011
+S
+#8018
+Corner of Roads~
+A proprietor of Uncle Sumpty's Ugly Emporium meanders by.  Stone Road
+continues north and south while a larger road goes west.
+~
+0 0 1
+D0
+Stone Road continues north.
+~
+~
+0 0 8017
+D2
+Stone Road continues south.
+~
+~
+0 0 8019
+D3
+Larger Stone Road continues west
+~
+~
+0 0 8012
+S
+#8019
+Corner of Roads~
+Stone Road goes north from here while the larger stone road goes
+west.
+~
+0 0 1
+D0
+Stone Road continues north.
+~
+~
+0 0 8018
+D3
+Larger stone road continues west.
+~
+~
+0 0 8013
+S
+#8020
+Ruined Cave Site.~
+This cave is completely in ruins. It looks terrible. You should
+just turn back the way you came.
+~
+0 0 1
+D0
+An intersection lies north.
+~
+~
+0 0 8009
+S
+#8021
+A Large Cave~
+This is a rather large cave. It appears to be a meeting place
+for all kinds of giants.
+~
+0 8 0
+D1
+An intersection lies east.
+~
+~
+0 0 8003
+S
+#8022
+A Large Cave~
+This is another meeting place for veerbeeg. It's not very tidy at all.
+There are tables all over the place. You wonder what to do.
+~
+0 8 0
+D1
+An intersection lies east.
+~
+~
+0 0 8005
+S
+#8023
+An Extremely Large Cave~
+This is an experimental psychiatric home. It's so crowded, you wonder
+if it was a good idea. Maybe they should just give it up, veerbeeg were
+never good with thoughts.
+~
+0 8 0
+D1
+A large square lies east.
+~
+~
+0 0 8006
+S
+#8024
+Cave Parlour~
+This is a clean cave, filled with all sorts of tables and chairs. You wonder
+if you'd ever be able to fit at a table. There seems to be no real point
+in staying.
+~
+0 8 0
+D1
+An intersection lies east.
+~
+~
+0 0 8007
+S
+#8025
+A Small Cave~
+This is a very disinteresting cave. There appears to be absolutly nothing
+to do here. You wonder what it's used for.
+~
+0 8 0
+D1
+An intersection lies east.
+~
+~
+0 0 8009
+S
+#8026
+Shopkeeper and Partner's Shop~
+This appears to have everything you would ever need for any reason, from
+food to those useless things you never know what they are. From the appearances
+the owners make a fortune
+There is also a sign next to the keyhole.
+~
+0 8 0
+E
+sign~
+To open insert key.
+~
+D0
+~
+door~
+0 8013 8027
+D3
+~
+door~
+0 0 8016
+S
+#8027
+Stockroom of The Store.~
+Many useless items stock the shelves of this stockroom.  A door leads
+south and large vault door is to the north.
+~
+0 8 0
+E
+vault door~
+This vault seems impervious to breaking.  There is a keyhole in the lock
+however.
+~
+D0
+~
+vault door~
+0 8012 8028
+D2
+~
+door~
+0 8013 8026
+S
+#8028
+Shopkeeper's Vault~
+The vault is musty with a slight smell of ozone in the air.
+~
+0 8 0
+D2
+~
+vault door~
+0 8012 8027
+S
+#0
+
+
+
+#SPECIALS
+M 8003 spec_cast_judge Load to: a veerbeeg guard
+M 8004 spec_thief Load to: a hill giant
+M 8006 spec_cast_judge Load to: a veerbeeg soldier
+M 8010 spec_cast_judge Load to: Chief of the coloney
+M 8011 spec_cast_judge Load to: Second in command
+S
+
+
+
+#RESETS
+M 0 8000 5 8004
+E 0 8006 0 14
+M 0 8000 5 8004
+E 0 8009 0 14
+M 0 8000 5 8006
+E 0 8009 0 14
+M 0 8000 5 8015
+E 0 8009 0 14
+E 0 8001 0 6
+M 0 8001 5 8006
+E 0 8009 0 14
+M 0 8001 5 8009
+E 0 8009 0 14
+E 0 8001 0 6
+M 0 8001 5 8011
+E 0 8006 0 14
+M 0 8003 5 8013
+E 0 8001 0 6
+M 0 8003 5 8014
+G 0 8000 0
+M 0 8002 4 8023
+E 0 8008 0 14
+M 0 8002 4 8024
+E 0 8010 0 14
+M 0 8004 5 8003
+M 0 8004 5 8006
+M 0 8004 5 8005
+M 0 8005 5 8010
+E 0 8006 0 14
+M 0 8005 5 8017
+E 0 8009 0 14
+M 0 8005 5 8019
+M 0 8006 5 8018
+E 0 8011 0 14
+M 0 8006 5 8012
+E 0 8011 0 14
+M 0 8006 5 8025
+E 0 8011 0 14
+M 0 8007 1 8027
+E 0 8009 0 14
+G 0 8012 0
+M 0 8009 1 8021
+E 0 8006 0 14
+G 0 8002 0
+G 0 8013 0
+M 0 8010 1 8007
+E 0 8011 0 14
+G 0 8003 0
+M 0 8011 1 8009
+E 0 8011 0 14
+G 0 8003 0
+M 0 8012 2 8011
+M 0 8012 2 8011
+O 0 8004 0 8028
+M 0 8008 1 8028
+E 0 8009 0 14
+G 0 8005 0
+P 0 8007 0 8004
+S
+
+
+
+#SHOPS
+0
+
+
+
+#$

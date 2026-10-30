@@ -1,0 +1,1629 @@
+#AREADATA
+Name        Akuma   Castle of the Dead~
+Builders    Akuma~
+VNUMs       9000 9100
+End
+
+
+
+#MOBILES
+#9000
+decayed gate guard~
+gate guard decayed~
+A decayed (former) gate guard shuffles in the area.  ~
+~
+113 67108864 0 S
+598 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#9001
+decayed archer guard~
+decayed archer guard~
+A decayed archer guard continues to stand watch here.  ~
+~
+81 67108864 0 S
+662 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#9002
+mutilated body~
+mutilated body~
+An unrecognizably mutilated corpse is wandering blindly.  ~
+~
+65 67108864 0 S
+510 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#9003
+skeletal steed~
+skeletal steed~
+The skeletal remains of a once mighty steed prance around here.  ~
+~
+65 67108864 0 S
+440 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#9004
+ghoulish guard~
+ghoulish guard~
+The guards of this place, now ghouls, patrol here.  ~
+~
+65 67108864 0 S
+531 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#9005
+zombified captain~
+zombified captain~
+The decrepit remains of the captain of the guard still walk here.  ~
+~
+81 67108864 0 S
+605 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#9006
+corpse castle guard~
+the corpse of a castle guard~
+A castle guard wanders aimlessly here.  ~
+~
+65 67108864 0 S
+520 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#9007
+ghost servant~
+the ghost of a servant~
+A ghostly servant continues his chores unaware.  ~
+~
+1 67108992 0 S
+448 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#9008
+royal guards~
+royal guards~
+A royal guard scours the area watching for threats.  ~
+~
+65 67108864 0 S
+713 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#9009
+king's guard~
+king's personal guard~
+One of the King's personal guards watches for threats to his master.  ~
+~
+81 67108864 0 S
+749 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#9010
+lich king~
+the lich king~
+The lich king of this castle sits atop his throne like a god.  ~
+~
+81 67108864 0 S
+817 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9011
+succubus queen~
+the queen succubus~
+The queen, now a succubus, waits for her king.  ~
+~
+81 67108864 0 S
+729 0 0 0d0+0 0d0+0
+0 0
+0 0 2
+#9012
+jailer~
+jailer~
+The jailer searches for souls to torture.  ~
+~
+81 67108864 0 S
+693 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9013
+prison guard~
+prison guard~
+A malignant ghast of a prison guard continues his tortures. ~
+~
+81 67108866 0 S
+638 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9014
+skeletal prisoner~
+skeletal prisoner~
+This prisoner, not more than a skeleton, is tortured even in undeath.  ~
+~
+65 67108864 0 S
+445 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#0
+
+
+
+#OBJECTS
+#0
+
+
+
+#ROOMS
+#9000
+Ancient Drawbridge~
+An ancient drawbridge crosses a moat to a castle that just now reveals itself
+as the fog parts around it.  However, with darkness clinging to the castle as it
+does, little can be seen of what lies inside.
+~
+0 4 0
+D0
+~
+~
+0 0 9001
+D2
+~
+~
+0 0 3906
+S
+#9001
+Entry to the Courtyard~
+A huge gate leads into the main courtyard of the castle, and just beyond it lay
+two guardhouses, one to either side.
+~
+0 0 0
+D0
+~
+~
+0 0 9004
+D1
+~
+~
+0 0 9002
+D2
+~
+~
+0 0 9000
+D3
+~
+~
+0 0 9003
+S
+#9002
+Guard Post~
+The stench of death hangs heavy in the air about this guardhouse.
+~
+0 9 0
+D3
+~
+~
+0 0 9001
+S
+#9003
+Guard Post~
+The stench of death hangs heavy in the air about this guardhouse.
+~
+0 9 0
+D1
+~
+~
+0 0 9001
+S
+#9004
+Castle Courtyard~
+Even just inside the castle courtyard, the stench of death is overpowering.
+None living have walked here in a great time.
+~
+0 0 0
+D0
+~
+~
+0 0 9013
+D1
+~
+~
+0 0 9005
+D2
+~
+~
+0 0 9001
+D3
+~
+~
+0 0 9014
+S
+#9005
+Castle Courtyard~
+Here in the courtyard, the darkness that surrounds the castle is nearly
+malleable.
+~
+0 0 0
+D0
+~
+~
+0 0 9012
+D1
+~
+~
+0 0 9006
+D3
+~
+~
+0 0 9004
+S
+#9006
+Castle Courtyard~
+Here in the courtyard, the darkness that surrounds the castle is nearly
+malleable.
+~
+0 0 0
+D0
+~
+~
+0 0 9011
+D1
+~
+~
+0 0 9007
+D3
+~
+~
+0 0 9005
+S
+#9007
+Castle Courtyard~
+~
+0 0 0
+D0
+~
+~
+0 0 9010
+D2
+~
+~
+0 0 9008
+D3
+~
+~
+0 0 9006
+S
+#9008
+Southeast Guard Tower~
+~
+0 12 0
+D0
+~
+~
+0 0 9007
+D4
+~
+~
+0 0 9009
+S
+#9009
+Watch Post~
+~
+0 8 0
+D5
+~
+~
+0 0 9008
+S
+#9010
+Castle Courtyard~
+Here in the courtyard, the darkness that surrounds the castle is nearly
+malleable.
+~
+0 0 0
+D2
+~
+~
+0 0 9007
+D3
+~
+~
+0 0 9011
+S
+#9011
+Castle Courtyard~
+~
+0 0 0
+D0
+~
+~
+0 0 9022
+D1
+~
+~
+0 0 9010
+D2
+~
+~
+0 0 9006
+D3
+~
+~
+0 0 9012
+S
+#9012
+Castle Courtyard~
+Here in the courtyard, the darkness that surrounds the castle is nearly
+malleable.
+~
+0 0 0
+D1
+~
+~
+0 0 9011
+D2
+~
+~
+0 0 9005
+D3
+~
+~
+0 0 9013
+S
+#9013
+Castle Courtyard~
+~
+0 0 0
+D0
+~
+~
+0 0 9030
+D1
+~
+~
+0 0 9012
+D2
+~
+~
+0 0 9004
+D3
+~
+~
+0 0 9019
+S
+#9014
+Castle Courtyard~
+Here in the courtyard, the darkness that surrounds the castle is nearly
+malleable.
+~
+0 0 0
+D0
+~
+~
+0 0 9019
+D1
+~
+~
+0 0 9004
+D3
+~
+~
+0 0 9015
+S
+#9015
+Castle Courtyard~
+Here in the courtyard, the darkness that surrounds the castle is nearly
+malleable.
+~
+0 0 0
+D0
+~
+~
+0 0 9020
+D1
+~
+~
+0 0 9014
+D3
+~
+~
+0 0 9016
+S
+#9016
+Castle Courtyard~
+~
+0 0 0
+D0
+~
+~
+0 0 9021
+D1
+~
+~
+0 0 9015
+D2
+~
+~
+0 0 9017
+S
+#9017
+Southwest Guard Tower~
+~
+0 12 0
+D0
+~
+~
+0 0 9016
+D4
+~
+~
+0 0 9018
+S
+#9018
+Watch Post~
+~
+0 8 0
+D5
+~
+~
+0 0 9017
+S
+#9019
+Castle Courtyard~
+Here in the courtyard, the darkness that surrounds the castle is nearly
+malleable.
+~
+0 0 0
+D1
+~
+~
+0 0 9013
+D2
+~
+~
+0 0 9014
+D3
+~
+~
+0 0 9020
+S
+#9020
+Castle Courtyard~
+~
+0 0 0
+D0
+~
+~
+0 0 9026
+D1
+~
+~
+0 0 9019
+D2
+~
+~
+0 0 9015
+D3
+~
+~
+0 0 9021
+S
+#9021
+Castle Courtyard~
+Here in the courtyard, the darkness that surrounds the castle is nearly
+malleable.
+~
+0 0 0
+D1
+~
+~
+0 0 9020
+D2
+~
+~
+0 0 9016
+S
+#9022
+Stable Entrance~
+~
+0 8 0
+D0
+~
+~
+0 0 9023
+D1
+~
+~
+0 0 9025
+D2
+~
+~
+0 0 9011
+S
+#9023
+Stables~
+~
+0 8 0
+D2
+~
+~
+0 0 9022
+S
+#9024
+Stables~
+~
+0 8 0
+D2
+~
+~
+0 0 9025
+S
+#9025
+Stables~
+~
+0 8 0
+D0
+~
+~
+0 0 9024
+D3
+~
+~
+0 0 9022
+S
+#9026
+Entrance to Guard Bunks~
+~
+0 8 0
+D0
+~
+~
+0 0 9027
+D2
+~
+~
+0 0 9020
+D3
+~
+~
+0 0 9029
+S
+#9027
+Officer's Quarters~
+~
+0 8 0
+D2
+~
+~
+0 0 9026
+S
+#9028
+Guard Bunks~
+~
+0 8 0
+D2
+~
+~
+0 0 9029
+S
+#9029
+Guard Bunks~
+~
+0 8 0
+D0
+~
+~
+0 0 9028
+D1
+~
+~
+0 0 9026
+S
+#9030
+Shattered Entry Ramp~
+~
+0 4 0
+D0
+~
+~
+0 0 9031
+D2
+~
+~
+0 0 9013
+S
+#9031
+Castle Gates~
+~
+0 0 0
+D0
+~
+~
+0 0 9032
+D2
+~
+~
+0 0 9030
+S
+#9032
+Entrance to the Castle~
+~
+0 8 0
+D0
+~
+~
+0 0 9046
+D1
+~
+~
+0 0 9033
+D2
+~
+~
+0 0 9031
+D3
+~
+~
+0 0 9051
+D4
+~
+~
+0 0 9064
+S
+#9033
+Servant's Passage~
+~
+0 8 0
+D1
+~
+~
+0 0 9034
+D3
+~
+~
+0 0 9032
+S
+#9034
+Servant's Passage~
+~
+0 8 0
+D0
+~
+~
+0 0 9041
+D1
+~
+~
+0 0 9035
+D3
+~
+~
+0 0 9033
+S
+#9035
+Long Corridor~
+~
+0 8 0
+D0
+~
+~
+0 0 9036
+D3
+~
+~
+0 0 9034
+S
+#9036
+Long Corridor~
+~
+0 8 0
+D0
+~
+~
+0 0 9037
+D2
+~
+~
+0 0 9035
+S
+#9037
+Long Corridor~
+~
+0 8 0
+D0
+~
+~
+0 0 9038
+D2
+~
+~
+0 0 9036
+S
+#9038
+Northwest Guard Tower~
+~
+0 8 0
+D2
+~
+~
+0 0 9037
+D4
+~
+~
+0 0 9039
+S
+#9039
+Destroyed Staircase~
+~
+0 0 0
+D5
+~
+~
+0 0 9038
+S
+#9040
+Non-existant Watch Post~
+This was once a watch post in a grand castle.  However, with age, the tower
+crumbled, leaving only the memory of what once was.
+~
+0 4 0
+S
+#9041
+Unused Passage~
+~
+0 12 0
+D0
+~
+~
+0 0 9042
+D2
+~
+~
+0 0 9034
+S
+#9042
+Guard Post~
+~
+0 9 0
+D0
+~
+~
+0 0 9043
+D2
+~
+~
+0 0 9041
+S
+#9043
+Dark Stairwell~
+~
+0 13 0
+D2
+~
+~
+0 0 9042
+D5
+~
+~
+0 0 9088
+S
+#9044
+Pantry~
+~
+0 9 0
+D0
+~
+~
+0 0 9045
+S
+#9045
+Servant's Passage~
+~
+0 8 0
+D2
+~
+~
+0 0 9044
+D3
+~
+~
+0 0 9050
+S
+#9046
+Dining Hall~
+~
+0 8 0
+D0
+~
+~
+0 0 9049
+D1
+~
+~
+0 0 9048
+D2
+~
+~
+0 0 9032
+D3
+~
+~
+0 0 9047
+S
+#9047
+Dining Hall~
+~
+0 8 0
+D1
+~
+~
+0 0 9046
+S
+#9048
+Dining Hall~
+~
+0 8 0
+D3
+~
+~
+0 0 9046
+S
+#9049
+Dining Hall~
+~
+0 8 0
+D0
+~
+~
+0 0 9050
+D2
+~
+~
+0 0 9046
+S
+#9050
+End of the Dining Hall~
+~
+0 8 0
+D1
+~
+~
+0 0 9045
+D2
+~
+~
+0 0 9049
+D3
+~
+~
+0 0 9063
+S
+#9051
+Servant's Passage~
+~
+0 8 0
+D1
+~
+~
+0 0 9032
+D3
+~
+~
+0 0 9052
+S
+#9052
+Servant's Passage~
+~
+0 8 0
+D0
+~
+~
+0 0 9059
+D1
+~
+~
+0 0 9051
+D3
+~
+~
+0 0 9053
+S
+#9053
+Long Corridor~
+~
+0 8 0
+D0
+~
+~
+0 0 9054
+D1
+~
+~
+0 0 9052
+S
+#9054
+Drafty Corridor~
+~
+0 8 0
+D0
+~
+~
+0 0 9055
+D2
+~
+~
+0 0 9053
+S
+#9055
+Half of a Corridor~
+~
+0 0 0
+D0
+~
+~
+0 0 9056
+D2
+~
+~
+0 0 9054
+S
+#9056
+Northeastern Guard Tower~
+~
+0 8 0
+D2
+~
+~
+0 0 9055
+D4
+~
+~
+0 0 9057
+S
+#9057
+Stairs to the Top~
+~
+0 8 0
+D4
+~
+~
+0 0 9058
+D5
+~
+~
+0 0 9056
+S
+#9058
+Watch Post~
+~
+0 8 0
+D5
+~
+~
+0 0 9057
+S
+#9059
+Servant's Passage~
+~
+0 8 0
+D0
+~
+~
+0 0 9060
+D2
+~
+~
+0 0 9052
+S
+#9060
+Kitchens~
+~
+0 8 0
+D0
+~
+~
+0 0 9061
+D1
+~
+~
+0 0 9062
+D2
+~
+~
+0 0 9059
+S
+#9061
+Ruined Stairwell~
+~
+0 8 0
+D2
+~
+~
+0 0 9060
+S
+#9062
+Kitchens~
+~
+0 8 0
+D0
+~
+~
+0 0 9063
+D3
+~
+~
+0 0 9060
+S
+#9063
+Servant's Passage~
+~
+0 8 0
+D1
+~
+~
+0 0 9050
+D2
+~
+~
+0 0 9062
+S
+#9064
+Second Floor~
+~
+0 12 0
+D0
+~
+~
+0 0 9081
+D1
+~
+~
+0 0 9065
+D3
+~
+~
+0 0 9073
+D5
+~
+~
+0 0 9032
+S
+#9065
+Hall to the Guest Quarters~
+~
+0 8 0
+D1
+~
+~
+0 0 9066
+D3
+~
+~
+0 0 9064
+S
+#9066
+Guest Quarters~
+~
+0 8 0
+D0
+~
+~
+0 0 9068
+D1
+~
+~
+0 0 9067
+D3
+~
+~
+0 0 9065
+S
+#9067
+Guest Quarters~
+~
+0 8 0
+D3
+~
+~
+0 0 9066
+S
+#9068
+Guest Quarters~
+~
+0 8 0
+D0
+~
+~
+0 0 9070
+D1
+~
+~
+0 0 9069
+D2
+~
+~
+0 0 9066
+S
+#9069
+Guest Quarters~
+~
+0 8 0
+D3
+~
+~
+0 0 9068
+S
+#9070
+Guest Quarters~
+~
+0 8 0
+D0
+~
+~
+0 0 9072
+D1
+~
+~
+0 0 9071
+D2
+~
+~
+0 0 9068
+S
+#9071
+Guest Quarters~
+~
+0 8 0
+D3
+~
+~
+0 0 9070
+S
+#9072
+Guest Quarters~
+~
+0 8 0
+D2
+~
+~
+0 0 9070
+S
+#9073
+Hall to the Royal Quarters~
+~
+0 8 0
+D1
+~
+~
+0 0 9064
+D3
+~
+~
+0 0 9074
+S
+#9074
+Royal Quarters~
+~
+0 8 0
+D0
+~
+~
+0 0 9076
+D1
+~
+~
+0 0 9073
+D3
+~
+~
+0 0 9075
+S
+#9075
+Royal Quarters~
+~
+0 8 0
+D1
+~
+~
+0 0 9074
+S
+#9076
+Royal Quarters~
+~
+0 8 0
+D0
+~
+~
+0 0 9078
+D2
+~
+~
+0 0 9074
+D3
+~
+~
+0 0 9077
+S
+#9077
+Royal Quarters~
+~
+0 8 0
+D1
+~
+~
+0 0 9076
+S
+#9078
+King's Chambers~
+~
+0 8 0
+D0
+~
+~
+0 0 9080
+D2
+~
+~
+0 0 9076
+D3
+~
+~
+0 0 9079
+S
+#9079
+An Extravagant Bedroom~
+~
+0 8 0
+D1
+~
+~
+0 0 9078
+S
+#9080
+The King's Personal Washroom~
+~
+0 8 0
+D2
+~
+~
+0 0 9078
+S
+#9081
+Throne Room~
+~
+0 8201 0
+D0
+~
+~
+0 0 9084
+D1
+~
+~
+0 0 9082
+D2
+~
+~
+0 0 9064
+D3
+~
+~
+0 0 9083
+S
+#9082
+Throne Room~
+~
+0 8201 0
+D0
+~
+~
+0 0 9085
+D3
+~
+~
+0 0 9081
+S
+#9083
+Throne Room~
+~
+0 8201 0
+D0
+~
+~
+0 0 9086
+D1
+~
+~
+0 0 9081
+S
+#9084
+Throne Room~
+~
+0 8201 0
+D0
+~
+~
+0 0 9087
+D1
+~
+~
+0 0 9085
+D2
+~
+~
+0 0 9081
+D3
+~
+~
+0 0 9086
+S
+#9085
+Throne Room~
+~
+0 8201 0
+D2
+~
+~
+0 0 9082
+D3
+~
+~
+0 0 9084
+S
+#9086
+Throne Room~
+~
+0 8201 0
+D1
+~
+~
+0 0 9084
+D2
+~
+~
+0 0 9083
+S
+#9087
+Throne of the Dead King~
+~
+0 24589 0
+D2
+~
+~
+0 0 9084
+S
+#9088
+Dark Stairwell~
+~
+0 9 0
+D2
+~
+~
+0 0 9089
+D4
+~
+~
+0 0 9043
+S
+#9089
+Entrance to the Castle Dungeons~
+~
+0 8201 0
+D0
+~
+~
+0 0 9088
+D1
+~
+~
+0 0 9090
+D2
+~
+~
+0 0 9092
+D3
+~
+~
+0 0 9091
+S
+#9090
+Jailer's Chambers~
+~
+0 8201 0
+D3
+~
+~
+0 0 9089
+S
+#9091
+Torture Chamber~
+~
+0 8201 0
+D1
+~
+~
+0 0 9089
+S
+#9092
+Dark Hallway~
+~
+0 8201 0
+D0
+~
+~
+0 0 9089
+D2
+~
+~
+0 0 9093
+S
+#9093
+Rubble-Strewn Passage~
+~
+0 8201 0
+D0
+~
+~
+0 0 9092
+D1
+~
+~
+0 0 9094
+D2
+~
+~
+0 0 9096
+D3
+~
+~
+0 0 9095
+S
+#9094
+Cell~
+~
+0 8201 0
+D3
+~
+~
+0 0 9093
+S
+#9095
+Cell~
+~
+0 8201 0
+D1
+~
+~
+0 0 9093
+S
+#9096
+Caved-in Passage~
+~
+0 8201 0
+D0
+~
+~
+0 0 9093
+D1
+~
+~
+0 0 9098
+D3
+~
+~
+0 0 9097
+S
+#9097
+Cell~
+~
+0 8201 0
+D1
+~
+~
+0 0 9096
+S
+#9098
+Cell~
+~
+0 8201 0
+D3
+~
+~
+0 0 9096
+D5
+~
+~
+0 0 9099
+S
+#9099
+Escape Tunnel~
+~
+0 8201 0
+D1
+~
+~
+0 0 9100
+D4
+~
+~
+0 0 9098
+S
+#9100
+Escape Tunnel~
+~
+0 9 0
+D3
+~
+~
+0 0 9099
+S
+#0
+
+
+
+#SPECIALS
+M 9000 spec_fido Load to: gate guard decayed
+M 9001 spec_fido Load to: decayed archer guard
+M 9002 spec_fido Load to: mutilated body
+M 9003 spec_poison Load to: skeletal steed
+M 9004 spec_fido Load to: ghoulish guard
+M 9005 spec_cast_cleric Load to: zombified captain
+M 9006 spec_poison Load to: the corpse of a castle guard
+M 9007 spec_janitor Load to: the ghost of a servant
+M 9008 spec_poison Load to: royal guards
+M 9009 spec_cast_undead Load to: king's personal guard
+M 9010 spec_breath_gas Load to: the lich king
+M 9011 spec_cast_adept Load to: the queen succubus
+M 9012 spec_cast_mage Load to: jailer
+M 9013 spec_poison Load to: prison guard
+M 9014 spec_poison Load to: skeletal prisoner
+S
+
+
+
+#RESETS
+M 0 9000 2 9002
+M 0 9000 2 9003
+M 0 9001 3 9009
+M 0 9001 3 9018
+M 0 9001 3 9058
+M 0 9002 7 9005
+M 0 9002 7 9007
+M 0 9002 7 9011
+M 0 9002 7 9014
+M 0 9002 7 9013
+M 0 9002 7 9016
+M 0 9002 7 9020
+M 0 9003 2 9023
+M 0 9003 2 9024
+M 0 9004 2 9028
+M 0 9004 2 9029
+M 0 9005 1 9027
+M 0 9006 5 9031
+M 0 9006 5 9033
+M 0 9006 5 9035
+M 0 9006 5 9051
+M 0 9006 5 9053
+M 0 9007 3 9044
+M 0 9007 3 9052
+M 0 9007 3 9062
+M 0 9008 3 9082
+M 0 9008 3 9083
+M 0 9008 3 9084
+M 0 9009 2 9087
+M 0 9009 2 9087
+M 0 9010 1 9087
+M 0 9011 1 9079
+M 0 9012 1 9090
+M 0 9013 4 9088
+M 0 9013 4 9091
+M 0 9013 4 9092
+M 0 9014 3 9094
+M 0 9014 3 9095
+M 0 9014 3 9097
+M 0 9013 4 9042
+S
+
+
+
+#SHOPS
+0
+
+
+
+#$
