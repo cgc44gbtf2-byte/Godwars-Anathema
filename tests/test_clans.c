@@ -833,6 +833,86 @@ static void nightstalker(void)
     }
 }
 
+static void gargoyle_form_ownership(void)
+{
+    const long forms[] = {
+        POLY_BAT, POLY_WOLF, POLY_MIST, POLY_SERPENT, POLY_RAVEN,
+        POLY_FISH, POLY_FROG, POLY_ZULO, POLY_SHADOW, POLY_SPIRIT,
+        POLY_MASK, POLY_TRUE, POLY_DRAGONFORM, POLY_PHOENIXFORM,
+        POLY_CHIRO, POLY_CHIMERA, POLY_PIG
+    };
+    const char *changes[] = {"change bat", "change wolf", "change mist"};
+    const long changed[] = {POLY_BAT, POLY_WOLF, POLY_MIST};
+    unsigned conflicts = 0, transitions = 0;
+    for (long rank = 1; rank <= 5; ++rank) {
+        fixture(CLASS_VAMPIRE);
+        pcs[0].cland[0] = VAMPIRE_BUILD_GARGOYLE;
+        pcs[0].powers[DISC_THAUMATURGY] = rank;
+        pcs[0].powers[DISC_PROTEAN] = 5;
+        assert(get_disc(&actors[0], DISC_PROTEAN) >= 4);
+        for (size_t i = 0; i < sizeof(forms)/sizeof(forms[0]); ++i) {
+            for (int polymorph = 0; polymorph < 2; ++polymorph) {
+                actors[0].polyaff = POLY_GARGOYLE_STATUE | forms[i];
+                actors[0].affected_by = polymorph ? AFF_POLYMORPH : 0;
+                long before = actors[0].polyaff;
+                assert(!gargoyle_statue(&actors[0]));
+                assert(gargoyle_damage(&actors[0], 1000) == 1000);
+                assert(gargoyle_saved_polyaff(&actors[0]) == forms[i]);
+                assert(actors[0].polyaff == before); /* Pure save projection. */
+                combat_status_update(); /* Forced conflicting form wins. */
+                assert(actors[0].polyaff == forms[i]);
+                assert((IS_AFFECTED(&actors[0], AFF_POLYMORPH) != 0) == polymorph);
+                actors[0].polyaff = 0; /* Other form subsequently reverts. */
+                REMOVE_BIT(actors[0].affected_by, AFF_POLYMORPH);
+                combat_status_update();
+                assert(!gargoyle_statue(&actors[0]) &&
+                       gargoyle_damage(&actors[0], 1000) == 1000);
+                assert(IS_GARGOYLE(&actors[0]) &&
+                       gargoyle_visceratika(&actors[0]) == rank);
+                ++conflicts;
+            }
+        }
+        /* AFF_POLYMORPH alone must also revoke stone-body protection. */
+        actors[0].polyaff = POLY_GARGOYLE_STATUE;
+        SET_BIT(actors[0].affected_by, AFF_POLYMORPH);
+        assert(gargoyle_saved_polyaff(&actors[0]) == 0);
+        combat_status_update();
+        assert(actors[0].polyaff == 0);
+        REMOVE_BIT(actors[0].affected_by, AFF_POLYMORPH);
+        for (size_t i = 0; i < sizeof(changes)/sizeof(changes[0]); ++i) {
+            actors[0].wait = 0;
+            run(0, "stoneform on");
+            assert(gargoyle_statue(&actors[0]));
+            actors[0].wait = 0;
+            run(0, changes[i]); /* Interpreter blocks voluntary overlap. */
+            assert(gargoyle_statue(&actors[0]) &&
+                   actors[0].polyaff == POLY_GARGOYLE_STATUE);
+            char direct[32];
+            snprintf(direct, sizeof(direct), "%s", changes[i] + 7);
+            do_change(&actors[0], direct); /* Internal caller is guarded too. */
+            assert(gargoyle_statue(&actors[0]) &&
+                   !IS_AFFECTED(&actors[0], AFF_POLYMORPH));
+            run(0, "stoneform off");
+            actors[0].wait = 0;
+            run(0, changes[i]);
+            assert(actors[0].polyaff == changed[i] &&
+                   IS_AFFECTED(&actors[0], AFF_POLYMORPH));
+            run(0, "stoneform on"); /* Inverse transition is rejected. */
+            assert(actors[0].polyaff == changed[i] &&
+                   !gargoyle_statue(&actors[0]));
+            run(0, "change human");
+            assert(actors[0].polyaff == 0 &&
+                   !IS_AFFECTED(&actors[0], AFF_POLYMORPH));
+            assert(IS_GARGOYLE(&actors[0]) &&
+                   gargoyle_visceratika(&actors[0]) == rank);
+            ++transitions;
+        }
+    }
+    assert(conflicts == 170 && transitions == 15);
+    puts("Gargoyle form ownership: 170 forced conflicts, 5 bare polymorph "
+         "revocations and 15 real Vampire round trips passed");
+}
+
 static void gargoyle(void)
 {
     fixture(CLASS_VAMPIRE);
@@ -1433,6 +1513,7 @@ int main(void)
     gargoyle_lesson_lifecycle();
     gargoyle_reflection();
     gargoyle_reflection_interruptions();
+    gargoyle_form_ownership();
     clan_registry_close();
     char_list = NULL; descriptor_list = NULL;
     for (int i = 0; i < 5; ++i) free_string(actors[i].clan);

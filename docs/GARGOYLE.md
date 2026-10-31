@@ -104,6 +104,12 @@ on the next combat-status pulse or load; saving projects a safe mask without
 mutating the live character. Full/short saves and exec-copyover retain valid
 statues. Normal class reset clears them.
 
+Form-ownership regressions cover 170 injected conflicts (17 legacy form bits,
+all five ranks, with and without polymorph), five bare-polymorph revocations,
+and 15 real bat/wolf/mist round trips. Conflicts receive no stone mitigation;
+the next status pulse removes only the stone bit, and later reversion does not
+reactivate it. These tests do not simulate every forced-transformation handler.
+
 ## Class and clan are separate
 
 A Gargoyle clan sponsor recruits a willing unclassed player through
