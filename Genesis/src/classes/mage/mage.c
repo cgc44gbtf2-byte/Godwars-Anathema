@@ -2228,6 +2228,11 @@ void do_polymorph_other(CHAR_DATA *ch, char *argument)
 
     sprintf(buf, "You polymorph %s into a pig.\n\r", victim->name); stc(buf, ch);
 
+    /* A forced form change wins over a Gargoyle's voluntary stone state.
+     * Clear the statue bit before applying the pig form so it cannot become
+     * active again when the temporary polymorph expires. */
+    REMOVE_BIT(victim->polyaff, POLY_GARGOYLE_STATUE);
+
     //morph into a pig
     send_to_char("Your form shrinks and shifts into the shape of a pig.\n\r",victim);
     act("$n's body moves and shifts into the shape of a pig.",victim,NULL,NULL,TO_ROOM);

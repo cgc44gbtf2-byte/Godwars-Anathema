@@ -94,6 +94,18 @@ class HybridMasteryCatalog(unittest.TestCase):
                     self.assertEqual(body.count(current), 1, current)
                     body = body.replace(current, original, 1)
                 data = (text[:start] + body + text[end:]).encode()
+            if path == "classes/mage/mage.c":
+                # Exclude only the separately reviewed Gargoyle forced-form fix;
+                # keep the full native trainer and cap-policy source hash intact.
+                text = data.decode()
+                gargoyle_form_fix = (
+                    "    /* A forced form change wins over a Gargoyle's voluntary stone state.\n"
+                    "     * Clear the statue bit before applying the pig form so it cannot become\n"
+                    "     * active again when the temporary polymorph expires. */\n"
+                    "    REMOVE_BIT(victim->polyaff, POLY_GARGOYLE_STATUE);\n\n"
+                )
+                self.assertEqual(text.count(gargoyle_form_fix), 1)
+                data = text.replace(gargoyle_form_fix, "", 1).encode()
             self.assertEqual(hashlib.sha1(b"blob " + str(len(data)).encode() +
                                          b"\0" + data).hexdigest(), expected, path)
 

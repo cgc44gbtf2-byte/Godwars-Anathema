@@ -142,6 +142,30 @@ static void unchanged(long mana)
     assert(caster.paradox == 0);
 }
 
+static void gargoyle_forced_polymorph_releases_stone_form(void)
+{
+    reset();
+    target.class = CLASS_VAMPIRE;
+    target_pc.cland[0] = VAMPIRE_BUILD_GARGOYLE;
+    target_pc.powers[DISC_THAUMATURGY] = 1;
+    target.polyaff = POLY_GARGOYLE_STATUE;
+    assert(gargoyle_statue(&target));
+
+    /* Exercise the real forced-form handler against a statue Gargoyle. */
+    do_polymorph_other(&caster, "target 0");
+    assert(IS_POLYAFF(&target, POLY_PIG));
+    assert(IS_AFFECTED(&target, AFF_POLYMORPH));
+    assert(!IS_POLYAFF(&target, POLY_GARGOYLE_STATUE));
+    assert(!gargoyle_statue(&target));
+
+    /* Match update.c's pig-expiry cleanup: stone must not return afterward. */
+    REMOVE_BIT(target.polyaff, POLY_PIG);
+    REMOVE_BIT(target.affected_by, AFF_POLYMORPH);
+    assert(target.polyaff == 0);
+    assert(!gargoyle_statue(&target));
+    assert(IS_GARGOYLE(&target));
+}
+
 int main(void)
 {
     for (long available = 0; available <= 2; ++available)
@@ -267,6 +291,7 @@ int main(void)
         do_inferno(&caster, "");
         assert(caster.mana == 95000);
     }
+    gargoyle_forced_polymorph_releases_stone_form();
     puts("mage powers: passed");
     return 0;
 }

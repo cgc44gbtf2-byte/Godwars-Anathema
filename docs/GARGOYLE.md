@@ -108,7 +108,10 @@ Form-ownership regressions cover 170 injected conflicts (17 legacy form bits,
 all five ranks, with and without polymorph), five bare-polymorph revocations,
 and 15 real bat/wolf/mist round trips. Conflicts receive no stone mitigation;
 the next status pulse removes only the stone bit, and later reversion does not
-reactivate it. These tests do not simulate every forced-transformation handler.
+reactivate it. The real Mage Polymorph Other handler is also tested against a
+statue: the forced pig form clears the stone state, which stays clear after the
+temporary form expires. Other external forced-transformation handlers are not
+exhaustively simulated.
 
 ## Class and clan are separate
 
