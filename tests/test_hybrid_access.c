@@ -492,6 +492,42 @@ static void drow_utilities(void)
     puts("hybrid Drow utilities: native+9 secondary orientations; learned gates,affects,RNG,protection,duplicates,ownership and exclusions passed");
 }
 
+static void native_drow_faerie_boundaries(void)
+{
+    const long values[]={LONG_MIN,LONG_MIN+49,LONG_MIN+50,LONG_MAX};
+    const long sn=skill_lookup("faerie fire");
+    unsigned checks=0;
+    for(int npc=0;npc<2;++npc)
+    for(int field=0;field<3;++field)
+    for(size_t v=0;v<sizeof(values)/sizeof(values[0]);++v) {
+        drow_utility_fixture(CLASS_DROW,0);drow_learn(DROW_FIRE);
+        CHAR_DATA *ch=actors,*victim=&actors[1];
+        if(npc)SET_BIT(victim->act,ACT_IS_NPC);
+        long *stats[]={&victim->hitroll,&victim->damroll,&victim->armor};
+        *stats[field]=values[v];
+        long before[]={victim->hitroll,victim->damroll,victim->armor};
+        long mana=ch->mana,primal=ch->primal,dp=pcs[0].classpoints[CP_CURRENT];
+        current_time=123;init_mm();
+        int untouched_rng=number_range(1,100000);init_mm();
+        interpret(ch,"faeriefire beta");
+        if(values[v]<LONG_MIN+50) {
+            assert(!victim->affected&&!ch->wait);
+            assert(number_range(1,100000)==untouched_rng);
+            for(int i=0;i<3;++i)assert(*stats[i]==before[i]);
+        } else {
+            assert(affect_count()==3&&ch->wait==12);
+            for(int i=0;i<3;++i)assert(*stats[i]==before[i]-50);
+            affect_strip(victim,sn);
+            assert(!victim->affected&&!IS_AFFECTED(victim,AFF_FAERIE_FIRE));
+            for(int i=0;i<3;++i)assert(*stats[i]==before[i]);
+        }
+        assert(ch->mana==mana&&ch->primal==primal&&pcs[0].classpoints[CP_CURRENT]==dp);
+        ++checks;
+    }
+    assert(checks==24);
+    puts("native Drow Faerie Fire: 24 PC/NPC arithmetic boundaries, exact cleanup, no rejected RNG/costs passed");
+}
+
 int main(int argc,char **argv)
 {
     string_space=malloc(1024*1024);assert(string_space);
@@ -499,7 +535,7 @@ int main(int argc,char **argv)
     if(argc==2&&!strcmp(argv[1],"--baseline")) {baseline_dump();return 0;}
     unchanged_native();learned_contributions();
     rejection_and_conditions();highlander_powers();
-    drow_utilities();
+    drow_utilities();native_drow_faerie_boundaries();
     puts("hybrid access: 20 native snapshots/180 untrained pairs,90 trained pairs;"
          " owned ranks,passives,conditions,RNG and live Highlander powers passed");
     return 0;

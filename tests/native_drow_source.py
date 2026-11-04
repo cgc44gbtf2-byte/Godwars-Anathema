@@ -157,7 +157,26 @@ def without_native_drow_acidbolt_safety(text):
               '    if (IS_ITEMAFF(ch, ITEMA_PEACE)) do_majesty(ch,"");\n \n'+marker)
     return text[:start]+body+text[end:]
 
+FAERIE_BOUNDS = """    /* Preflight all three debuffs before RNG or allocating any affects.
+     * Reject unrepresentable stats rather than overflowing or applying only
+     * part of the spell; ordinary -50 effects and removal remain unchanged. */
+    if (victim->hitroll < LONG_MIN + 50 ||
+        victim->damroll < LONG_MIN + 50 ||
+        victim->armor < LONG_MIN + 50)
+    {
+        stc("Faerie Fire cannot safely affect that target. Please tell staff.\\n\\r",ch);
+        return;
+    }
+
+"""
+
+def without_native_drow_faerie_bounds(text):
+    if "/* Preflight all three debuffs" not in text:
+        return text
+    return once(text,FAERIE_BOUNDS,"")
+
 def without_native_drow_shoot_context(text):
+    text=without_native_drow_faerie_bounds(text)
     text=without_native_drow_acidbolt_safety(text)
     if SHOOT_CONTEXT not in text:
         return text

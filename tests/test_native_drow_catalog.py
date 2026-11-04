@@ -107,8 +107,9 @@ class NativeDrowCatalog(unittest.TestCase):
             self.assertNotEqual(blob(restored),prior)
 
     def test_acidbolt_safety_followup_is_strictly_scoped(self):
-        from native_drow_source import without_native_drow_acidbolt_safety
-        text=(SRC/"classes/drow/drow.c").read_text()
+        from native_drow_source import (without_native_drow_acidbolt_safety,
+                                       without_native_drow_faerie_bounds)
+        text=without_native_drow_faerie_bounds((SRC/"classes/drow/drow.c").read_text())
         normalized=without_native_drow_acidbolt_safety(text)
         self.assertEqual(blob(normalized),
                          "7020849f7e34be6aa7969838bad497ee0aa14482")
@@ -117,6 +118,23 @@ class NativeDrowCatalog(unittest.TestCase):
         mutated=text.replace("victim == ch","victim != ch",1)
         with self.assertRaises(AssertionError):
             without_native_drow_acidbolt_safety(mutated)
+
+    def test_faerie_bounds_followup_is_strictly_scoped(self):
+        from native_drow_source import without_native_drow_faerie_bounds
+        text=(SRC/"classes/drow/drow.c").read_text()
+        self.assertEqual(blob(without_native_drow_faerie_bounds(text)),
+                         "5642bf5697705f7f73d19ba364926058e7b5724e")
+        body=text.split("void do_faeriefire(",1)[1].split("void do_summonspider(",1)[0]
+        for stat in ("hitroll","damroll","armor"):
+            self.assertIn(f"victim->{stat} < LONG_MIN + 50",body)
+        self.assertLess(body.index("LONG_MIN"),body.index("number_percent()"))
+        self.assertLess(body.index("LONG_MIN"),body.index("affect_to_char"))
+        with self.assertRaises(AssertionError):
+            without_native_drow_faerie_bounds(text.replace(
+                "victim->armor < LONG_MIN + 50","victim->armor < LONG_MIN + 49",1))
+        tests=(ROOT/"tests/test_hybrid_access.c").read_text()
+        self.assertIn("assert(checks==24)",tests)
+        self.assertIn("drow_utilities();native_drow_faerie_boundaries();",tests)
 
     def test_equipment_followup_exercises_real_recipes_and_invalid_contexts(self):
         native=(ROOT/"tests/test_native_drow.c").read_text()

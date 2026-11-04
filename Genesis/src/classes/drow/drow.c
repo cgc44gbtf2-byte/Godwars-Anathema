@@ -177,6 +177,17 @@ void do_faeriefire( CHAR_DATA *ch, char *argument )
     
     if (is_safe(ch, victim)) return;
 
+    /* Preflight all three debuffs before RNG or allocating any affects.
+     * Reject unrepresentable stats rather than overflowing or applying only
+     * part of the spell; ordinary -50 effects and removal remain unchanged. */
+    if (victim->hitroll < LONG_MIN + 50 ||
+        victim->damroll < LONG_MIN + 50 ||
+        victim->armor < LONG_MIN + 50)
+    {
+        stc("Faerie Fire cannot safely affect that target. Please tell staff.\n\r",ch);
+        return;
+    }
+
     if (!IS_NPC(victim) && victim->pcdata->atm >= number_percent())
     {
 	stc("Nothing happens.\n\r", ch);
