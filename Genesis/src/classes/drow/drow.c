@@ -80,6 +80,7 @@ void do_acidbolt( CHAR_DATA *ch, char *argument )
     char arg [MAX_INPUT_LENGTH];
     CHAR_DATA *victim;
     ROOM_INDEX_DATA *combat_room;
+    bool had_peace, safe;
 
     if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL || ch->in_room == NULL)
         return;
@@ -98,8 +99,6 @@ void do_acidbolt( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    if (IS_ITEMAFF(ch, ITEMA_PEACE)) do_majesty(ch,"");
- 
     if (arg[0] == '\0' && ch->fighting == NULL)
     {
 	stc("Who do you wish to use Acid Bolt on?\n\r",ch);
@@ -111,8 +110,28 @@ void do_acidbolt( CHAR_DATA *ch, char *argument )
 	stc("They aren't here.\n\r", ch);
 	return;
     }
-    
-    if (is_safe(ch, victim)) return;
+    if (victim == ch)
+    {
+        stc("You cannot target yourself with Acid Bolt.\n\r",ch);
+        return;
+    }
+
+    /* Majesty normally blocks combat. Temporarily ignore only the caster's
+     * own peace bit while checking the target; a rejected attempt must not
+     * lower Majesty or start its cooldown. Restore it before returning. */
+    had_peace = IS_ITEMAFF(ch, ITEMA_PEACE) != 0;
+    if (had_peace) REMOVE_BIT(ch->itemaffect, ITEMA_PEACE);
+    safe = is_safe(ch, victim);
+    if (had_peace) SET_BIT(ch->itemaffect, ITEMA_PEACE);
+    if (safe) return;
+
+    if (had_peace)
+    {
+        do_majesty(ch,"");
+        /* Non-Vampire callers cannot lower Majesty; fail closed if the
+         * peace state was not actually removed. */
+        if (IS_ITEMAFF(ch, ITEMA_PEACE)) return;
+    }
 
     act("You fire a bolt of acid at $N!", ch, NULL, victim, TO_CHAR);
     act("$n fires a bolt of acid at you!", ch, NULL, victim, TO_VICT);

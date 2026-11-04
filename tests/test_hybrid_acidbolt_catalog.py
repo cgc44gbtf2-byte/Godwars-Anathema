@@ -17,6 +17,9 @@ class HybridAcidBoltCatalog(unittest.TestCase):
         self.assertIn("WAIT_STATE(ch, 8)",body)
         self.assertNotRegex(body,r"ch->(?:class|mana|primal|exp)\s*[-+*/]?=(?!=)")
         self.assertNotIn("get_drow(",body)
+        self.assertLess(body.index("get_char_room"),body.index("do_majesty"))
+        self.assertLess(body.index("victim == ch"),body.index("do_majesty"))
+        self.assertLess(body.index("if (safe) return"),body.index("do_majesty"))
 
     def test_real_engine_and_native_oracles_are_mandatory(self):
         text=(ROOT/"tests/test_hybrid_acidbolt.c").read_text()

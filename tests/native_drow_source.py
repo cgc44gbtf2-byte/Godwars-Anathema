@@ -111,7 +111,54 @@ SHOOT_CONTEXT = """    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL) retur
 
 """
 
+ACID_BOLT_SELF_GUARD = """    if (victim == ch)
+    {
+        stc("You cannot target yourself with Acid Bolt.\\n\\r",ch);
+        return;
+    }
+"""
+
+ACID_BOLT_PEACE_GUARD = """    /* Majesty normally blocks combat. Temporarily ignore only the caster's
+     * own peace bit while checking the target; a rejected attempt must not
+     * lower Majesty or start its cooldown. Restore it before returning. */
+    had_peace = IS_ITEMAFF(ch, ITEMA_PEACE) != 0;
+    if (had_peace) REMOVE_BIT(ch->itemaffect, ITEMA_PEACE);
+    safe = is_safe(ch, victim);
+    if (had_peace) SET_BIT(ch->itemaffect, ITEMA_PEACE);
+    if (safe) return;
+
+    if (had_peace)
+    {
+        do_majesty(ch,"");
+        /* Non-Vampire callers cannot lower Majesty; fail closed if the
+         * peace state was not actually removed. */
+        if (IS_ITEMAFF(ch, ITEMA_PEACE)) return;
+    }
+"""
+
+def without_native_drow_acidbolt_safety(text):
+    """Remove only the Acid Bolt target/Majesty safety follow-up."""
+    if "void do_acidbolt(" not in text:
+        return text
+    start=text.index("void do_acidbolt(")
+    end=text.index("\nvoid do_faeriefire(",start)
+    body=text[start:end]
+    declaration="    bool had_peace, safe;\n"
+    if declaration not in body:
+        return text
+    body=once(body,declaration,"")
+    body=once(body,ACID_BOLT_SELF_GUARD,"")
+    body=once(body,ACID_BOLT_PEACE_GUARD,
+              "    if (is_safe(ch, victim)) return;\n")
+    body=once(body,"\n\n    if (is_safe(ch, victim)) return;",
+              "\n    \n    if (is_safe(ch, victim)) return;")
+    marker="    if (arg[0] == '\\0' && ch->fighting == NULL)\n"
+    body=once(body,marker,
+              '    if (IS_ITEMAFF(ch, ITEMA_PEACE)) do_majesty(ch,"");\n \n'+marker)
+    return text[:start]+body+text[end:]
+
 def without_native_drow_shoot_context(text):
+    text=without_native_drow_acidbolt_safety(text)
     if SHOOT_CONTEXT not in text:
         return text
     return once(text,SHOOT_CONTEXT,"")

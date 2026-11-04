@@ -199,6 +199,48 @@ static void fail_closed(void)
     }
 }
 
+static void majesty_target_safety(void)
+{
+    /* A Vampire/Drow hybrid can have both active Majesty and trained
+     * secondary Acid Bolt. Failed targets must not lower its protection. */
+    fixture(CLASS_VAMPIRE,CLASS_DROW,1,1);
+    pcs[0].powers[DISC_PRESENCE]=5;
+    SET_BIT(actors[0].itemaffect,ITEMA_PEACE);
+    interpret(actors,"acidbolt absent");
+    assert(IS_ITEMAFF(&actors[0],ITEMA_PEACE));
+    assert(pcs[0].majesty==0&&hits==0);
+
+    fixture(CLASS_VAMPIRE,CLASS_DROW,1,1);
+    pcs[0].powers[DISC_PRESENCE]=5;
+    SET_BIT(actors[0].itemaffect,ITEMA_PEACE);
+    interpret(actors,"acidbolt alpha");
+    assert(IS_ITEMAFF(&actors[0],ITEMA_PEACE));
+    assert(pcs[0].majesty==0&&hits==0);
+
+    fixture(CLASS_VAMPIRE,CLASS_DROW,1,1);
+    pcs[0].powers[DISC_PRESENCE]=5;
+    SET_BIT(actors[0].itemaffect,ITEMA_PEACE);
+    SET_BIT(actors[1].itemaffect,ITEMA_PEACE);
+    interpret(actors,"acidbolt beta");
+    assert(IS_ITEMAFF(&actors[0],ITEMA_PEACE));
+    assert(pcs[0].majesty==0&&hits==0);
+
+    /* An unsupported/non-Vampire peace flag also fails closed. */
+    fixture(CLASS_DROW,0,1,1);
+    SET_BIT(actors[0].itemaffect,ITEMA_PEACE);
+    interpret(actors,"acidbolt beta");
+    assert(IS_ITEMAFF(&actors[0],ITEMA_PEACE));
+    assert(pcs[0].majesty==0&&hits==0);
+
+    /* A real hostile target lowers Majesty once, then receives the attack. */
+    fixture(CLASS_VAMPIRE,CLASS_DROW,1,1);
+    pcs[0].powers[DISC_PRESENCE]=5;
+    SET_BIT(actors[0].itemaffect,ITEMA_PEACE);
+    interpret(actors,"acidbolt beta");
+    assert(!IS_ITEMAFF(&actors[0],ITEMA_PEACE));
+    assert(pcs[0].majesty==120&&hits==1);
+}
+
 int main(int argc,char **argv)
 {
     if(argc==2&&!strcmp(argv[1],"--native-dump")){native_dump(1);return 0;}
@@ -211,7 +253,7 @@ int main(int argc,char **argv)
     }
     assert(native_dump(0)==UINT64_C(13561486456634868849));
     for(int mode=1;mode<=3;mode++)boundaries(mode);
-    paired();fail_closed();
+    paired();fail_closed();majesty_target_safety();
     puts("Acid Bolt: 48 native snapshots, 864 paired commands, 10 refusal and 3 callback/context cases passed.");
     return 0;
 }

@@ -106,6 +106,18 @@ class NativeDrowCatalog(unittest.TestCase):
             except AssertionError: continue
             self.assertNotEqual(blob(restored),prior)
 
+    def test_acidbolt_safety_followup_is_strictly_scoped(self):
+        from native_drow_source import without_native_drow_acidbolt_safety
+        text=(SRC/"classes/drow/drow.c").read_text()
+        normalized=without_native_drow_acidbolt_safety(text)
+        self.assertEqual(blob(normalized),
+                         "7020849f7e34be6aa7969838bad497ee0aa14482")
+        self.assertIn("victim == ch",text)
+        self.assertIn("if (safe) return;",text)
+        mutated=text.replace("victim == ch","victim != ch",1)
+        with self.assertRaises(AssertionError):
+            without_native_drow_acidbolt_safety(mutated)
+
     def test_equipment_followup_exercises_real_recipes_and_invalid_contexts(self):
         native=(ROOT/"tests/test_native_drow.c").read_text()
         for token in ('command("drowarmor crossbow")','command("drowarmor bolts 2")',
