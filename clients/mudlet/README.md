@@ -44,6 +44,23 @@ already running; destroy it or restart the profile as well.
 To change the default position, edit the `config` table in the Lua source
 and regenerate the XML, or edit the imported Script's copy directly.
 
+## Mapper compatibility
+
+The server publishes standard `gmcp.Room.Info` packets with room vnum, name,
+area, terrain/environment and open exits. No coordinates or prebuilt map are
+sent; the map is learned as you move.
+
+For automatic mapping, install/configure a Mudlet mapping script such as the
+[IRE mapping script](https://wiki.mudlet.org/w/Adding_your_mud_to_the_IRE_mapping_script)
+in addition to Mudlet's Mapper display. Configure its game entry for Anathema
+to read `gmcp.Room.Info.area`, `.name`, `.environment`, `.num` and `.exits`, and
+register the environment names `inside`, `city`, `field`, `forest`, `hills`,
+`mountain`, `swim`, `noswim`, `underwater`, `air`, `desert` and `unknown`.
+The mapper keeps its explored rooms in the Mudlet profile; it is not a
+server-downloaded atlas. The GMCP feed is wire-tested, but importing and
+visually checking a specific Mudlet mapper module still needs a client-side
+test.
+
 ## Behavior and tested scope
 
 - Disconnect, new connection, GMCP disable/re-enable and reload clear old data.

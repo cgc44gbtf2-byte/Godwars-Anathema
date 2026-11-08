@@ -260,6 +260,7 @@ struct	descriptor_data
     unsigned char       telnet_verb;
     unsigned char       gmcp_state;
     char                gmcp_cache[2048]; /* Matches GMCP_CACHE_SIZE; transient. */
+    char                gmcp_room_cache[2048]; /* Independent room-map cache. */
     unsigned char       telnet_output_state;
     bool                snoop_text_started;
     char		inbuf		[4 * MAX_INPUT_LENGTH];

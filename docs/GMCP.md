@@ -2,20 +2,54 @@
 
 GMCP is optional. Enable GMCP in your client and reconnect to the operator's
 normal game endpoint. Clients without it retain ordinary text play.
-The server adds **data**, not an autohealer, mapper or party panel.
-An [optional Mudlet HUD](../clients/mudlet/README.md) is now supplied separately;
-MudForge still needs its own widget/plugin configuration.
+The server supplies authenticated vitals and current-room mapping data; the
+client builds its own explored map. It does not send a pre-drawn atlas or party
+data. An [optional Mudlet HUD](../clients/mudlet/README.md) is supplied separately.
 
 ## Packages
 
 The server offers Telnet option 201 (`IAC WILL GMCP`). Once the client accepts
-with `IAC DO GMCP`, each snapshot consists of three GMCP subnegotiations:
+with `IAC DO GMCP`, the authenticated snapshot contains the three status
+subnegotiations below. A separate `Room.Info` packet is sent when room-map data
+changes.
 
 ```text
 Char.Base {"name":"Example","level":2,"class":"vampire"}
 Char.Vitals {"hp":71,"maxhp":100,"mp":33,"maxmp":99,"mana":33,"maxmana":99}
 Anathema.Vitals {"available":true,"class":"vampire","blood":{"current":17,"max":50},"ki":null,"quintessence":null,"paradox":null,"class_points":null,"willpower":null}
+Room.Info {"num":12001,"name":"Temple of Mara","area":"Temple","zone":"Temple","environment":"city","terrain":"city","exits":{"n":12002,"e":12003}}
 ```
+
+## Room mapping
+
+`Room.Info` follows the common GMCP Room package shape used by MudForge's map
+widget and Mudlet mapping scripts:
+
+| Field | Meaning |
+| --- | --- |
+| `num` | Stable room vnum |
+| `name` | Room title |
+| `area` / `zone` | Area name (both aliases are supplied) |
+| `environment` / `terrain` | Existing sector label (both aliases are supplied) |
+| `exits` | Open exits keyed by `n`, `e`, `s`, `w`, `u`, `d`, with destination vnums |
+
+Closed exits are omitted, matching the game's ordinary automatic exits list.
+The world has no authored room coordinates, so clients infer layout from
+movement and build a local map as players explore. No room descriptions,
+occupants, hidden player state, or other players' locations are sent. The
+packet is authenticated-session-only and independently cached: vitals changing
+does not resend an unchanged room, and a room transition does not require a
+vitals change. Sleeping, blindness and obscuring darkness suppress new map
+records; the client may still display the last room it learned.
+
+MudForge's Map Widget can use GMCP `Room.Info`; if needed, set its field
+mappings to `num`, `name`, `area`, `environment` (or `terrain`) and `exits`.
+Mudlet needs a mapping script in addition to its Mapper display. Its IRE mapping
+script accepts `gmcp.Room.Info` with these fields; follow the script's
+game-specific setup and environment registration. Neither client receives a
+pre-populated coordinate atlas from the server.
+Portals, non-compass travel and irregular world geometry may require manual
+mapper corrections. No automatic walking or route execution is added.
 
 `Char.Base` supplies the authenticated player's name, actual character level
 (not trust, class rank or an invented RPG level), and primary class. It uses the
@@ -58,8 +92,8 @@ not an inferred hybrid build. No stats, costs, powers or class eligibility chang
 
 - No identity or vitals before entering an authenticated in-game session.
 - Only the descriptor's reciprocally attached PC is reported. No opponents,
-  room IDs, passwords, inventory, or another player's data. Only the player's
-  own name is supplied.
+  passwords, inventory, or another player's data. Only the player's own name
+  and current room's public map data are supplied.
 - Switched/NPC, object/head and detached sessions do not expose body stats.
   A previously active view receives zero standard vitals and
   `"available":false` with null custom resources, rather than stale vitals.
@@ -82,8 +116,9 @@ This does not change legacy ASCII **command input** or add TLS.
 
 ## Client access
 
-Mudlet scripts can read `gmcp.Char.Base`, `gmcp.Char.Vitals` and `gmcp.Anathema.Vitals` and react
-to the corresponding `gmcp.Char.Vitals` / `gmcp.Anathema.Vitals` events.
+Mudlet scripts can read `gmcp.Char.Base`, `gmcp.Char.Vitals`,
+`gmcp.Anathema.Vitals` and `gmcp.Room.Info`, and react to the corresponding
+GMCP package events.
 For example, inspect `gmcp.Char.Vitals.hp` and `.maxhp` after the first snapshot.
 MudForge exposes GMCP to its widgets/plugins; use these package names and the
 schema above, rather than relying on prompt wording.
@@ -117,8 +152,9 @@ Rollback to a pre-v2 executable still requires checked save and stop/start;
 see [CLIENTS.md](CLIENTS.md).
 
 `test_gmcp.c` runs the real reader/writer and covers all ten classes, option
-acknowledgements, fragmented payloads, privacy, null clearing, editors, caching,
-LONG_MIN/MAX formatting, failed output and recovery. Every-split snoop checks
+acknowledgements, fragmented payloads, privacy, null clearing, editors, separate
+vitals/room caches, Room.Info exits and escaping, LONG_MIN/MAX formatting,
+failed output and recovery. Every-split snoop checks
 protect metadata from becoming staff-client protocol state. Restart tests
 reject partial control output in new, offered, active and disabled GMCP states. Independent
 Python tests decode JSON over every packet split. The production-executable smoke test

@@ -27,6 +27,32 @@ class GMCPChecks(unittest.TestCase):
 
     def test_vitals_and_transport_unchanged(self):
         source=(SRC/"gmcp.c").read_text()
+        source=source.replace('#include "classes/hybrid/access.h"\n', "")
+        source=source.replace(
+            '_Static_assert(sizeof(((DESCRIPTOR_DATA *)0)->gmcp_room_cache) == GMCP_CACHE_SIZE,\n'
+            '               "GMCP room cache size mismatch");\n\n'
+            'static const char *const map_dir[MAX_DIR] = {"n", "e", "s", "w", "u", "d"};\n', "")
+        source=source.replace("        d->gmcp_room_cache[0] = '\\0';\n", "")
+        source=source.replace("    d->gmcp_room_cache[0] = '\\0';\n", "")
+        source=source.replace("    if (ch == NULL) d->gmcp_room_cache[0] = '\\0';\n", "")
+        source=source.replace(
+            "    if (d->gmcp_state != next) {\n"
+            "        d->gmcp_cache[0] = '\\0';\n"
+            "    }\n",
+            "    if (d->gmcp_state != next) d->gmcp_cache[0] = '\\0';\n")
+        new_tail = """    if (strcmp(frame, d->gmcp_cache)) {
+        if (!telnet_write(d, (const unsigned char *)frame, (size_t)count))
+            return FALSE;
+        memcpy(d->gmcp_cache, frame, (size_t)count + 1);
+    }
+    return gmcp_room_update(d, map_visible(ch) ? ch->in_room : NULL);
+"""
+        self.assertEqual(source.count(new_tail), 1)
+        source=source.replace(new_tail, """    if (!strcmp(frame, d->gmcp_cache)) return TRUE;
+    if (!telnet_write(d, (const unsigned char *)frame, (size_t)count)) return FALSE;
+    memcpy(d->gmcp_cache, frame, (size_t)count + 1);
+    return TRUE;
+""")
         start=source.index("/* Normal player names are ASCII letters")
         end=source.index("bool gmcp_update(",start)
         source=source[:start]+(
@@ -121,6 +147,20 @@ class GMCPChecks(unittest.TestCase):
         self.assertIn("ch->desc != d", gmcp)
         self.assertIn("d->original != NULL", gmcp)
         self.assertIn("MORE_HEAD", gmcp)
+
+    def test_room_info_is_separate_cached_gmcp_package(self):
+        header=(SRC/"merc.h").read_text()
+        source=(SRC/"gmcp.c").read_text()
+        self.assertIn("gmcp_room_cache[2048]",header)
+        self.assertIn(r'Room.Info {\"num\":%ld,\"name\":\"%s\",\"area\":\"%s\"',source)
+        self.assertIn(r'\"environment\":\"%s\",\"terrain\":\"%s\",',source)
+        self.assertIn(r'\"exits\":{',source)
+        self.assertIn("map_dir[MAX_DIR] = {\"n\", \"e\", \"s\", \"w\", \"u\", \"d\"}",source)
+        self.assertIn("IS_SET(exit->exit_info, EX_CLOSED)",source)
+        self.assertIn("gmcp_room_update(d, map_visible(ch) ? ch->in_room : NULL)",source)
+        from native_drow_skipdisc_source import without_native_drow_skipdisc
+        changed=header.replace("gmcp_room_cache[2048]", "gmcp_room_cache[2049]")
+        self.assertIn("gmcp_room_cache[2049]", without_native_drow_skipdisc(changed))
 
     def test_copyover_keeps_existing_manifest_version(self):
         restart = (SRC / "restart.c").read_text()

@@ -32,7 +32,8 @@ reuse an important password.
 Ordinary text play is retained. Optional **GMCP vitals** are now supported;
 see [the packet schema and client notes](GMCP.md).
 The [optional Mudlet HUD](../clients/mudlet/README.md) is included separately.
-Automatic mapping is not included; MudForge widgets remain client-specific.
+The server also sends standard GMCP `Room.Info` for clients to map rooms as
+players explore. It provides no hand-drawn coordinates or pre-populated atlas.
 
 | Feature | Current server behavior |
 | --- | --- |
@@ -40,15 +41,17 @@ Automatic mapping is not included; MudForge widgets remain client-specific.
 | Telnet negotiation, including fragmented packets | Parsed before command input |
 | Password ECHO acknowledgements | Existing WILL/WONT ECHO flow retained |
 | TTYPE, NAWS and other unsupported options | Declined, subnegotiation discarded |
-| GMCP | Optional Char.Base, Char.Vitals and Anathema.Vitals, authenticated self-only snapshots |
+| GMCP | Optional Char.Base, Char.Vitals and Anathema.Vitals, plus authenticated current-room Room.Info |
 | MSDP, MXP and MCCP | Not implemented; unsupported negotiation declined |
-| Party data and automatic room maps | Not supplied by this server |
+| Party data | Not supplied by this server |
 | UTF-8 command input | Not added; legacy ASCII canonicalization remains |
 
 Client aliases, text triggers and locally scripted interfaces can still use
 ordinary game text. A client advertising extra protocols must not cause
 protocol bytes, terminal names, dimensions or JSON to become game commands.
 An optional Mudlet HUD is bundled separately; no MudForge plugin is bundled.
+MudForge's built-in Map Widget and Mudlet's Mapper can consume `Room.Info`;
+Mudlet still needs a mapping script configured for Anathema.
 
 ## MudForge browser troubleshooting
 
@@ -66,9 +69,10 @@ external bridge failure. Avoid deleting world files or resetting all settings.
 
 Enable GMCP for vitals. The status bar can consume `Char.Vitals.hp`, `maxhp`,
 `mana` and `maxmana`; the existing `mp` and `maxmp` aliases remain available.
-Hide the movement gauge: no movement telemetry is advertised. Empty map and
-party widgets are expected until the server implements those packages, not
-evidence of a broken connection. The custom resource package is documented in
+Hide the movement gauge: no movement telemetry is advertised. If the map is
+empty, enable GMCP and configure the Map Widget's `Room.Info` field mappings;
+the map fills as you explore and no starting atlas is bundled. Party data is
+not supplied. The room and resource packages are documented in
 [GMCP.md](GMCP.md).
 
 ## Implementation
@@ -137,8 +141,9 @@ The hosted MudForge web client v2.0.3915 was additionally exercised in headless
 Chromium: its real WebSocket bridge reached Anathema's greeting and login-name
 prompt. No account was created or authenticated. That confirms one connection
 path at the time of the probe, not hosted-bridge uptime or a full authenticated
-GUI/copyover test. TLS deployment, UTF-8 input, automatic mapping and party
-support are not added by these checks.
+GUI/copyover test. The new mapping feed is tested at the protocol level;
+rendering it in the hosted GUI and a specific Mudlet mapper is not yet verified.
+TLS deployment, UTF-8 input and party support are not added.
 
 Smoke-test greetings use a bounded 25-second receive deadline, rather than
 inheriting the short TCP-connect timeout. EOF still fails immediately and

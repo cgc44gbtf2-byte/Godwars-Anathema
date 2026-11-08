@@ -16,6 +16,9 @@ extern bool process_output(DESCRIPTOR_DATA *d, bool prompt);
 static DESCRIPTOR_DATA d;
 static CHAR_DATA ch, enemy;
 static PC_DATA pc;
+static AREA_DATA test_area;
+static ROOM_INDEX_DATA test_room, north_room, south_room;
+static EXIT_DATA north_exit, south_exit;
 static int peer;
 
 static void begin(void)
@@ -24,12 +27,31 @@ static void begin(void)
     assert(socketpair(AF_UNIX, SOCK_STREAM, 0, pair) == 0);
     memset(&d, 0, sizeof(d)); memset(&ch, 0, sizeof(ch));
     memset(&pc, 0, sizeof(pc)); memset(&enemy, 0, sizeof(enemy));
+    memset(&test_area, 0, sizeof(test_area));
+    memset(&test_room, 0, sizeof(test_room));
+    memset(&north_room, 0, sizeof(north_room));
+    memset(&south_room, 0, sizeof(south_room));
+    memset(&north_exit, 0, sizeof(north_exit));
+    memset(&south_exit, 0, sizeof(south_exit));
     d.descriptor = pair[0]; peer = pair[1];
     assert(fcntl(pair[0], F_SETFL, O_NONBLOCK) == 0);
     d.outsize = 2000; d.outbuf = alloc_mem(d.outsize);
     d.outbuf[0] = '\0';
     d.connected = CON_PLAYING; d.character = &ch;
     ch.desc = &d; ch.pcdata = &pc; ch.name = "Self\"\\\n";
+    ch.position = POS_STANDING;
+    test_area.name = "Test Area";
+    test_room.name = "Test Room"; test_room.vnum = 100;
+    test_room.area = &test_area; test_room.sector_type = SECT_CITY;
+    north_room.name = "North Room"; north_room.vnum = 101;
+    north_room.area = &test_area; north_room.sector_type = SECT_FOREST;
+    south_room.name = "South Room"; south_room.vnum = 102;
+    south_room.area = &test_area; south_room.sector_type = SECT_FIELD;
+    north_exit.to_room = &north_room;
+    south_exit.to_room = &south_room; south_exit.exit_info = EX_CLOSED;
+    test_room.exit[DIR_NORTH] = &north_exit;
+    test_room.exit[DIR_SOUTH] = &south_exit;
+    ch.in_room = &test_room;
     ch.level = LEV_IMP;
     ch.hit = 71; ch.max_hit = 100; ch.mana = 33; ch.max_mana = 99;
     ch.fighting = &enemy; enemy.hit = 987654321;
@@ -120,18 +142,73 @@ static void classes(void)
     finish();
 }
 
+static void room_mapping(void)
+{
+    begin(); ack(TRUE);
+    assert(gmcp_update(&d));
+    assert(strstr(d.outbuf,
+        "Room.Info {\"num\":100,\"name\":\"Test Room\",\"area\":\"Test Area\","
+        "\"zone\":\"Test Area\",\"environment\":\"city\",\"terrain\":\"city\","
+        "\"exits\":{\"n\":101}}"));
+    assert(!strstr(d.outbuf, "\"s\":102")); /* Closed exits are not mapped. */
+    clear_output();
+
+    --ch.hit; /* Vitals may change without resending the room map record. */
+    assert(gmcp_update(&d) && d.outtop > 0);
+    assert(strstr(d.outbuf, "Char.Vitals"));
+    assert(!strstr(d.outbuf, "Room.Info"));
+    clear_output();
+
+    north_room.name = "North \"room\"\n";
+    ch.in_room = &north_room;
+    assert(gmcp_update(&d) && d.outtop > 0);
+    assert(strstr(d.outbuf,
+        "Room.Info {\"num\":101,\"name\":\"North \\\"room\\\"\\u000a\""));
+    clear_output();
+    assert(gmcp_update(&d) && d.outtop == 0); /* Unchanged room is cached. */
+
+    /* Changing room metadata or an open exit invalidates the independent cache. */
+    north_room.sector_type = SECT_HILLS;
+    assert(gmcp_update(&d) && strstr(d.outbuf, "\"environment\":\"hills\""));
+    clear_output();
+    test_room.exit[DIR_SOUTH] = &south_exit;
+    south_exit.exit_info = 0;
+    ch.in_room = &test_room;
+    assert(gmcp_update(&d) && strstr(d.outbuf, "\"s\":102"));
+    clear_output();
+    ch.position = POS_SLEEPING;
+    assert(gmcp_update(&d) && !strstr(d.outbuf, "Room.Info"));
+    assert(d.gmcp_room_cache[0] == '\0');
+    ch.position = POS_STANDING;
+    assert(gmcp_update(&d) && strstr(d.outbuf, "Room.Info"));
+    clear_output();
+    ch.level = 2; ch.affected_by |= AFF_BLIND;
+    assert(gmcp_update(&d) && !strstr(d.outbuf, "Room.Info"));
+    ch.affected_by &= ~AFF_BLIND;
+    test_room.room_flags |= ROOM_DARK;
+    clear_output();
+    assert(gmcp_update(&d) && !strstr(d.outbuf, "Room.Info"));
+    test_room.room_flags &= ~ROOM_DARK;
+    assert(gmcp_update(&d) && strstr(d.outbuf, "Room.Info"));
+    finish();
+}
+
 static void privacy(void)
 {
     begin(); ack(TRUE);
     d.connected = CON_GET_OLD_PASSWORD;
     assert(gmcp_update(&d) && d.outtop == 0);
     d.connected = CON_PLAYING;
-    assert(gmcp_update(&d) && d.outtop > 0); clear_output();
+    assert(gmcp_update(&d) && d.outtop > 0);
+    assert(strstr(d.outbuf, "Room.Info"));
+    clear_output();
     d.original = &enemy;
     assert(gmcp_update(&d) && strstr(d.outbuf, "\"available\":false"));
     assert(strstr(d.outbuf, "\"hp\":0,\"maxhp\":0"));
     assert(strstr(d.outbuf, "\"mp\":0,\"maxmp\":0,\"mana\":0,\"maxmana\":0"));
     assert(strstr(d.outbuf, "Char.Base {\"name\":\"\",\"level\":0,\"class\":\"none\"}"));
+    assert(!strstr(d.outbuf, "Room.Info"));
+    assert(d.gmcp_room_cache[0] == '\0');
     clear_output(); assert(gmcp_update(&d) && d.outtop == 0);
     d.original = NULL; SET_BIT(ch.act, ACT_IS_NPC);
     assert(gmcp_update(&d) && d.outtop == 0);
@@ -260,6 +337,7 @@ static void snoop_privacy(void)
         telnet_snoop_output(&d,wire+cut,size-cut);
         assert(!strstr(watcher.outbuf,"Char.Vitals"));
         assert(!strstr(watcher.outbuf,"Char.Base"));
+        assert(!strstr(watcher.outbuf,"Room.Info"));
         assert(!strstr(watcher.outbuf,"Self"));
         assert(!strstr(watcher.outbuf,"Anathema.Vitals"));
         assert(!strstr(watcher.outbuf,"\"hp\""));
@@ -340,8 +418,8 @@ int main(int argc, char **argv)
     }
     identity();
     mudforge_fields();
-    negotiation(); classes(); privacy(); updates_and_wire();
+    negotiation(); classes(); room_mapping(); privacy(); updates_and_wire();
     payloads_and_recovery(); limits(); snoop_privacy();
-    puts("GMCP identity/255 name bytes, negotiation, ten-class self-only snapshots, 588 MudForge alias cases, snoop isolation, cache, wire, recovery and bounds passed");
+    puts("GMCP identity/255 name bytes, ten-class private snapshots, Room.Info mapping, 588 MudForge alias cases, snoop isolation, cache, wire, recovery and bounds passed");
     return 0;
 }

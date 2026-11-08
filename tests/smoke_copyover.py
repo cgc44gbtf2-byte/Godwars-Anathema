@@ -62,6 +62,20 @@ def validate_identity(records):
     return snapshots
 
 
+def validate_rooms(records):
+    rooms = [value for package, value in records if package == "Room.Info"]
+    assert rooms, "No authenticated room map received"
+    for room in rooms:
+        assert set(room) == {"num", "name", "area", "zone",
+                             "environment", "terrain", "exits"}
+        assert type(room["num"]) is int and room["num"] > 0
+        assert room["name"] and room["area"] == room["zone"]
+        assert room["terrain"] == room["environment"]
+        assert set(room["exits"]) <= {"n", "e", "s", "w", "u", "d"}
+        assert all(type(vnum) is int for vnum in room["exits"].values())
+    return rooms
+
+
 def validate_engine_identity_bytes():
     # Decode the actual engine's output independently of its C assertions.
     raw = subprocess.check_output([str(repo / "tests/test_gmcp"), "--identity-wire"])
@@ -69,7 +83,13 @@ def validate_engine_identity_bytes():
     for byte in raw:
         probe.feed(bytes([byte]))
     names = [value for package, value in probe.records if package == "Char.Base"]
-    assert len(names) == 255 and len(probe.records) == 765
+    room_info = [value for package, value in probe.records if package == "Room.Info"]
+    assert len(names) == 255 and len(room_info) == 1 and len(probe.records) == 766
+    assert room_info[0] == {
+        "num": 100, "name": "Test Room", "area": "Test Area",
+        "zone": "Test Area", "environment": "city", "terrain": "city",
+        "exits": {"n": 101},
+    }
     for byte, data in enumerate(names, 1):
         assert data == {"name": chr(byte), "level": 6, "class": "none"}
     assert probe.state == 0, "Unterminated Telnet frame"
@@ -128,12 +148,13 @@ with tempfile.TemporaryDirectory(prefix="anathema-copyover-") as directory:
             staff.sendall(b"save\n")
             until(staff, b"Saved.", trace=gmcp.feed,
                   ready=lambda: ({"Char.Vitals", "Anathema.Vitals"} |
-                      (set() if legacy_before_copyover else {"Char.Base"})) <= {
+                      (set() if legacy_before_copyover else {"Char.Base", "Room.Info"})) <= {
                       p for p, _ in gmcp.records})
             assert {"Char.Vitals", "Anathema.Vitals"} <= {p for p, _ in gmcp.records}
             validate_vitals(gmcp.records, legacy=legacy_before_copyover)
             if not legacy_before_copyover:
                 validate_identity(gmcp.records)
+                validate_rooms(gmcp.records)
             assert not any("Restarter" in str(value) for package, value in gmcp.records
                            if package != "Char.Base")
             pending = socket.create_connection(("127.0.0.1", port), timeout=3)
@@ -165,12 +186,13 @@ with tempfile.TemporaryDirectory(prefix="anathema-copyover-") as directory:
             staff.sendall(b"Forge\nnot-a-command\xff\xf0"
                           b"\xff\xfe\xc9\xff\xfd\xc9save\n")
             until(staff, b"Saved.", trace=gmcp.feed,
-                  ready=lambda: {"Char.Base", "Char.Vitals", "Anathema.Vitals"} <= {
+                  ready=lambda: {"Char.Base", "Char.Vitals", "Anathema.Vitals", "Room.Info"} <= {
                       p for p, _ in gmcp.records[before_recovery:]})
             assert {"Char.Vitals", "Anathema.Vitals"} <= {
                 p for p, _ in gmcp.records[before_recovery:]}
             validate_vitals(gmcp.records[before_recovery:])
             validate_identity(gmcp.records[before_recovery:])
+            validate_rooms(gmcp.records[before_recovery:])
             pending.settimeout(5)
             try:
                 while pending.recv(65536):

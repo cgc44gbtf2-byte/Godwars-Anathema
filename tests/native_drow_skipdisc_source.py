@@ -22,6 +22,11 @@ def once(text, new, old):
     return text.replace(new, old, 1)
 
 def without_native_drow_skipdisc(text):
+    # Independent room-map storage is not part of the historical class header.
+    # Only the exact reviewed addition is stripped; mutations remain visible.
+    text = text.replace(
+        "    char                gmcp_room_cache[2048]; /* Independent room-map cache. */\n",
+        "")
     from native_drow_spider_stats_source import without_native_drow_spider_stats
     text = without_native_drow_spider_stats(text)
     from native_drow_source import without_native_drow_ammo_template_guard

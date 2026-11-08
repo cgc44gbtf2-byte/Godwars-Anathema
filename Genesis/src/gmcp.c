@@ -25,9 +25,14 @@
 #include "merc.h"
 #include "telnet_input.h"
 #include "gmcp.h"
+#include "classes/hybrid/access.h"
 
 _Static_assert(sizeof(((DESCRIPTOR_DATA *)0)->gmcp_cache) == GMCP_CACHE_SIZE,
                "GMCP descriptor cache size mismatch");
+_Static_assert(sizeof(((DESCRIPTOR_DATA *)0)->gmcp_room_cache) == GMCP_CACHE_SIZE,
+               "GMCP room cache size mismatch");
+
+static const char *const map_dir[MAX_DIR] = {"n", "e", "s", "w", "u", "d"};
 
 bool gmcp_offer(DESCRIPTOR_DATA *d)
 {
@@ -46,7 +51,10 @@ void gmcp_negotiate(DESCRIPTOR_DATA *d, bool enable)
      * Honor unsolicited DO/DONT too, as the GMCP specification requires. */
     if (d == NULL) return;
     unsigned char next = enable ? GMCP_ACTIVE : GMCP_DISABLED;
-    if (d->gmcp_state != next) d->gmcp_cache[0] = '\0';
+    if (d->gmcp_state != next) {
+        d->gmcp_cache[0] = '\0';
+        d->gmcp_room_cache[0] = '\0';
+    }
     d->gmcp_state = next;
 }
 
@@ -60,6 +68,7 @@ bool gmcp_recover(DESCRIPTOR_DATA *d)
     if (d == NULL || !telnet_write(d, reset, sizeof(reset))) return FALSE;
     d->gmcp_state = GMCP_OFFERED;
     d->gmcp_cache[0] = '\0';
+    d->gmcp_room_cache[0] = '\0';
     return TRUE;
 }
 
@@ -102,6 +111,104 @@ static void identity_name(char out[385], const char *name)
     out[used] = '\0';
 }
 
+/* Room/area labels follow the same bounded JSON escaping as identity. Room
+ * text can be legacy data, so never let it become raw JSON or Telnet framing. */
+static void room_label(char out[385], const char *text)
+{
+    static const char hex[] = "0123456789abcdef";
+    size_t used = 0;
+    for (size_t i = 0; text != NULL && i < 64 && text[i] != '\0'; ++i) {
+        unsigned char c = (unsigned char)text[i];
+        if (c < 32 || c >= 127) {
+            out[used++] = '\\'; out[used++] = 'u';
+            out[used++] = '0'; out[used++] = '0';
+            out[used++] = hex[c >> 4]; out[used++] = hex[c & 15];
+        } else {
+            if (c == '"' || c == '\\') out[used++] = '\\';
+            out[used++] = (char)c;
+        }
+    }
+    out[used] = '\0';
+}
+
+/* Quiet equivalent of the room-look visibility gates: telemetry must not
+ * reveal rooms that ordinary play currently hides. Never call check_blind(),
+ * which would emit text on every telemetry tick. */
+static bool map_visible(CHAR_DATA *ch)
+{
+    CHAR_DATA *other;
+    if (ch == NULL || ch->in_room == NULL || ch->position <= POS_SLEEPING)
+        return FALSE;
+    if (!(effective_holylight(ch) && !IS_EXTRA(ch, BLINDFOLDED)) &&
+        !IS_ITEMAFF(ch, ITEMA_VISION)) {
+        if (IS_EXTRA(ch, BLINDFOLDED) ||
+            (IS_AFFECTED(ch, AFF_BLIND) && !effective_shadowsight(ch)))
+            return FALSE;
+    }
+    if (!IS_BUI(ch)) {
+        if (IS_EXTRA(ch, BLINDFOLDED)) return FALSE;
+        for (other = ch->in_room->people; other != NULL; other = other->next_in_room)
+            if (hybrid_drow_globe_active(other)) return FALSE;
+        if (!effective_holylight(ch) && !IS_ITEMAFF(ch, ITEMA_VISION) &&
+            !effective_nightsight(ch) && !IS_AFFECTED(ch, AFF_SHADOWPLANE) &&
+            room_is_dark(ch->in_room)) return FALSE;
+    }
+    return TRUE;
+}
+
+/* Room.Info follows the GMCP Room package used by MudForge's map widget and
+ * Mudlet mapping scripts. These rooms have no authored coordinates; clients
+ * infer their layout while the player explores. Closed exits are omitted just
+ * like the game's normal automatic exits display. */
+static bool gmcp_room_update(DESCRIPTOR_DATA *d, ROOM_INDEX_DATA *room)
+{
+    char frame[GMCP_CACHE_SIZE];
+    char name[385], area[385];
+    size_t used;
+    int count;
+    bool first = TRUE;
+    static const char *const unknown = "Unknown";
+
+    if (d == NULL) return FALSE;
+    if (room == NULL) {
+        d->gmcp_room_cache[0] = '\0';
+        return TRUE;
+    }
+
+    room_label(name, room->name != NULL ? room->name : unknown);
+    room_label(area, room->area != NULL && room->area->name != NULL
+                     ? room->area->name : unknown);
+    count = snprintf(frame, sizeof(frame),
+        "%c%c%cRoom.Info {\"num\":%ld,\"name\":\"%s\",\"area\":\"%s\","
+        "\"zone\":\"%s\",\"environment\":\"%s\",\"terrain\":\"%s\","
+        "\"exits\":{",
+        255,250,GMCP_OPTION,room->vnum,name,area,area,
+        sector_name(room->sector_type),sector_name(room->sector_type));
+    if (count < 0 || (size_t)count >= sizeof(frame)) return FALSE;
+    used = (size_t)count;
+
+    for (long door = 0; door < MAX_DIR; ++door) {
+        EXIT_DATA *exit = room->exit[door];
+        if (exit == NULL || exit->to_room == NULL ||
+            IS_SET(exit->exit_info, EX_CLOSED)) continue;
+        count = snprintf(frame + used, sizeof(frame) - used, "%s\"%s\":%ld",
+                         first ? "" : ",", map_dir[door], exit->to_room->vnum);
+        if (count < 0 || (size_t)count >= sizeof(frame) - used) return FALSE;
+        used += (size_t)count;
+        first = FALSE;
+    }
+    count = snprintf(frame + used, sizeof(frame) - used, "}}%c%c",255,240);
+    if (count < 0 || (size_t)count >= sizeof(frame) - used) return FALSE;
+    used += (size_t)count;
+    if (used >= sizeof(frame)) return FALSE;
+    frame[used] = '\0';
+
+    if (!strcmp(frame, d->gmcp_room_cache)) return TRUE;
+    if (!telnet_write(d, (const unsigned char *)frame, used)) return FALSE;
+    memcpy(d->gmcp_room_cache, frame, used + 1);
+    return TRUE;
+}
+
 /* Identity and vitals share the authenticated-self privacy gate and cache.
  * Class is the existing primary class, never inferred hybrid ancestry. */
 bool gmcp_update(DESCRIPTOR_DATA *d)
@@ -116,12 +223,14 @@ bool gmcp_update(DESCRIPTOR_DATA *d)
     if (d->gmcp_state != GMCP_ACTIVE) return TRUE;
     if (!descriptor_is_in_game(d)) {
         d->gmcp_cache[0] = '\0';
+        d->gmcp_room_cache[0] = '\0';
         return TRUE; /* No authentication-shell telemetry. */
     }
     ch = d->character;
     if (d->original != NULL || ch == NULL || IS_NPC(ch) ||
         ch->pcdata == NULL || ch->desc != d ||
         IS_MORE(ch, MORE_HEAD) || IS_EXTRA(ch, EXTRA_OSWITCH)) ch = NULL;
+    if (ch == NULL) d->gmcp_room_cache[0] = '\0';
     if (ch == NULL && d->gmcp_cache[0] == '\0') return TRUE;
     if (ch != NULL) {
         hp = ch->hit; maxhp = ch->max_hit;
@@ -159,8 +268,10 @@ bool gmcp_update(DESCRIPTOR_DATA *d)
         255,250,GMCP_OPTION,ch ? "true" : "false",
         ch ? class_name(ch->class) : "none",blood,ki,quint,paradox,points,will,255,240);
     if (count < 0 || (size_t)count >= sizeof(frame)) return FALSE;
-    if (!strcmp(frame, d->gmcp_cache)) return TRUE;
-    if (!telnet_write(d, (const unsigned char *)frame, (size_t)count)) return FALSE;
-    memcpy(d->gmcp_cache, frame, (size_t)count + 1);
-    return TRUE;
+    if (strcmp(frame, d->gmcp_cache)) {
+        if (!telnet_write(d, (const unsigned char *)frame, (size_t)count))
+            return FALSE;
+        memcpy(d->gmcp_cache, frame, (size_t)count + 1);
+    }
+    return gmcp_room_update(d, map_visible(ch) ? ch->in_room : NULL);
 }
