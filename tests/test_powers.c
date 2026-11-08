@@ -234,15 +234,22 @@ static void test_disc(void)
     reset(CLASS_DROW);
     chars[0].affected_by = AFF_HIDE;
     do_skipdisc(&chars[0], "");
-    assert(chars[0].affected_by == (AFF_HIDE | AFF_FLYING));
-    do_skipdisc(&chars[0], "");
     assert(chars[0].affected_by == AFF_HIDE);
-    /* An unrelated item bit at the same numeric position is not flight. */
+    assert(DROW_DISC_ACTIVE(&chars[0]) &&
+           IS_AFFECTED(&chars[0], AFF_FLYING));
+    do_skipdisc(&chars[0], "");
+    assert(chars[0].affected_by == AFF_HIDE &&
+           !DROW_DISC_ACTIVE(&chars[0]) &&
+           !IS_AFFECTED(&chars[0], AFF_FLYING));
+    /* The disc source remains independent of an unrelated item bit. */
     chars[0].itemaffect = AFF_FLYING;
     do_skipdisc(&chars[0], "");
-    assert(IS_AFFECTED(&chars[0], AFF_FLYING));
+    assert(DROW_DISC_ACTIVE(&chars[0]) &&
+           IS_AFFECTED(&chars[0], AFF_FLYING));
     do_skipdisc(&chars[0], "");
-    assert(chars[0].affected_by == AFF_HIDE);
+    assert(chars[0].affected_by == AFF_HIDE &&
+           !DROW_DISC_ACTIVE(&chars[0]) &&
+           !IS_AFFECTED(&chars[0], AFF_FLYING));
     assert(chars[0].itemaffect == AFF_FLYING);
 }
 

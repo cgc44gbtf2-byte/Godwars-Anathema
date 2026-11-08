@@ -423,7 +423,10 @@ if (ch->pcdata->wolf > 0)
 	    {
 		if (get_drow(ch, DROW_GLOBE))
 		{
-		    ch->pcdata->classpoints[CP_CURRENT] -= 150;
+    /* Exhaustion precedes subtraction, including corrupt negative balances. */
+    ch->pcdata->classpoints[CP_CURRENT] =
+        ch->pcdata->classpoints[CP_CURRENT] > 150 ?
+        ch->pcdata->classpoints[CP_CURRENT] - 150 : 0;
 		    if (ch->pcdata->classpoints[CP_CURRENT] <= 0)
 		    {
 			ch->pcdata->classpoints[CP_CURRENT] = 0;
@@ -822,6 +825,19 @@ if (ch->spec_fun != 0)
                ;
             else
             {
+               /* Only a Drow summon's stamped guardian effect owns this
+                * lifetime. Generic guardians and ordinary charms are not
+                * affected; normal extraction releases the owner's slot. */
+               if (IS_NPC(ch) && paf->location == APPLY_NONE &&
+                   paf->modifier == DROW_SPIDER &&
+                   IS_SET(paf->bitvector, AFF_CHARM) &&
+                   paf->type == skill_lookup("guardian"))
+               {
+                  act("$n fades back into the shadows.",ch,NULL,NULL,TO_ROOM);
+                  extract_char(ch,TRUE);
+                  drop_out = TRUE;
+                  break;
+               }
                if ( paf_next == NULL
                   ||   paf_next->type != paf->type
                   ||   paf_next->duration > 0 )
@@ -836,6 +852,7 @@ if (ch->spec_fun != 0)
                affect_remove( ch, paf );
             }
          }
+         if (drop_out) continue; /* The expired summon has been recycled. */
       
       /*
       * Careful with the damages here,

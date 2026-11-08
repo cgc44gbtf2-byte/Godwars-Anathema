@@ -93,6 +93,11 @@ static void bank_case(long cls,unsigned hybrid,int order)
         victim->pcdata->absorb[i]=1000+i;
     victim->arete=10;victim->paradox=20;victim->paradox_ward=5;
     victim->beginners_luck=4;victim->doublecast_timer=600;
+    if(victim->class==CLASS_DROW) {
+        victim->pcdata->drow[DROW_POWERS]=DROW_SKIP|DROW_DISC;
+        assert(DROW_DISC_ACTIVE(victim)&&IS_AFFECTED(victim,AFF_FLYING));
+        assert(!IS_SET(victim->affected_by,AFF_FLYING));
+    }
     /* Victim-targeted effects are independent of personal class ownership. */
     victim->better_body_timer=17;victim->ephemera_timer=18;
     victim->slow_timer=19;victim->liquify_timer=20;
@@ -103,12 +108,14 @@ static void bank_case(long cls,unsigned hybrid,int order)
     assert(save_char_obj_checked(victim));
     do_clearclass(staff,"Target");
     assert_empty_banks(victim);
+    assert(!DROW_DISC_ACTIVE(victim)&&!IS_AFFECTED(victim,AFF_FLYING));
     assert(victim->better_body_timer==17&&victim->ephemera_timer==18&&
         victim->slow_timer==19&&victim->liquify_timer==20&&
         victim->atoningwinds_timer==21&&victim->enrage_timer==22);
     assert(victim->xtra==xtra);
     CHAR_DATA *loaded=load_reset();
     assert_empty_banks(loaded);
+    assert(!DROW_DISC_ACTIVE(loaded)&&!IS_AFFECTED(loaded,AFF_FLYING));
     assert(loaded->gold==1234&&loaded->primal==4321);
     for(int i=0;i<5;i++)loaded->stats[i]=10;
     do_autoclass(loaded,"mage hermes");

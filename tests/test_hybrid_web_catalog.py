@@ -7,6 +7,22 @@ from web_source import without_web_stage
 
 
 class HybridWebCatalog(unittest.TestCase):
+    def test_native_web_safety_repairs_are_exact(self):
+        from web_source import without_web_safety
+        for path,prior in (
+            ("clan.c","f6f82017fc079308dbda89bccfb863d815a442bc"),
+            ("magic.c","6a1537c329c64056b61563a92ec3d4dbf425fd9a"),
+        ):
+            text=(SRC/path).read_text()
+            old=without_web_safety(text).encode()
+            self.assertEqual(hashlib.sha1(b"blob "+str(len(old)).encode()+b"\0"+old).hexdigest(),prior)
+            mutated=text.replace("LONG_MIN + 100","LONG_MIN + 99",1)
+            with self.assertRaisesRegex(AssertionError,"Unreviewed"):
+                without_web_safety(mutated)
+        body=(SRC/"magic.c").read_text().split("void spell_web(",1)[1].split("\nvoid spell_find_familiar(",1)[0]
+        self.assertLess(body.index("combat_character_in_room"),body.index('act("You point'))
+        self.assertLess(body.index("LONG_MIN + 100"),body.index("number_percent()"))
+
     def body(self):
         return (SRC/"clan.c").read_text().split("void do_web(",1)[1].split(
             "\nvoid do_entrancement(",1)[0]

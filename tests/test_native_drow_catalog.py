@@ -10,6 +10,86 @@ def blob(text):
     return hashlib.sha1(b"blob "+str(len(b)).encode()+b"\0"+b).hexdigest()
 
 class NativeDrowCatalog(unittest.TestCase):
+    def test_spider_stats_inverse_rejects_unreviewed_changes(self):
+        from native_drow_spider_stats_source import without_native_drow_spider_stats
+        from native_drow_attune_source import without_native_drow_attune_owner_guard
+        text=(SRC/"classes/drow/drow.c").read_text()
+        restored=without_native_drow_spider_stats(text)
+        self.assertIn("victim->hitroll = char_hitroll(ch) - 50;",restored)
+        for old,new in (("spider_hitroll < LONG_MIN + 50","spider_hitroll < LONG_MIN + 49"),
+                        ("spider_armor - 50;","spider_armor - 49;")):
+            with self.assertRaises(AssertionError):
+                without_native_drow_spider_stats(text.replace(old,new,1))
+        original=without_native_drow_attune_owner_guard(text)
+        self.assertIn("if (str_cmp(ch->name,obj->questowner))",original)
+        with self.assertRaises(AssertionError):
+            without_native_drow_attune_owner_guard(text.replace(
+                "obj->questowner[0] == '\\0'","obj->questowner[0] != '\\0'",1))
+
+    def test_skipdisc_owned_state_has_strict_inverse(self):
+        from native_drow_skipdisc_source import without_native_drow_skipdisc
+        for path,expected in (
+            ("merc.h","1ac72bd5054742364425b947239383997e8b2804"),
+            ("handler.c","e22fb64eb8b8526c5ad435a9f986d030d581eed5"),
+            # Immediately preceding local stage includes Darkness dismissal.
+            ("classes/drow/drow.c","bb96c132b960755e6ffc5df58dbe902a1f530ee0"),
+        ):
+            text=(SRC/path).read_text()
+            self.assertEqual(blob(without_native_drow_skipdisc(text)),expected)
+            if path=="handler.c":
+                changed=text.replace("IS_SET(ch->affected_by, AFF_FLYING)", "IS_SET(ch->affected_by, AFF_BLIND)",1)
+                self.assertNotEqual(blob(without_native_drow_skipdisc(changed)),expected)
+                continue
+            changed=text.replace("DROW_DISC 524288","DROW_DISC 8192",1) if path=="merc.h" else text.replace("DROW_DISC);","DROW_SKIP);",1)
+            with self.assertRaises(AssertionError):
+                without_native_drow_skipdisc(changed)
+
+    def test_native_darkness_dismissal_inverse_and_regression(self):
+        from native_drow_source import without_native_drow_darkness_dismissal
+        text=(SRC/"classes/drow/drow.c").read_text()
+        self.assertEqual(blob(without_native_drow_darkness_dismissal(text)),
+                         "d5fb182e96fbbcb566795f969e6d51bf5ebac4b8")
+        with self.assertRaises(AssertionError):
+            without_native_drow_darkness_dismissal(
+                text.replace("!(IS_DROW(ch) && hybrid_drow_globe_active(ch))",
+                             "!hybrid_drow_globe_active(ch)",1))
+        fixture=(ROOT/"tests/test_native_drow.c").read_text()
+        for token in ('"--darkness-dismissal"', "darkness_loss_cleanup();",
+                      'assert(strstr(output,"banish your globe"))',
+                      'assert(strstr(output,"obtain darkness first"))',
+                      "actor->pcdata->drow[DROW_POWERS]==DROW_SKIP"):
+            self.assertIn(token,fixture)
+
+    def test_darkness_upkeep_inverse_is_exact_and_rejects_cost_mutations(self):
+        from native_drow_source import without_native_drow_darkness_upkeep
+        text=(SRC/"update.c").read_text()
+        self.assertEqual(blob(without_native_drow_darkness_upkeep(text)),
+                         "3bf1a340a09b4ed1cccfc5b5a40850f556a47ffe")
+        for old,new in (("> 150 ?", "> 149 ?"), (" - 150 : 0;", " - 149 : 0;")):
+            self.assertIn(old,text)
+            with self.assertRaises(AssertionError):
+                without_native_drow_darkness_upkeep(text.replace(old,new,1))
+
+    def test_darkness_audit_has_real_upkeep_and_explicit_extreme_reproducer(self):
+        fixture=(ROOT/"tests/test_native_drow.c").read_text()
+        for token in ("static void darkness_pulse(void)", "mobile_update();",
+                      '"--darkness-lifecycle"', '"--darkness-extreme"',
+                      "const long funds[]={LONG_MIN,-1,0,1,149,150,151,499,500,650,651,LONG_MAX}",
+                      "actor->desc=NULL;", "actor->hit=0;update_pos(actor);",
+                      "static void darkness_loss_cleanup(void)",
+                      "reload.character->pcdata->classpoints[CP_CURRENT]==1000"):
+            self.assertIn(token,fixture)
+
+    def test_rejected_commands_check_pools_and_wait_in_real_world(self):
+        fixture=(ROOT/"tests/test_native_drow.c").read_text()
+        for token in ("static void rejected_costs(void)", "actor->wait==0",
+                      "actor->exp==exp&&actor->primal==primal",
+                      "actor->pcdata->ninja[NINJA_KI]==ki",
+                      '"--rejected-costs"', 'rejection_cost_check("summonspider")',
+                      'rejection_cost_check("faeriefire RejectedDrowTarget")',
+                      "target->affected==affects"):
+            self.assertIn(token,fixture)
+
     def test_previous_complete_source_is_preserved(self):
         self.assertEqual(blob(without_native_drow_stage(
             (SRC/"classes/drow/drow.c").read_text())), BASE)
@@ -93,10 +173,22 @@ class NativeDrowCatalog(unittest.TestCase):
             self.assertNotEqual(blob(without_native_drow_stage(text.replace(old,new,1))),BASE)
 
     def test_equipment_followup_only_adds_shoot_context_guards(self):
-        from native_drow_source import without_native_drow_shoot_context
+        from native_drow_source import (without_native_drow_shoot_context,
+                                        without_native_drow_ammo_template_guard)
         text=(SRC/"classes/drow/drow.c").read_text()
         prior="cf1244d5a43ebf6e54dcd50802c44866a1962b2b"
         self.assertEqual(blob(without_native_drow_shoot_context(text)),prior)
+        restored_ammo=without_native_drow_ammo_template_guard(text)
+        self.assertIn("if (weapon->pIndexData == NULL || weapon->value[3] < 0)",
+                      restored_ammo)
+        self.assertNotIn("weapon->pIndexData->item_type",restored_ammo)
+        self.assertNotIn("ammo->pIndexData->item_type",restored_ammo)
+        for old,new in (("weapon->pIndexData->item_type != ITEM_MISSILE",
+                         "weapon->pIndexData->item_type == ITEM_MISSILE"),
+                        ("ammo->pIndexData->item_type != ITEM_AMMO",
+                         "ammo->pIndexData->item_type == ITEM_AMMO")):
+            with self.assertRaises(AssertionError):
+                without_native_drow_ammo_template_guard(text.replace(old,new,1))
         for old,new in (("ch->pcdata == NULL","ch->pcdata != NULL"),
                         ("ch->pcdata->classpoints[CP_CURRENT] -= 500;",
                          "ch->pcdata->classpoints[CP_CURRENT] -= 5;")):
@@ -105,6 +197,12 @@ class NativeDrowCatalog(unittest.TestCase):
             try: restored=without_native_drow_shoot_context(changed)
             except AssertionError: continue
             self.assertNotEqual(blob(restored),prior)
+        ammo=(ROOT/"tests/test_drow_ammo.c").read_text()
+        for token in ("static void ownership_and_compatibility(void)",
+                      "indices[0].item_type=ITEM_TRASH",
+                      "indices[1].item_type=ITEM_TRASH",
+                      "stale_ammo->carried_by==&actor"):
+            self.assertIn(token,ammo)
 
     def test_acidbolt_safety_followup_is_strictly_scoped(self):
         from native_drow_source import (without_native_drow_acidbolt_safety,
@@ -118,6 +216,21 @@ class NativeDrowCatalog(unittest.TestCase):
         mutated=text.replace("victim == ch","victim != ch",1)
         with self.assertRaises(AssertionError):
             without_native_drow_acidbolt_safety(mutated)
+
+    def test_spider_expiry_followup_is_strictly_scoped(self):
+        from native_drow_source import without_native_drow_spider_expiry
+        for path,prior in (
+            ("classes/drow/drow.c","0d0924be76069c002ee02d5204886126000cded8"),
+            ("update.c","47a1b2ab7fef30414a48a606854be831e1063d77"),
+        ):
+            text=(SRC/path).read_text()
+            self.assertEqual(blob(without_native_drow_spider_expiry(text)),prior)
+            marker="af.modifier  = DROW_SPIDER" if path.endswith("drow.c") else "paf->modifier == DROW_SPIDER"
+            mutated=text.replace(marker,marker.replace("DROW_SPIDER","0"),1)
+            with self.assertRaises(AssertionError):
+                without_native_drow_spider_expiry(mutated)
+        update=(SRC/"update.c").read_text()
+        self.assertIn("if (drop_out) continue; /* The expired summon has been recycled. */",update)
 
     def test_faerie_bounds_followup_is_strictly_scoped(self):
         from native_drow_source import without_native_drow_faerie_bounds

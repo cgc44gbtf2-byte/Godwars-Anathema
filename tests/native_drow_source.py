@@ -62,6 +62,60 @@ def once(text, new, old):
     assert text.count(new) == 1, ("Unreviewed native Drow edit", new[:100])
     return text.replace(new, old, 1)
 
+SPIDER_STAMP = """    /* APPLY_NONE ignores modifier: retain provenance without changing the
+     * shared guardian spell or identifying pets by mutable display names. */
+    af.modifier  = DROW_SPIDER;
+"""
+SPIDER_EXPIRY = """               /* Only a Drow summon's stamped guardian effect owns this
+                * lifetime. Generic guardians and ordinary charms are not
+                * affected; normal extraction releases the owner's slot. */
+               if (IS_NPC(ch) && paf->location == APPLY_NONE &&
+                   paf->modifier == DROW_SPIDER &&
+                   IS_SET(paf->bitvector, AFF_CHARM) &&
+                   paf->type == skill_lookup("guardian"))
+               {
+                  act("$n fades back into the shadows.",ch,NULL,NULL,TO_ROOM);
+                  extract_char(ch,TRUE);
+                  drop_out = TRUE;
+                  break;
+               }
+"""
+
+DARKNESS_UPKEEP = """    /* Exhaustion precedes subtraction, including corrupt negative balances. */
+    ch->pcdata->classpoints[CP_CURRENT] =
+        ch->pcdata->classpoints[CP_CURRENT] > 150 ?
+        ch->pcdata->classpoints[CP_CURRENT] - 150 : 0;
+"""
+
+def without_native_drow_darkness_upkeep(text):
+    if "/* Exhaustion precedes subtraction, including corrupt negative balances. */" in text:
+        text=once(text,DARKNESS_UPKEEP,"\t\t    ch->pcdata->classpoints[CP_CURRENT] -= 150;\n")
+    return text
+
+DARKNESS_DISMISSAL = """    /* Native dismissal survives training loss; activation still needs the gift. */
+    if (!hybrid_power_drow(ch, DROW_DARK) &&
+        !(IS_DROW(ch) && hybrid_drow_globe_active(ch)))
+"""
+
+def without_native_drow_darkness_dismissal(text):
+    from native_drow_skipdisc_source import without_native_drow_skipdisc
+    text=without_native_drow_skipdisc(text)
+    if "/* Native dismissal survives training loss; activation still needs the gift. */" in text:
+        text=once(text,DARKNESS_DISMISSAL,"    if (!hybrid_power_drow(ch, DROW_DARK))\n")
+    return text
+
+def without_native_drow_spider_expiry(text):
+    from native_drow_skipdisc_source import without_native_drow_skipdisc
+    text=without_native_drow_skipdisc(text)
+    text=without_native_drow_darkness_dismissal(text)
+    text=without_native_drow_darkness_upkeep(text)
+    if "/* APPLY_NONE ignores modifier: retain provenance" in text:
+        text=once(text,SPIDER_STAMP,"    af.modifier  = 0;\n")
+    if "/* Only a Drow summon's stamped guardian effect" in text:
+        text=once(text,SPIDER_EXPIRY,"")
+        text=once(text,"         if (drop_out) continue; /* The expired summon has been recycled. */\n","")
+    return text
+
 def without_native_drow_stage(text):
     from nightstalker_source import without_nightstalker_stage
     text = without_nightstalker_stage(text)
@@ -110,6 +164,31 @@ SHOOT_CONTEXT = """    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL) retur
     if (argument == NULL) argument = "";
 
 """
+
+WEAPON_TEMPLATE_TYPE_GUARD = """    if (weapon == NULL || weapon->item_type != ITEM_MISSILE ||
+        weapon->pIndexData == NULL ||
+        weapon->pIndexData->item_type != ITEM_MISSILE ||
+        weapon->value[3] < 0) return NULL;
+"""
+AMMO_TEMPLATE_TYPE_GUARD = """            ammo->pIndexData->item_type != ITEM_AMMO ||
+"""
+
+def without_native_drow_ammo_template_guard(text):
+    if "static OBJ_DATA *drow_shot_ammunition(" not in text:
+        return text
+    start=text.index("static OBJ_DATA *drow_shot_ammunition(")
+    end=text.index("\nvoid do_shoot(",start)
+    body=text[start:end]
+    if WEAPON_TEMPLATE_TYPE_GUARD in body:
+        body=once(body,WEAPON_TEMPLATE_TYPE_GUARD,
+                  "    if (weapon->pIndexData == NULL || weapon->value[3] < 0) return NULL;\n")
+    elif "weapon->pIndexData->item_type" in body:
+        raise AssertionError("Unreviewed Drow weapon-template guard")
+    if AMMO_TEMPLATE_TYPE_GUARD in body:
+        body=once(body,AMMO_TEMPLATE_TYPE_GUARD,"")
+    elif "ammo->pIndexData->item_type" in body:
+        raise AssertionError("Unreviewed Drow ammunition-template guard")
+    return text[:start]+body+text[end:]
 
 ACID_BOLT_SELF_GUARD = """    if (victim == ch)
     {
@@ -171,6 +250,7 @@ FAERIE_BOUNDS = """    /* Preflight all three debuffs before RNG or allocating a
 """
 
 def without_native_drow_faerie_bounds(text):
+    text=without_native_drow_spider_expiry(text)
     if "/* Preflight all three debuffs" not in text:
         return text
     return once(text,FAERIE_BOUNDS,"")

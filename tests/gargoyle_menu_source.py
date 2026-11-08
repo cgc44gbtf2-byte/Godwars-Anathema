@@ -21,6 +21,8 @@ PROOFS = [
 ]
 
 def without_gargoyle_menu(text):
+    from web_source import without_web_safety
+    text = without_web_safety(text)
     for path, _, hunks in PROOFS:
         marker = "void do_powers(" if path.endswith("/clan.c") else "void interpret("
         # The native source places spaces between function names and '('.

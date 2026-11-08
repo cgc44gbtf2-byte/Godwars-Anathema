@@ -33,6 +33,8 @@ MARKERS = {"combat_damage.c": "void hurt_person(",
            "comm.c": "void game_loop_", "merc.h": "#define IS_NINJA(ch)"}
 
 def without_gargoyle_reflection(text):
+    from native_drow_skipdisc_source import without_native_drow_skipdisc
+    text=without_native_drow_skipdisc(text)
     for path, _, hunks in PROOFS:
         if MARKERS[path.rsplit("/", 1)[-1]] not in text:
             continue

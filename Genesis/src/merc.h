@@ -725,6 +725,8 @@ extern CHAR_DATA Score_ch;      /* Score_ch */
 #define DROW_MAX		65536
 
 #define DROW_GLOBE		262144
+/* Native active-state ownership, not a learned gift or secondary-parent grant. */
+#define DROW_DISC 524288
 
 
 /*
@@ -2016,7 +2018,12 @@ extern  long    gsn_brittle_bones;
 #define IS_AWA(ch)		(get_trust(ch) >= LEV_AWA && !IS_NPC(ch))
 #define CAN_PK(ch)		(IS_NPC(ch) || IS_FLAG((ch),FLAG_PK))
 
-#define IS_AFFECTED(ch, sn)	(IS_SET((ch)->affected_by, (sn)))
+/* Disc flight is derived, never written over spell/equipment-owned raw flight. */
+#define DROW_DISC_ACTIVE(ch) \
+    ((ch) != NULL && !IS_NPC(ch) && (ch)->pcdata != NULL && \
+     (ch)->class == CLASS_DROW && IS_SET((ch)->pcdata->drow[DROW_POWERS], DROW_DISC))
+#define IS_AFFECTED(ch, sn) \
+    (IS_SET((ch)->affected_by | (DROW_DISC_ACTIVE(ch) ? AFF_FLYING : 0), (sn)))
 #define IS_ITEMAFF(ch, sn)	(IS_SET((ch)->itemaffect, (sn)))
 #define IS_IMMUNE(ch, sn)	(IS_SET((ch)->immune, (sn)))
 #define IS_WILLPOWER(ch, sn)	(IS_SET((ch)->pcdata->resist[0], (sn)))

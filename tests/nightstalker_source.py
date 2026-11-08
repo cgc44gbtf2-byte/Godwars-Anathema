@@ -38,6 +38,8 @@ MARKERS = {
 }
 
 def without_nightstalker_stage(text):
+    from native_drow_source import without_native_drow_spider_expiry
+    text = without_native_drow_spider_expiry(text)
     from gargoyle_source import without_gargoyle_stage
     text = without_gargoyle_stage(text)
     for path, _, hunks in PROOFS:

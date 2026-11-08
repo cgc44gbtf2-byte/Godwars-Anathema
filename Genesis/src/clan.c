@@ -2376,6 +2376,13 @@ void do_web( CHAR_DATA *ch, char *argument )
     /* A current-opponent fallback must still be a live local actor. */
     if (!combat_character_in_room(ch->in_room, victim)) return;
     if (is_safe(ch, victim)) return;
+    /* Invalid armor must not reach the spell or consume Ki/wait/RNG.
+     * Keep the existing already-webbed attempt policy unchanged. */
+    if (!IS_AFFECTED(victim, AFF_WEBBED) && victim->armor < LONG_MIN + 100)
+    {
+        stc("Web cannot safely affect that target. Please tell staff.\n\r",ch);
+        return;
+    }
     if (!drow_ready && IS_NINJA(ch) && ch->pcdata->ninja[NINJA_KI] < 10)
     {
 	stc("You don't have enough Ki to use web.\n\r", ch);

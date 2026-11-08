@@ -177,7 +177,7 @@ int hybrid_mastery_read(const CHAR_DATA *ch,HYBRID_MASTERY *report)
             "Spider bite","Dual wield","Blind fighting","Summon spider","Spider eyes",
             "Read aura","Darkvision","Heighten","Poison immunity","Skip disc",
             "Attunement","Might","Toughness"};
-        unlocks(&r,HYBRID_MASTERY_DROW,p->drow[DROW_POWERS],names,17,DROW_GLOBE);
+        unlocks(&r,HYBRID_MASTERY_DROW,p->drow[DROW_POWERS],names,17,DROW_GLOBE|DROW_DISC);
         item(&r,HYBRID_MASTERY_DROW_SPEED,0,"Drow speed",p->drow[DROW_SPEED],4,0,0);
         break;
     }

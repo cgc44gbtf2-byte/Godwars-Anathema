@@ -2913,6 +2913,9 @@ void spell_web( long sn, long level, CHAR_DATA *ch, void *vo )
     AFFECT_DATA af;
     CHAR_DATA *victim = (CHAR_DATA *) vo;
 
+    /* Direct spell callers need the same live local target contract as web. */
+    if (ch == NULL || !combat_character_in_room(ch->in_room, victim)) return;
+
     act("You point your finger at $N and a web flies from your hand!", ch, NULL, victim, TO_CHAR);
     act("$n points $s finger at $N and a web flies from $s hand!", ch, NULL, victim, TO_NOTVICT);
     act("$n points $s finger at you and a web flies from $s hand!", ch, NULL, victim, TO_VICT);
@@ -2925,7 +2928,14 @@ void spell_web( long sn, long level, CHAR_DATA *ch, void *vo )
 
     if (is_safe(ch, victim)) return;
 
-    if (!IS_NPC(victim) && number_percent() < (char_stat(victim, STAT_DEX) * 2) && victim->position >= POS_FIGHTING)
+    /* Reject all-or-nothing before the dodge roll or affect allocation. */
+    if (victim->armor < LONG_MIN + 100)
+    {
+        stc("Web cannot safely affect that target. Please tell staff.\n\r",ch);
+        return;
+    }
+
+    if (!IS_NPC(victim) && number_percent() < ((long)char_stat(victim, STAT_DEX) * 2) && victim->position >= POS_FIGHTING)
     {
 	stc("You dodge the web!\n\r", victim);
 	act("$n dodges the web!", victim, NULL, NULL, TO_ROOM);

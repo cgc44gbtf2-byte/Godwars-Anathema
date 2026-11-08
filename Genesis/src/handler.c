@@ -791,14 +791,14 @@ static void equip_char_inner( CHAR_DATA *ch, OBJ_DATA *obj, long iWear )
 	    sn = obj->value[0] / 1000;
 
 	     if ((sn == 27) && (IS_AFFECTED(ch, AFF_DETECT_INVIS))) return;
-	else if ((sn == 39) && (IS_AFFECTED(ch, AFF_FLYING)))       return;
+else if ((sn == 39) && (IS_SET(ch->affected_by, AFF_FLYING))) return;
 	else if ((sn == 45) && (IS_AFFECTED(ch, AFF_INFRARED)))     return;
 	else if ((sn == 46) && (IS_AFFECTED(ch, AFF_INVISIBLE)))    return;
 	else if ((sn == 52) && (IS_AFFECTED(ch, AFF_PASS_DOOR)))    return;
 	else if ((sn == 57) && (IS_AFFECTED(ch, AFF_SANCTUARY)))    return;
 	else if ((sn == 1 ) && (IS_AFFECTED(ch, AFF_INFRARED)))     return;
 	else if ((sn == 2 ) && (IS_AFFECTED(ch, AFF_DETECT_INVIS))) return;
-	else if ((sn == 3 ) && (IS_AFFECTED(ch, AFF_FLYING)))       return;
+else if ((sn == 3 ) && (IS_SET(ch->affected_by, AFF_FLYING))) return;
 	else if ((sn == 4 ) && (IS_AFFECTED(ch, AFF_BLIND)))        return;
 	else if ((sn == 5 ) && (IS_AFFECTED(ch, AFF_INVISIBLE)))    return;
 	else if ((sn == 6 ) && (IS_AFFECTED(ch, AFF_PASS_DOOR)))    return;

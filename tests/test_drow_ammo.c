@@ -172,6 +172,26 @@ static void rejection_and_misses(void)
 
 static void ownership_and_compatibility(void)
 {
+    /* OLC can change a prototype while existing player objects retain their
+     * old runtime type. A stale missile/ammo instance must not bypass the
+     * current template's type validation or consume a shot. */
+    fixture(); bolt(1);
+    long bow_type=indices[0].item_type;
+    indices[0].item_type=ITEM_TRASH;
+    shoot("north target");
+    assert(pc.classpoints[CP_CURRENT]==1000&&bolts(&actor)==1&&
+           target.hit==100000);
+    indices[0].item_type=bow_type;
+
+    fixture(); OBJ_DATA *stale_ammo=bolt(1);
+    long ammo_type=indices[1].item_type;
+    indices[1].item_type=ITEM_TRASH;
+    shoot("north target");
+    assert(pc.classpoints[CP_CURRENT]==1000&&bolts(&actor)==1&&
+           stale_ammo->in_room==NULL&&stale_ammo->in_obj==NULL&&
+           stale_ammo->carried_by==&actor&&target.hit==100000);
+    indices[1].item_type=ammo_type;
+
     for (int i = 0; i < 9; ++i) {
         fixture(); OBJ_DATA *ammo = bolt(1);
         if (i == 0) ammo->item_type = ITEM_TRASH;

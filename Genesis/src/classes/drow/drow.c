@@ -59,7 +59,8 @@ void do_attune( CHAR_DATA *ch, char *argument )
 	stc("You cannot attune that item.\n\r", ch);
 	return;
     }
-    if (str_cmp(ch->name,obj->questowner))
+    if (obj->questowner == NULL || obj->questowner[0] == '\0' ||
+        str_cmp(ch->name,obj->questowner))
     {
 	stc("You do not own this object.\n\r", ch);
 	return;
@@ -233,6 +234,7 @@ void do_summonspider( CHAR_DATA *ch, char *argument )
     MOB_INDEX_DATA *prototype;
     AFFECT_DATA af;
     long sn;
+    long spider_hitroll, spider_damroll, spider_armor;
 
     if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL || ch->in_room == NULL)
         return;
@@ -264,6 +266,17 @@ void do_summonspider( CHAR_DATA *ch, char *argument )
         stc("The spider summon is unavailable; please tell staff.\n\r",ch);
         return;
     }
+    /* Reject unrepresentable summon stats before allocating a follower. */
+    spider_hitroll = char_hitroll(ch);
+    spider_damroll = char_damroll(ch);
+    spider_armor = char_ac(ch);
+    if (spider_hitroll < LONG_MIN + 50 ||
+        spider_damroll < LONG_MIN + 50 ||
+        spider_armor < LONG_MIN + 50)
+    {
+        stc("Your stats cannot safely summon a spider. Please tell staff.\n\r",ch);
+        return;
+    }
     victim = create_mobile(prototype);
     free_string(victim->lord);
     victim->lord = str_dup(ch->name);
@@ -282,9 +295,9 @@ void do_summonspider( CHAR_DATA *ch, char *argument )
     victim->max_hit = 30000;
     victim->mana = 1000;
     victim->max_mana = 1000;
-    victim->hitroll = char_hitroll(ch) - 50;
-    victim->damroll = char_damroll(ch) - 50;
-    victim->armor = char_ac(ch) - 50;
+    victim->hitroll = spider_hitroll - 50;
+    victim->damroll = spider_damroll - 50;
+    victim->armor = spider_armor - 50;
     char_to_room(victim,ch->in_room);
 
     ch->pcdata->followers++;
@@ -292,7 +305,9 @@ void do_summonspider( CHAR_DATA *ch, char *argument )
     af.type      = sn;
     af.duration  = 6666;
     af.location  = APPLY_NONE;
-    af.modifier  = 0;
+    /* APPLY_NONE ignores modifier: retain provenance without changing the
+     * shared guardian spell or identifying pets by mutable display names. */
+    af.modifier  = DROW_SPIDER;
     af.bitvector = AFF_CHARM;
     affect_to_char(victim, &af);
     stc("A spider skitters out of the shadows and kneels before you.\n\r", ch);
@@ -624,10 +639,19 @@ if (victim->pcdata->drow[DROW_SPEED] < 0 || victim->pcdata->drow[DROW_SPEED] > 4
 
 void do_skipdisc( CHAR_DATA *ch, char *argument )
 {
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL) return;
     if (!IS_DROW(ch))
     {
 	stc("Huh?\n\r", ch);
 	return;
+    }
+
+    /* Dismiss only this source, including after training loss. */
+    if (DROW_DISC_ACTIVE(ch))
+    {
+        REMOVE_BIT(ch->pcdata->drow[DROW_POWERS], DROW_DISC);
+        stc("You leap off your skip disc.\n\r", ch);
+        return;
     }
 
     if (!get_drow(ch, DROW_SKIP))
@@ -636,16 +660,8 @@ void do_skipdisc( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    if (IS_AFFECTED(ch, AFF_FLYING))
-    {
-	stc("You leap off your skip disc.\n\r", ch);
-	REMOVE_BIT(ch->affected_by, AFF_FLYING);
-    }
-    else
-    {
-	stc("You leap onto your skip disc.\n\r", ch);
-	SET_BIT(ch->affected_by, AFF_FLYING);
-    }
+    SET_BIT(ch->pcdata->drow[DROW_POWERS], DROW_DISC);
+    stc("You leap onto your skip disc.\n\r", ch);
     return;
 }
 
@@ -718,7 +734,9 @@ void do_globedark( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    if (!hybrid_power_drow(ch, DROW_DARK))
+    /* Native dismissal survives training loss; activation still needs the gift. */
+    if (!hybrid_power_drow(ch, DROW_DARK) &&
+        !(IS_DROW(ch) && hybrid_drow_globe_active(ch)))
     {
 	stc("You need to obtain darkness first.\n\r", ch);
 	return;
@@ -751,7 +769,10 @@ if (!hybrid_drow_points_charge(ch,500) ||
 
 static OBJ_DATA *drow_shot_ammunition(CHAR_DATA *ch, const OBJ_DATA *weapon)
 {
-    if (weapon->pIndexData == NULL || weapon->value[3] < 0) return NULL;
+    if (weapon == NULL || weapon->item_type != ITEM_MISSILE ||
+        weapon->pIndexData == NULL ||
+        weapon->pIndexData->item_type != ITEM_MISSILE ||
+        weapon->value[3] < 0) return NULL;
     long vnum = weapon->value[0];
     if (weapon->pIndexData != NULL &&
         weapon->pIndexData->vnum == OBJ_VNUM_DROW_CROSSBOW && vnum == 9315)
@@ -760,6 +781,7 @@ static OBJ_DATA *drow_shot_ammunition(CHAR_DATA *ch, const OBJ_DATA *weapon)
     for (OBJ_DATA *ammo = ch->carrying; ammo != NULL; ammo = ammo->next_content) {
         if (ammo == weapon || ammo->wear_loc != WEAR_NONE ||
             ammo->item_type != ITEM_AMMO || ammo->pIndexData == NULL ||
+            ammo->pIndexData->item_type != ITEM_AMMO ||
             ammo->pIndexData->vnum != vnum || ammo->value[3] != weapon->value[3] ||
             ammo->chobj != NULL || ammo->contains != NULL ||
             IS_SET(ammo->quest, QUEST_ARTIFACT)) continue;

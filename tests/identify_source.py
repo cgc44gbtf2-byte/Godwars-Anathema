@@ -1,5 +1,7 @@
 """Mask only the independently tested identify-output scope for older pins."""
 def without_identify_stage(text):
+    from web_source import without_web_safety
+    text = without_web_safety(text)
     from drow_poison_source import without_drow_poison_stage
     text = without_drow_poison_stage(text)
     marker = "/* Identification helpers are deliberately local;"

@@ -18,7 +18,39 @@ def once(text,new,old):
     assert text.count(new)==1,("Unreviewed Web fragment",new)
     return text.replace(new,old)
 
+WEB_ARMOR_GATE="""    /* Invalid armor must not reach the spell or consume Ki/wait/RNG.
+     * Keep the existing already-webbed attempt policy unchanged. */
+    if (!IS_AFFECTED(victim, AFF_WEBBED) && victim->armor < LONG_MIN + 100)
+    {
+        stc("Web cannot safely affect that target. Please tell staff.\\n\\r",ch);
+        return;
+    }
+"""
+WEB_SPELL_CONTEXT="""    /* Direct spell callers need the same live local target contract as web. */
+    if (ch == NULL || !combat_character_in_room(ch->in_room, victim)) return;
+
+"""
+WEB_SPELL_ARMOR="""    /* Reject all-or-nothing before the dodge roll or affect allocation. */
+    if (victim->armor < LONG_MIN + 100)
+    {
+        stc("Web cannot safely affect that target. Please tell staff.\\n\\r",ch);
+        return;
+    }
+
+"""
+
+def without_web_safety(text):
+    if "/* Invalid armor must not reach the spell" in text:
+        text=once(text,WEB_ARMOR_GATE,"")
+    if "/* Direct spell callers need the same live local target" in text:
+        text=once(text,WEB_SPELL_CONTEXT,"")
+        text=once(text,WEB_SPELL_ARMOR,"")
+        text=once(text,"((long)char_stat(victim, STAT_DEX) * 2)",
+                       "(char_stat(victim, STAT_DEX) * 2)")
+    return text
+
 def without_web_stage(text):
+    text=without_web_safety(text)
     from drow_aura_source import without_drow_aura_stage
     text=without_drow_aura_stage(text)
     if "void do_web(" not in text:return text

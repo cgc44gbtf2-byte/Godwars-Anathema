@@ -277,7 +277,9 @@ static void shooting_fixture(void)
     crossbow.item_type = ITEM_MISSILE;
     memset(&ammunition, 0, sizeof(ammunition));
     ammunition_index.vnum = OBJ_VNUM_DROW_BOLT;
+    ammunition_index.item_type = ITEM_AMMO;
     crossbow_index.vnum = OBJ_VNUM_DROW_CROSSBOW;
+    crossbow_index.item_type = ITEM_MISSILE;
     crossbow.pIndexData = &crossbow_index;
     crossbow.value[0] = 9315; /* Existing saves must work without migration. */
     crossbow.value[3] = 3;

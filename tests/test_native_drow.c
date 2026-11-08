@@ -11,8 +11,12 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include "merc.h"
+#include "classes/hybrid/mastery.h"
+#include "classes/hybrid/access.h"
 
 extern void init_mm(void);
+extern void char_update(void);
+extern void mobile_update(void);
 
 static CHAR_DATA *actor;
 static DESCRIPTOR_DATA descriptor;
@@ -261,6 +265,49 @@ static void equipment_use(void)
     printf("Native Drow shipped crossbow: 12 hits/six directions hash=%llu; safe-target refusals, DP/bolts, poison, stealth and room lists passed.\n",hash);
 }
 
+static void crossbow_death_cleanup(void)
+{
+    const char *dirs[]={"north","east","south","west","up","down"};
+    time_t old_time=current_time;
+    long old_damroll=actor->damroll,old_points=actor->pcdata->classpoints[CP_CURRENT];
+    long old_quest=actor->pcdata->quest,old_kills=actor->mkill;
+    actor->damroll=10;
+    actor->pcdata->classpoints[CP_CURRENT]=8000;actor->pcdata->quest=400;
+    command("drowarmor crossbow");command("wear crossbow");
+    OBJ_DATA *bow=get_eq_char(actor,WEAR_HOLD);
+    assert(bow&&bow->pIndexData->vnum==OBJ_VNUM_DROW_CROSSBOW);
+    for(int dir=0;dir<6;++dir) {
+        ROOM_INDEX_DATA destination={0};EXIT_DATA exit={0},*saved=arena.exit[dir];
+        destination.vnum=999920+dir;destination.name="Lethal Drow range";
+        destination.description="";destination.area=&area;destination.light=1;
+        exit.to_room=&destination;arena.exit[dir]=&exit;
+        CHAR_DATA *victim=create_mobile(get_mob_index(MOB_VNUM_GUARDIAN));
+        free_string(victim->name);victim->name=str_dup("DrowDeathTarget");
+        /* Suppress rewards so the exact activation charge is observable. */
+        victim->act=ACT_IS_NPC|ACT_NOEXP;victim->position=POS_STANDING;
+        victim->hit=1;victim->max_hit=1000;
+        char_to_room(victim,&destination);
+        actor->pcdata->classpoints[CP_CURRENT]=600;
+        command("drowarmor bolts");
+        assert(projectile_count()==1&&actor->pcdata->classpoints[CP_CURRENT]==500);
+        current_time=2000001000+dir;init_mm();
+        char line[128];snprintf(line,sizeof line,"shoot %s DrowDeathTarget",dirs[dir]);
+        command(line);
+        assert(actor->in_room==&arena&&arena.people==actor);
+        assert(descriptor.character==actor&&get_eq_char(actor,WEAR_HOLD)==bow);
+        assert(destination.people==NULL&&projectile_count()==0);
+        assert(actor->pcdata->classpoints[CP_CURRENT]==0&&actor->mkill==old_kills+dir+1);
+        for(CHAR_DATA *live=char_list;live;live=live->next)assert(live!=victim);
+        /* No world object may retain a pointer to this stack room. */
+        while(destination.contents)extract_obj(destination.contents);
+        arena.exit[dir]=saved;
+    }
+    extract_obj(bow);actor->damroll=old_damroll;
+    actor->pcdata->classpoints[CP_CURRENT]=old_points;
+    actor->pcdata->quest=old_quest;actor->mkill=old_kills;current_time=old_time;
+    puts("Native Drow crossbow death: six real NPC deaths/extractions, exact DP/ammo charges, live actor/descriptor and room cleanup passed.");
+}
+
 static void dual_wield(void)
 {
     OBJ_INDEX_DATA *p=NULL;
@@ -339,6 +386,316 @@ static void spider(void)
     assert(!actor->pcdata->followers);
 }
 
+/* Full-HP native stats isolate the summon subtraction from wounded scaling.
+ * The optional LONG_MIN probe is intentionally outside the passing suite:
+ * run it with UBSan to reproduce a documented, still-unfixed defect. */
+static void rejection_cost_check(const char *text);
+
+static void spider_stat_boundaries(int extreme_stat)
+{
+    long hr=actor->hitroll,dr=actor->damroll,ac=actor->armor;
+    long speed=actor->pcdata->drow[DROW_SPEED];
+    long old_hit=actor->hit,old_max=actor->max_hit;
+    const long values[]={LONG_MIN+50,LONG_MIN+51,-100,0,49,50,1000,LONG_MAX};
+    actor->hit=actor->max_hit=50000;
+    actor->pcdata->drow[DROW_SPEED]=0;
+    for(int stat=0;stat<3;++stat) {
+        for(size_t i=0;i<sizeof(values)/sizeof(*values);++i) {
+            if(extreme_stat>=0&&(stat!=extreme_stat||i>=2))continue;
+            long value=extreme_stat>=0?(i==0?LONG_MIN:LONG_MIN+49):values[i];
+            actor->hitroll=actor->damroll=actor->armor=0;
+            if(stat==0)actor->hitroll=value;
+            else if(stat==1)actor->damroll=value;
+            else actor->armor=value;
+            long computed=stat==0?char_hitroll(actor):
+                          stat==1?char_damroll(actor):char_ac(actor);
+            assert(computed==value);
+            long dp=actor->pcdata->classpoints[CP_CURRENT];
+            if(extreme_stat>=0) {
+                CHAR_DATA *head=char_list,*next=actor->next;
+                rejection_cost_check("summonspider");
+                assert(strstr(output,"cannot safely summon a spider"));
+                assert(char_list==head&&actor->next==next&&arena.people==actor);
+                assert(actor->pcdata->followers==0);
+                continue;
+            }
+            command("summonspider");
+            CHAR_DATA *pet=arena.people;
+            assert(pet!=actor&&pet->master==actor&&actor->pcdata->followers==1);
+            if(extreme_stat<0) {
+                assert(pet->hitroll==(stat==0?value-50:-50));
+                assert(pet->damroll==(stat==1?value-50:-50));
+                assert(pet->armor==(stat==2?value-50:-50));
+            }
+            assert(actor->pcdata->classpoints[CP_CURRENT]==dp&&actor->wait==0);
+            extract_char(pet,TRUE);
+            assert(actor->pcdata->followers==0&&arena.people==actor);
+        }
+    }
+    actor->hitroll=hr;actor->damroll=dr;actor->armor=ac;
+    actor->pcdata->drow[DROW_SPEED]=speed;
+    actor->hit=old_hit;actor->max_hit=old_max;
+    if(extreme_stat<0) {
+        puts("Native spider: 24 representable stat boundaries, free summon and follower cleanup passed.");
+        spider_stat_boundaries(0);
+        spider_stat_boundaries(1);
+        spider_stat_boundaries(2);
+    }
+}
+
+static void timed_effects(void)
+{
+    /* Isolate the real timer from unrelated boot-world NPCs, retaining every
+     * world link for restoration before the normal fixture teardown. */
+    assert(char_list==actor&&arena.people==actor);
+    CHAR_DATA *world_tail=actor->next;actor->next=NULL;
+    long old_timer=actor->timer;actor->timer=0;
+    CHAR_DATA *victim=create_mobile(get_mob_index(MOB_VNUM_GUARDIAN));
+    free_string(victim->name);victim->name=str_dup("DrowExpiryTarget");
+    victim->act=ACT_IS_NPC;victim->hit=victim->max_hit=100000;
+    victim->position=POS_STANDING;
+    victim->hitroll=123;victim->damroll=456;victim->armor=789;
+    char_to_room(victim,&arena);
+    command("faeriefire DrowExpiryTarget");
+    assert(victim->hitroll==73&&victim->damroll==406&&victim->armor==739);
+    for(int tick=0;tick<10;++tick)char_update();
+    assert(IS_AFFECTED(victim,AFF_FAERIE_FIRE)&&victim->hitroll==73);
+    char_update();
+    assert(!IS_AFFECTED(victim,AFF_FAERIE_FIRE)&&!victim->affected);
+    assert(victim->hitroll==123&&victim->damroll==456&&victim->armor==789);
+    command("web DrowExpiryTarget");
+    assert(IS_AFFECTED(victim,AFF_WEBBED)&&victim->armor==689);
+    char_update();char_update();
+    assert(IS_AFFECTED(victim,AFF_WEBBED)&&victim->armor==689);
+    char_update();
+    assert(!IS_AFFECTED(victim,AFF_WEBBED)&&!victim->affected&&victim->armor==789);
+    extract_char(victim,TRUE);
+
+    long mana=actor->mana,primal=actor->primal;
+    long points=actor->pcdata->classpoints[CP_CURRENT];
+    command("summonspider");
+    CHAR_DATA *pet=arena.people;long sn=skill_lookup("guardian");
+    assert(pet!=actor&&pet->master==actor&&actor->pcdata->followers==1);
+    AFFECT_DATA *guardian=NULL;
+    for(AFFECT_DATA *af=pet->affected;af;af=af->next)
+        if(af->type==sn)guardian=af;
+    assert(guardian&&guardian->duration==6666&&guardian->modifier==DROW_SPIDER);
+    /* Keep another live effect behind the expiring guardian: extraction
+     * recycles both nodes and must not resume the old affect iterator. */
+    AFFECT_DATA copy=*guardian,other={0};
+    affect_remove(pet,guardian);
+    other.type=skill_lookup("armor");other.duration=99;other.location=APPLY_NONE;
+    affect_to_char(pet,&other);affect_to_char(pet,&copy);
+    guardian=pet->affected;guardian->duration=1;
+    ROOM_INDEX_DATA remote={0};remote.name="Remote spider expiry";
+    remote.description="";remote.area=&area;remote.light=1;
+    free_string(pet->name);pet->name=str_dup("renamedspider");
+    char_from_room(pet);char_to_room(pet,&remote);
+    char_update();
+    assert(guardian->duration==0&&pet->master==actor&&IS_AFFECTED(pet,AFF_CHARM));
+    assert(actor->pcdata->followers==1);
+    char_update();
+    bool present=FALSE;
+    for(CHAR_DATA *live=char_list;live;live=live->next)if(live==pet)present=TRUE;
+    assert(!present&&actor->pcdata->followers==0&&arena.people==actor&&!remote.people);
+    assert(actor->mana==mana&&actor->primal==primal&&
+           actor->pcdata->classpoints[CP_CURRENT]==points);
+    command("summonspider");
+    pet=arena.people;
+    assert(pet!=actor&&pet->master==actor&&IS_AFFECTED(pet,AFF_CHARM));
+    assert(actor->pcdata->followers==1);
+    extract_char(pet,TRUE);
+
+    /* A generic guardian has no Drow stamp and keeps its old lifetime policy. */
+    spell_guardian(sn,50,actor,actor);
+    pet=arena.people;
+    assert(pet!=actor&&pet->master==actor&&actor->pcdata->followers==1);
+    guardian=NULL;
+    for(AFFECT_DATA *af=pet->affected;af;af=af->next)if(af->type==sn)guardian=af;
+    assert(guardian&&guardian->modifier==0);guardian->duration=0;
+    char_update();
+    assert(arena.people==pet&&!IS_AFFECTED(pet,AFF_CHARM));
+    assert(actor->pcdata->followers==1);
+    extract_char(pet,TRUE);
+
+    /* Neither a different spell with the same modifier nor a player carrying
+     * the stamped effect can be mistaken for the summoned NPC. */
+    pet=create_mobile(get_mob_index(MOB_VNUM_GUARDIAN));
+    pet->act=ACT_IS_NPC;pet->hit=pet->max_hit=1000;pet->position=POS_STANDING;
+    char_to_room(pet,&arena);
+    other.type=gsn_charm_person;other.duration=0;other.modifier=DROW_SPIDER;
+    other.bitvector=AFF_CHARM;affect_to_char(pet,&other);
+    char_update();assert(arena.people==pet&&!pet->affected);
+    extract_char(pet,TRUE);
+    other.type=sn;affect_to_char(actor,&other);
+    char_update();assert(char_list==actor&&arena.people==actor&&!actor->affected);
+    assert(actor->pcdata->followers==0&&char_list==actor&&arena.people==actor);
+    actor->next=world_tail;actor->timer=old_timer;
+    puts("Native Drow timed effects: Faerie Fire/Web restore stats; expired spider vanishes, releases its slot and permits resummoning.");
+}
+
+/* Rejected commands must not spend unrelated pools or start a wait.
+ * Real interpreter/world objects, not permission or resource mocks. */
+static void rejection_cost_check(const char *text)
+{
+    long points=actor->pcdata->classpoints[CP_CURRENT],quest=actor->pcdata->quest;
+    long mana=actor->mana,hit=actor->hit,exp=actor->exp,primal=actor->primal;
+    long ki=actor->pcdata->ninja[NINJA_KI],powers=actor->pcdata->drow[DROW_POWERS];
+    long speed=actor->pcdata->drow[DROW_SPEED],followers=actor->pcdata->followers;
+    long count=actor->carry_number,weight=actor->carry_weight;
+    ROOM_INDEX_DATA *room=actor->in_room;
+    command(text);
+    assert(output[0] && actor->wait==0);
+    assert(actor->pcdata->classpoints[CP_CURRENT]==points&&actor->pcdata->quest==quest);
+    assert(actor->mana==mana&&actor->hit==hit&&actor->exp==exp&&actor->primal==primal);
+    assert(actor->pcdata->ninja[NINJA_KI]==ki);
+    assert(actor->pcdata->drow[DROW_POWERS]==powers&&actor->pcdata->drow[DROW_SPEED]==speed);
+    assert(actor->pcdata->followers==followers&&actor->carry_number==count&&
+           actor->carry_weight==weight&&actor->in_room==room);
+}
+
+static void equipment_refusal_boundaries(void)
+{
+    assert(!actor->carrying&&actor->carry_number==0&&actor->carry_weight==0);
+    long dp=actor->pcdata->classpoints[CP_CURRENT],qp=actor->pcdata->quest;
+    const char *invalid[]={"0","-1","+1","21","1x","1 2","999999999999999999999999999999999999"};
+    actor->pcdata->classpoints[CP_CURRENT]=LONG_MAX;
+    actor->pcdata->quest=LONG_MAX;
+    for(size_t i=0;i<sizeof invalid/sizeof *invalid;++i) {
+        char text[128];snprintf(text,sizeof text,"drowarmor bolts %s",invalid[i]);
+        rejection_cost_check(text);
+        assert(!actor->carrying);
+    }
+    const long poor[]={LONG_MIN,-1,0,99};
+    for(size_t i=0;i<sizeof poor/sizeof *poor;++i) {
+        actor->pcdata->classpoints[CP_CURRENT]=poor[i];
+        rejection_cost_check("drowarmor bolts");
+        assert(!actor->carrying);
+    }
+    actor->pcdata->classpoints[CP_CURRENT]=LONG_MAX;
+    OBJ_INDEX_DATA *p=get_obj_index(OBJ_VNUM_DROW_BOLT);assert(p);
+    long type=p->item_type,flags=p->wear_flags,weight=p->weight,spell=p->value[3];
+    p->item_type=ITEM_TRASH;rejection_cost_check("drowarmor bolts");p->item_type=type;
+    p->wear_flags=0;rejection_cost_check("drowarmor bolts");p->wear_flags=flags;
+    p->weight=-1;rejection_cost_check("drowarmor bolts");p->weight=weight;
+    p->value[3]=-1;rejection_cost_check("drowarmor bolts");p->value[3]=spell;
+    actor->carry_number=LONG_MAX;rejection_cost_check("drowarmor bolts 2");
+    actor->carry_number=-1;rejection_cost_check("drowarmor bolts");
+    actor->carry_number=0;actor->carry_weight=LONG_MAX;
+    /* Force a positive weight without relying on future template edits. */
+    p->weight=1;rejection_cost_check("drowarmor bolts 2");
+    actor->carry_weight=-1;rejection_cost_check("drowarmor bolts");
+    actor->carry_weight=0;p->weight=weight;
+    assert(!actor->carrying);
+    const int batches[]={1,20};
+    for(size_t i=0;i<sizeof batches/sizeof *batches;++i) {
+        char text[80];snprintf(text,sizeof text,"drowarmor bolts %d",batches[i]);
+        actor->pcdata->classpoints[CP_CURRENT]=batches[i]*100;
+        actor->pcdata->quest=357;
+        command(text);
+        assert(actor->pcdata->classpoints[CP_CURRENT]==0&&actor->pcdata->quest==357);
+        assert(projectile_count()==batches[i]&&actor->wait==0);
+        for(OBJ_DATA *o=actor->carrying;o;o=o->next_content)
+            assert(o->cost==0&&o->points==0&&!str_cmp(o->questmaker,actor->name)&&
+                   (!o->questowner||!o->questowner[0]));
+        while(actor->carrying)extract_obj(actor->carrying);
+        assert(actor->carry_number==0&&actor->carry_weight==0);
+    }
+
+    /* Ownership is the bound owner, not the maker or present carrier. */
+    OBJ_DATA *item=create_object(get_obj_index(29653),50);
+    free_string(item->name);item->name=str_dup("auditedrelic");
+    free_string(item->questmaker);item->questmaker=str_dup(actor->name);
+    free_string(item->questowner);item->questowner=str_dup("OtherDrow");
+    REMOVE_BIT(item->extra_flags,ITEM_LOYAL);
+    obj_to_char(item,actor);
+    long extras=item->extra_flags;
+    rejection_cost_check("attunement auditedrelic");
+    assert(item->extra_flags==extras&&!str_cmp(item->questowner,"OtherDrow"));
+    free_string(item->questowner);item->questowner=str_dup("");
+    rejection_cost_check("attunement auditedrelic");assert(item->extra_flags==extras);
+    free_string(item->questowner);item->questowner=NULL;
+    rejection_cost_check("attunement auditedrelic");assert(item->extra_flags==extras);
+    free_string(item->questowner);item->questowner=str_dup(actor->name);
+    const long excluded[]={ITEM_QUEST,ITEM_AMMO,ITEM_EGG,ITEM_VOODOO,ITEM_MONEY,ITEM_TREASURE,ITEM_PAGE};
+    for(size_t i=0;i<sizeof excluded/sizeof *excluded;++i) {
+        item->item_type=excluded[i];
+        rejection_cost_check("attunement auditedrelic");assert(item->extra_flags==extras);
+    }
+    item->item_type=ITEM_ARMOR;
+    long quest=item->quest;SET_BIT(item->quest,QUEST_ARTIFACT);
+    rejection_cost_check("attunement auditedrelic");assert(item->extra_flags==extras);
+    item->quest=quest;
+    command("attunement auditedrelic");assert(IS_SET(item->extra_flags,ITEM_LOYAL));
+    long loyal=item->extra_flags;
+    rejection_cost_check("attunement auditedrelic");assert(item->extra_flags==loyal);
+    extract_obj(item);
+    assert(!actor->carrying&&actor->carry_number==0&&actor->carry_weight==0);
+    actor->pcdata->classpoints[CP_CURRENT]=dp;actor->pcdata->quest=qp;
+    puts("Native Drow equipment: invalid batches/templates/carry limits, exact crafting costs, ownership and attunement exclusions passed.");
+}
+
+static void rejected_costs(void)
+{
+    const char *missing[]={
+        "acidbolt","acidbolt NoSuchDrowTarget","acidbolt self",
+        "faeriefire","faeriefire NoSuchDrowTarget","web NoSuchDrowTarget",
+        "attune","attune NoSuchDrowObject","dimensiondoor","dimensiondoor NoSuchDrowTarget",
+        "prayer","prayer NoSuchDrowTarget speed","prayer self NotAPower",
+        "prayer self acidbolt","prayer self speed",
+        "drowarmor NotARelic","drowarmor bolts 0","drowarmor bolts 21",
+        "drowarmor bolts -1","drowarmor bolts 9999999999999999999999999",
+        "drowarmor bolts 2 extra","readaura NoSuchDrowTarget","scry NoSuchDrowTarget",
+        "shoot north NoSuchDrowTarget"
+    };
+    long points=actor->pcdata->classpoints[CP_CURRENT];
+    long powers=actor->pcdata->drow[DROW_POWERS],speed=actor->pcdata->drow[DROW_SPEED];
+    actor->pcdata->classpoints[CP_CURRENT]=123456;
+    for(size_t i=0;i<sizeof missing/sizeof *missing;++i)rejection_cost_check(missing[i]);
+    const char *untrained[]={"acidbolt self","faeriefire self","web self",
+        "summonspider","attune","skipdisc","globedarkness","darkvision","heighten",
+        "readaura self","scry self"};
+    actor->pcdata->drow[DROW_POWERS]=0;
+    for(size_t i=0;i<sizeof untrained/sizeof *untrained;++i)
+        rejection_cost_check(untrained[i]);
+    actor->pcdata->drow[DROW_POWERS]=powers;
+    actor->pcdata->classpoints[CP_CURRENT]=0;
+    actor->pcdata->drow[DROW_SPEED]=0;
+    const char *poor[]={"globedarkness","drowarmor helmet","drowarmor bolts",
+        "prayer self speed","shoot north NoSuchDrowTarget"};
+    for(size_t i=0;i<sizeof poor/sizeof *poor;++i)rejection_cost_check(poor[i]);
+    long followers=actor->pcdata->followers;
+    actor->pcdata->followers=1;
+    rejection_cost_check("summonspider");
+    actor->pcdata->followers=followers;
+    actor->pcdata->drow[DROW_SPEED]=speed;
+    actor->pcdata->classpoints[CP_CURRENT]=points;
+
+    CHAR_DATA *target=create_mobile(get_mob_index(MOB_VNUM_GUARDIAN));
+    free_string(target->name);target->name=str_dup("RejectedDrowTarget");
+    char_to_room(target,&arena);
+    long flags=arena.room_flags;
+    SET_BIT(arena.room_flags,ROOM_SAFE);
+    rejection_cost_check("acidbolt RejectedDrowTarget");
+    rejection_cost_check("faeriefire RejectedDrowTarget");
+    rejection_cost_check("web RejectedDrowTarget");
+    assert(!target->affected&&!actor->fighting);
+    arena.room_flags=flags;
+    command("faeriefire RejectedDrowTarget");
+    assert(actor->wait==12&&IS_AFFECTED(target,AFF_FAERIE_FIRE));
+    rejection_cost_check("faeriefire RejectedDrowTarget");
+    command("web RejectedDrowTarget");
+    assert(actor->wait==12&&IS_AFFECTED(target,AFF_WEBBED));
+    /* Already-webbed is an attempted cast, not an input rejection.
+     * Preserve the native wait, without charging DP or adding effects. */
+    long before=actor->pcdata->classpoints[CP_CURRENT];
+    AFFECT_DATA *affects=target->affected;
+    command("web RejectedDrowTarget");
+    assert(actor->wait==12&&actor->pcdata->classpoints[CP_CURRENT]==before&&
+           target->affected==affects);
+    extract_char(target,TRUE);
+}
+
 static void toggles(void)
 {
     command("darkvision");assert(effective_nightsight(actor));
@@ -375,15 +732,22 @@ static void skipdisc_travel(void)
                     long before_speed=get_speed(actor);
                     command("skipdisc");
                     bool permitted=cls==0&&learned;
-                    assert(!!IS_AFFECTED(actor,AFF_FLYING)==(permitted?!flying:flying));
+                    assert(!!IS_AFFECTED(actor,AFF_FLYING)==(permitted||flying));
                     assert(actor->affected_by==((original_affects&~AFF_FLYING)|
-                           ((permitted?!flying:flying)?AFF_FLYING:0)));
-                    assert(actor->pcdata->drow[DROW_POWERS]==(learned?DROW_SKIP:0));
+                           (flying?AFF_FLYING:0)));
+                    assert(actor->pcdata->drow[DROW_POWERS]==
+                           ((learned?DROW_SKIP:0)|(permitted?DROW_DISC:0)));
                     assert(actor->pcdata->classpoints[CP_CURRENT]==points[funds]);
                     assert(actor->mana==mana&&actor->hit==hit&&get_speed(actor)==before_speed);
                     if(cls)assert(strstr(output,"Huh?"));
                     else if(!learned)assert(strstr(output,"obtain skip disc first"));
-                    else assert(strstr(output,flying?"leap off":"leap onto"));
+                    else {
+                        assert(strstr(output,"leap onto"));
+                        command("skipdisc");
+                        assert(strstr(output,"leap off"));
+                        assert(!DROW_DISC_ACTIVE(actor));
+                        assert(!!IS_AFFECTED(actor,AFF_FLYING)==flying);
+                    }
                 }
     actor->class=CLASS_DROW;actor->pcdata->drow[DROW_POWERS]=original_powers|DROW_SKIP;
     actor->pcdata->classpoints[CP_CURRENT]=0;
@@ -394,16 +758,19 @@ static void skipdisc_travel(void)
     assert(get_speed(actor)==learned_speed+3);
     SET_BIT(actor->pcdata->drow[DROW_POWERS],DROW_SKIP);
     for(int flying=0;flying<2;++flying) {
-        if(flying)SET_BIT(actor->affected_by,AFF_FLYING);
-        else REMOVE_BIT(actor->affected_by,AFF_FLYING);
+        if(flying)SET_BIT(actor->pcdata->drow[DROW_POWERS],DROW_DISC);
+        else REMOVE_BIT(actor->pcdata->drow[DROW_POWERS],DROW_DISC);
         assert(save_char_obj_checked(actor));
         DESCRIPTOR_DATA reload={0};assert(load_char_obj(&reload,"NativeDrow"));
         assert(reload.character->class==CLASS_DROW);
         assert(get_drow(reload.character,DROW_SKIP));
         assert(!!IS_AFFECTED(reload.character,AFF_FLYING)==flying);
+        assert(!!DROW_DISC_ACTIVE(reload.character)==flying);
+        assert(!IS_SET(reload.character->affected_by,AFF_FLYING));
         assert(reload.character->pcdata->classpoints[CP_CURRENT]==0);
         free_char(reload.character);
     }
+    REMOVE_BIT(actor->pcdata->drow[DROW_POWERS],DROW_DISC);
     REMOVE_BIT(actor->affected_by,AFF_FLYING);
     const char *directions[]={"north","east","south","west","up","down"};
     const int reverse[]={2,3,0,1,5,4};
@@ -437,6 +804,268 @@ static void skipdisc_travel(void)
     arena.sector_type=original_sector;
     puts("Native Drow Skip Disc: class/training gates, zero-DP toggles, saved flight, "
          "learned speed bonus and all six air/deep-water exit directions passed.");
+}
+
+/* Independent flight sources must survive one another's removal. */
+static void skipdisc_ownership_probe(void)
+{
+    long powers=actor->pcdata->drow[DROW_POWERS],flags=actor->affected_by;
+    actor->pcdata->drow[DROW_POWERS]=DROW_SKIP;
+    REMOVE_BIT(actor->affected_by,AFF_FLYING);
+    long fly=skill_lookup("fly");assert(fly>=0);
+    spell_fly(fly,20,actor,actor);
+    assert(is_affected(actor,fly)&&IS_AFFECTED(actor,AFF_FLYING));
+    command("skipdisc");
+    assert(is_affected(actor,fly)&&IS_AFFECTED(actor,AFF_FLYING)&&DROW_DISC_ACTIVE(actor));
+    command("skipdisc");
+    assert(is_affected(actor,fly)&&IS_AFFECTED(actor,AFF_FLYING)&&!DROW_DISC_ACTIVE(actor));
+    command("skipdisc");
+    affect_strip(actor,fly);
+    assert(DROW_DISC_ACTIVE(actor)&&IS_AFFECTED(actor,AFF_FLYING));
+    assert(!IS_SET(actor->affected_by,AFF_FLYING));
+    command("skipdisc");assert(!IS_AFFECTED(actor,AFF_FLYING));
+
+    OBJ_DATA *item=create_object(get_obj_index(29653),50);
+    item->item_type=ITEM_ARMOR;item->value[3]=39;
+    obj_to_char(item,actor);equip_char(actor,item,WEAR_HEAD);
+    assert(get_eq_char(actor,WEAR_HEAD)==item&&IS_AFFECTED(actor,AFF_FLYING));
+    command("skipdisc");
+    assert(get_eq_char(actor,WEAR_HEAD)==item&&DROW_DISC_ACTIVE(actor));
+    command("skipdisc");
+    assert(!DROW_DISC_ACTIVE(actor)&&IS_AFFECTED(actor,AFF_FLYING));
+    unequip_char(actor,item);extract_obj(item);
+
+    command("skipdisc");assert(IS_AFFECTED(actor,AFF_FLYING));
+    item=create_object(get_obj_index(29653),50);
+    item->item_type=ITEM_ARMOR;item->value[3]=39;
+    obj_to_char(item,actor);equip_char(actor,item,WEAR_HEAD);
+    unequip_char(actor,item);extract_obj(item);
+    assert(DROW_DISC_ACTIVE(actor)&&IS_AFFECTED(actor,AFF_FLYING));
+    command("skipdisc");assert(!IS_AFFECTED(actor,AFF_FLYING));
+
+    /* Equipping while the disc is active must still establish item flight. */
+    for(int spell=3;spell<=39;spell+=36) {
+        command("skipdisc");
+        item=create_object(get_obj_index(29653),50);
+        item->item_type=ITEM_ARMOR;item->value[3]=spell;
+        /* Native saves omit unowned worn objects; use real owned equipment. */
+        free_string(item->questowner);item->questowner=str_dup(actor->name);
+        obj_to_char(item,actor);equip_char(actor,item,WEAR_HEAD);
+        assert(save_char_obj_checked(actor));
+        DESCRIPTOR_DATA reload={0};assert(load_char_obj(&reload,"NativeDrow"));
+        OBJ_DATA *worn=get_eq_char(reload.character,WEAR_HEAD);
+        assert(worn&&DROW_DISC_ACTIVE(reload.character));
+        do_skipdisc(reload.character,"");
+        assert(!DROW_DISC_ACTIVE(reload.character)&&
+               IS_AFFECTED(reload.character,AFF_FLYING));
+        unequip_char(reload.character,worn);
+        assert(!IS_AFFECTED(reload.character,AFF_FLYING));
+        free_char(reload.character);
+        command("skipdisc");
+        assert(!DROW_DISC_ACTIVE(actor)&&IS_AFFECTED(actor,AFF_FLYING));
+        unequip_char(actor,item);extract_obj(item);
+        assert(!IS_AFFECTED(actor,AFF_FLYING));
+    }
+
+    REMOVE_BIT(actor->affected_by,AFF_FLYING);
+    command("skipdisc");assert(IS_AFFECTED(actor,AFF_FLYING));
+    REMOVE_BIT(actor->pcdata->drow[DROW_POWERS],DROW_SKIP);
+    command("skipdisc");
+    assert(!IS_AFFECTED(actor,AFF_FLYING)&&!DROW_DISC_ACTIVE(actor));
+    command("skipdisc");
+    assert(strstr(output,"obtain skip disc")&&!IS_AFFECTED(actor,AFF_FLYING));
+    actor->pcdata->drow[DROW_POWERS]=powers;actor->affected_by=flags;
+    puts("Skip Disc ownership: spell/item removal, independent dismissal and training-loss cleanup passed.");
+}
+
+static void skipdisc_source_guards(void)
+{
+    long powers=actor->pcdata->drow[DROW_POWERS],flags=actor->affected_by,cls=actor->class;
+    long points=actor->pcdata->classpoints[CP_CURRENT];
+    HYBRID_MASTERY before,after;
+    actor->pcdata->drow[DROW_POWERS]=DROW_SKIP;
+    REMOVE_BIT(actor->affected_by,AFF_FLYING);
+    assert(hybrid_mastery_read(actor,&before));
+    command("skipdisc");
+    assert(hybrid_mastery_read(actor,&after));
+    assert(before.count==after.count&&before.applicable==after.applicable&&
+           before.met==after.met&&before.review==after.review);
+    for(size_t i=0;i<before.count;++i)
+        assert(before.items[i].current==after.items[i].current&&
+               before.items[i].status==after.items[i].status);
+    assert(!hybrid_power_drow(actor,DROW_DISC)); /* Active state is never training. */
+    SET_BIT(actor->affected_by,AFF_BLIND);
+    assert(IS_AFFECTED(actor,AFF_FLYING|AFF_BLIND)==(AFF_FLYING|AFF_BLIND));
+    assert(IS_AFFECTED(actor,AFF_BLIND)==AFF_BLIND);
+    actor->class=CLASS_MAGE;
+    assert(!DROW_DISC_ACTIVE(actor)&&!IS_AFFECTED(actor,AFF_FLYING));
+    actor->class=CLASS_DROW;
+    REMOVE_BIT(actor->pcdata->drow[DROW_POWERS],DROW_SKIP);
+    assert(DROW_DISC_ACTIVE(actor));
+    actor->affected_by=flags&~AFF_FLYING;
+    assert(save_char_obj_checked(actor));
+    DESCRIPTOR_DATA reload={0};assert(load_char_obj(&reload,"NativeDrow"));
+    assert(DROW_DISC_ACTIVE(reload.character)&&
+           !get_drow(reload.character,DROW_SKIP));
+    do_skipdisc(reload.character,"");
+    assert(!DROW_DISC_ACTIVE(reload.character)&&
+           !IS_AFFECTED(reload.character,AFF_FLYING));
+    assert(reload.character->pcdata->classpoints[CP_CURRENT]==points);
+    free_char(reload.character);
+    command("skipdisc");assert(!IS_AFFECTED(actor,AFF_FLYING));
+    do_skipdisc(NULL,NULL);
+    CHAR_DATA invalid={0};invalid.class=CLASS_DROW;
+    do_skipdisc(&invalid,NULL);assert(!DROW_DISC_ACTIVE(&invalid));
+    PC_DATA npcpc={0};invalid.pcdata=&npcpc;invalid.act=ACT_IS_NPC;
+    npcpc.drow[DROW_POWERS]=DROW_DISC|DROW_SKIP;
+    do_skipdisc(&invalid,NULL);assert(!DROW_DISC_ACTIVE(&invalid));
+    actor->class=cls;actor->pcdata->drow[DROW_POWERS]=powers;
+    actor->affected_by=flags;
+    puts("Skip Disc: native-only/null/NPC guards, bitmask semantics and saved training-loss cleanup passed.");
+}
+
+static void skipdisc_blocked_movement(void)
+{
+    long powers=actor->pcdata->drow[DROW_POWERS],flags=actor->affected_by;
+    long sector=arena.sector_type,points=actor->pcdata->classpoints[CP_CURRENT];
+    long mana=actor->mana,hit=actor->hit;
+    const char *directions[]={"north","east","south","west","up","down"};
+    const long terrain[]={SECT_AIR,SECT_WATER_NOSWIM};
+    const long barriers[]={EX_CLOSED,EX_WALL_WATER,EX_WALL_GRANITE};
+    actor->pcdata->drow[DROW_POWERS]=DROW_SKIP;
+    SET_BIT(actor->pcdata->drow[DROW_POWERS],DROW_DISC);
+    for(unsigned t=0;t<2;++t)for(int dir=0;dir<6;++dir) {
+        ROOM_INDEX_DATA destination={0};EXIT_DATA exit={0};
+        CHAR_DATA first={0},second={0};
+        EXIT_DATA *saved=arena.exit[dir];
+        destination.name="Blocked Skip Disc audit";destination.description="";
+        destination.area=&area;destination.light=1;destination.sector_type=terrain[t];
+        arena.sector_type=SECT_INSIDE;
+        exit.to_room=&destination;exit.keyword="audit door";
+        for(int mode=0;mode<6;++mode) {
+            arena.exit[dir]=mode==0?NULL:&exit;
+            exit.exit_info=mode>=1&&mode<=3?barriers[mode-1]:0;
+            destination.room_flags=mode==4?ROOM_SOLITARY:mode==5?ROOM_PRIVATE:0;
+            destination.people=mode>=4?&first:NULL;
+            first.next_in_room=mode==5?&second:NULL;
+            command(directions[dir]);
+            assert(actor->in_room==&arena&&IS_AFFECTED(actor,AFF_FLYING));
+            assert(actor->wait==0&&actor->pcdata->classpoints[CP_CURRENT]==points);
+            assert(actor->mana==mana&&actor->hit==hit);
+        }
+        destination.people=NULL;arena.exit[dir]=saved;
+    }
+    arena.sector_type=sector;actor->affected_by=flags;
+    actor->pcdata->drow[DROW_POWERS]=powers;
+    puts("Skip Disc: 72 blocked exits/barriers/private-room movements preserve flight, room and resources.");
+}
+
+static void darkness_pulse(void)
+{
+    assert(char_list==actor);
+    CHAR_DATA *tail=actor->next;
+    actor->next=NULL;
+    mobile_update();
+    actor->next=tail;
+}
+
+static void darkness_lifecycle(void)
+{
+    long powers=actor->pcdata->drow[DROW_POWERS];
+    long points=actor->pcdata->classpoints[CP_CURRENT];
+    long room_flags=arena.room_flags,added_flags=arena.added_flags,light=arena.light;
+    long mana=actor->mana,hit=actor->hit,quest=actor->pcdata->quest;
+    const long funds[]={LONG_MIN,-1,0,1,149,150,151,499,500,650,651,LONG_MAX};
+    for(size_t i=0;i<sizeof funds/sizeof *funds;++i) {
+        actor->pcdata->drow[DROW_POWERS]=DROW_DARK;
+        actor->pcdata->classpoints[CP_CURRENT]=funds[i];
+        command("globedarkness");
+        assert(!!get_drow(actor,DROW_GLOBE)==(funds[i]>=500));
+        assert(actor->pcdata->classpoints[CP_CURRENT]==
+               (funds[i]>=500?funds[i]-500:funds[i]));
+        assert(actor->wait==0&&actor->mana==mana&&actor->hit==hit);
+        if(funds[i]>=500) {
+            long after=actor->pcdata->classpoints[CP_CURRENT];
+            command("globedarkness");
+            assert(!get_drow(actor,DROW_GLOBE)&&
+                   actor->pcdata->classpoints[CP_CURRENT]==after&&actor->wait==0);
+        }
+    }
+    /* All signed balances are safe, including the formerly overflowing minimum. */
+    for(size_t i=0;i<sizeof funds/sizeof *funds;++i) {
+        actor->pcdata->drow[DROW_POWERS]=DROW_DARK|DROW_GLOBE;
+        actor->pcdata->classpoints[CP_CURRENT]=funds[i];
+        darkness_pulse();
+        assert(actor->pcdata->classpoints[CP_CURRENT]==
+               (funds[i]>150?funds[i]-150:0));
+        assert(!!get_drow(actor,DROW_GLOBE)==(funds[i]>150));
+        assert(actor->mana==mana&&actor->hit==hit&&actor->pcdata->quest==quest);
+    }
+    /* Movement follows the caster without borrowing room darkness flags. */
+    ROOM_INDEX_DATA destination={0};
+    destination.vnum=999905;destination.name="Darkness lifecycle audit";
+    destination.description="";destination.area=&area;destination.light=1;
+    actor->pcdata->drow[DROW_POWERS]=DROW_DARK|DROW_GLOBE;
+    actor->pcdata->classpoints[CP_CURRENT]=1000;
+    char_from_room(actor);char_to_room(actor,&destination);
+    assert(get_drow(actor,DROW_GLOBE)&&destination.added_flags==0&&destination.light==1);
+    char_from_room(actor);char_to_room(actor,&arena);
+    assert(!destination.people&&arena.added_flags==added_flags&&arena.light==light);
+    assert(arena.room_flags==room_flags&&actor->pcdata->classpoints[CP_CURRENT]==1000);
+    assert(save_char_obj_checked(actor));
+    DESCRIPTOR_DATA reload={0};assert(load_char_obj(&reload,"NativeDrow"));
+    assert(get_drow(reload.character,DROW_GLOBE)&&
+           reload.character->pcdata->classpoints[CP_CURRENT]==1000);
+    free_char(reload.character);
+
+    /* Native upkeep only runs for a playing descriptor; disconnected
+     * characters retain the globe and balance in the current policy. */
+    actor->desc=NULL;
+    darkness_pulse();
+    assert(get_drow(actor,DROW_GLOBE)&&actor->pcdata->classpoints[CP_CURRENT]==1000);
+    actor->desc=&descriptor;
+    actor->hit=0;update_pos(actor);
+    assert(!get_drow(actor,DROW_GLOBE));
+    actor->hit=hit;actor->position=POS_STANDING;
+    actor->pcdata->drow[DROW_POWERS]=powers;
+    actor->pcdata->classpoints[CP_CURRENT]=points;
+    puts("Darkness: 12 activation boundaries, 12 upkeep boundaries, movement, save/reload, disconnect and zero-HP cleanup passed.");
+}
+
+static void darkness_loss_cleanup(void)
+{
+    long powers=actor->pcdata->drow[DROW_POWERS];
+    long points=actor->pcdata->classpoints[CP_CURRENT];
+    long mana=actor->mana,hit=actor->hit,primal=actor->primal,quest=actor->pcdata->quest;
+    long added=arena.added_flags,light=arena.light;
+    const long funds[]={LONG_MIN,-1,0,499,500,1000,LONG_MAX};
+    for(size_t i=0;i<sizeof funds/sizeof *funds;++i) {
+        actor->pcdata->drow[DROW_POWERS]=DROW_SKIP|DROW_GLOBE;
+        actor->pcdata->classpoints[CP_CURRENT]=funds[i];
+        command("globedarkness");
+        assert(strstr(output,"banish your globe"));
+        assert(actor->pcdata->drow[DROW_POWERS]==DROW_SKIP);
+        assert(actor->pcdata->classpoints[CP_CURRENT]==funds[i]&&actor->wait==0);
+        assert(actor->mana==mana&&actor->hit==hit&&actor->primal==primal&&
+               actor->pcdata->quest==quest&&arena.added_flags==added&&arena.light==light);
+        /* Dismissal is not a new grant: a repeated command must reject even
+         * when there is enough DP, and subsequent upkeep must charge nothing. */
+        command("globedarkness");
+        assert(strstr(output,"obtain darkness first"));
+        assert(actor->pcdata->drow[DROW_POWERS]==DROW_SKIP&&actor->wait==0);
+        darkness_pulse();
+        assert(actor->pcdata->classpoints[CP_CURRENT]==funds[i]);
+        assert(actor->pcdata->drow[DROW_POWERS]==DROW_SKIP);
+    }
+    actor->pcdata->classpoints[CP_CURRENT]=1000;
+    assert(save_char_obj_checked(actor));
+    DESCRIPTOR_DATA reload={0};assert(load_char_obj(&reload,"NativeDrow"));
+    assert(reload.character->pcdata->drow[DROW_POWERS]==DROW_SKIP);
+    assert(reload.character->pcdata->classpoints[CP_CURRENT]==1000);
+    free_char(reload.character);
+    actor->pcdata->drow[DROW_POWERS]=powers;
+    actor->pcdata->classpoints[CP_CURRENT]=points;
+    puts("Darkness training loss: free dismissal, denied reactivation, no later upkeep and saved cleanup passed.");
 }
 
 static void upkeep_check(long powers,long speed)
@@ -938,7 +1567,23 @@ int main(int argc,char **argv)
     else if(argc==2&&!strcmp(argv[1],"--training-bounds"))training_and_reports();
     else if(argc==2&&!strcmp(argv[1],"--prayer-menu"))prayer_menu();
     else if(argc==2&&!strcmp(argv[1],"--equipment-use")) {
-        prayers();equipment();equipment_use();
+        prayers();equipment();equipment_use();crossbow_death_cleanup();
+    }
+    else if(argc==2&&!strcmp(argv[1],"--equipment-boundaries")) {
+        prayers();equipment_refusal_boundaries();spider_stat_boundaries(-1);
+    }
+    else if(argc==2&&(!strcmp(argv[1],"--spider-stat-hitroll")||
+                     !strcmp(argv[1],"--spider-stat-damroll")||
+                     !strcmp(argv[1],"--spider-stat-armor"))) {
+        prayers();
+        spider_stat_boundaries(!strcmp(argv[1],"--spider-stat-hitroll")?0:
+                               !strcmp(argv[1],"--spider-stat-damroll")?1:2);
+    }
+    else if(argc==2&&!strcmp(argv[1],"--effect-expiry")) {
+        prayers();timed_effects();
+    }
+    else if(argc==2&&!strcmp(argv[1],"--rejected-costs")) {
+        prayers();rejected_costs();
     }
     else if(argc==2&&!strcmp(argv[1],"--house-commands")) {
         prayers();house_commands();
@@ -950,12 +1595,29 @@ int main(int argc,char **argv)
         prayers();dimensional_travel();
     }
     else if(argc==2&&!strcmp(argv[1],"--skipdisc-travel")) {
-        prayers();skipdisc_travel();
+        prayers();skipdisc_travel();skipdisc_blocked_movement();
+    }
+    else if(argc==2&&!strcmp(argv[1],"--skipdisc-ownership")) {
+        skipdisc_ownership_probe();skipdisc_source_guards();
+    }
+    else if(argc==2&&!strcmp(argv[1],"--darkness-lifecycle")) {
+        darkness_lifecycle();darkness_loss_cleanup();
+    }
+    else if(argc==2&&!strcmp(argv[1],"--darkness-dismissal")) {
+        darkness_loss_cleanup();
+    }
+    else if(argc==2&&!strcmp(argv[1],"--darkness-extreme")) {
+        actor->pcdata->drow[DROW_POWERS]=DROW_DARK|DROW_GLOBE;
+        actor->pcdata->classpoints[CP_CURRENT]=LONG_MIN;
+        darkness_pulse();
+        assert(actor->pcdata->classpoints[CP_CURRENT]==0);
+        assert(!get_drow(actor,DROW_GLOBE));
     }
     else {
-        prayers();equipment_use();toggles();training_and_reports();prayer_menu();house_training();house_commands();communication();dimensional_travel();skipdisc_travel();
+        prayers();rejected_costs();equipment_use();crossbow_death_cleanup();toggles();training_and_reports();prayer_menu();house_training();house_commands();communication();dimensional_travel();skipdisc_travel();skipdisc_blocked_movement();skipdisc_ownership_probe();skipdisc_source_guards();
+        darkness_lifecycle();darkness_loss_cleanup();
         if(argc==2&&!strcmp(argv[1],"--spider"))spider();
-        else {equipment();dual_wield();combat_and_travel();spider();}
+        else {equipment();equipment_refusal_boundaries();dual_wield();combat_and_travel();spider();spider_stat_boundaries(-1);timed_effects();}
     }
     extract_char(actor,TRUE);actor=NULL;
     clan_registry_close();

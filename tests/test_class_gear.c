@@ -186,6 +186,78 @@ static void craft_boundaries(void)
     }
 }
 
+static void drow_relic_rejections(void)
+{
+    for (size_t i = 0; i < sizeof(crafts)/sizeof(crafts[0]); ++i) {
+        const struct craft *c = &crafts[i];
+        if (c->fn != do_drowarmor) continue;
+
+        long wear_flag = !str_cmp(c->arg, "cloak") ? ITEM_WEAR_ABOUT :
+                         !str_cmp(c->arg, "helmet") ? ITEM_WEAR_HEAD :
+                         !str_cmp(c->arg, "breastplate") ? ITEM_WEAR_BODY :
+                         !str_cmp(c->arg, "bracer") ? ITEM_WEAR_WRIST :
+                         !str_cmp(c->arg, "crossbow") ? ITEM_WEAR_HOLD : 0;
+        assert(wear_flag != 0);
+        OBJ_INDEX_DATA *p = index_for(c->vnum, c->type);
+        long original_type = p->item_type;
+        long original_flags = p->wear_flags;
+        long original_weight = p->weight;
+
+#define REJECT_DROW_RELIC() do { \
+            fixture(CLASS_DROW); \
+            pc.classpoints[CP_CURRENT] = 8000; \
+            pc.quest = 400; \
+            invoke(c->fn, c->arg); \
+            assert(actor.carrying == NULL && actor.carry_number == 0 && \
+                   actor.carry_weight == 0 && \
+                   pc.classpoints[CP_CURRENT] == 8000 && pc.quest == 400); \
+        } while (0)
+
+        p->item_type = c->type == ITEM_MISSILE ? ITEM_ARMOR : ITEM_TRASH;
+        REJECT_DROW_RELIC();
+        p->item_type = original_type;
+
+        p->wear_flags &= ~ITEM_TAKE;
+        REJECT_DROW_RELIC();
+        p->wear_flags = original_flags;
+
+        p->wear_flags &= ~wear_flag;
+        REJECT_DROW_RELIC();
+        p->wear_flags = original_flags;
+
+        p->weight = -1;
+        REJECT_DROW_RELIC();
+        p->weight = original_weight;
+
+        fixture(CLASS_DROW);
+        actor.carry_number = LONG_MAX;
+        actor.carry_weight = 0;
+        pc.classpoints[CP_CURRENT] = 8000;
+        pc.quest = 400;
+        invoke(c->fn, c->arg);
+        assert(actor.carrying == NULL && actor.carry_number == LONG_MAX &&
+               actor.carry_weight == 0 &&
+               pc.classpoints[CP_CURRENT] == 8000 && pc.quest == 400);
+
+        fixture(CLASS_DROW);
+        actor.carry_number = 0;
+        actor.carry_weight = LONG_MAX;
+        pc.classpoints[CP_CURRENT] = 8000;
+        pc.quest = 400;
+        invoke(c->fn, c->arg);
+        assert(actor.carrying == NULL && actor.carry_number == 0 &&
+               actor.carry_weight == LONG_MAX &&
+               pc.classpoints[CP_CURRENT] == 8000 && pc.quest == 400);
+
+        p->item_type = original_type;
+        p->wear_flags = original_flags;
+        p->weight = original_weight;
+#undef REJECT_DROW_RELIC
+    }
+    puts("Drow relic crafting: malformed type/slot/template and carry-overflow "
+         "rejections preserve Drow points, quest points and inventory");
+}
+
 static void gargoyle_equipment(void)
 {
     const long masks[] = {ITEM_WEAR_NECK, ITEM_WEAR_ABOUT, ITEM_WEAR_BODY};
@@ -822,7 +894,8 @@ int main(int argc, char **argv)
         else if (!strcmp(argv[1],"conjured")) conjured_supplies();
         else abort();
     } else {
-        missing_sorcerer(); craft_boundaries(); gargoyle_equipment();
+        missing_sorcerer(); craft_boundaries(); drow_relic_rejections();
+        gargoyle_equipment();
         gargoyle_equipment_damage(); sorcerer(); forge(); upgraded_forge();
         mage_costs(); equipment(); class_restrictions(); dragon_persistence();
         consumable_market(); market_sales(); conjured_supplies(); fetish_crafting();

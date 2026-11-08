@@ -1,5 +1,6 @@
 /* Reuse the real-engine actors, records and deterministic RNG fixture.
  * No permission/rank/RNG/spell implementation is substituted. */
+#include <limits.h>
 #define main acid_fixture_main
 #include "test_hybrid_acidbolt.c"
 #undef main
@@ -159,8 +160,95 @@ static void web_boundaries(int mode)
     }
 }
 
+static void web_armor_boundaries(void)
+{
+    const long values[]={LONG_MIN,LONG_MIN+99,LONG_MIN+100,LONG_MAX};
+    unsigned count=0;
+    for(int ninja=0;ninja<2;++ninja)
+    for(int npc=0;npc<2;++npc)
+    for(size_t v=0;v<sizeof(values)/sizeof(values[0]);++v) {
+        web_fixture(ninja?CLASS_NINJA:CLASS_DROW,0,!ninja,8,10,npc);
+        CHAR_DATA *ch=actors,*victim=&actors[1];
+        victim->armor=values[v];victim->position=POS_RESTING;
+        long mana=ch->mana,primal=ch->primal,dp=pcs[0].classpoints[CP_CURRENT];
+        init_mm();long untouched_rng=number_range(1,1000000);init_mm();
+        do_web(ch,"beta");
+        if(values[v]<LONG_MIN+100) {
+            assert(!web_calls&&!ch->wait&&!victim->affected);
+            assert(victim->armor==values[v]&&pcs[0].ninja[NINJA_KI]==10);
+            assert(number_range(1,1000000)==untouched_rng);
+        } else {
+            assert(web_calls==1&&ch->wait==12&&IS_AFFECTED(victim,AFF_WEBBED));
+            assert(victim->armor==values[v]-100&&victim->affected->duration==2);
+            assert(pcs[0].ninja[NINJA_KI]==(ninja?0:10));
+            affect_strip(victim,gsn_web);
+            assert(!victim->affected&&!IS_AFFECTED(victim,AFF_WEBBED));
+            assert(victim->armor==values[v]);
+        }
+        assert(ch->mana==mana&&ch->primal==primal&&pcs[0].classpoints[CP_CURRENT]==dp);
+        /* Direct spell dispatch must enforce the same arithmetic boundary. */
+        ch->wait=0;init_mm();
+        __real_spell_web(gsn_web,50,ch,victim);
+        if(values[v]<LONG_MIN+100) {
+            assert(!victim->affected&&victim->armor==values[v]);
+            assert(number_range(1,1000000)==untouched_rng);
+        } else {
+            assert(victim->armor==values[v]-100);
+            affect_strip(victim,gsn_web);assert(victim->armor==values[v]);
+        }
+        ++count;
+    }
+    assert(count==16);
+    puts("Web: 16 native Drow/Ninja PC/NPC armor boundaries; direct spell guards, exact cleanup and rejected RNG/costs passed.");
+}
+
+static void web_direct_targets(void)
+{
+    for(int mode=0;mode<6;++mode) {
+        web_fixture(CLASS_DROW,0,1,0,10,0);
+        CHAR_DATA *ch=actors;void *target=&actors[1];
+        ROOM_INDEX_DATA elsewhere={0};
+        if(mode==0)ch=NULL;
+        if(mode==1)target=NULL;
+        if(mode==2)actors[0].in_room=NULL;
+        if(mode==3)actors[1].in_room=&elsewhere;
+        if(mode==4)actors[0].next_in_room=NULL;
+        if(mode==5)target=(void *)(uintptr_t)1; /* Never dereferenced. */
+        init_mm();long rng=number_range(1,1000000);init_mm();
+        __real_spell_web(gsn_web,50,ch,target);
+        assert(!actors[1].affected&&!actors[0].wait);
+        assert(!descs[0].outtop&&!descs[1].outtop);
+        assert(pcs[0].ninja[NINJA_KI]==10&&number_range(1,1000000)==rng);
+    }
+    puts("Web: six direct null/nonlocal/stale-target refusals passed.");
+}
+
+static void web_dex_boundaries(void)
+{
+    const int values[]={INT_MIN,INT_MIN/2-1,-1,0,50,INT_MAX};
+    for(int ninja=0;ninja<2;++ninja)
+    for(size_t i=0;i<sizeof(values)/sizeof(values[0]);++i) {
+        web_fixture(ninja?CLASS_NINJA:CLASS_DROW,0,!ninja,8,10,0);
+        actors[1].stats[STAT_DEX]=values[i];
+        long armor=actors[1].armor;
+        long threshold=(long)char_stat(&actors[1],STAT_DEX)*2;
+        init_mm();bool dodged=number_percent()<threshold;
+        long next=number_range(1,1000000);init_mm();
+        do_web(actors,"beta");
+        assert(web_calls==1&&actors[0].wait==12);
+        assert(!!IS_AFFECTED(&actors[1],AFF_WEBBED)==!dodged);
+        assert(pcs[0].ninja[NINJA_KI]==(ninja?0:10));
+        assert(number_range(1,1000000)==next);
+        affect_strip(&actors[1],gsn_web);
+        assert(!actors[1].affected&&actors[1].armor==armor);
+    }
+    puts("Web: 12 native Drow/Ninja extreme Dexterity dodge thresholds and RNG sequences passed.");
+}
+
 int main(int argc,char **argv)
 {
+    if(argc==2&&!strcmp(argv[1],"--armor-boundaries")){web_armor_boundaries();return 0;}
+    if(argc==2&&!strcmp(argv[1],"--dex-boundaries")){web_dex_boundaries();return 0;}
     if(argc==2&&!strcmp(argv[1],"--native-dump")){web_native(1);return 0;}
     if(argc==3&&!strcmp(argv[1],"--boundary")){web_boundaries(atoi(argv[2]));return 0;}
     if(argc==2&&!strcmp(argv[1],"--secondary-repro")){
@@ -172,6 +260,7 @@ int main(int argc,char **argv)
     web_pairs();web_refusals();
     for(int mode=1;mode<=7;mode++)web_boundaries(mode);
     do_web(NULL,NULL);
+    web_armor_boundaries();web_direct_targets();web_dex_boundaries();
     puts("Web: 224 native snapshots, 4032 paired commands, 7 refusals and 8 context/callback checks passed.");
     return 0;
 }
