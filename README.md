@@ -21,7 +21,7 @@ Recent work includes:
 - Werewolf advancement, shifting and gift-help corrections, plus safer utility commands.
 - Updated damage wording without changing the existing damage thresholds.
 - Safer saves, reconnects, shutdowns, combat messages and item handling.
-- Mudlet/MudForge support, GMCP vitals and an optional Mudlet HUD.
+- Mudlet/MudForge support, GMCP vitals, explored-room mapping and an optional Mudlet HUD.
 
 See the [class guide](deploy/CLASS_AUDIT.md) and
 [gear guide](deploy/CLASS_GEAR.md) for commands, costs and known gaps.
@@ -81,15 +81,15 @@ game service.
 
 ## Guides
 
+- [Documentation index](docs/README.md)
 - [Client setup and compatibility](docs/CLIENTS.md)
+- [Map setup and appearance](docs/MAPPING.md)
 - [Optional Mudlet HUD](clients/mudlet/README.md)
 - [Classes, skills and known gaps](deploy/CLASS_AUDIT.md)
 - [Werewolf commands, advancement and known gaps](docs/WEREWOLF.md)
 - [Class gear and consumables](deploy/CLASS_GEAR.md)
 - [Clan management](deploy/CLAN_MANAGEMENT.md)
 - [Hybrid implementation status](docs/HYBRIDS.md)
-- [Combat organization and remaining work](docs/COMBAT.md)
-- [World compatibility audit](docs/WORLD_AUDIT.md)
 
 ## Building and testing
 

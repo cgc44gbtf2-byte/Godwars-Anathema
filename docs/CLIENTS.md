@@ -15,10 +15,6 @@ default game port is 4000; an operator can choose another.
   The game endpoint must be reachable from that bridge; your private
   `127.0.0.1` test server is not a public game endpoint.
 
-The configured public endpoint is **137.184.145.164**, TCP **4000**. No IP
-allowlist is added. Actual host availability/firewall configuration is not
-established by the repository's isolated tests.
-
 Mudlet's connection guide:
 <https://wiki.mudlet.org/w/Manual%3AIntroduction>.
 
@@ -52,6 +48,9 @@ protocol bytes, terminal names, dimensions or JSON to become game commands.
 An optional Mudlet HUD is bundled separately; no MudForge plugin is bundled.
 MudForge's built-in Map Widget and Mudlet's Mapper can consume `Room.Info`;
 Mudlet still needs a mapping script configured for Anathema.
+
+For field detection, map appearance and client-side limitations, see the
+[mapping guide](MAPPING.md).
 
 ## MudForge browser troubleshooting
 
@@ -141,8 +140,10 @@ The hosted MudForge web client v2.0.3915 was additionally exercised in headless
 Chromium: its real WebSocket bridge reached Anathema's greeting and login-name
 prompt. No account was created or authenticated. That confirms one connection
 path at the time of the probe, not hosted-bridge uptime or a full authenticated
-GUI/copyover test. The new mapping feed is tested at the protocol level;
-rendering it in the hosted GUI and a specific Mudlet mapper is not yet verified.
+GUI/copyover test. The operator subsequently supplied authenticated MudForge
+map screenshots and confirmed backtracking and reconnect persistence; see the
+[mapping verification scope](MAPPING.md#verified-scope-and-limitations).
+Specific Mudlet mapper rendering remains unverified.
 TLS deployment, UTF-8 input and party support are not added.
 
 Smoke-test greetings use a bounded 25-second receive deadline, rather than

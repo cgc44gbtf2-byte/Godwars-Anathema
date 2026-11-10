@@ -1,10 +1,11 @@
-# GMCP identity and vitals for Mudlet and MudForge
+# GMCP identity, vitals and room mapping
 
 GMCP is optional. Enable GMCP in your client and reconnect to the operator's
 normal game endpoint. Clients without it retain ordinary text play.
 The server supplies authenticated vitals and current-room mapping data; the
 client builds its own explored map. It does not send a pre-drawn atlas or party
 data. An [optional Mudlet HUD](../clients/mudlet/README.md) is supplied separately.
+For client setup and appearance, use the [mapping guide](MAPPING.md).
 
 ## Packages
 

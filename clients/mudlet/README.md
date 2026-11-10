@@ -1,6 +1,6 @@
 # Optional Anathema HUD for Mudlet
 
-Server: **137.184.145.164**, TCP port **4000**. Use your unique game password.
+Use the server address supplied by your operator and a unique game password.
 The normal endpoint is plain Telnet, not TLS. This HUD is display-only: it
 does not send commands, autoheal, choose combat actions, reconnect, download
 anything, or change your console borders.
@@ -9,7 +9,7 @@ anything, or change your console borders.
 
 1. Use a current Mudlet 4.x with its bundled Geyser UI and enable GMCP in the
    profile's connection preferences.
-2. Download `AnathemaHUD.xml` from this private repository. In Mudlet's
+2. Download `AnathemaHUD.xml` from this repository's `clients/mudlet/` directory. In Mudlet's
    **Scripts** editor, use **Import** to import that XML and save the profile.
    Alternatively create one Script, paste `anathema_hud.lua` and save.
    Install **one** form, not both.
