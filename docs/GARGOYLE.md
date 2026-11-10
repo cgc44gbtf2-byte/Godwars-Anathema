@@ -25,16 +25,17 @@ An already-classed player is not converted by these commands. Do not use
   read-only menu remains available while petrified.
 - `discipline visceratika`: ranks 1–5; **15 × next rank** primal, including
   15 primal to start. No clan-name discount or extra in-clan discipline slots.
-- Visceratika reduces positive incoming damage by 10/20/30/40/50%, after
-  Anathema's existing calculations. Integer damage rounds down. The shared HP
-  boundary covers melee and direct book/spell hits once; healing and
-  self-inflicted costs are not reduced.
+- While in stone form, Visceratika reduces positive incoming damage by
+  10/20/30/40/50%, after Anathema's existing calculations. Integer damage rounds
+  down. The shared HP boundary covers melee and direct book/spell hits once;
+  healing and self-inflicted costs are not reduced. Flesh form has no stone
+  mitigation.
 - Rank 1 unlocks `camouflage` (Skin of the Chameleon): free, 12 action lag,
   using normal Hide visibility and reveal rules. Already hidden or invalid
   physical/recovery contexts cannot activate it.
-- Ranks 4–5 resist the native `punch` command's damage and stun, like the
-  engine's existing high-Fortitude immunity. EM's HP-restoration/finger-breaking
-  workaround is not imported.
+- In stone form, ranks 4–5 resist the native `punch` command's damage and stun,
+  like the engine's existing high-Fortitude immunity. EM's
+  HP-restoration/finger-breaking workaround is not imported.
 - Other Vampire disciplines, blood pools, generation rules and `varmor` remain
   Anathema's native systems. No flight or new item vnums are added.
   `varmor mark`, `varmor trenchcoat` and `varmor vest` retain the native cost of

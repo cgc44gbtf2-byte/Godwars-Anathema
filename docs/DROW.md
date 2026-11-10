@@ -133,13 +133,32 @@ off can prevent leaving that terrain until you fly again. Other exit restriction
 still apply.
 
 The learned initiative and avoidance bonuses do not require the flight toggle
-to be on. Learning and flight state survive normal player saves. Skip Disc uses
-the existing shared flight flag; it does not track a separate flight source, so
-using it while already flying turns that shared flag off.
+to be on. Learning and disc state survive normal player saves. The disc now
+tracks its own flight source: dismissing it does not remove a Fly spell or
+flight item, and removing those sources does not cancel an active disc.
 
-The real-world audit checks class/training gates, unchanged resources, both saved
-flight states and all six movement directions through air and deep water.
-This adds coverage without changing travel rules, costs or flight ownership.
+A native Drow may dismiss an active disc after losing Skip Disc training, but
+cannot reactivate it without the gift. No automatic training-loss revocation
+was added. Unmarked legacy flight cannot reliably be attributed to a disc,
+spell or item; it is preserved for staff review, not automatically migrated.
+
+The audit covers independent source removal in both activation orders,
+equipment/reload cases and all six movement directions through air/deep water,
+including blocked exits. Costs and the learned combat bonuses are unchanged.
+See the [audit history](DROW_LOCAL_AUDIT.md) for cases and remaining limits.
+
+## Globe of Darkness
+
+After learning Darkness, `globedarkness` toggles the globe. Activation costs
+500 DP with no wait; native upkeep costs 150 DP per update. A balance at or
+below 150 becomes zero and the globe ends, without subtraction overflow.
+Manual dismissal is free, including after losing the learned Darkness gift.
+Reactivation still requires the gift and 500 DP.
+
+The globe follows its caster rather than changing permanent room-light flags.
+Full save/reload retains active state and DP; zero-HP cleanup clears it.
+Training loss does not automatically dismiss it. Native upkeep does not bill
+a disconnected character for the tested update; this is not wall-clock expiry.
 
 ## Class equipment
 
@@ -224,8 +243,8 @@ This is not proof of live-server configuration, every custom OLC edit, PvP
 balance, or crash/power-cut durability. The house and Sign checks above do not
 cover every possible hostile room-text callback. A cross-player
 prayer still uses ordinary separate player saves, not an atomic two-player
-transaction. The existing
-shared flag/follower conventions are retained rather than replaced.
+transaction. Other legacy shared-flag/follower conventions remain, except for
+the dedicated Skip Disc flight source described above.
 
 ### Native Speed combat validation
 

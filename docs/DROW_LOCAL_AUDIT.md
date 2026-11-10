@@ -1,7 +1,14 @@
-# Local native Drow audit
+# Native Drow audit history
 
-Uncommitted investigation notes. No GitHub publication or deployment.
-Selfbrid feature work remains paused.
+These notes were written during the local investigation and later published in
+commit `c189a302e9e805e9513e0941c8888a8ecf2db213`. Statements below such as
+"fixed locally", "uncommitted" or "no GitHub publication" describe that earlier
+stage, not the current branch status. Historical `/tmp/` log paths are evidence
+references from that environment, not files distributed with the repository.
+
+For current commands and costs, use the [native Drow guide](DROW.md).
+This history records specific reproductions and tests, not proof of deployment
+or every live player outcome. Selfbrid feature work remains paused.
 
 ## Follow-up — crafting, attunement and spider stat boundaries
 

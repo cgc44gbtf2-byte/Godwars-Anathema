@@ -169,8 +169,8 @@ Vitae, and Cauldron of Blood. The new capacity affect is appended to the skill
 catalog without moving existing skills. Potency is derived from Genesis's
 generations, not an imported EM blood-array slot. Capacity survives save/load
 and generation changes, expires normally and clamps excess blood. Detailed
-syntax, costs, durations, portability adaptations and rollback caveats are in
-the README.
+syntax, costs, durations and limitations are in the
+[Vampire blood-power guide](VAMPIRE_BALANCE.md).
 
 The twelfth suite links production engine objects, exercising these abilities
 and real character serialization using synthetic fixtures and a private

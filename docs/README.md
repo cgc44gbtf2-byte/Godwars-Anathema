@@ -34,7 +34,7 @@ and the current development status. Use the guides below for details.
 - [Combat organization](COMBAT.md)
 - [Message formatting](MESSAGES.md)
 - [Class reset](CLASS_RESET.md)
-- [Native Drow local audit](DROW_LOCAL_AUDIT.md)
+- [Native Drow audit history](DROW_LOCAL_AUDIT.md)
 - [Werewolf gift/source comparison](WEREWOLF_GIFT_AUDIT.md)
 - [World compatibility audit](WORLD_AUDIT.md)
 - [Hybrid implementation status](HYBRIDS.md)
