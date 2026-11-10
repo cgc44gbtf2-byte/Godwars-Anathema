@@ -55,6 +55,7 @@ void do_pset( CHAR_DATA *ch, char *argument )
 	stc("Syntax: pset <victim> <area> <value1> <value2>\n\r", ch);
 	stc("Area being one of:\n\r", ch);
 	stc("  quest stat beast cps status rank gen stance class honor\n\r", ch);
+stc("Gargoyle: pset <victim> class vampire gargoyle (unclassed, awakened only).\n\r", ch);
 	return;
     }
 
@@ -93,8 +94,20 @@ void do_pset( CHAR_DATA *ch, char *argument )
 	    return;
 	}
 
-	if ( !str_cmp( arg3, "vampire" ) )
+if ( !str_cmp( arg3, "vampire" ) || !str_cmp( arg3, "gargoyle" ) )
 	{
+    const bool gargoyle = !str_cmp(arg3, "gargoyle") ||
+                          !str_cmp(arg4, "gargoyle");
+    if (arg4[0] && (str_cmp(arg3, "vampire") ||
+                   str_cmp(arg4, "gargoyle"))) {
+        stc("Syntax: pset <victim> class vampire [gargoyle]\n\r", ch);
+        return;
+    }
+    if (victim->pcdata == NULL || victim->pcdata->player_load_failed) {
+        stc("Their player data is unavailable; class was not changed.\n\r", ch);
+        return;
+    }
+    if (gargoyle && clan_block_class_change(victim)) return;
 	    victim->class = CLASS_VAMPIRE;
 	    victim->vampgen = 9;
 	    update_gen(victim);
@@ -109,7 +122,14 @@ void do_pset( CHAR_DATA *ch, char *argument )
 	    victim->pcdata->cland[0] = -1;
 	    victim->pcdata->cland[1] = -1;
 	    victim->pcdata->cland[2] = -1;
-	    send_to_char("You are now a Vampire.\n\r",victim);
+    if (gargoyle) {
+        victim->pcdata->cland[0] = VAMPIRE_BUILD_GARGOYLE;
+        victim->pcdata->powers[DISC_THAUMATURGY] = -1;
+        stc("You are now a Gargoyle (Vampire variant).\n\r", victim);
+        stc("Train with 'discipline visceratika' (15 primal for rank 1), "
+            "then use 'stoneform on'. No free rank is granted.\n\r", victim);
+        stc("Gargoyle build set; Visceratika is available for paid training.\n\r", ch);
+    } else send_to_char("You are now a Vampire.\n\r",victim);
 	}
 	else if ( !str_cmp( arg3, "werewolf" ) )
 	{

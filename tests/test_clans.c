@@ -913,6 +913,98 @@ static void gargoyle_form_ownership(void)
          "revocations and 15 real Vampire round trips passed");
 }
 
+static void gargoyle_staff_entry(void)
+{
+    fixture(CLASS_VAMPIRE);
+    actors[0].class = CLASS_NONE;
+    run(4, "pset Leader class vampire gargoyle");
+    assert(IS_GARGOYLE(&actors[0]) && actors[0].vampgen == 9);
+    assert(pcs[0].powers[DISC_THAUMATURGY] == -1);
+    assert(pcs[0].cland[1] == -1 && pcs[0].cland[2] == -1);
+    assert(strstr(outputs[0], "Gargoyle") &&
+           strstr(outputs[0], "discipline visceratika"));
+    assert(strstr(outputs[4], "Gargoyle"));
+    run(0, "discipline");
+    assert(strstr(outputs[0], "Visceratika") &&
+           !strstr(outputs[0], "Thaumaturgy"));
+    run(0, "stoneform on");
+    assert(!gargoyle_statue(&actors[0]));
+    actors[0].primal = 14;
+    run(0, "discipline visceratika");
+    assert(actors[0].primal == 14 && gargoyle_visceratika(&actors[0]) == 0);
+    actors[0].primal = 15;
+    run(0, "discipline visceratika");
+    assert(actors[0].primal == 0 && gargoyle_visceratika(&actors[0]) == 1);
+    actors[0].wait = 0;
+    run(0, "stoneform on");
+    assert(gargoyle_statue(&actors[0]));
+    assert(save_char_obj_checked(&actors[0]));
+    DESCRIPTOR_DATA reload = {0};
+    assert(load_char_obj(&reload, "Leader") && IS_GARGOYLE(reload.character));
+    assert(gargoyle_visceratika(reload.character) == 1 &&
+           gargoyle_statue(reload.character) && reload.character->primal == 0);
+    free_char(reload.character);
+    memset(&reload, 0, sizeof reload);
+    assert(load_char_short(&reload, "Leader") && IS_GARGOYLE(reload.character));
+    assert(gargoyle_visceratika(reload.character) == 1 &&
+           gargoyle_statue(reload.character) && reload.character->primal == 0);
+    free_char(reload.character);
+    if (fpReserve != NULL) { fclose(fpReserve); fpReserve = NULL; }
+    actors[0].wait = 0;
+    run(0, "stoneform off");
+    assert(!gargoyle_statue(&actors[0]));
+    run(4, "pset Leader class vampire");
+    assert(IS_GARGOYLE(&actors[0]) && gargoyle_visceratika(&actors[0]) == 1);
+    assert(strstr(outputs[4], "already have a class"));
+
+    fixture(CLASS_VAMPIRE);
+    actors[0].class = CLASS_NONE;
+    run(4, "pset Leader class vampire gargoyel");
+    assert(actors[0].class == CLASS_NONE && pcs[0].cland[0] == -1);
+    assert(strstr(outputs[4], "gargoyle"));
+    run(4, "pset Leader class vampire");
+    assert(IS_VAMPIRE(&actors[0]) && !IS_GARGOYLE(&actors[0]));
+    assert(pcs[0].cland[0] == -1 && pcs[0].cland[1] == -1 &&
+           pcs[0].cland[2] == -1 && pcs[0].powers[DISC_THAUMATURGY] == 0);
+    run(0, "discipline visceratika");
+    assert(gargoyle_visceratika(&actors[0]) == 0);
+
+    fixture(CLASS_VAMPIRE);
+    actors[0].class = CLASS_NONE;
+    run(4, "pset Leader class gargoyle");
+    assert(IS_GARGOYLE(&actors[0]) &&
+           pcs[0].powers[DISC_THAUMATURGY] == -1);
+    fixture(CLASS_VAMPIRE);
+    actors[0].class = CLASS_NONE;
+    run(4, "pset Leader class VaMpIrE GaRgOyLe");
+    assert(IS_GARGOYLE(&actors[0]));
+
+    fixture(CLASS_VAMPIRE);
+    actors[0].class = CLASS_NONE;
+    pcs[0].player_load_failed = TRUE;
+    run(4, "pset Leader class vampire gargoyle");
+    assert(actors[0].class == CLASS_NONE && pcs[0].cland[0] == -1);
+    assert(strstr(outputs[4], "unavailable"));
+
+    fixture(CLASS_VAMPIRE);
+    run(4, "clanadmin create Leader Stone");
+    actors[0].class = CLASS_NONE; /* Invalid class cache cannot bypass registry. */
+    run(4, "pset Leader class vampire gargoyle");
+    assert(actors[0].class == CLASS_NONE &&
+           pcs[0].cland[0] != VAMPIRE_BUILD_GARGOYLE);
+    actors[0].class = CLASS_VAMPIRE;
+    disband_admin();
+
+    fixture(CLASS_VAMPIRE);
+    actors[0].class = CLASS_NONE;
+    actors[0].level = LEV_SLE;
+    run(4, "pset Leader class vampire gargoyle");
+    assert(actors[0].class == CLASS_NONE && pcs[0].cland[0] == -1);
+    assert(strstr(outputs[4], "awakened"));
+    puts("Gargoyle staff entry: explicit build, paid training, stone toggle, "
+         "ordinary Vampire, typo and reclass protections passed");
+}
+
 static void gargoyle(void)
 {
     fixture(CLASS_VAMPIRE);
@@ -1508,6 +1600,7 @@ int main(void)
     native_recruitment();
     enrollment_recovery();
     nightstalker();
+    gargoyle_staff_entry();
     gargoyle();
     gargoyle_power_menu();
     gargoyle_lesson_lifecycle();

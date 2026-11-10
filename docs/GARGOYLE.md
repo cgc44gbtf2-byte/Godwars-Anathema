@@ -5,6 +5,18 @@ This is a permanent **Vampire build**, not a new primary class or a clan name.
 Existing Vampires are not automatically changed. Entry uses Anathema's normal
 requirements and generation 9, not EM's generation-2 grant.
 
+Classing unlocks Visceratika for training; it does not grant a free rank.
+Use `discipline visceratika` with 15 primal to learn rank 1, then `stoneform on`.
+The primary class still reads Vampire: Gargoyle is a build within that class.
+
+Staff can use `pset <player> class vampire gargoyle` (or
+`pset <player> class gargoyle`) on an awakened, unclassed player. This sets the
+build and untrained Visceratika, not earned ranks or clan membership.
+Plain `pset <player> class vampire` remains an ordinary Vampire.
+Misspelled variants are rejected instead of silently creating a plain Vampire.
+An already-classed player is not converted by these commands. Do not use
+`clearclass` as a repair shortcut: it removes earned class progress.
+
 ## Progression and commands
 
 - `discipline`: Visceratika replaces Thaumaturgy in the menu.
