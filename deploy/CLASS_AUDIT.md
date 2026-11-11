@@ -103,9 +103,13 @@ values are regression-tested, not rebalanced. NPC and immortal caps differ.
 - **Teach discipline:** subsequently replaced with guarded EM-style teaching
   in `vampire.c`: free at rank 3, explicit named student acceptance, and
   checked persistence. See the subsequent port notes below.
-- **Mage per-sphere descriptions:** legacy `sphere <name>` views still
-  contain placeholder prose despite implemented spells. `magepowers` is
-  the more useful command; its thresholds were corrected in this pass.
+- **Mage per-sphere descriptions:** the former placeholder views now name
+  implemented commands, point to `magepowers` for rank-based unlocks and show
+  the matching `sphere <name> learn` syntax. The summaries do not bypass or
+  replace each spell's other prerequisites. Reading help remains free.
+  Matter no longer advertises the unregistered `analyze` command; no
+  replacement rank-1 command was invented. Forces lists the registered
+  `friction` command rather than the unrecognized `frictioncurse` name.
 - **Literal skill references:** the structural audit found no unresolved
   literal `skill_lookup("...")` references using the existing prefix lookup
   convention (`blind` resolves to `blindness`). Dynamic names, serialized
@@ -265,8 +269,7 @@ the catalog check prevents advertising an empty spell as player-castable.
 
 ### Still unverified or deliberately unresolved
 
-- Quicksand/Lycaon and Malkavian mapping are not restored; Mage sphere prose
-  still contains placeholders.
+- Quicksand/Lycaon and Malkavian mapping are not restored.
 - Full multiplayer balance, sustained regeneration/feeding, equipment-heavy
   matchups and generic indirect lag behavior outside the guarded powers remain.
 - Combat resource transfers are not multi-character durable transactions.

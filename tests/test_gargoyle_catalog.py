@@ -8,6 +8,7 @@ from gargoyle_menu_source import PROOFS as MENU_PROOFS, without_gargoyle_menu
 from gargoyle_teaching_source import PATH as TEACH_PATH, BASE_BLOB as TEACH_BASE, NEW as TEACH_NEW, without_gargoyle_teaching
 from gargoyle_recruit_source import PATH as RECRUIT_PATH, BASE_BLOB as RECRUIT_BASE, NEW as RECRUIT_NEW, without_gargoyle_recruit
 from gargoyle_death_source import BASE as DEATH_BASE, NEW as DEATH_NEW, BEHEAD_NEW, without_gargoyle_death
+from class_help_source import without_class_help
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -115,7 +116,7 @@ class GargoyleCatalog(unittest.TestCase):
                 for needle in ("1002", "rank <= 5", "Visceratika", "IS_GARGOYLE"):
                     if needle not in new:
                         continue
-                    text = (ROOT / path).read_text()
+                    text = without_class_help((ROOT / path).read_text())
                     mutated = text.replace(new, new.replace(needle, "MUTATION", 1), 1)
                     self.assertNotEqual(blob(without_gargoyle_stage(mutated)), expected)
                     mutations += 1

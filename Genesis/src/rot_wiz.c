@@ -156,7 +156,7 @@ if ( !str_cmp( arg3, "vampire" ) || !str_cmp( arg3, "gargoyle" ) )
 	{
 	    victim->class = CLASS_MONK;
 	    victim->vampgen = 4;
-	    stc("You are now a Monk.\nr\r", victim);
+	    stc("You are now a Monk.\n\r", victim);
         }
 	else if ( !str_cmp( arg3, "dragon" ) )
 	{

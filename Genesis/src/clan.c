@@ -4663,6 +4663,9 @@ ch->class = CLASS_VAMPIRE;
 	ch->pcdata->powers[DISC_PRESENCE] = -1;
 	stc(IS_GARGOYLE(ch) ? "You are now a Gargoyle.\n\r" :
             "You are now a #rVampire#n.\n\r", ch);
+if (IS_GARGOYLE(ch))
+    stc("Train with 'discipline visceratika' (15 primal for rank 1), "
+        "then use 'stoneform on'. No free rank is granted.\n\r", ch);
     }
     else if (!str_cmp(arg1, "werewolf"))
     {
@@ -4705,7 +4708,7 @@ ch->class = CLASS_VAMPIRE;
 
 	ch->class = CLASS_MONK;
 	ch->vampgen = 4;
-	stc("You are now a #7Monk#n.\nr\r", ch);
+	stc("You are now a #7Monk#n.\n\r", ch);
     }
     else if (!str_cmp(arg1, "dragon"))
     {

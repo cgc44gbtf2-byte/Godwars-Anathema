@@ -77,7 +77,7 @@ Life 1: Life scan: clan.c
 Mind 1: Heighten: clan.c
 Mind 2: Scry: clan.c
 Mind 3: Shield: clan.c
-Matter 1: Analyze: warlock.c
+Matter 1: No standalone command is registered.
 */
 
 //mana costs
@@ -2891,7 +2891,9 @@ void do_spheres( CHAR_DATA *ch, char *argument )
 	}
 	else
         {
-	stc("This sphere will eventually do fun things.\n\r", ch);
+	stc("Life powers include readaura, mageheal, betterbody and polymorphother.\n\r"
+    "Use 'magepowers' for rank-based unlocks; other spell requirements still apply.\n\r"
+    "Train with 'sphere life learn'.\n\r", ch);
 	return;
 	}
     }
@@ -2905,7 +2907,9 @@ void do_spheres( CHAR_DATA *ch, char *argument )
 	
 	else
 	{
-	 stc("This sphere will eventually do fun things.\n\r", ch);
+	 stc("Prime powers include heartsblood, holysmote, mageenchant and ward.\n\r"
+     "Use 'magepowers' for rank-based unlocks; other spell requirements still apply.\n\r"
+     "Train with 'sphere prime learn'.\n\r", ch);
         return;
 	}
     }
@@ -2919,7 +2923,9 @@ void do_spheres( CHAR_DATA *ch, char *argument )
       }
 	else
       {
-	 stc("This sphere will eventually do fun things.\n\r", ch);
+	 stc("Matter powers include shatterwall, sculpture and alterweight.\n\r"
+     "Use 'magepowers' for rank-based unlocks; other spell requirements still apply.\n\r"
+     "Train with 'sphere matter learn'.\n\r", ch);
         return;
       }
     }
@@ -2932,7 +2938,9 @@ void do_spheres( CHAR_DATA *ch, char *argument )
       }
 	else
       {
-	 stc("This sphere will eventually do fun things.\n\r", ch);
+	 stc("Spirit powers include spiritsense, spiritcaress, stepsideways and breakdreamshell.\n\r"
+     "Use 'magepowers' for rank-based unlocks; other spell requirements still apply.\n\r"
+     "Train with 'sphere spirit learn'.\n\r", ch);
         return;
       }
     }
@@ -2945,7 +2953,9 @@ void do_spheres( CHAR_DATA *ch, char *argument )
       }
       else
       {
-	 stc("This sphere will eventually do fun things.\n\r", ch);
+	 stc("Entropy powers include beginnersluck, brittlebones and mutateephemera.\n\r"
+     "Use 'magepowers' for rank-based unlocks; other spell requirements still apply.\n\r"
+     "Train with 'sphere entropy learn'.\n\r", ch);
         return;
       }
     }
@@ -2958,7 +2968,9 @@ void do_spheres( CHAR_DATA *ch, char *argument )
       }
 	else
 	{
-	 stc("This sphere will eventually do fun things.\n\r", ch);
+	 stc("Correspondence governs targeting range and unlocks rift creation.\n\r"
+     "Use 'magepowers' for rank-based unlocks; other spell requirements still apply.\n\r"
+     "Train with 'sphere correspondence learn'.\n\r", ch);
         return;
 	}
     }
@@ -2972,7 +2984,9 @@ void do_spheres( CHAR_DATA *ch, char *argument )
 	
 	else
 	{
- 		stc("This sphere will eventually do fun things.\n\r", ch);
+		stc("Mind powers include heighten, scry, shield and mageinvis.\n\r"
+     "Use 'magepowers' for rank-based unlocks; other spell requirements still apply.\n\r"
+     "Train with 'sphere mind learn'.\n\r", ch);
         	return;
 	}
     }
@@ -2986,7 +3000,9 @@ void do_spheres( CHAR_DATA *ch, char *argument )
   
       else
       {
-	stc("This sphere will eventually do fun things.\n\r", ch);
+	stc("Forces powers include nightsight, electricalchaos, friction and inferno.\n\r"
+    "Use 'magepowers' for rank-based unlocks; other spell requirements still apply.\n\r"
+    "Train with 'sphere forces learn'.\n\r", ch);
         return;
 
       }
@@ -3000,7 +3016,9 @@ void do_spheres( CHAR_DATA *ch, char *argument )
       }
       else
       {
-	stc("This sphere will eventually do fun things.\n\r", ch);
+	stc("Time powers include contingency and doublecast.\n\r"
+    "Use 'magepowers' for rank-based unlocks; other spell requirements still apply.\n\r"
+    "Train with 'sphere time learn'.\n\r", ch);
         return;
       }
     }
@@ -3133,7 +3151,7 @@ if (ch->spheres[MENT] >= 3) stc(", brittlebones", ch);
         stc("Forces: ", ch);
 	if (ch->spheres[MFOR] >= 1) stc("nightsight", ch);
         if (ch->spheres[MFOR] >= 2) stc(", electricalchaos", ch);
-        if (ch->spheres[MFOR] >= 3) stc(", frictioncurse", ch);
+        if (ch->spheres[MFOR] >= 3) stc(", friction", ch);
         if (ch->spheres[MFOR] >= 5) stc(", inferno", ch);
         stc(".\n\r", ch);
     }
@@ -3151,8 +3169,8 @@ if (ch->spheres[MENT] >= 3) stc(", brittlebones", ch);
     if (ch->spheres[MMAT] > 0)
     {
         stc("Matter: ", ch);
-	if (ch->spheres[MMAT] >= 1) stc("analyze", ch);
-        if (ch->spheres[MMAT] >= 2) stc(", shatterwall", ch);
+	if (ch->spheres[MMAT] < 2) stc("no standalone rank-1 command", ch);
+        if (ch->spheres[MMAT] >= 2) stc("shatterwall", ch);
         if (ch->spheres[MMAT] >= 3) stc(", sculpture", ch);
         if (ch->spheres[MMAT] >= 5) stc(", alterweight", ch);
         stc(".\n\r", ch);

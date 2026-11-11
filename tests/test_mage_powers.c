@@ -1,6 +1,7 @@
 /* Synthetic fixtures only; compile this TU with -ffunction-sections
  * -fdata-sections and link with -Wl,--gc-sections. It includes real spells. */
 #include <assert.h>
+#include <strings.h>
 #include "../Genesis/src/classes/mage/mage.c"
 
 static CHAR_DATA caster, target;
@@ -32,7 +33,9 @@ char *one_argument(char *s, char *out)
     while (*s == ' ') ++s;
     return s;
 }
-bool str_cmp(const char *a, const char *b) { return strcmp(a, b) != 0; }
+bool str_cmp(const char *a, const char *b) { return strcasecmp(a, b) != 0; }
+bool str_prefix(const char *a, const char *b)
+{ return strncasecmp(a, b, strlen(a)) != 0; }
 CHAR_DATA *get_char_world(CHAR_DATA *ch, char *name)
 { (void)ch; return !strcmp(name, "target") ? &target : NULL; }
 CHAR_DATA *get_char_room(CHAR_DATA *ch, char *name)
@@ -166,8 +169,103 @@ static void gargoyle_forced_polymorph_releases_stone_form(void)
     assert(IS_GARGOYLE(&target));
 }
 
+static void sphere_help_is_read_only(void)
+{
+    static const struct {
+        char *name;
+        const char *example;
+    } cases[] = {
+        {"correspondence", "rift"}, {"life", "mageheal"},
+        {"prime", "mageenchant"}, {"entropy", "brittlebones"},
+        {"mind", "mageinvis"}, {"spirit", "stepsideways"},
+        {"forces", "electricalchaos"}, {"matter", "alterweight"},
+        {"time", "doublecast"}
+    };
+    for (int sphere = 0; sphere < 9; ++sphere)
+    {
+        for (long rank = 0; rank <= 5; ++rank)
+        {
+            reset();
+            caster.spheres[sphere] = rank;
+            caster.primal = 123;
+            CHAR_DATA before = caster;
+            PC_DATA before_pc = caster_pc;
+            do_spheres(&caster, cases[sphere].name);
+            assert(memcmp(&caster, &before, sizeof(caster)) == 0);
+            assert(memcmp(&caster_pc, &before_pc, sizeof(caster_pc)) == 0);
+            assert(strstr(messages, "eventually") == NULL);
+            if (rank == 0)
+                assert(strstr(messages, "no knowledge") != NULL);
+            else
+            {
+                char training[80];
+                snprintf(training, sizeof(training), "'sphere %s learn'",
+                         cases[sphere].name);
+                assert(strstr(messages, training) != NULL);
+                assert(strstr(messages, cases[sphere].example) != NULL);
+                assert(strstr(messages, "'magepowers'") != NULL);
+                assert(strstr(messages, "other spell requirements still apply") != NULL);
+            }
+        }
+    }
+    reset();
+    caster.class = CLASS_NONE;
+    CHAR_DATA before = caster;
+    PC_DATA before_pc = caster_pc;
+    do_spheres(&caster, "life");
+    assert(strcmp(messages, "Huh?\n\r") == 0);
+    assert(memcmp(&caster, &before, sizeof(caster)) == 0);
+    assert(memcmp(&caster_pc, &before_pc, sizeof(caster_pc)) == 0);
+    for (long rank = 1; rank <= 2; ++rank)
+    {
+        reset();
+        caster.spheres[MMAT] = rank;
+        before = caster;
+        before_pc = caster_pc;
+        do_magepowers(&caster, "");
+        assert(strstr(messages, "analyze") == NULL);
+        assert(strstr(messages, "frictioncurse") == NULL);
+        assert(strstr(messages, ", friction, inferno") != NULL);
+        assert(strstr(messages, rank == 1 ?
+            "Matter: no standalone rank-1 command." : "Matter: shatterwall.") != NULL);
+        assert(memcmp(&caster, &before, sizeof(caster)) == 0);
+        assert(memcmp(&caster_pc, &before_pc, sizeof(caster_pc)) == 0);
+    }
+}
+
+static void sphere_training_costs_are_unchanged(void)
+{
+    for (int sphere = 0; sphere < 9; ++sphere)
+    {
+        for (int selected = 0; selected <= 1; ++selected)
+        {
+            for (long rank = 0; rank <= 5; ++rank)
+            {
+                long cost = (rank + 1) * 10;
+                for (int enough = 0; enough <= 1; ++enough)
+                {
+                    reset();
+                    caster_pc.cland[0] = selected ? sphere : -1;
+                    caster_pc.cland[1] = caster_pc.cland[2] = -1;
+                    caster.spheres[sphere] = rank;
+                    caster.primal = cost - !enough;
+                    char command[80];
+                    snprintf(command, sizeof(command), "%s learn", sphere_name[sphere]);
+                    long primal = caster.primal;
+                    do_spheres(&caster, command);
+                    bool accepted = enough && rank < (selected ? 5 : 4);
+                    assert(caster.spheres[sphere] == rank + accepted);
+                    assert(caster.primal == primal - (accepted ? cost : 0));
+                }
+            }
+        }
+    }
+}
+
 int main(void)
 {
+    sphere_help_is_read_only();
+    sphere_training_costs_are_unchanged();
     for (long available = 0; available <= 2; ++available)
     {
         reset();
@@ -217,7 +315,7 @@ int main(void)
     reset();
     for (int i = 0; i < 9; ++i) caster.spheres[i] = 3;
     do_magepowers(&caster, "");
-    const char *third_rank[] = {"brittlebones", "frictioncurse", "betterbody",
+    const char *third_rank[] = {"brittlebones", "friction", "betterbody",
         "sculpture", "shield", "mageenchant", "stepsideways", "contingency"};
     for (unsigned i = 0; i < sizeof(third_rank)/sizeof(third_rank[0]); ++i)
         assert(strstr(messages, third_rank[i]));

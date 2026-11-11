@@ -137,6 +137,7 @@ static void test_prerequisites(void)
         int minimum[5];
     } cases[] = {
         {"vampire ventrue", CLASS_VAMPIRE, {3, 2, 4, 2, 1}},
+        {"vampire gargoyle", CLASS_VAMPIRE, {3, 2, 4, 2, 1}},
         {"werewolf", CLASS_WEREWOLF, {4, 2, 3, 1, 2}},
         {"sorcerer", CLASS_SORCERER, {2, 2, 1, 4, 3}},
         {"monk", CLASS_MONK, {2, 3, 2, 1, 4}},
@@ -178,6 +179,8 @@ static void test_prerequisites(void)
             assert(ch.level == LEV_SOR && ch.vampgen == 4);
         if (ch.class == CLASS_MONK || ch.class == CLASS_NINJA)
             assert(ch.vampgen == 4);
+        if (ch.class == CLASS_MONK)
+            assert(strcmp(output, "You are now a #7Monk#n.\n\r") == 0);
         if (ch.class == CLASS_DRAGON)
             assert(ch.vampgen == 12);
         if (ch.class == CLASS_DROW)
@@ -224,8 +227,11 @@ static void test_vampires(void)
     for (i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i)
     {
         fixture(&ch, &pc);
+        /* An ordinary Vampire recipe must replace a stale variant marker. */
+        pc.cland[0] = VAMPIRE_BUILD_GARGOYLE;
         do_autoclass(&ch, cases[i].command);
         assert(ch.class == CLASS_VAMPIRE && ch.vampgen == 9);
+        assert(!IS_GARGOYLE(&ch) && strstr(output, "Gargoyle") == NULL);
         assert(pc.willpower[0] == 80 && pc.willpower[1] == 80);
         assert(ch.blood[BLOOD_POOL] == 300);
         check_clan(&ch, cases[i].name);
@@ -241,6 +247,27 @@ static void test_vampires(void)
         }
         free_string(ch.clan);
     }
+}
+
+static void test_gargoyle_acquisition(void)
+{
+    CHAR_DATA ch;
+    PC_DATA pc;
+    fixture(&ch, &pc);
+    do_autoclass(&ch, "vampire gargoyle");
+    assert(ch.class == CLASS_VAMPIRE && IS_GARGOYLE(&ch));
+    assert(ch.vampgen == 9 && ch.blood[BLOOD_POOL] == 300);
+    assert(pc.willpower[0] == 80 && pc.willpower[1] == 80);
+    assert(pc.cland[0] == VAMPIRE_BUILD_GARGOYLE);
+    assert(pc.cland[1] == -1 && pc.cland[2] == -1);
+    assert(pc.powers[DISC_THAUMATURGY] == -1);
+    assert(gargoyle_visceratika(&ch) == 0 && !gargoyle_statue(&ch));
+    assert(ch.primal == 0);
+    check_clan(&ch, "");
+    assert(strstr(output, "You are now a Gargoyle.") != NULL);
+    assert(strstr(output, "'discipline visceratika' (15 primal for rank 1)") != NULL);
+    assert(strstr(output, "'stoneform on'. No free rank is granted.") != NULL);
+    free_string(ch.clan);
 }
 
 static void test_mages_and_dragons(void)
@@ -371,6 +398,7 @@ int main(void)
     test_power_listings();
     test_prerequisites();
     test_vampires();
+    test_gargoyle_acquisition();
     test_mages_and_dragons();
     test_rejections();
     assert(owned_string == NULL);

@@ -40,6 +40,8 @@ WEB_SPELL_ARMOR="""    /* Reject all-or-nothing before the dodge roll or affect 
 """
 
 def without_web_safety(text):
+    from class_help_source import without_class_help
+    text = without_class_help(text)
     if "/* Invalid armor must not reach the spell" in text:
         text=once(text,WEB_ARMOR_GATE,"")
     if "/* Direct spell callers need the same live local target" in text:
