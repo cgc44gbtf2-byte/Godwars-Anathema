@@ -5,6 +5,7 @@ import re
 import unittest
 
 from class_help_source import PROOFS, without_class_help
+from elemental_help_source import ELEMENT_HELP
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -40,6 +41,53 @@ class ClassHelpCatalog(unittest.TestCase):
                 self.assertTrue(name in commands, f"Unregistered Mage help command: {name}")
         self.assertIn("rift", commands)
         self.assertNotIn("eventually do fun things", help_text)
+
+    def test_elementalist_help_matches_registered_handlers_and_actual_ranks(self):
+        source = (ROOT / "Genesis/src/classes/elemental/elemental.c").read_text()
+        commands = dict(re.findall(
+            r'\{\s*"([^"]+)"\s*,\s*(do_\w+)',
+            (ROOT / "Genesis/src/interp.c").read_text().split("social_table")[0]))
+        self.assertEqual(len(ELEMENT_HELP), 25)
+        for element, _, rank, _, command in ELEMENT_HELP:
+            handler = "do_cloak" if command == "cloakofsight" else "do_" + command
+            self.assertEqual(commands.get(command), handler, command)
+            body = re.split(r"\bvoid\s+" + handler + r"\s*\(", source, maxsplit=1)[1]
+            body = body.split("\nvoid ", 1)[0]
+            compact = re.sub(r"\s+", "", body)
+            guard = f"ch->pcdata->powers[ELEM_{element}]<{rank}"
+            if command == "sunbath":
+                guard = "hybrid_power_rank(ch,CLASS_ELEM,HYBRID_TRAIN_ELEMENT,ELEM_SUN)<3"
+            self.assertTrue(guard in compact, f"Help rank differs from {handler}")
+
+    def test_vampire_and_werewolf_advertisements_dispatch_correctly(self):
+        commands = re.findall(
+            r'\{\s*"([^"]+)"\s*,\s*(do_\w+)',
+            (ROOT / "Genesis/src/interp.c").read_text().split("social_table")[0])
+        exact = dict(commands)
+        aliases = {
+            "beckon": "do_beckon", "mirror": "do_mirrorimage",
+            "clone": "do_cloneobject", "control": "do_control",
+            "condition": "do_conditioning", "shroud": "do_shroudnight",
+            "arms": "do_arms", "entrance": "do_entrancement",
+        }
+        for path, function, minimum in (
+            ("clan.c", "do_powers", 70),
+            ("classes/werewolf/werewolf.c", "do_wwpowers", 50),
+        ):
+            source = (ROOT / "Genesis/src" / path).read_text()
+            body = source.split("void " + function + "(", 1)[1].split("\nvoid ", 1)[0]
+            checked = 0
+            for literal in re.findall(r'(?:strcpy|strcat)\(buf,\s*"([^"]+)"', body):
+                for token in literal.split(":", 1)[-1].replace("\\n\\r", "").strip(" .").split():
+                    if not token.isalpha():
+                        continue
+                    name = token.lower()
+                    expected = exact.get(name, aliases.get(name))
+                    actual = next((fn for cmd, fn in commands if cmd.startswith(name)), None)
+                    self.assertIsNotNone(expected, f"Undocumented menu alias: {name}")
+                    self.assertEqual(actual, expected, name)
+                    checked += 1
+            self.assertGreaterEqual(checked, minimum)
 
 
 if __name__ == "__main__":

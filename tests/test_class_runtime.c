@@ -25,6 +25,8 @@ static bool relocate_caster;
 static int hit_calls, damage_calls, poison_calls, observed_victim_lag;
 static CHAR_DATA *last_target;
 static int caster_moves;
+static bool capture_help;
+static char help_output[8192];
 
 char *one_argument(char *s, char *out)
 {
@@ -35,7 +37,19 @@ char *one_argument(char *s, char *out)
     return s;
 }
 bool str_cmp(const char *a, const char *b) { return strcasecmp(a, b) != 0; }
-void send_to_char(const char *s, CHAR_DATA *ch) { (void)s; (void)ch; }
+/* do_element also links Phoenix focus cleanup. Menu/training fixtures must
+ * never reach its owned-string mutations; fail rather than fake that flow. */
+void free_string(char *text)
+{ (void)text; fputs("unexpected form-string release\n", stderr); abort(); }
+char *str_dup(const char *text)
+{ (void)text; fputs("unexpected form-string allocation\n", stderr); abort(); }
+void send_to_char(const char *s, CHAR_DATA *ch)
+{
+    (void)ch;
+    if (!capture_help) return;
+    assert(strlen(help_output) + strlen(s) < sizeof(help_output));
+    strcat(help_output, s);
+}
 void act(const char *s, CHAR_DATA *ch, const void *a, const void *b, long t)
 { (void)s; (void)ch; (void)a; (void)b; (void)t; }
 long get_trust(CHAR_DATA *ch) { return ch->level; }
@@ -382,8 +396,83 @@ static void test_combat_only_targeting(void)
     }
 }
 
+static void test_elementalist_help_and_training(void)
+{
+    static const struct { char *name; int element; } elements[] = {
+        {"fire", ELEM_FIRE}, {"water", ELEM_WATER}, {"wind", ELEM_WIND},
+        {"earth", ELEM_EARTH}, {"sun", ELEM_SUN}, {"moon", ELEM_MOON},
+        {"time", ELEM_TIME}, {"infinity", ELEM_INFIN}
+    };
+    static const struct { int element, rank; const char *command; } commands[] = {
+        {ELEM_FIRE, 1, "flarearrow"}, {ELEM_FIRE, 8, "fireblade"},
+        {ELEM_FIRE, 10, "phoenixform"}, {ELEM_WATER, 1, "iciclestorm"},
+        {ELEM_WATER, 5, "watertravel"}, {ELEM_WATER, 8, "aquabarrier"},
+        {ELEM_WATER, 10, "watercontrol"}, {ELEM_WIND, 1, "windwings"},
+        {ELEM_WIND, 8, "windblades"}, {ELEM_WIND, 10, "atoningwinds"},
+        {ELEM_EARTH, 1, "localquake"}, {ELEM_EARTH, 8, "stoneblast"},
+        {ELEM_EARTH, 10, "liquifyearth"}, {ELEM_SUN, 3, "sunbath"},
+        {ELEM_SUN, 5, "holyaura"}, {ELEM_SUN, 8, "solarflash"},
+        {ELEM_SUN, 10, "solarlight"}, {ELEM_MOON, 3, "mirageslice"},
+        {ELEM_MOON, 8, "nightblade"}, {ELEM_MOON, 10, "spiralmoon"},
+        {ELEM_TIME, 10, "slow"}, {ELEM_INFIN, 2, "farsight"},
+        {ELEM_INFIN, 3, "cloakofsight"}, {ELEM_INFIN, 5, "infinitesight"},
+        {ELEM_INFIN, 10, "ultimawave"}
+    };
+    CHAR_DATA ch = {0};
+    PC_DATA pc = {0};
+    ch.pcdata = &pc;
+    ch.class = CLASS_ELEM;
+    ch.primal = 1200;
+    ch.mana = 9000;
+    ch.wait = 9;
+    capture_help = TRUE;
+    for (unsigned e = 0; e < sizeof(elements) / sizeof(elements[0]); ++e)
+    {
+        for (int rank = 0; rank <= 10; ++rank)
+        {
+            memset(&pc, 0, sizeof(pc));
+            pc.powers[elements[e].element] = rank;
+            CHAR_DATA before = ch;
+            PC_DATA before_pc = pc;
+            help_output[0] = '\0';
+            do_element(&ch, elements[e].name);
+            assert(memcmp(&ch, &before, sizeof(ch)) == 0);
+            assert(memcmp(&pc, &before_pc, sizeof(pc)) == 0);
+            for (unsigned c = 0; c < sizeof(commands) / sizeof(commands[0]); ++c)
+            {
+                char hint[64];
+                snprintf(hint, sizeof(hint), "(%s)", commands[c].command);
+                bool visible = commands[c].element == elements[e].element &&
+                               rank >= commands[c].rank;
+                assert((strstr(help_output, hint) != NULL) == visible);
+            }
+        }
+        for (int rank = 0; rank <= 8; ++rank)
+        for (int enough = 0; enough <= 1; ++enough)
+        {
+            memset(&pc, 0, sizeof(pc));
+            pc.powers[elements[e].element] = rank;
+            long cost = (rank + 1) * 10;
+            ch.primal = cost - !enough;
+            CHAR_DATA expected = ch;
+            PC_DATA expected_pc = pc;
+            bool accepted = enough && rank < 8;
+            expected.primal -= accepted ? cost : 0;
+            expected_pc.powers[elements[e].element] += accepted;
+            char command[64];
+            snprintf(command, sizeof(command), "%s improve", elements[e].name);
+            help_output[0] = '\0';
+            do_element(&ch, command);
+            assert(memcmp(&ch, &expected, sizeof(ch)) == 0);
+            assert(memcmp(&pc, &expected_pc, sizeof(pc)) == 0);
+        }
+    }
+    capture_help = FALSE;
+}
+
 int main(void)
 {
+    test_elementalist_help_and_training();
     test_combat_only_targeting();
     test_chain(do_flarearrow, CLASS_ELEM, 3, 500);
     test_chain(do_windblades, CLASS_ELEM, 3, 800);

@@ -110,6 +110,12 @@ values are regression-tested, not rebalanced. NPC and immortal caps differ.
   Matter no longer advertises the unregistered `analyze` command; no
   replacement rank-1 command was invented. Forces lists the registered
   `friction` command rather than the unrecognized `frictioncurse` name.
+- **Elementalist ability help:** all 25 active abilities in `elemskill`
+  views now include their registered command names, including
+  `liquifyearth` and `cloakofsight`. Sun Bath and Mirage Slice are listed at
+  rank 3, and Far Sight at rank 2, matching their existing handlers rather
+  than the former rank-1 advertisements. Spell prerequisites, resource
+  costs, focus behavior, training caps and passive entries are unchanged.
 - **Literal skill references:** the structural audit found no unresolved
   literal `skill_lookup("...")` references using the existing prefix lookup
   convention (`blind` resolves to `blindness`). Dynamic names, serialized

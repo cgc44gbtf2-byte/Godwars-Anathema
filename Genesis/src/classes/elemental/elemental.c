@@ -68,55 +68,55 @@ void do_element( CHAR_DATA *ch, char *argument )
 	{
 	    stc("Fire - Element of Strength and Ferocity.\n\r\n\r", ch);
 	    if (ch->pcdata->powers[ELEM_FIRE] == 0) stc("You have no skill with Fire.\n\r", ch);
-	    if (ch->pcdata->powers[ELEM_FIRE] >= 1) stc("1 : Flare Arrow    - Launches flaming arrows.\n\r", ch);
+	    if (ch->pcdata->powers[ELEM_FIRE] >= 1) stc("1 : Flare Arrow    - Launches flaming arrows (flarearrow).\n\r", ch);
 	    if (ch->pcdata->powers[ELEM_FIRE] >= 5) stc("5 : Flame Aura     - Strength increase. <auto>\n\r", ch);
-	    if (ch->pcdata->powers[ELEM_FIRE] >= 8) stc("8 : Fire Blade     - Ignites your weapons.\n\r", ch);
-	    if (ch->pcdata->powers[ELEM_FIRE] >= 10) stc("10: Phoenix Form   - Turn into a Phoenix.\n\r", ch);
+	    if (ch->pcdata->powers[ELEM_FIRE] >= 8) stc("8 : Fire Blade     - Ignites your weapons (fireblade).\n\r", ch);
+	    if (ch->pcdata->powers[ELEM_FIRE] >= 10) stc("10: Phoenix Form   - Turn into a Phoenix (phoenixform).\n\r", ch);
 	}
 	else if (!str_cmp(arg1, "water"))
 	{
 	    stc("Water - Element of Order and Conformity.\n\r\n\r", ch);
 	    if (ch->pcdata->powers[ELEM_WATER] == 0) stc("You have no skill with Water.\n\r", ch);
-	    if (ch->pcdata->powers[ELEM_WATER] >= 1) stc("1 : Icicle Storm  - Conjures a barrage of icicles.\n\r", ch);
-	    if (ch->pcdata->powers[ELEM_WATER] >= 5) stc("5 : Water Travel  - Allows quick travel.\n\r", ch);
-	    if (ch->pcdata->powers[ELEM_WATER] >= 8) stc("8 : Aqua Barrier  - Surrounds you with a barrier of water.\n\r", ch);
-	    if (ch->pcdata->powers[ELEM_WATER] >= 10) stc("10: Water Control - Stuns opponents.\n\r", ch);
+	    if (ch->pcdata->powers[ELEM_WATER] >= 1) stc("1 : Icicle Storm  - Conjures a barrage of icicles (iciclestorm).\n\r", ch);
+	    if (ch->pcdata->powers[ELEM_WATER] >= 5) stc("5 : Water Travel  - Allows quick travel (watertravel).\n\r", ch);
+	    if (ch->pcdata->powers[ELEM_WATER] >= 8) stc("8 : Aqua Barrier  - Surrounds you with a barrier of water (aquabarrier).\n\r", ch);
+	    if (ch->pcdata->powers[ELEM_WATER] >= 10) stc("10: Water Control - Stuns opponents (watercontrol).\n\r", ch);
 	}
 	else if (!str_cmp(arg1, "wind"))
 	{
 	    stc("Wind - Element of Chaos and Speed.\n\r\n\r", ch);
 	    if (ch->pcdata->powers[ELEM_WIND] == 0) stc("You have no skill with Wind.\n\r", ch);
-	    if (ch->pcdata->powers[ELEM_WIND] >= 1) stc("1 : Wind Wings     - Lifts you into the air.\n\r", ch);
+	    if (ch->pcdata->powers[ELEM_WIND] >= 1) stc("1 : Wind Wings     - Lifts you into the air (windwings).\n\r", ch);
 	    if (ch->pcdata->powers[ELEM_WIND] >= 5) stc("5 : Wind Song      - Speed increase. <auto>\n\r", ch);
-	    if (ch->pcdata->powers[ELEM_WIND] >= 8) stc("8 : Wind Blades    - Slashes with blades of wind.\n\r", ch);
-	    if (ch->pcdata->powers[ELEM_WIND] >= 10) stc("10: Atoning Winds  - Slows opponents.\n\r", ch);
+	    if (ch->pcdata->powers[ELEM_WIND] >= 8) stc("8 : Wind Blades    - Slashes with blades of wind (windblades).\n\r", ch);
+	    if (ch->pcdata->powers[ELEM_WIND] >= 10) stc("10: Atoning Winds  - Slows opponents (atoningwinds).\n\r", ch);
 	}
 	else if (!str_cmp(arg1, "earth"))
 	{
 	    stc("Earth - Element of Toughness.\n\r\n\r", ch);
 	    if (ch->pcdata->powers[ELEM_EARTH] == 0) stc("You have no skill with Earth.\n\r",ch);
-	    if (ch->pcdata->powers[ELEM_EARTH] >= 1) stc("1 : Local Quake   - Shakes the earth.\n\r",ch);
+	    if (ch->pcdata->powers[ELEM_EARTH] >= 1) stc("1 : Local Quake   - Shakes the earth (localquake).\n\r",ch);
 	    if (ch->pcdata->powers[ELEM_EARTH] >= 5) stc("5 : Earthen Skin  - Defense increase. <auto>\n\r", ch);
-	    if (ch->pcdata->powers[ELEM_EARTH] >= 8) stc("8 : Stone Blast   - Blasts everything.\n\r", ch);
-	    if (ch->pcdata->powers[ELEM_EARTH] >= 10) stc("10: Liquify Stone - Turns the land into quicksand.\n\r", ch);
+	    if (ch->pcdata->powers[ELEM_EARTH] >= 8) stc("8 : Stone Blast   - Blasts everything (stoneblast).\n\r", ch);
+	    if (ch->pcdata->powers[ELEM_EARTH] >= 10) stc("10: Liquify Stone - Turns the land into quicksand (liquifyearth).\n\r", ch);
 	}
 	else if (!str_cmp(arg1, "sun"))
 	{
 	    stc("Sun - Element of Light and Protection.\n\r\n\r", ch);
 	    if (ch->pcdata->powers[ELEM_SUN] == 0) stc("You have no skill with Sun.\n\r", ch);
-	    if (ch->pcdata->powers[ELEM_SUN] >= 1) stc("1 : Sun Bath        - Showers target with healing light.\n\r", ch);
-	    if (ch->pcdata->powers[ELEM_SUN] >= 5) stc("5 : Holy Aura       - Surrounds you with a holy aura.\n\r", ch);
-	    if (ch->pcdata->powers[ELEM_SUN] >= 8) stc("8 : Solar Flash     - Blinds opponents.\n\r", ch);
-	    if (ch->pcdata->powers[ELEM_SUN] >= 10) stc("10: Solar Light     - Grants you a halo of sunlight.\n\r", ch);
+	    if (ch->pcdata->powers[ELEM_SUN] >= 3) stc("3 : Sun Bath        - Showers target with healing light (sunbath).\n\r", ch);
+	    if (ch->pcdata->powers[ELEM_SUN] >= 5) stc("5 : Holy Aura       - Surrounds you with a holy aura (holyaura).\n\r", ch);
+	    if (ch->pcdata->powers[ELEM_SUN] >= 8) stc("8 : Solar Flash     - Blinds opponents (solarflash).\n\r", ch);
+	    if (ch->pcdata->powers[ELEM_SUN] >= 10) stc("10: Solar Light     - Grants you a halo of sunlight (solarlight).\n\r", ch);
 	}
 	else if (!str_cmp(arg1, "moon"))
 	{
 	    stc("Moon - Element of Darkness and Illusion.\n\r\n\r", ch);
 	    if (ch->pcdata->powers[ELEM_MOON] == 0) stc("You have no skill with Moon.\n\r", ch);
-	    if (ch->pcdata->powers[ELEM_MOON] >= 1) stc("1 : Mirage Slice   - Summons an illusionary double to attack.\n\r", ch);
+	    if (ch->pcdata->powers[ELEM_MOON] >= 3) stc("3 : Mirage Slice   - Summons an illusionary double to attack (mirageslice).\n\r", ch);
 	    if (ch->pcdata->powers[ELEM_MOON] >= 5) stc("5 : Mirage Bodies  - Evade increase. <auto>\n\r", ch);
-	    if (ch->pcdata->powers[ELEM_MOON] >= 8) stc("8 : Night Blade    - Life stealing double attack.\n\r", ch);
-	    if (ch->pcdata->powers[ELEM_MOON] >= 10) stc("10: Spiral Moon    - Weakens with dark energy.\n\r", ch);
+	    if (ch->pcdata->powers[ELEM_MOON] >= 8) stc("8 : Night Blade    - Life stealing double attack (nightblade).\n\r", ch);
+	    if (ch->pcdata->powers[ELEM_MOON] >= 10) stc("10: Spiral Moon    - Weakens with dark energy (spiralmoon).\n\r", ch);
 	}
 	else if (!str_cmp(arg1,"time"))
 	{
@@ -125,17 +125,17 @@ void do_element( CHAR_DATA *ch, char *argument )
 	    if (ch->pcdata->powers[ELEM_TIME] >= 1) stc("1 : Speed Vision   - Attack increase. <auto>\n\r", ch);
 	    if (ch->pcdata->powers[ELEM_TIME] >= 5) stc("5 : Hasten         - Speed increase. <auto>\n\r", ch);
 	    if (ch->pcdata->powers[ELEM_TIME] >= 8) stc("8 : Quick Chant    - Spell speed increase. <auto>\n\r", ch);
-	    if (ch->pcdata->powers[ELEM_TIME] >= 10) stc("10: Slow           - Slows target.\n\r", ch);
+	    if (ch->pcdata->powers[ELEM_TIME] >= 10) stc("10: Slow           - Slows target (slow).\n\r", ch);
 	}
 	else if (!str_cmp(arg1,"infinity"))
 	{
 	    stc("Infinity - Element of Unity and the Void.\n\r\n\r", ch);
 	    if (ch->pcdata->powers[ELEM_INFIN] == 0) stc("You have no skill with this element.\n\r", ch);
-	    if (ch->pcdata->powers[ELEM_INFIN] >= 1) stc("1 : Far Sight      - Watches from afar.\n\r", ch);
-	    if (ch->pcdata->powers[ELEM_INFIN] >= 3) stc("3 : Cloak of Sight - Hides you at a distance.\n\r", ch);
-	    if (ch->pcdata->powers[ELEM_INFIN] >= 5) stc("5 : Infinite Sight - Opens your eyes to everything.\n\r", ch);
+	    if (ch->pcdata->powers[ELEM_INFIN] >= 2) stc("2 : Far Sight      - Watches from afar (farsight).\n\r", ch);
+	    if (ch->pcdata->powers[ELEM_INFIN] >= 3) stc("3 : Cloak of Sight - Hides you at a distance (cloakofsight).\n\r", ch);
+	    if (ch->pcdata->powers[ELEM_INFIN] >= 5) stc("5 : Infinite Sight - Opens your eyes to everything (infinitesight).\n\r", ch);
 	    if (ch->pcdata->powers[ELEM_INFIN] >= 8) stc("8 : Focus          - Skill increase. <auto>\n\r", ch);
-	    if (ch->pcdata->powers[ELEM_INFIN] >= 10) stc("10: Ultima Wave    - Creates a wave of destruction.\n\r", ch);
+	    if (ch->pcdata->powers[ELEM_INFIN] >= 10) stc("10: Ultima Wave    - Creates a wave of destruction (ultimawave).\n\r", ch);
 	}
 	else
 	{

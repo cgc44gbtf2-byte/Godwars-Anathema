@@ -1,4 +1,5 @@
 """Reverse only reviewed class-help strings; preserve older gameplay pins."""
+from elemental_help_source import ELEMENT_HUNKS
 
 SPHERES = [
     ("life", "Life powers include readaura, mageheal, betterbody and polymorphother.", 4),
@@ -39,6 +40,8 @@ GARGOYLE_HINT = """if (IS_GARGOYLE(ch))
         "then use 'stoneform on'. No free rank is granted.\\n\\r", ch);
 """
 PROOFS = [
+    ("Genesis/src/classes/elemental/elemental.c",
+     "90fa65b2627a1f25c9ef29de916427dfb33aa074", ELEMENT_HUNKS),
     ("Genesis/src/classes/mage/mage.c",
      "667337169a49331e1ec68678faf4ba6699a573cf", MAGE_HUNKS),
     ("Genesis/src/clan.c", "6cc9fa0d03e3a87c55a622f9ef959288e8550570", [
