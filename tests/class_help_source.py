@@ -39,7 +39,20 @@ GARGOYLE_HINT = """if (IS_GARGOYLE(ch))
     stc("Train with 'discipline visceratika' (15 primal for rank 1), "
         "then use 'stoneform on'. No free rank is granted.\\n\\r", ch);
 """
+HIGHLAND_GUIDANCE = (
+    '\tstc("Syntax: increase <attack/defense/weaponry/powers>\\n\\r"\n'
+    '        "Training buys one rank immediately: 15 x next rank primal; maximum 6.\\n\\r"\n'
+    '        "Power commands: bflash (Powers 2), bash (Powers 3), htwist (Powers 4),\\n\\r"\n'
+    '        "                judge (Powers 5), lunge (Powers 6).\\n\\r"\n'
+    '        "Counter: counter (Powers 4 + Defense 4); wield your own forged katana to activate.\\n\\r"\n'
+    '        "Use \'counter off\' to lower your guard. Other ability restrictions still apply.\\n\\r", ch);'
+)
 PROOFS = [
+    ("Genesis/src/classes/highlander/highland.c",
+     "4d0d0c9f802b65b914571fb9999d0556a885ded3", [
+         (HIGHLAND_GUIDANCE,
+          '\tstc("Syntax: increase <attack/defense/weaponry/powers>",ch);'),
+     ]),
     ("Genesis/src/classes/elemental/elemental.c",
      "90fa65b2627a1f25c9ef29de916427dfb33aa074", ELEMENT_HUNKS),
     ("Genesis/src/classes/mage/mage.c",

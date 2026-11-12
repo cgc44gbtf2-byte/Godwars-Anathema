@@ -59,6 +59,67 @@ static void costless(void)
 
 static void command(const char *name);
 
+static void test_highlander_training_help(void)
+{
+    static const struct { char *name; int path; } paths[] = {
+        {"attack", HIGH_ATTACK}, {"defense", HIGH_DEFENSE},
+        {"weaponry", HIGH_WEAPON}, {"powers", HIGH_ABILITY}
+    };
+    static const char *const hints[] = {
+        "bflash (Powers 2)", "bash (Powers 3)", "htwist (Powers 4)",
+        "judge (Powers 5)", "lunge (Powers 6)",
+        "counter (Powers 4 + Defense 4)", "your own forged katana",
+        "15 x next rank primal; maximum 6.", "Training buys one rank immediately",
+        "counter off"
+    };
+    unsigned views = 0, purchases = 0;
+    for (size_t p = 0; p < sizeof(paths) / sizeof(paths[0]); ++p)
+    for (int rank = 0; rank <= 6; ++rank)
+    {
+        fresh(CLASS_HIGHLANDER);
+        player.highland[paths[p].path] = rank;
+        actor.wait = 7;
+        CHAR_DATA expected = actor;
+        PC_DATA expected_pc = player;
+        do_increase(&actor, "");
+        assert(!memcmp(&actor, &expected, sizeof(actor)));
+        assert(!memcmp(&player, &expected_pc, sizeof(player)));
+        assert(strstr(output, "Syntax: increase <attack/defense/weaponry/powers>\n\r"));
+        for (size_t h = 0; h < sizeof(hints) / sizeof(hints[0]); ++h)
+            assert(strstr(output, hints[h]));
+        ++views;
+        for (int enough = 0; enough <= 1; ++enough)
+        {
+            fresh(CLASS_HIGHLANDER);
+            player.highland[paths[p].path] = rank;
+            const long cost = (rank + 1) * 15;
+            actor.primal = cost - !enough;
+            actor.wait = 7;
+            expected = actor;
+            expected_pc = player;
+            const bool accepted = enough && rank < 6;
+            expected.primal -= accepted ? cost : 0;
+            expected_pc.highland[paths[p].path] += accepted;
+            do_increase(&actor, paths[p].name);
+            assert(!memcmp(&actor, &expected, sizeof(actor)));
+            assert(!memcmp(&player, &expected_pc, sizeof(player)));
+            if (rank == 6) assert(strstr(output, "maximum proficiency"));
+            else if (enough) assert(strstr(output, "improved your skill"));
+            else assert(strstr(output, "It costs"));
+            ++purchases;
+        }
+    }
+    fresh(CLASS_HIGHLANDER);
+    CHAR_DATA before = actor;
+    PC_DATA before_pc = player;
+    do_increase(&actor, "unknown");
+    assert(strstr(output, "Training buys one rank immediately"));
+    assert(!memcmp(&actor, &before, sizeof(actor)));
+    assert(!memcmp(&player, &before_pc, sizeof(player)));
+    assert(views == 28 && purchases == 56);
+    puts("Highlander: 28 free help views and 56 training cost/cap boundaries passed");
+}
+
 static void test_highlander_flash(void)
 {
     CHAR_DATA victim;
@@ -304,6 +365,7 @@ int main(void)
     assert(string_space); top_string = string_space;
     current_time = 123456;
     init_mm();
+    test_highlander_training_help();
     test_highlander_flash();
     test_presence();
     test_beast();

@@ -4,7 +4,7 @@ from pathlib import Path
 import re
 import unittest
 
-from class_help_source import PROOFS, without_class_help
+from class_help_source import HIGHLAND_GUIDANCE, PROOFS, without_class_help
 from elemental_help_source import ELEMENT_HELP
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -58,6 +58,31 @@ class ClassHelpCatalog(unittest.TestCase):
             if command == "sunbath":
                 guard = "hybrid_power_rank(ch,CLASS_ELEM,HYBRID_TRAIN_ELEMENT,ELEM_SUN)<3"
             self.assertTrue(guard in compact, f"Help rank differs from {handler}")
+
+    def test_highlander_guidance_matches_registered_handlers_and_actual_ranks(self):
+        source = (ROOT / "Genesis/src/classes/highlander/highland.c").read_text()
+        commands = re.findall(
+            r'\{\s*"([^"]+)"\s*,\s*(do_\w+)',
+            (ROOT / "Genesis/src/interp.c").read_text().split("social_table")[0])
+        for name, handler, rank in (
+            ("bflash", "do_bladeflash", 2), ("bash", "do_bash", 3),
+            ("htwist", "do_htwist", 4), ("judge", "do_judgement", 5),
+            ("lunge", "do_lunge", 6),
+        ):
+            self.assertEqual(next(fn for cmd, fn in commands if cmd.startswith(name)),
+                             handler)
+            self.assertIn(f"{name} (Powers {rank})", HIGHLAND_GUIDANCE)
+            body = re.split(r"\bvoid\s+" + handler + r"\s*\(", source, maxsplit=1)[1]
+            body = re.split(r"\n(?:void|bool)\s+", body, maxsplit=1)[0]
+            self.assertIn(f"HIGH_ABILITY)<{rank}", re.sub(r"\s+", "", body))
+        self.assertEqual(next(fn for cmd, fn in commands if cmd.startswith("counter")),
+                         "do_counter")
+        counter = source.split("static bool counter_ready(", 1)[1].split(
+            "\nstatic bool counter_equipped(", 1)[0]
+        for path in ("HIGH_DEFENSE", "HIGH_ABILITY"):
+            self.assertIn(f"{path})>=4", re.sub(r"\s+", "", counter))
+        self.assertIn("counter (Powers 4 + Defense 4)", HIGHLAND_GUIDANCE)
+        self.assertIn("15 x next rank primal; maximum 6.", HIGHLAND_GUIDANCE)
 
     def test_vampire_and_werewolf_advertisements_dispatch_correctly(self):
         commands = re.findall(

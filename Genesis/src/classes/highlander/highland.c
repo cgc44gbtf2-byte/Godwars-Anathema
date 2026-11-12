@@ -187,7 +187,12 @@ void do_increase( CHAR_DATA *ch, char *argument )
 snprintf(buf, sizeof(buf), "Increases: Attack (%li), Defense (%li), Weaponry (%li), Powers (%li).\n\r",
 	 get_highland(ch, HIGH_ATTACK), get_highland(ch, HIGH_DEFENSE), get_highland(ch, HIGH_WEAPON), get_highland(ch, HIGH_ABILITY));
 	stc(buf, ch);
-	stc("Syntax: increase <attack/defense/weaponry/powers>",ch);
+	stc("Syntax: increase <attack/defense/weaponry/powers>\n\r"
+        "Training buys one rank immediately: 15 x next rank primal; maximum 6.\n\r"
+        "Power commands: bflash (Powers 2), bash (Powers 3), htwist (Powers 4),\n\r"
+        "                judge (Powers 5), lunge (Powers 6).\n\r"
+        "Counter: counter (Powers 4 + Defense 4); wield your own forged katana to activate.\n\r"
+        "Use 'counter off' to lower your guard. Other ability restrictions still apply.\n\r", ch);
 	return;
     }
 

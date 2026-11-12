@@ -120,6 +120,14 @@ values are regression-tested, not rebalanced. NPC and immortal caps differ.
   literal `skill_lookup("...")` references using the existing prefix lookup
   convention (`blind` resolves to `blindness`). Dynamic names, serialized
   spell slots, help files and world-object references need separate checks.
+- **Highlander training help:** `increase` now explains that selecting a path
+  immediately purchases one rank for 15 x the next rank in primal, up to rank
+  6. The menu names the registered `bflash`, `bash`, `htwist`, `judge` and
+  `lunge` commands with their existing Powers requirements, and describes
+  Counter's Powers 4 / Defense 4 and owned-katana requirements. These are
+  help-only changes; the trainers, combat handlers, activation costs and
+  ownership checks are unchanged. Full-engine fixtures check 28 read-only
+  menu views and 56 insufficient/exact-cost and cap boundaries.
 
 ## Verification boundaries
 
