@@ -59,6 +59,70 @@ static void costless(void)
 
 static void command(const char *name);
 
+static void test_monk_training_help(void)
+{
+    static const struct { char *name; int path; } paths[] = {
+        {"mantra", MONK_MANTRA}, {"art", MONK_ART}, {"tech", MONK_TECH}
+    };
+    unsigned views = 0, purchases = 0;
+    for (size_t p = 0; p < sizeof(paths) / sizeof(paths[0]); ++p)
+    for (int rank = 0; rank <= 8; ++rank)
+    {
+        for (int menu = 0; menu <= 1; ++menu)
+        {
+            fresh(CLASS_MONK);
+            player.monk[paths[p].path] = rank;
+            actor.wait = 7;
+            CHAR_DATA expected = actor;
+            PC_DATA expected_pc = player;
+            do_monklearn(&actor, menu ? paths[p].name : "");
+            assert(!memcmp(&actor, &expected, sizeof(actor)));
+            assert(!memcmp(&player, &expected_pc, sizeof(player)));
+            if (!menu)
+            {
+                assert(strstr(output, "View: monklearn <mantra/art/tech> (free)."));
+                assert(strstr(output, "Train: monklearn <mantra/art/tech> gain."));
+                assert(strstr(output, "10 x next rank primal; maximum 8."));
+            }
+            else
+                assert(strstr(output, p == 0 ? "Mantras -" :
+                                     p == 1 ? "Arts -" : "Techs -"));
+            ++views;
+        }
+        for (int enough = 0; enough <= 1; ++enough)
+        {
+            fresh(CLASS_MONK);
+            player.monk[paths[p].path] = rank;
+            const long cost = (rank + 1) * 10;
+            actor.primal = cost - !enough;
+            actor.wait = 7;
+            CHAR_DATA expected = actor;
+            PC_DATA expected_pc = player;
+            const bool accepted = enough && rank < 8;
+            expected.primal -= accepted ? cost : 0;
+            expected_pc.monk[paths[p].path] += accepted;
+            char arg[48];
+            snprintf(arg, sizeof(arg), "%s gain", paths[p].name);
+            do_monklearn(&actor, arg);
+            assert(!memcmp(&actor, &expected, sizeof(actor)));
+            assert(!memcmp(&player, &expected_pc, sizeof(player)));
+            if (rank == 8) assert(strstr(output, "may not gain any more"));
+            else if (enough) assert(strstr(output, "You use"));
+            else assert(strstr(output, "It costs"));
+            ++purchases;
+        }
+    }
+    fresh(CLASS_MONK);
+    CHAR_DATA expected = actor;
+    PC_DATA expected_pc = player;
+    do_monklearn(&actor, "unknown");
+    assert(strstr(output, "View: monklearn <mantra/art/tech> (free)."));
+    assert(!memcmp(&actor, &expected, sizeof(actor)));
+    assert(!memcmp(&player, &expected_pc, sizeof(player)));
+    assert(views == 54 && purchases == 54);
+    puts("Monk: 54 free help views and 54 training cost/cap boundaries passed");
+}
+
 static void test_dragon_training_help(void)
 {
     static const struct { char *name; long age, bit; } skills[] = {
@@ -583,6 +647,7 @@ int main(void)
     assert(string_space); top_string = string_space;
     current_time = 123456;
     init_mm();
+    test_monk_training_help();
     test_dragon_training_help();
     test_sorcerer_training_help();
     test_ninja_training_help();

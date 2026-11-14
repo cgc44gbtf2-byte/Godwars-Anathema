@@ -19,6 +19,8 @@ def blob(text):
     return hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest()
 
 def without_celestial_stage(text):
+    from class_help_source import without_class_help
+    text = without_class_help(text)
     start=text.index("void do_celestial(")
     end=text.index("\nvoid do_lifecloak(",start)
     body=text[start:end]

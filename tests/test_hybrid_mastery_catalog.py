@@ -48,6 +48,9 @@ class HybridMasteryCatalog(unittest.TestCase):
             data = (SRC / path).read_bytes()
             from werewolf_source import without_werewolf_stage
             data = without_werewolf_stage(data.decode()).encode()
+            if path == "classes/monk/monk.c":
+                from class_help_source import without_class_help
+                data = without_class_help(data.decode()).encode()
             if path == "classes/highlander/highland.c":
                 text = data.decode().replace(
                     '    if (ch && ch->class != CLASS_HIGHLANDER &&\n'

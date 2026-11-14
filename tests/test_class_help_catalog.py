@@ -5,7 +5,7 @@ import re
 import unittest
 
 from class_help_source import (
-    DRAGON_GUIDANCE, HIGHLAND_GUIDANCE, NINJA_GUIDANCE, SORCERER_GUIDANCE,
+    DRAGON_GUIDANCE, HIGHLAND_GUIDANCE, MONK_GUIDANCE, NINJA_GUIDANCE, SORCERER_GUIDANCE,
     PROOFS, without_class_help,
 )
 from elemental_help_source import ELEMENT_HELP
@@ -19,6 +19,19 @@ def blob(text):
 
 
 class ClassHelpCatalog(unittest.TestCase):
+    def test_monk_training_guidance_matches_registered_command_and_existing_cost(self):
+        commands = re.findall(
+            r'\{\s*"([^"]+)"\s*,\s*(do_\w+)',
+            (ROOT / "Genesis/src/interp.c").read_text().split("social_table")[0])
+        self.assertEqual(next(fn for cmd, fn in commands if cmd.startswith("monklearn")),
+                         "do_monklearn")
+        source = (ROOT / "Genesis/src/classes/monk/monk.c").read_text()
+        body = source.split("void do_monklearn(", 1)[1].split("\nvoid ", 1)[0]
+        self.assertIn("10 x next rank primal; maximum 8.", MONK_GUIDANCE)
+        self.assertIn("cost = (ch->pcdata->monk[improve] + 1) * 10;", body)
+        self.assertIn("get_monk(ch, improve) >= 8", body)
+        self.assertIn('!str_cmp(arg2, "gain")', body)
+
     def test_dragon_guidance_uses_registered_trainer_and_existing_prices(self):
         commands = re.findall(
             r'\{\s*"([^"]+)"\s*,\s*(do_\w+)',

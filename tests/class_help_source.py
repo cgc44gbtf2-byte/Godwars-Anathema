@@ -71,7 +71,18 @@ DRAGON_GUIDANCE = (
     '    "Very Old 70000/2500; Ancient 100000/3000. Age purchases stop at Wyrm.\\n\\r"\n'
     '    "Eligible choices:\\n\\r", ch);'
 )
+MONK_GUIDANCE = (
+    'stc("View: monklearn <mantra/art/tech> (free).\\n\\r"\n'
+    '    "Train: monklearn <mantra/art/tech> gain.\\n\\r"\n'
+    '    "Training buys one rank immediately: 10 x next rank primal; maximum 8.\\n\\r", ch);'
+)
 PROOFS = [
+    ("Genesis/src/classes/monk/monk.c",
+     "051fe16da87e9b7647c819512e833893c22762b0", [
+         (MONK_GUIDANCE,
+          '\tstc("Syntax: Display: Monklearn <mantra/art/tech>.\\n\\r", ch);\n'
+          '\tstc("        Improve: Monklearn <mantra/art/tech> gain.\\n\\r", ch);'),
+     ]),
     ("Genesis/src/classes/dragon/dragon.c",
      "d49760816c58db4303b9bf7200e2b52fa4b87016", [
          (DRAGON_GUIDANCE, '\tstc("Learn which dragon skill:\\n\\r", ch);'),

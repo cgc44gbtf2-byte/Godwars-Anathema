@@ -150,6 +150,11 @@ values are regression-tested, not rebalanced. NPC and immortal caps differ.
   eligibility, learned flags, prices, forms and combat are unchanged.
   Full-engine fixtures cover 24 free views, 624 skill eligibility/duplicate/
   affordability cases and 48 age DP/QP/cap boundaries across all 12 ages.
+- **Monk training help:** `monklearn` now marks the three family views as
+  free and explains the immediate `gain` purchase, existing 10 x next rank
+  primal cost and rank-8 cap. Only the menu strings changed; Mantra, Art,
+  Tech, resource, and combat behavior remain unchanged. Full-engine fixtures
+  check 54 read-only views and 54 insufficient/exact-cost and cap boundaries.
 
 ## Verification boundaries
 

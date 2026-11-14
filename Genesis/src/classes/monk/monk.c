@@ -51,8 +51,9 @@ void do_monklearn( CHAR_DATA *ch, char *argument )
 	sprintf(buf, "Monk Skills: Mantras(%li), Arts(%li), Techs(%li).\n\r",
 	 get_monk(ch, MONK_MANTRA), get_monk(ch, MONK_ART), get_monk(ch, MONK_TECH));
 	stc(buf, ch);
-	stc("Syntax: Display: Monklearn <mantra/art/tech>.\n\r", ch);
-	stc("        Improve: Monklearn <mantra/art/tech> gain.\n\r", ch);
+stc("View: monklearn <mantra/art/tech> (free).\n\r"
+    "Train: monklearn <mantra/art/tech> gain.\n\r"
+    "Training buys one rank immediately: 10 x next rank primal; maximum 8.\n\r", ch);
 	return;
     }
 

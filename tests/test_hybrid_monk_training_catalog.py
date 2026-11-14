@@ -32,6 +32,7 @@ class MonkTrainingCatalog(unittest.TestCase):
         self.assertEqual(blob(text),"5d74784c64dbdd28ba5c547323bcab58be659437")
 
     def test_native_training_backend_getters_save_and_colors_are_unchanged(self):
+        from class_help_source import without_class_help
         for path,sha in (("classes/monk/monk.c","051fe16da87e9b7647c819512e833893c22762b0"),
                          ("classes/hybrid/training.c","4646c2494470f6427efbba6da69752b32590c2a2"),
                          ("classes/hybrid/colors.c","3c060e0ff58f5ef05305e6c4921acc47fff1e36c"),
@@ -39,6 +40,8 @@ class MonkTrainingCatalog(unittest.TestCase):
                          ("interp.c","ccb0125d4264a8a5447618c29a9240ec674d2eb4"),
                          ("save.c","3655e4f99b37b0d5165e58dc73d78c00b47564fc")):
             text=(SRC/path).read_text()
+            if path=="classes/monk/monk.c":
+                text=without_class_help(text)
             if path=="merc.h":
                 text=text.replace("    int                 hybrid_forms_present;\n","")
             if path=="save.c":
