@@ -128,6 +128,14 @@ values are regression-tested, not rebalanced. NPC and immortal caps differ.
   help-only changes; the trainers, combat handlers, activation costs and
   ownership checks are unchanged. Full-engine fixtures check 28 read-only
   menu views and 56 insufficient/exact-cost and cap boundaries.
+- **Ninja training help:** `principle` now distinguishes free
+  `principle <sora/chikyu/ningenno>` views from immediate purchases with
+  `principle <sora/chikyu/ningenno> improve`. The menu states the existing
+  10 x next rank primal cost and rank-10 cap; the invalid-action hint uses
+  the full registered command. Ninja and Nightstalker progression, Ki costs,
+  passives and combat are unchanged. Full-engine fixtures check 198 read-only
+  menu views and 132 insufficient/exact-cost and cap boundaries across both
+  variants; an exact source inverse preserves every non-help byte.
 
 ## Verification boundaries
 

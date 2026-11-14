@@ -4,7 +4,7 @@ from pathlib import Path
 import re
 import unittest
 
-from class_help_source import HIGHLAND_GUIDANCE, PROOFS, without_class_help
+from class_help_source import HIGHLAND_GUIDANCE, NINJA_GUIDANCE, PROOFS, without_class_help
 from elemental_help_source import ELEMENT_HELP
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,6 +16,19 @@ def blob(text):
 
 
 class ClassHelpCatalog(unittest.TestCase):
+    def test_ninja_training_guidance_uses_registered_command_and_existing_cost(self):
+        commands = re.findall(
+            r'\{\s*"([^"]+)"\s*,\s*(do_\w+)',
+            (ROOT / "Genesis/src/interp.c").read_text().split("social_table")[0])
+        self.assertEqual(next(fn for cmd, fn in commands if cmd.startswith("principle")),
+                         "do_principles")
+        source = (ROOT / "Genesis/src/classes/ninja/ninja.c").read_text()
+        body = source.split("void do_principles(", 1)[1].split("\nvoid ", 1)[0]
+        self.assertIn("10 x next rank primal; maximum 10.", NINJA_GUIDANCE)
+        self.assertIn("cost = (get_ninja(ch, improve) + 1) * 10;", body)
+        self.assertIn("get_ninja(ch, improve) >= 10", body)
+        self.assertIn('!str_cmp(arg2, "improve")', body)
+
     def test_only_reviewed_help_changes_restore_exact_previous_sources(self):
         for path, expected, hunks in PROOFS:
             text = (ROOT / path).read_text()

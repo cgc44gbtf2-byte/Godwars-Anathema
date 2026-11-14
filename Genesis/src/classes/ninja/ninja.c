@@ -56,6 +56,9 @@ if (IS_NIGHTSTALKER(ch))
 	sprintf(buf, "Principles: Sora (%li), Chikyu (%li), Ningenno (%li).\n\r",
 	 get_ninja(ch, NINJA_SORA), get_ninja(ch, NINJA_CHIKYU), get_ninja(ch, NINJA_NINGENNO));
 	stc(buf, ch);
+stc("View powers: principle <sora/chikyu/ningenno>\n\r"
+    "Train: principle <sora/chikyu/ningenno> improve\n\r"
+    "Training buys one rank immediately: 10 x next rank primal; maximum 10.\n\r", ch);
 	return;
     }
 
@@ -153,7 +156,7 @@ stc(IS_NIGHTSTALKER(ch) ?
 	sprintf(buf, "You improve your ability in the %s principle.\n\r", arg1);
 	stc(buf, ch);
     }
-    else stc("To improve, type: prin <sora/chikyu/ningenno> improve.\n\r", ch);
+    else stc("To improve, type: principle <sora/chikyu/ningenno> improve.\n\r", ch);
     return;
 }
 

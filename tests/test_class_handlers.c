@@ -59,6 +59,78 @@ static void costless(void)
 
 static void command(const char *name);
 
+static void test_ninja_training_help(void)
+{
+    static const struct { char *name; int path; } paths[] = {
+        {"sora", NINJA_SORA}, {"chikyu", NINJA_CHIKYU},
+        {"ningenno", NINJA_NINGENNO}
+    };
+    unsigned views = 0, purchases = 0;
+    for (int night = 0; night <= 1; ++night)
+    for (size_t p = 0; p < sizeof(paths) / sizeof(paths[0]); ++p)
+    for (int rank = 0; rank <= 10; ++rank)
+    {
+        for (int menu = 0; menu < 3; ++menu)
+        {
+            fresh(CLASS_NINJA);
+            if (night) player.cland[0] = NINJA_BUILD_NIGHTSTALKER;
+            player.ninja[paths[p].path] = rank;
+            actor.wait = 7;
+            CHAR_DATA expected = actor;
+            PC_DATA expected_pc = player;
+            do_principles(&actor, menu == 0 ? "" :
+                          menu == 1 ? paths[p].name : "unknown");
+            assert(!memcmp(&actor, &expected, sizeof(actor)));
+            assert(!memcmp(&player, &expected_pc, sizeof(player)));
+            if (menu != 1)
+            {
+                assert(strstr(output, "View powers: principle <sora/chikyu/ningenno>"));
+                assert(strstr(output, "Train: principle <sora/chikyu/ningenno> improve"));
+                assert(strstr(output, "10 x next rank primal; maximum 10."));
+                assert(!!strstr(output, "Nightstalker: no Michi") == night);
+            }
+            else if (p == 0)
+            {
+                assert(!!strstr(output, "replace Michi with shadow senses") == night);
+                assert(!!strstr(output, "1 : Michi") == (!night && rank >= 1));
+            }
+            ++views;
+        }
+        for (int enough = 0; enough <= 1; ++enough)
+        {
+            char argument[64];
+            fresh(CLASS_NINJA);
+            if (night) player.cland[0] = NINJA_BUILD_NIGHTSTALKER;
+            player.ninja[paths[p].path] = rank;
+            const long cost = (rank + 1) * 10;
+            actor.primal = cost - !enough;
+            actor.wait = 7;
+            CHAR_DATA expected = actor;
+            PC_DATA expected_pc = player;
+            const bool accepted = enough && rank < 10;
+            expected.primal -= accepted ? cost : 0;
+            expected_pc.ninja[paths[p].path] += accepted;
+            snprintf(argument, sizeof(argument), "%s improve", paths[p].name);
+            do_principles(&actor, argument);
+            assert(!memcmp(&actor, &expected, sizeof(actor)));
+            assert(!memcmp(&player, &expected_pc, sizeof(player)));
+            if (rank == 10) assert(strstr(output, "already gained all"));
+            else if (enough) assert(strstr(output, "You improve your ability"));
+            else assert(strstr(output, "It costs"));
+            ++purchases;
+        }
+    }
+    fresh(CLASS_NINJA);
+    CHAR_DATA expected = actor;
+    PC_DATA expected_pc = player;
+    do_principles(&actor, "sora invalid");
+    assert(strstr(output, "To improve, type: principle <sora/chikyu/ningenno> improve."));
+    assert(!memcmp(&actor, &expected, sizeof(actor)));
+    assert(!memcmp(&player, &expected_pc, sizeof(player)));
+    assert(views == 198 && purchases == 132);
+    puts("Ninja/Nightstalker: 198 free help views and 132 training boundaries passed");
+}
+
 static void test_highlander_training_help(void)
 {
     static const struct { char *name; int path; } paths[] = {
@@ -365,6 +437,7 @@ int main(void)
     assert(string_space); top_string = string_space;
     current_time = 123456;
     init_mm();
+    test_ninja_training_help();
     test_highlander_training_help();
     test_highlander_flash();
     test_presence();

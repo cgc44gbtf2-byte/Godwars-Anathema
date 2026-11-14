@@ -47,7 +47,18 @@ HIGHLAND_GUIDANCE = (
     '        "Counter: counter (Powers 4 + Defense 4); wield your own forged katana to activate.\\n\\r"\n'
     '        "Use \'counter off\' to lower your guard. Other ability restrictions still apply.\\n\\r", ch);'
 )
+NINJA_GUIDANCE = (
+    'stc("View powers: principle <sora/chikyu/ningenno>\\n\\r"\n'
+    '    "Train: principle <sora/chikyu/ningenno> improve\\n\\r"\n'
+    '    "Training buys one rank immediately: 10 x next rank primal; maximum 10.\\n\\r", ch);\n'
+)
 PROOFS = [
+    ("Genesis/src/classes/ninja/ninja.c",
+     "7425898de585ebbac6d4500cf861f6c40cf721c3", [
+         (NINJA_GUIDANCE, ""),
+         ("To improve, type: principle <sora/chikyu/ningenno> improve.",
+          "To improve, type: prin <sora/chikyu/ningenno> improve."),
+     ]),
     ("Genesis/src/classes/highlander/highland.c",
      "4d0d0c9f802b65b914571fb9999d0556a885ded3", [
          (HIGHLAND_GUIDANCE,
