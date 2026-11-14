@@ -143,6 +143,13 @@ values are regression-tested, not rebalanced. NPC and immortal caps differ.
   and combat remain unchanged. Full-engine fixtures check 72 read-only
   views and 72 insufficient/exact-cost and cap boundaries across all colors;
   the exact source inverse preserves every non-help byte.
+- **Dragon training help:** `dragonskill` now distinguishes its free menu
+  from immediate skill and age purchases, displays the existing skill DP
+  prices and current-age DP/QP advancement schedule, and explains the Wyrm
+  purchase limit. Learning is not activation. Only the menu text changed;
+  eligibility, learned flags, prices, forms and combat are unchanged.
+  Full-engine fixtures cover 24 free views, 624 skill eligibility/duplicate/
+  affordability cases and 48 age DP/QP/cap boundaries across all 12 ages.
 
 ## Verification boundaries
 

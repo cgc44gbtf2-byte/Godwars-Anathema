@@ -59,6 +59,102 @@ static void costless(void)
 
 static void command(const char *name);
 
+static void test_dragon_training_help(void)
+{
+    static const struct { char *name; long age, bit; } skills[] = {
+        {"fangs", AGE_VYOUNG, DRAG_FANGS}, {"nightsight", AGE_VYOUNG, DRAG_NIGHT},
+        {"claws", AGE_YOUNG, DRAG_CLAWS}, {"horns", AGE_YOUNG, DRAG_HORNS},
+        {"wings", AGE_JUVENILE, DRAG_WINGS}, {"breath", AGE_JUVENILE, DRAG_BREATH},
+        {"tail", AGE_YADULT, DRAG_TAIL}, {"truesight", AGE_ADULT, DRAG_TRUESIGHT},
+        {"dust", AGE_MATURE, DRAG_DUST}, {"magic", AGE_OLD, DRAG_MAGIC},
+        {"scry", AGE_OLD, DRAG_SCRY}, {"readaura", AGE_VOLD, DRAG_READAURA},
+        {"shield", AGE_ANCIENT, DRAG_SHIELD}
+    };
+    static const struct { long age, dp, qp; } ages[] = {
+        {AGE_HATCHLING, 2500, 0}, {AGE_VYOUNG, 5000, 0},
+        {AGE_YOUNG, 7500, 0}, {AGE_JUVENILE, 10000, 0},
+        {AGE_YADULT, 15000, 500}, {AGE_ADULT, 25000, 1000},
+        {AGE_MATURE, 35000, 1500}, {AGE_OLD, 50000, 2000},
+        {AGE_VOLD, 70000, 2500}, {AGE_ANCIENT, 100000, 3000},
+        {AGE_WYRM, 0, 0}, {AGE_AWYRM, 0, 0}
+    };
+    unsigned views = 0, purchases = 0, age_cases = 0;
+    for (size_t a = 0; a < sizeof(ages) / sizeof(ages[0]); ++a)
+    {
+        for (int invalid = 0; invalid <= 1; ++invalid)
+        {
+            fresh(CLASS_DRAGON);
+            actor.vampgen = ages[a].age;
+            actor.wait = 7;
+            CHAR_DATA expected = actor;
+            PC_DATA expected_pc = player;
+            do_dragonskill(&actor, invalid ? "unknown" : "");
+            assert(!memcmp(&actor, &expected, sizeof(actor)));
+            assert(!memcmp(&player, &expected_pc, sizeof(player)));
+            assert(strstr(output, "View eligible choices: dragonskill (free)."));
+            assert(strstr(output, "Purchases spend immediately"));
+            assert(strstr(output, "learning a skill does not activate it"));
+            assert(strstr(output, "Age purchases stop at Wyrm."));
+            ++views;
+        }
+        for (size_t s = 0; s < sizeof(skills) / sizeof(skills[0]); ++s)
+        for (int known = 0; known <= 1; ++known)
+        for (int enough = 0; enough <= 1; ++enough)
+        {
+            fresh(CLASS_DRAGON);
+            actor.vampgen = ages[a].age;
+            actor.wait = 7;
+            const long cost = 1000 * (12 - skills[s].age);
+            player.classpoints[CP_CURRENT] = cost - !enough;
+            if (known) player.dragskills = skills[s].bit;
+            CHAR_DATA expected = actor;
+            PC_DATA expected_pc = player;
+            const bool eligible = actor.vampgen <= skills[s].age;
+            const bool accepted = eligible && !known && enough;
+            if (accepted)
+            {
+                expected_pc.dragskills |= skills[s].bit;
+                expected_pc.classpoints[CP_CURRENT] -= cost;
+            }
+            do_dragonskill(&actor, skills[s].name);
+            assert(!memcmp(&actor, &expected, sizeof(actor)));
+            assert(!memcmp(&player, &expected_pc, sizeof(player)));
+            if (!eligible) assert(strstr(output, "Eligible choices:"));
+            else if (known) assert(strstr(output, "already have that skill"));
+            else if (enough) assert(strstr(output, "You learn a Dragon skill"));
+            else assert(strstr(output, "You need"));
+            ++purchases;
+        }
+        for (int dp_short = 0; dp_short <= 1; ++dp_short)
+        for (int qp_short = 0; qp_short <= 1; ++qp_short)
+        {
+            fresh(CLASS_DRAGON);
+            actor.vampgen = ages[a].age;
+            actor.wait = 7;
+            player.classpoints[CP_CURRENT] = ages[a].dp - dp_short;
+            player.quest = ages[a].qp - qp_short;
+            CHAR_DATA expected = actor;
+            PC_DATA expected_pc = player;
+            const bool accepted = ages[a].dp && !dp_short && !qp_short;
+            if (accepted)
+            {
+                --expected.vampgen;
+                expected_pc.classpoints[CP_CURRENT] -= ages[a].dp;
+                expected_pc.quest -= ages[a].qp;
+            }
+            do_dragonskill(&actor, "age");
+            assert(!memcmp(&actor, &expected, sizeof(actor)));
+            assert(!memcmp(&player, &expected_pc, sizeof(player)));
+            if (!ages[a].dp) assert(strstr(output, "highest possible age"));
+            else if (accepted) assert(strstr(output, "gone up in age"));
+            else assert(strstr(output, "You require"));
+            ++age_cases;
+        }
+    }
+    assert(views == 24 && purchases == 624 && age_cases == 48);
+    puts("Dragon: 24 free views, 624 skill and 48 age purchase boundaries passed");
+}
+
 static void test_sorcerer_training_help(void)
 {
     static const struct { char *name; int color; } colors[] = {
@@ -487,6 +583,7 @@ int main(void)
     assert(string_space); top_string = string_space;
     current_time = 123456;
     init_mm();
+    test_dragon_training_help();
     test_sorcerer_training_help();
     test_ninja_training_help();
     test_highlander_training_help();

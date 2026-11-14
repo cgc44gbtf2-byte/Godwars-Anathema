@@ -316,7 +316,18 @@ void do_dragonskill( CHAR_DATA *ch, char *argument )
 
     if (arg[0] == '\0')
     {
-	stc("Learn which dragon skill:\n\r", ch);
+	stc("View eligible choices: dragonskill (free).\n\r"
+    "Buy a skill: dragonskill <skill> (DP; required age applies).\n\r"
+    "Buy the next age: dragonskill age (DP/QP).\n\r"
+    "Purchases spend immediately; learning a skill does not activate it.\n\r"
+    "Skill DP: fangs/nightsight 1000; claws/horns 2000; wings/breath 3000;\n\r"
+    "tail 4000; truesight 5000; dust 6000; magic/scry 7000;\n\r"
+    "readaura 8000; shield 9000. Known skills cannot be bought twice.\n\r"
+    "Age DP/QP by current age: Hatchling 2500/0; Very Young 5000/0;\n\r"
+    "Young 7500/0; Juvenile 10000/0; Young Adult 15000/500;\n\r"
+    "Adult 25000/1000; Mature Adult 35000/1500; Old 50000/2000;\n\r"
+    "Very Old 70000/2500; Ancient 100000/3000. Age purchases stop at Wyrm.\n\r"
+    "Eligible choices:\n\r", ch);
 	stc(" Age", ch);
 	if (ch->vampgen <= AGE_VYOUNG)	stc(", Fangs, Nightsight", ch);
 	if (ch->vampgen <= AGE_YOUNG)	stc(", Claws, Horns", ch);

@@ -57,7 +57,25 @@ SORCERER_GUIDANCE = (
     '    "Train: colors <purple/red/blue/green/yellow/black>\\n\\r"\n'
     '    "Training buys one rank immediately: 10 x next rank primal; maximum 5.\\n\\r", ch);'
 )
+DRAGON_GUIDANCE = (
+    '\tstc("View eligible choices: dragonskill (free).\\n\\r"\n'
+    '    "Buy a skill: dragonskill <skill> (DP; required age applies).\\n\\r"\n'
+    '    "Buy the next age: dragonskill age (DP/QP).\\n\\r"\n'
+    '    "Purchases spend immediately; learning a skill does not activate it.\\n\\r"\n'
+    '    "Skill DP: fangs/nightsight 1000; claws/horns 2000; wings/breath 3000;\\n\\r"\n'
+    '    "tail 4000; truesight 5000; dust 6000; magic/scry 7000;\\n\\r"\n'
+    '    "readaura 8000; shield 9000. Known skills cannot be bought twice.\\n\\r"\n'
+    '    "Age DP/QP by current age: Hatchling 2500/0; Very Young 5000/0;\\n\\r"\n'
+    '    "Young 7500/0; Juvenile 10000/0; Young Adult 15000/500;\\n\\r"\n'
+    '    "Adult 25000/1000; Mature Adult 35000/1500; Old 50000/2000;\\n\\r"\n'
+    '    "Very Old 70000/2500; Ancient 100000/3000. Age purchases stop at Wyrm.\\n\\r"\n'
+    '    "Eligible choices:\\n\\r", ch);'
+)
 PROOFS = [
+    ("Genesis/src/classes/dragon/dragon.c",
+     "d49760816c58db4303b9bf7200e2b52fa4b87016", [
+         (DRAGON_GUIDANCE, '\tstc("Learn which dragon skill:\\n\\r", ch);'),
+     ]),
     ("Genesis/src/classes/sorcerer/sorcerer.c",
      "e44a6b703dbf47456776c2207ac4ee70ff7e8956", [
          (SORCERER_GUIDANCE, '\tstc("To improve type \\"colors <color>\\".\\n\\r", ch);'),

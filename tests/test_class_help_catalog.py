@@ -5,7 +5,8 @@ import re
 import unittest
 
 from class_help_source import (
-    HIGHLAND_GUIDANCE, NINJA_GUIDANCE, SORCERER_GUIDANCE, PROOFS, without_class_help,
+    DRAGON_GUIDANCE, HIGHLAND_GUIDANCE, NINJA_GUIDANCE, SORCERER_GUIDANCE,
+    PROOFS, without_class_help,
 )
 from elemental_help_source import ELEMENT_HELP
 
@@ -18,6 +19,44 @@ def blob(text):
 
 
 class ClassHelpCatalog(unittest.TestCase):
+    def test_dragon_guidance_uses_registered_trainer_and_existing_prices(self):
+        commands = re.findall(
+            r'\{\s*"([^"]+)"\s*,\s*(do_\w+)',
+            (ROOT / "Genesis/src/interp.c").read_text().split("social_table")[0])
+        self.assertEqual(next(fn for cmd, fn in commands if cmd.startswith("dragonskill")),
+                         "do_dragonskill")
+        source = (ROOT / "Genesis/src/classes/dragon/dragon.c").read_text()
+        body = source.split("void do_dragonskill(", 1)[1].split("\nvoid ", 1)[0]
+        self.assertIn("cost = 1000 * (12 - age);", body)
+        constants = dict(re.findall(
+            r"#define\s+(AGE_\w+)\s+(\d+)",
+            (ROOT / "Genesis/src/merc.h").read_text()))
+        for names, price in (
+            ("fangs/nightsight", 1000), ("claws/horns", 2000),
+            ("wings/breath", 3000), ("tail", 4000), ("truesight", 5000),
+            ("dust", 6000), ("magic/scry", 7000), ("readaura", 8000), ("shield", 9000),
+        ):
+            self.assertIn(f"{names} {price}", DRAGON_GUIDANCE)
+            for name in names.split("/"):
+                age = re.search(
+                    r'!str_cmp\(arg, "' + name + r'"\)\)\s*\{age = (AGE_\w+);',
+                    body).group(1)
+                self.assertEqual(1000 * (12 - int(constants[age])), price)
+        for age, dp, qp in (
+            ("HATCHLING", 2500, 0), ("VYOUNG", 5000, 0), ("YOUNG", 7500, 0),
+            ("JUVENILE", 10000, 0), ("YADULT", 15000, 500),
+            ("ADULT", 25000, 1000), ("MATURE", 35000, 1500),
+            ("OLD", 50000, 2000), ("VOLD", 70000, 2500), ("ANCIENT", 100000, 3000),
+        ):
+            case = re.search(r"case AGE_" + age + r":(.*?)break;", body).group(1)
+            self.assertIn(f"cost = {dp};", case)
+            if qp:
+                self.assertIn(f"qpcost = {qp};", case)
+            self.assertIn(f"{dp}/{qp}", DRAGON_GUIDANCE)
+        for age in ("WYRM", "AWYRM"):
+            self.assertNotIn("case AGE_" + age + ":", body)
+        self.assertIn("Age purchases stop at Wyrm.", DRAGON_GUIDANCE)
+
     def test_sorcerer_training_guidance_matches_command_colors_cost_and_cap(self):
         commands = re.findall(
             r'\{\s*"([^"]+)"\s*,\s*(do_\w+)',
