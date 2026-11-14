@@ -104,7 +104,16 @@ static void test_vampire_training_help(void)
             assert(strstr(output, "Viewing is free; discipline <name> buys one rank immediately."));
             assert(strstr(output, "In-clan: 5 x next rank primal (max 7)"));
             assert(strstr(output, "Caitiff/Panders: 5 x next rank primal (max 6)"));
-            assert(strstr(output, "Thaumaturgy/Visceratika always max 5."));
+            if (profiles[p].build == VAMPIRE_BUILD_GARGOYLE)
+            {
+                assert(strstr(output, "Visceratika always has a maximum rank of 5."));
+                assert(!strstr(output, "Thaumaturgy"));
+            }
+            else
+            {
+                assert(strstr(output, "Thaumaturgy always has a maximum rank of 5."));
+                assert(!strstr(output, "Visceratika"));
+            }
             assert(strstr(output, "training does not activate them."));
             ++views;
         }

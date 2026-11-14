@@ -79,9 +79,11 @@ MONK_GUIDANCE = (
 VAMPIRE_GUIDANCE = (
     'stc("Viewing is free; discipline <name> buys one rank immediately.\\n\\r"\n'
     '    "In-clan: 5 x next rank primal (max 7); other unlocked disciplines: 15 x (max 5).\\n\\r"\n'
-    '    "Caitiff/Panders: 5 x next rank primal (max 6). Thaumaturgy/Visceratika always max 5.\\n\\r"\n'
+    '    "Caitiff/Panders: 5 x next rank primal (max 6).\\n\\r"\n'
     '    "An unlocked, untrained discipline starts at rank 1 for 5/15 primal, not a free rank.\\n\\r"\n'
     '    "Use powers to list trained abilities; training does not activate them.\\n\\r", ch);\n'
+    'stc(IS_GARGOYLE(ch) ? "Visceratika always has a maximum rank of 5.\\n\\r" :\n'
+    '    "Thaumaturgy always has a maximum rank of 5.\\n\\r", ch);\n'
 )
 WEREWOLF_VIEW_GUIDANCE = (
     '    stc("Viewing gifts is free. Use gifts to see ratings, prices, and train.\\n\\r", ch);'

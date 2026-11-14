@@ -2974,9 +2974,11 @@ void do_discipline( CHAR_DATA *ch, char *argument )
 	send_to_char("To improve a discipline rating, type: discipline <name>\n\r",ch);
 stc("Viewing is free; discipline <name> buys one rank immediately.\n\r"
     "In-clan: 5 x next rank primal (max 7); other unlocked disciplines: 15 x (max 5).\n\r"
-    "Caitiff/Panders: 5 x next rank primal (max 6). Thaumaturgy/Visceratika always max 5.\n\r"
+    "Caitiff/Panders: 5 x next rank primal (max 6).\n\r"
     "An unlocked, untrained discipline starts at rank 1 for 5/15 primal, not a free rank.\n\r"
     "Use powers to list trained abilities; training does not activate them.\n\r", ch);
+stc(IS_GARGOYLE(ch) ? "Visceratika always has a maximum rank of 5.\n\r" :
+    "Thaumaturgy always has a maximum rank of 5.\n\r", ch);
 	send_to_char( "--------------------------------------------------------------------------------\n\r", ch );
 	return;
     }
