@@ -76,7 +76,23 @@ MONK_GUIDANCE = (
     '    "Train: monklearn <mantra/art/tech> gain.\\n\\r"\n'
     '    "Training buys one rank immediately: 10 x next rank primal; maximum 8.\\n\\r", ch);'
 )
+WEREWOLF_VIEW_GUIDANCE = (
+    '    stc("Viewing gifts is free. Use gifts to see ratings, prices, and train.\\n\\r", ch);'
+)
+WEREWOLF_GIFT_GUIDANCE = (
+    'stc("Your selected breed/auspice/tribe gifts cost 10 x next rank primal (max 5);\\n\\r"\n'
+    '    "other gifts cost 15 x next rank primal (max 4). Each purchase trains one rank immediately.\\n\\r", ch);'
+)
 PROOFS = [
+    ("Genesis/src/classes/werewolf/werewolf.c",
+     "36e08820873319e226c52a26f7fbf98dc3ae9a50", [
+         ('if (!any_powers) stc("You have no gifts.\\n\\r", ch);\n'
+          + WEREWOLF_VIEW_GUIDANCE,
+          'if (!any_powers) stc("You have no gifts.\\n\\r", ch);'),
+         ('stc("To improve a gift rating, type: gifts <name>\\n\\r", ch);\n'
+          + WEREWOLF_GIFT_GUIDANCE,
+          'stc("To improve a gift rating, type: gifts <name>\\n\\r", ch);'),
+     ]),
     ("Genesis/src/classes/monk/monk.c",
      "051fe16da87e9b7647c819512e833893c22762b0", [
          (MONK_GUIDANCE,

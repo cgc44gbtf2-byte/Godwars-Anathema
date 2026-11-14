@@ -6,6 +6,7 @@ import unittest
 
 from class_help_source import (
     DRAGON_GUIDANCE, HIGHLAND_GUIDANCE, MONK_GUIDANCE, NINJA_GUIDANCE, SORCERER_GUIDANCE,
+    WEREWOLF_GIFT_GUIDANCE,
     PROOFS, without_class_help,
 )
 from elemental_help_source import ELEMENT_HELP
@@ -19,6 +20,22 @@ def blob(text):
 
 
 class ClassHelpCatalog(unittest.TestCase):
+    def test_werewolf_gift_menu_matches_registered_command_and_existing_prices(self):
+        commands = dict(re.findall(
+            r'\{\s*"([^"]+)"\s*,\s*(do_\w+)',
+            (ROOT / "Genesis/src/interp.c").read_text().split("social_table")[0]))
+        self.assertEqual(commands.get("gifts"), "do_gifts")
+        source = (ROOT / "Genesis/src/classes/werewolf/werewolf.c").read_text()
+        body = source.split("void do_gifts(", 1)[1].split("\nvoid do_tribegifts(", 1)[0]
+        self.assertIn(WEREWOLF_GIFT_GUIDANCE, source)
+        self.assertIn("imp_cost = (gift + 1) * 10;", body)
+        self.assertIn("imp_cost = (gift + 1) * 15;", body)
+        self.assertIn("if (ch->pcdata->tgift[gt] == improve) ww_max = 5;", body)
+        self.assertIn("else ww_max = 4;", body)
+        self.assertIn('ch->pcdata->tgift[gt] == improve', body)
+        self.assertIn('stc("Viewing gifts is free. Use gifts to see ratings, prices, and train.\\n\\r", ch);',
+                      source)
+
     def test_monk_training_guidance_matches_registered_command_and_existing_cost(self):
         commands = re.findall(
             r'\{\s*"([^"]+)"\s*,\s*(do_\w+)',

@@ -312,6 +312,7 @@ if (get_tribe(ch, TRIBE_UKTENA) >= 4) strcat(buf, " Invisibility[unavailable]");
 	stc(buf, ch);
     }
     if (!any_powers) stc("You have no gifts.\n\r", ch);
+    stc("Viewing gifts is free. Use gifts to see ratings, prices, and train.\n\r", ch);
     stc("--------------------------------------------------------------------------------\n\r", ch);
     return;
 }
@@ -403,6 +404,8 @@ void do_gifts( CHAR_DATA *ch, char *argument )
 	if (col % 3 != 0) stc("\n\r", ch);
 	stc("--------------------------------------------------------------------------------\n\r", ch);
 	stc("To improve a gift rating, type: gifts <name>\n\r", ch);
+stc("Your selected breed/auspice/tribe gifts cost 10 x next rank primal (max 5);\n\r"
+    "other gifts cost 15 x next rank primal (max 4). Each purchase trains one rank immediately.\n\r", ch);
 	stc("--------------------------------------------------------------------------------\n\r", ch);
 	return;
     }

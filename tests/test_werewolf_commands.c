@@ -178,6 +178,11 @@ static void menus(void)
     pcs[0].tribes[TRIBE_CHILDREN_OF_GAIA]=4;
     do_wwpowers(actors,"");
     assert(strstr(outputs[0],"Spiritward")&&strstr(outputs[0],"Spiritguardian"));
+    assert(strstr(outputs[0],"Viewing gifts is free"));
+    execute("gifts");
+    assert(strstr(outputs[0],"Your selected breed/auspice/tribe gifts cost 10"));
+    assert(strstr(outputs[0],"other gifts cost 15"));
+    assert(strstr(outputs[0],"Each purchase trains one rank immediately"));
 }
 
 /* Deliberately malformed internal calls reproduce old failures separately;

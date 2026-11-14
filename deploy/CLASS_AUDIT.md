@@ -155,6 +155,11 @@ values are regression-tested, not rebalanced. NPC and immortal caps differ.
   primal cost and rank-8 cap. Only the menu strings changed; Mantra, Art,
   Tech, resource, and combat behavior remain unchanged. Full-engine fixtures
   check 54 read-only views and 54 insufficient/exact-cost and cap boundaries.
+- **Werewolf gift help:** `wwpowers` labels gift viewing as free, while
+  `gifts` explains immediate rank purchases and the different existing prices
+  and caps: a selected breed, auspice, or tribe gift costs 10 x next rank
+  primal up to rank 5; other gifts cost 15 x next rank up to rank 4. Gift
+  selection, training prices, and combat behavior are unchanged.
 
 ## Verification boundaries
 
