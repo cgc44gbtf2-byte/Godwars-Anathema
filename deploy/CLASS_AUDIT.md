@@ -33,7 +33,7 @@ corresponding training command accepts the purchase.
 
 | Class | Training command | Existing cost and limit |
 | --- | --- | --- |
-| Vampire | `discipline <name>` | Clan discipline: next x 5 primal; other: next x 15. An unlearned -1 rating costs 5/15 and becomes 1. Generation and discipline rules also apply. |
+| Vampire | `discipline <name>` | In-clan: next x 5 primal, max 7; other unlocked disciplines: next x 15, max 5. Caitiff/Panders: next x 5, max 6. Thaumaturgy/Visceratika always max 5. An unlocked, untrained -1 rating costs 5/15 and becomes 1. Viewing is free; training purchases one rank immediately, not activation. |
 | Werewolf | `gifts <family>` | Preferred breed/auspice/tribe: next x 10 primal, maximum 5; others next x 15, maximum 4. |
 | Sorcerer | `colors <color>` | Next x 10 primal; maximum 5. |
 | Drow | `prayer <person> <power>` | Individual fixed Drow-point prices displayed by `prayer`; speed costs 10,000 per rank, maximum 4. Gifts to another Drow require the same nonempty house. |

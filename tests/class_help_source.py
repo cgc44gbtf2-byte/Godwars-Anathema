@@ -76,6 +76,13 @@ MONK_GUIDANCE = (
     '    "Train: monklearn <mantra/art/tech> gain.\\n\\r"\n'
     '    "Training buys one rank immediately: 10 x next rank primal; maximum 8.\\n\\r", ch);'
 )
+VAMPIRE_GUIDANCE = (
+    'stc("Viewing is free; discipline <name> buys one rank immediately.\\n\\r"\n'
+    '    "In-clan: 5 x next rank primal (max 7); other unlocked disciplines: 15 x (max 5).\\n\\r"\n'
+    '    "Caitiff/Panders: 5 x next rank primal (max 6). Thaumaturgy/Visceratika always max 5.\\n\\r"\n'
+    '    "An unlocked, untrained discipline starts at rank 1 for 5/15 primal, not a free rank.\\n\\r"\n'
+    '    "Use powers to list trained abilities; training does not activate them.\\n\\r", ch);\n'
+)
 WEREWOLF_VIEW_GUIDANCE = (
     '    stc("Viewing gifts is free. Use gifts to see ratings, prices, and train.\\n\\r", ch);'
 )
@@ -123,6 +130,7 @@ PROOFS = [
     ("Genesis/src/classes/mage/mage.c",
      "667337169a49331e1ec68678faf4ba6699a573cf", MAGE_HUNKS),
     ("Genesis/src/clan.c", "6cc9fa0d03e3a87c55a622f9ef959288e8550570", [
+        (VAMPIRE_GUIDANCE, ""),
         (GARGOYLE_HINT, ""),
         ('"You are now a #7Monk#n.\\n\\r"', '"You are now a #7Monk#n.\\nr\\r"'),
     ]),

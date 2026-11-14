@@ -6,7 +6,7 @@ import unittest
 
 from class_help_source import (
     DRAGON_GUIDANCE, HIGHLAND_GUIDANCE, MONK_GUIDANCE, NINJA_GUIDANCE, SORCERER_GUIDANCE,
-    WEREWOLF_GIFT_GUIDANCE,
+    WEREWOLF_GIFT_GUIDANCE, VAMPIRE_GUIDANCE,
     PROOFS, without_class_help,
 )
 from elemental_help_source import ELEMENT_HELP
@@ -20,6 +20,23 @@ def blob(text):
 
 
 class ClassHelpCatalog(unittest.TestCase):
+    def test_vampire_help_matches_existing_costs_and_caps(self):
+        source = (ROOT / "Genesis/src/clan.c").read_text()
+        body = source.split("void do_discipline(", 1)[1].split("\nvoid ", 1)[0]
+        self.assertIn(VAMPIRE_GUIDANCE, body)
+        for rule in ("long  max_d = 5;", "max_d = 7;", "max_d = 6;",
+                     "if (improve == DISC_THAUMATURGY) max_d = 5;",
+                     "cost = 5;", "cost = 15;",
+                     "cost = ( ch->pcdata->powers[improve] + 1 ) * 5;",
+                     "cost = ((ch->pcdata->powers[improve] + 1) * 15);",
+                     'str_cmp(ch->clan, "Caitiff")', 'str_cmp(ch->clan, "Panders")'):
+            self.assertIn(rule, body)
+        commands = dict(re.findall(
+            r'\{\s*"([^"]+)"\s*,\s*(do_\w+)',
+            (ROOT / "Genesis/src/interp.c").read_text().split("social_table")[0]))
+        self.assertEqual(commands.get("discipline"), "do_discipline")
+        self.assertEqual(commands.get("powers"), "do_powers")
+
     def test_werewolf_gift_menu_matches_registered_command_and_existing_prices(self):
         commands = dict(re.findall(
             r'\{\s*"([^"]+)"\s*,\s*(do_\w+)',

@@ -59,6 +59,67 @@ static void costless(void)
 
 static void command(const char *name);
 
+static void test_vampire_training_help(void)
+{
+    static const struct {
+        char *clan, *name;
+        long disc, build, price, cap;
+        bool in_clan;
+    } profiles[] = {
+        {"Ventrue", "dominate", DISC_DOMINATE, -1, 5, 7, TRUE},
+        {"Ventrue", "animalism", DISC_ANIMALISM, -1, 15, 5, FALSE},
+        {"Caitiff", "animalism", DISC_ANIMALISM, -1, 5, 6, FALSE},
+        {"Panders", "animalism", DISC_ANIMALISM, -1, 5, 6, FALSE},
+        {"Caitiff", "dominate", DISC_DOMINATE, -1, 5, 6, TRUE},
+        {"Panders", "dominate", DISC_DOMINATE, -1, 5, 6, TRUE},
+        {"Ventrue", "thaumaturgy", DISC_THAUMATURGY, -1, 15, 5, FALSE},
+        {"Ventrue", "thaumaturgy", DISC_THAUMATURGY, -1, 5, 5, TRUE},
+        {"Caitiff", "thaumaturgy", DISC_THAUMATURGY, -1, 5, 5, FALSE},
+        {"Panders", "thaumaturgy", DISC_THAUMATURGY, -1, 5, 5, FALSE},
+        {"", "visceratika", DISC_THAUMATURGY, VAMPIRE_BUILD_GARGOYLE, 15, 5, FALSE},
+        {"", "animalism", DISC_ANIMALISM, VAMPIRE_BUILD_GARGOYLE, 15, 5, FALSE}
+    };
+    unsigned views = 0, boundaries = 0;
+    for (size_t p = 0; p < sizeof(profiles) / sizeof(profiles[0]); ++p)
+    for (int rank = -1; rank <= 7; ++rank)
+    for (int mode = 0; mode < 3; ++mode)
+    {
+        fresh(CLASS_VAMPIRE);
+        actor.clan = profiles[p].clan;
+        player.cland[0] = profiles[p].in_clan ? profiles[p].disc : profiles[p].build;
+        player.powers[profiles[p].disc] = rank;
+        const long cost = (rank == -1 ? 1 : rank + 1) * profiles[p].price;
+        actor.primal = cost - (mode == 1);
+        actor.wait = 7;
+        CHAR_DATA expected = actor;
+        PC_DATA expected_pc = player;
+        const bool accepted = mode == 2 && rank != 0 && rank < profiles[p].cap;
+        expected.primal -= accepted ? cost : 0;
+        if (accepted) expected_pc.powers[profiles[p].disc] = rank < 1 ? 1 : rank + 1;
+        do_discipline(&actor, mode == 0 ? "" : profiles[p].name);
+        assert(!memcmp(&actor, &expected, sizeof(actor)));
+        assert(!memcmp(&player, &expected_pc, sizeof(player)));
+        if (mode == 0)
+        {
+            assert(strstr(output, "Viewing is free; discipline <name> buys one rank immediately."));
+            assert(strstr(output, "In-clan: 5 x next rank primal (max 7)"));
+            assert(strstr(output, "Caitiff/Panders: 5 x next rank primal (max 6)"));
+            assert(strstr(output, "Thaumaturgy/Visceratika always max 5."));
+            assert(strstr(output, "training does not activate them."));
+            ++views;
+        }
+        else
+        {
+            assert(strstr(output, rank == 0 ? "no such discipline" :
+                rank >= profiles[p].cap ? "any further" :
+                accepted ? "You improve your discipline." : "You need another"));
+            ++boundaries;
+        }
+    }
+    assert(views == 108 && boundaries == 216);
+    puts("Vampire: 108 free menu views and 216 training cost/cap boundaries passed");
+}
+
 static void test_monk_training_help(void)
 {
     static const struct { char *name; int path; } paths[] = {
@@ -647,6 +708,7 @@ int main(void)
     assert(string_space); top_string = string_space;
     current_time = 123456;
     init_mm();
+    test_vampire_training_help();
     test_monk_training_help();
     test_dragon_training_help();
     test_sorcerer_training_help();
