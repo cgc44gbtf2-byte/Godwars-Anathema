@@ -1,0 +1,402 @@
+#HELPS
+
+4 VLIST~
+Shows a list of free vnums...works best when used with alist, to determine
+all free vnums.  The number is multiplied by 100, to get the full vnum.
+~
+
+4 SUPERAT~
+SUPERAT ALL <action>
+SUPERAT MORTALS <action>
+SUPERAT GODS <action>
+SUPERAT MOBS <action>
+SUPERAT EVERYWHERE <action>
+
+
+Executes action several times, either on ALL players (not including yourself),
+MORTALS (including trusted characters), GODS (characters with level higher than
+L_HERO), MOBS (Not recommended) or every room (not recommended either!)
+
+If you insert a # in the action, it will be replaced by the name of the target.
+
+If # is a part of the action, the action will be executed for every target
+in game. If there is no #, the action will be executed for every room containg
+at least one target, but only once per room. # cannot be used with SUPERAT EVERY-
+WHERE. # can be anywhere in the action.
+
+Example: 
+
+SUPERAT ALL SMILE -> you will only smile once in a room with 2 players.
+SUPERAT ALL TWIDDLE # -> In a room with A and B, you will twiddle A then B.
+
+Destroying the characters this command acts upon MAY cause it to fail. Try to
+avoid something like SUPERAT MOBS PURGE (although it actually works at my MUD).
+
+SUPERAT MOBS TRANS 3054 (transfer ALL the mobs to Maraden temple) does NOT work
+though :)
+
+The command works by transporting the character to each of the rooms with 
+target in them. Private rooms are not violated.
+~
+
+4 VOPEN~
+Makes a list of unallocated vnums.
+~
+
+4 ALLOW BAN~
+Syntax: allow   <site>
+Syntax: ban     <site>
+Syntax: ban
+
+BAN <site> prohibits players from that site from logging in.  BAN with
+no arguments lists the banned sites.  ALLOW <site> removes a site from
+the ban list.
+
+The site ban test works by suffix comparison, so if you ban 'foo.edu',
+all sites within 'foo.edu' are banned as well.
+
+Site bans are now saved; so every time the server is rebooted, the site
+ban list remains in effect.
+~
+
+4 REBOOT SHUTDOWN WIZLOCK COPYOVER~
+Syntax: reboot
+Syntax: shutdown
+Syntax: wizlock
+Syntax: copyover
+
+REBOOT shuts down the server.  When the normal 'startup' script is used
+to control the server, a delay of five seconds will ensue (to allow
+old connections to die), followed by a reboot.
+
+SHUTDOWN shuts down the server and prevents the normal 'startup' script
+from restarting it.
+
+WIZLOCK is a toggle command.  When the server is WIZLOCKed, players
+below level 4 may not log in.  Players who lose their links, however,
+may reconnect.
+
+COPYOVER reboots the server without disconnecting the players, this is
+useful if many players are logged in and you need to reboot the server
+for whatever reason.
+~
+
+4 DENY DISCONNECT FREEZE~
+Syntax: deny       <character>
+Syntax: disconnect <character>
+Syntax: freeze     <character>
+
+DENY denies access to a particular player and throws them out of the game.
+DENY is permanent (persists across reboots) and is not undoable from within the
+game.  Only someone with access to the player files directory may repeal a
+DENY by editing the appropriate player file.
+
+DISCONNECT <character> immediately disconnects that character.
+
+FREEZE <character> is a toggle which prevents a character from issuing any
+commands at all.
+~
+
+4 FORCE~
+Syntax: force <character> <command>
+Syntax: force all <command>
+
+FORCE forces one character to execute a command.
+
+FORCE 'all' forces all player characters to execute a command.
+This is typically used for 'force all save'.
+~
+
+4 USERS~
+Syntax: users
+
+USERS reports all of the visible users connected to the server, including users
+in the process of logging in.  The two numbers inside brackets are the channel
+number and the 'connected' state.  The 'connected' states are listed in merc.h:
+0 is CON_PLAYING; non-zero values are various states of logging in.
+~
+
+4 MLOAD OLOAD PLOAD~
+Syntax: mload <vnum>
+Syntax: oload <vnum>
+Syntax: oload <vnum> <level>
+Syntax: pload <player>
+
+MLOAD loads a mobile given its vnum (virtual number).  The vnum's are just
+the #NNNN numbers that appear in world.obj.
+
+OLOAD loads an object given its vnum.  It takes an optional parameter for
+the level of the object to be loaded.
+
+PLOAD loads the specified player under your control.  To get back, simply 
+quit and log back on as your normal character.
+~
+
+4 MSET OSET RSET SSET QSET~
+Syntax: mset <character> <field> <value>
+Syntax: oset <object>    <field> <value>
+Syntax: rset <location>  <field> <value>
+Syntax: sset <character> <skill> <value>
+Syntax: sset <character> all     <value>
+Syntax: qset <object>    <field> <value>
+
+MSET, OSET, and RSET set the properties of mobiles, objects, and rooms,
+respectively.  SSET sets a skill or spell level on a PC.  QSET sets 
+special properties and text messages on objects.
+
+There is currently no way to enter more than one line of text for a
+string-valued option.
+~
+
+4 OCLONE~
+Syntax: oclone <object>
+
+This creates an identical copy of the specified object, with the only 
+exceptions being that the cloned objects creator is the person creating 
+the clone, and the cloned objects owner is not set.
+~
+
+4 OTRANSFER~
+Syntax: otransfer <object>
+Syntax: otransfer <object> <character>
+
+This will transfer the specified object to the specified character.  The 
+character is defaulted to yourself.
+~
+
+4 MCLEAR~
+Syntax: mclear <player>
+
+This resets the target players stats to their correct value.
+~
+
+4 NOEMOTE NOTELL SILENCE~
+Syntax: noemote <character>
+Syntax: notell  <character>
+Syntax: silence <character>
+
+NOEMOTE, NOTELL, and SILENCE are used to muffle other characters, by
+preventing them from emoting, telling, and using channels, respectively.
+Characters who are no'telled will also not receive those forms of
+communication.
+~
+
+4 PURGE~
+Syntax: purge
+Syntax: purge <character>
+
+PURGE is used to clean up the world.  PURGE with no arguments removes all the
+NPC's and objects in the current room.  PURGE with an argument purges one
+character from anywhere in the world.
+
+PURGE will not get rid of PC's.
+~
+
+4 RESTORE~
+Syntax: restore <character>
+
+RESTORE restores full hit points, mana points, and movement points to the
+target character.
+~
+
+4 SLAY~
+Syntax: slay <character>
+
+SLAY kills a character in cold blood, no saving throw.
+
+SLAY bypasses auto actions such as AUTOLOOT and AUTOSAC.
+~
+
+4 TRANSFER~
+Syntax: transfer <character>
+Syntax: transfer all
+Syntax: transfer <character> <location>
+Syntax: transfer all         <location>
+
+TRANSFER transfers the target character, or ALL player characters,
+to your current location (default) or to a specified location.
+~
+
+4 AT~
+Syntax: at <location> <command>
+
+AT executes the given command (which may have arguments) at the given
+location.  The location may be specified as a vnum, as the name of
+a mobile, or as the name of an object.
+
+AT works by temporarily moving you to that location, executing the
+command, and then moving you back (if the command didn't change your
+location).
+~
+
+4 ECHO RECHO~
+Syntax: echo  <message>
+Syntax: recho <message>
+
+ECHO sends a message to all players in the game, without any prefix
+indicating who sent it.
+
+RECHO sends a message to all players in your room, without any prefix
+indicating who sent it.
+~
+
+4 GOTO~
+Syntax: goto <location>
+
+GOTO takes you to a location.  The location may be specified as a vnum,
+as the name of a mobile, or as the name of an object.
+
+You may not GOTO a room if it is PRIVATE and has two (or more) characters
+already present, or if it is SOLITARY and has one (or more) characters
+already present.
+
+Some useful numbers for new imms are:
+Limbo: 2, The Temple of Midgaard: 3001, The Entrance to Mud School: 3700,
+The Chat Room: 1200, The Dark Crypt: 30001, The Temple Altar: 3054,
+~
+
+
+4 MEMORY~
+Syntax: memory
+
+MEMORY reports the size of your mud.
+
+The 'Mobs' and 'Objs' lines report the number of types of mobiles and objects,
+not the number of instances currently in the game.
+
+The 'Strings' line shows memory used by area-file strings.  These strings have
+a maximum limit, which is also shown.
+
+The 'Perms' line shows permanently allocated memory blocks.  There is no limit
+on the number and size of these blocks.
+~
+
+4 MFIND OFIND~
+Syntax: mfind <name>
+Syntax: ofind <name>
+
+MFIND finds all mobile types with a particular name.
+
+OFIND finds all object types with a particular name.
+~
+
+4 MSTAT OSTAT RSTAT QSTAT~
+Syntax: mstat <character>
+Syntax: ostat <object>
+Syntax: rstat <location>
+Syntax: rstat
+Syntax: qstat <object>
+
+MSTAT shows you statistics on a character.
+
+OSTAT shows you statistics on an object.
+
+RSTAT shows you statistics on a location. The location may be specified as
+a vnum, as the name of a mobile, or as the name of an object.
+
+QSTAT shows you the special properties and strings on an object.
+~
+
+4 MWHERE~
+Syntax: mwhere <name>
+
+MWHERE shows you the locations of all mobiles with a particular name.
+~
+
+4 PEACE~
+Syntax: peace
+
+PEACE causes all characters in a room to stop fighting.
+~
+
+4 BAMFIN BAMFOUT~
+Syntax: bamfin  <message>
+Syntax: bamfout <message>
+
+The standard messages for GOTO are 'arrives in a swirling mist' and
+'leaves in a swirling mist'.  You can replace these messages with messages of
+your own choosing using the BAMFIN and BAMFOUT commands.
+~
+
+4 SLOOKUP~
+Syntax: slookup <skill-or-spell>
+Syntax: slookup all
+
+SLOOKUP shows you the internal 'sn' and external 'slot' for the given skill
+or spell.  The 'sn' is used for OSET and OSTAT.  The 'slot' is used for area
+files.  Neither 'sn' nor 'slot' is used for player files; these operate with
+the actual skill and spell names.
+
+SLOOKUP ALL shows this information for all skills and spells.
+~
+
+4 LOG SNOOP~
+Syntax: log   <character>
+Syntax: log   all
+Syntax: snoop <character>
+
+LOG <character> causes all of a character's commands to be logged into
+the server's log file.  Like FREEZE, it is a permanent character toggle.
+
+Certain commands (PASSWORD) are protected against LOG.  Conversely, certain
+commands (especially immortal commands) are always logged.
+
+LOG ALL logs all character commands.  It is a server-wide toggle; it does not
+persist across reboots.
+
+SNOOP shows you a copy of all the input and output going to a character.
+The character must have an open channel.  You may snoop more than one
+character at a time.
+
+SNOOP yourself to cancel all outstanding snoops.
+~
+
+4 SWITCH RETURN OSWITCH ORETURN~
+Syntax: switch <character>
+Syntax: return
+Syntax: oswitch <object>
+Syntax: oreturn
+
+SWITCH switches you into the body of another character (who must not
+already have a descriptor, e.g. you can't switch into a PC).
+
+OSWITCH acts like switch, except it switches you into an object.
+
+RETURN and ORETURN return you to your original body.
+~
+
+4 IMMTALK :~
+Syntax: immtalk <message>
+
+IMMTALK sends a message to all immortals.  : is a synonym for IMMTALK.
+~
+
+4 QUEST-TYPES~
+The following are a few examples of quest types:
+* Find the object/s.  Examples: Find 5 different coloured potions, Find a 
+  pitch black longsword that flames brightly, Find a dragon dagger, belt 
+  and bracer, etc.
+* Kill the mob/s.  These can be hunt down and kill, or simple placing the 
+  player in the same room as the mob/s.  Can also be combined with finding 
+  objects - Example: Find and kill two different dragons and bring me 
+  their claws.
+* Solve a puzzle.  For example find a certain room, solve a riddle in an 
+  area, or successfully get out of a maze.  These are particularly good 
+  when several players of different ability are competing in the quest.
+* Duel: A one-on-one fight pitting either a player against a mob, or 
+  (more usually) a player against another player.  The conditions will be 
+  decided beforehand, and can include any conditions that both sides 
+  agree on.  Example: No sanctuary, no potions (or maybe a limited number),
+  no spells, no weapons, or whatever.
+* Skirmishes: Like a duel, but involves several players on either side.  
+  Although the sides don't have to be equal in number, it is generally a 
+  good idea to make sure they are roughly equal in power.
+* There are also several more obscure quests that can be run - for 
+  example you could require that the player brings you 3 small green 
+  eggs, then load mob 30005 into the players room.  Another battle might 
+  involve no melee - all combat must be with missile weapons.
+~
+
+0 $~
+
+#$

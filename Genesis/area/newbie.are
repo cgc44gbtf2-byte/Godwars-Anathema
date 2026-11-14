@@ -1,0 +1,100 @@
+#AREADATA
+Name        Core    Newbie School~
+Builders    Akuma~
+VNUMs       100 199
+End
+
+
+
+#MOBILES
+#0
+
+
+
+#OBJECTS
+#0
+
+
+
+#ROOMS
+#100
+Entrance~
+West = Mudding Basics.  East = Anathema Stuff.  South = Combat Arena.
+~
+0 0 0
+D3
+~
+~
+0 0 101
+S
+#101
+Basics~
+Look, Config, Exits, Movement...
+~
+0 0 0
+D0
+~
+~
+0 0 102
+D1
+~
+~
+0 0 100
+D2
+~
+~
+0 0 103
+D3
+~
+~
+0 0 104
+S
+#102
+Equipment~
+inventory, equipment, wear, remove, c iden...
+~
+0 0 0
+D2
+~
+~
+0 0 101
+S
+#103
+Combat~
+~
+0 0 0
+D0
+~
+~
+0 0 101
+S
+#104
+Stats~
+score, terms, ...
+~
+0 0 0
+D1
+~
+~
+0 0 101
+S
+#0
+
+
+
+#SPECIALS
+S
+
+
+
+#RESETS
+S
+
+
+
+#SHOPS
+0
+
+
+
+#$

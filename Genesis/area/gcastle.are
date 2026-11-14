@@ -1,0 +1,604 @@
+#AREADATA
+Name        Haif    Gnome Castle~
+Builders    Haif~
+VNUMs       6600 6647
+End
+
+
+
+#MOBILES
+#6600
+member gnome maintenance~
+A member of the maintenance~
+A member of the castle maintenance is here, cleaning.
+~
+This is an old gnome, appears to have been here a while.
+He is in the midst of cleaning the endless rooms and walls.
+~
+161 0 0 S
+108 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#6601
+slave gnome~
+A gnome slave~
+A slave to the gnomes is working hard.
+~
+This is one of the regularly beaten slaves.
+As you watch him work hard, you realize that you don't
+have much pity for him.
+~
+161 0 0 S
+116 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#6602
+gopher mean~
+a mean little gopher~
+A mean looking gopher is here, growling at you.
+~
+You see a snarling gopher. It appears to be one of the pets.
+~
+161 0 0 S
+141 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#6603
+shadows hidden shadow~
+a hidden shadow~
+A very well hidden shadow is here.
+~
+You can't see quite what it is, so dark it is.
+Yet you know it can't be anything good. Perhaps this is
+the reason for the soldiers.
+~
+161 0 0 S
+143 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#6604
+common soldier~
+a common soldier~
+A common gnome soldier patrols here.
+~
+It's a normal gnomish patrol guard.
+He glances at you a moment before continuing on.
+~
+161 0 0 S
+217 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#6605
+gnome girl child~
+a female gnome child~
+A little girl gnome is here, playing on the floor.
+~
+The gnomish girl completely ignores you as she plays on the floor.
+~
+161 0 0 S
+101 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#6606
+gnome old matron~
+An old gnome matron~
+An old gnome matron is carefully eying the room.
+~
+You see an sharp old matron. Completely oblivious to you, she keeps
+her attention on the guards and children.
+~
+33 0 0 S
+152 0 0 0d0+0 0d0+0
+0 0
+0 0 2
+#6607
+prisoner~
+a prisoner~
+A prison is here, looking dejected.
+~
+This is a sick little prisoner, shackled to the wall. You feel pitty
+for him. At least you're not in the position, getting whipped daily.
+~
+177 8 0 S
+113 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#6608
+rat small~
+a small rat~
+A small rat is scurrying around here.
+~
+A disgusting rat is here. You just want to stomp on it.
+~
+177 0 0 S
+35 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#0
+
+
+
+#OBJECTS
+#6600
+maintenance brush cleaning~
+a cleaning brush~
+A small cleaning brush is here.~
+~
+5 0 8193
+0 1 6 3
+15 600 0
+#6601
+golden band ring~
+a golden band~
+A pretty golden band draws your eye.~
+~
+9 0 3
+1 0 0 0
+8 7000 0
+A
+13 6
+A
+1 1
+#6621
+robe dark black~
+a dark robe~
+A dark black robe is here collecting dust.~
+~
+9 0 1025
+1 0 0 0
+5 4000 0
+A
+12 5
+A
+4 1
+#6644
+apple red~
+a red apple~
+A red apple sits on the floor here, dirty.~
+~
+19 0 1
+15 0 0 0
+5 15 0
+#6645
+grapes collection~
+a collection of grapes~
+A collection of grapes lie on the floor here.~
+~
+19 0 1
+4 0 0 1
+5 14 0
+#6646
+flask small~
+a small flask~
+A small flask sits on the floor here.~
+~
+10 0 1
+30 16 1 0
+1 1500 0
+#6647
+club wooden small~
+a wooden club~
+A small wooden club is rolling on the floor.~
+~
+5 0 8193
+0 2 3 5
+5 1700 0
+#0
+
+
+
+#ROOMS
+#6601
+The Entrance to the Castle~
+This is the entrance to a gnomish castle. The drawbridge, thankfully,
+is down. As you look upon the structure, you wonder why exactly you are here.
+There is a small sign here. Might as well take a glance and go in.
+~
+0 12 0
+E
+sign~
+Gnome Castle.... Keep out -Gnomes
+~
+D0
+~
+~
+0 -1 6500
+D2
+You see a dark chamber of the castle.
+~
+~
+0 -1 6602
+S
+#6602
+Foyer~
+You are in the foyer of the castle. East is a large walk in closet.
+There aren't many decorations here.
+~
+0 8 0
+D0
+You see the drawbridge.
+~
+~
+0 -1 6601
+D1
+You see an orderly closet.
+~
+~
+0 -1 6626
+D2
+You see a dimly illuminated room.
+~
+~
+0 -1 6604
+D3
+You see a dimly illuminated room.
+~
+~
+0 -1 6603
+S
+#6603
+Anteroom~
+You are in one anteroom of many in this castle. West is a small bedroom.
+The silence in this place is almost defeaning
+~
+0 8 0
+D1
+You see a dimly illuminated room.
+~
+~
+0 -1 6602
+D2
+You see a dimly illuminated room.
+~
+~
+0 -1 6605
+D3
+You see a clean and neat bedroom.
+~
+~
+0 -1 6606
+S
+#6604
+Main Ball Room~
+You are in the main ball room. Far above your head is a chandallier.
+You wonder what kind of dances they have here.
+~
+0 8 0
+D0
+You see a dimly illuminated room.
+~
+~
+0 -1 6602
+D1
+You see the playroom.
+~
+~
+0 -1 6610
+D3
+You see a dimly illuminated room.
+~
+~
+0 -1 6605
+S
+#6605
+Anteroom~
+This is yet another anteroom. West appears to be a stairway.
+You wonder why they have so many anterooms.
+~
+0 8 0
+D0
+You see a dimly illuminated room.
+~
+~
+0 -1 6603
+D1
+You see a dimly illumanted room.
+~
+~
+0 -1 6604
+D3
+You see a stone staircase leading down.
+~
+~
+0 -1 6607
+S
+#6606
+A Clean Bedroom~
+This is an amazingly clean bedroom. You wonder what they do to the
+maintenance crew to keep it so clean.
+~
+0 8 0
+D1
+You see a dimly illuminated room.
+~
+~
+0 -1 6603
+S
+#6607
+The Staircase~
+You stand at the beginning of a stone staircase leading down.
+It's not in very good shape. Whatever's down there mustn't be very important.
+~
+0 8 0
+D1
+You see a dimly illuminated room.
+~
+~
+0 -1 6605
+D5
+You see the entrance to a jail.
+~
+~
+0 -1 6612
+S
+#6608
+A Playroom~
+You are in one room of the play area for the children.
+~
+0 0 2
+D1
+You see a playroom.
+~
+~
+0 -1 6609
+D2
+You see a playroom.
+~
+~
+0 -1 6610
+S
+#6609
+A Playroom~
+You are in another play area. These children must have fun.
+~
+0 0 2
+D2
+You see a playroom.
+~
+~
+0 -1 6611
+D3
+You see a playroom.
+~
+~
+0 -1 6608
+S
+#6610
+A Playroom~
+This isn't any different from the others. They should have more
+decorations.
+~
+0 0 2
+D0
+You see a playroom.
+~
+~
+0 -1 6608
+D1
+You see a playroom.
+~
+~
+0 -1 6611
+D3
+You see a dimly illuminated room.
+~
+~
+0 -1 6604
+S
+#6611
+A Playroom~
+This playroom is cleaner than the others. Mustn't be used much.
+~
+0 0 2
+D0
+You see a playroom.
+~
+~
+0 -1 6609
+D3
+You see a playroom.
+~
+~
+0 -1 6610
+S
+#6612
+Entrance to the Jail~
+You stand in the entrance to a small jail. It isn't very well kept.
+Maybe you shouldn't go into it.
+~
+0 13 2
+D1
+~
+~
+0 -1 6613
+D4
+You see some stairs.
+~
+~
+0 -1 6607
+S
+#6613
+Jail~
+You are in one room of the jail. Barred doors are on either side.
+~
+0 9 2
+D1
+~
+~
+0 -1 6614
+D2
+~
+~
+0 -1 6615
+D3
+~
+~
+0 -1 6612
+S
+#6614
+Jail~
+You are in another room of the jail. Same as before, barred doors are everywhere.
+~
+0 9 2
+D2
+~
+~
+0 -1 6616
+D3
+~
+~
+0 -1 6613
+S
+#6615
+Jail~
+This jail is extensive. You could get lost in here.
+~
+0 9 2
+D0
+~
+~
+0 -1 6613
+D1
+~
+~
+0 -1 6616
+S
+#6616
+Jail~
+More doors are around. You're getting bored.
+~
+0 9 2
+D0
+~
+~
+0 -1 6614
+D2
+~
+~
+0 -1 6624
+D3
+~
+~
+0 -1 6615
+S
+#6624
+End of the Jail~
+You are at the end of the passage ways. There is a sign here,
+perhaps you should read it.
+~
+0 9 2
+E
+sign~
+Anyone breaking gnome law will end up here. Beware - Gnomes
+~
+D0
+~
+~
+0 -1 6616
+D2
+~
+~
+0 -1 6631
+S
+#6626
+A Clean Closet~
+This is a very clean and neat closet. You could find anything in here.
+You wonder what the maintenance crew is getting paid.
+~
+0 8 0
+D3
+You see a dimly lit room.
+~
+~
+0 -1 6602
+S
+#6631
+A Large Cell~
+You have finally reached the unlocked cell. There is a prisoner chained to the wall,
+both his hands and feet are shackled. You feel a little pity for him.
+The walls are slime covered, and slipper. There is a constant drip drip of water.
+A small rat scurries across the floor.
+~
+0 9 2
+D0
+~
+~
+0 -1 6624
+S
+#0
+
+
+
+#SPECIALS
+M 6600 spec_thief Load to: A member of the maintenance
+M 6601 spec_thief Load to: A gnome slave
+M 6602 spec_thief Load to: a mean little gopher
+M 6603 spec_thief Load to: a hidden shadow
+M 6604 spec_thief Load to: a common soldier
+M 6605 spec_thief Load to: a female gnome child
+M 6606 spec_cast_cleric Load to: An old gnome matron
+M 6608 spec_thief Load to: a small rat
+S
+
+
+
+#RESETS
+R 0 6613 4
+R 0 6614 4
+R 0 6615 4
+R 0 6616 4
+M 0 6607 1 6624
+M 0 6608 1 6631
+M 0 6600 3 6602
+E 0 6600 0 14
+M 0 6601 2 6602
+M 0 6602 2 6602
+M 0 6606 2 6602
+G 0 6646 0
+G 0 6644 0
+E 0 6621 0 10
+M 0 6600 3 6603
+E 0 6600 0 14
+M 0 6600 3 6604
+E 0 6600 0 14
+M 0 6602 2 6604
+M 0 6606 2 6604
+G 0 6646 0
+M 0 6605 2 6604
+G 0 6601 0
+M 0 6600 3 6605
+E 0 6600 0 14
+M 0 6602 2 6605
+G 0 6645 0
+M 0 6605 2 6605
+M 0 6600 2 6608
+M 0 6603 3 6608
+E 0 6647 0 14
+M 0 6600 2 6609
+M 0 6604 3 6609
+M 0 6603 3 6609
+E 0 6647 0 14
+M 0 6603 3 6609
+E 0 6647 0 14
+M 0 6600 2 6610
+M 0 6604 3 6610
+M 0 6603 3 6610
+E 0 6647 0 14
+M 0 6605 2 6610
+M 0 6604 3 6611
+M 0 6603 3 6611
+E 0 6647 0 14
+M 0 6603 3 6611
+E 0 6647 0 14
+M 0 6605 3 6606
+M 0 6601 3 6606
+S
+
+
+
+#SHOPS
+0
+
+
+
+#$

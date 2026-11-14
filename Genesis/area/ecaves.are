@@ -1,0 +1,1529 @@
+#AREADATA
+Name        Haif    Elemental Caves~
+Builders    None~
+VNUMs       9500 9599
+End
+
+
+
+#MOBILES
+#9500
+black bat~
+A black bat~
+A small, nasty looking black bat hovers here
+~
+This bat does not look pretty. Hovering six feet above the floor, it appears 
+to snarl at you as you watch it.
+~
+113 524840 0 S
+90 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#9501
+small rat~
+a small rat~
+A small rat scurries quickly out of your way
+~
+This rat doesn't look like much. In fact, it seems quite little, and you could 
+probably step on it to kill it.
+~
+161 66048 0 S
+142 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9502
+mouse~
+a thin mouse~
+A thin mouse runs around in little circles
+~
+The mouse just constantly runs in circles. It doesn't even seem to be bothering 
+to looking for food, which it obviously needs.
+~
+33 512 0 S
+117 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9503
+monster~
+monster under the bed~
+A large monster under the bed is here
+~
+As you look at the monster under the bed, you wonder why it is here. Surely it 
+is dark, yet there is no bed for it to be under...
+~
+33 552 0 S
+200 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9504
+bear demon~
+bear demon~
+A man-eating bear-demon possessed by primitive narcotics growls at you
+~
+This monster looks.... odd. The bear-demon has the upper features of a bear, yet 
+the wings and hobnailed feet of a demon. You wonder why it's here
+~
+97 524840 0 S
+309 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#9505
+Grinch~
+The Grinch~
+The Grinch stands here, looking as if he wants to steal something
+~
+The Grinch, the green skinned monster that thought to steal Christmas is standing 
+here, looking very grouchy in his hidden hideout.
+~
+49 552 0 S
+523 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9506
+mane~
+a minor mane~
+A minor mane is standing here, looking very forlorn
+~
+The mane isn't very impressive. Small, and rather weak for an otherwordly creature, 
+it doesn't even seem to care that you're here.
+~
+33 524840 0 S
+340 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9507
+kakilari~
+a kakilari~
+A Kakilari stands here, waving it's six arms threateningly
+~
+The Kakilari is fairly tall, wielding a weapon in one hand, while relying on its 
+pincers to do the rest of the work for the other five arms.
+~
+33 552 0 S
+401 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#9508
+goblinoid~
+a goblinoid~
+A goblinoid stands here, looking somewhat odd
+~
+This goblinoid doesn't look quite right. It has the normal features of a goblin... 
+just exagerated. The normal large feet of a goblin are, well, huge. It's quite ugly in 
+appearance.
+~
+33 512 0 S
+247 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9509
+animate walking stick~
+an animate walking stick~
+A walking stick is here.... well.... walking
+~
+The walking stick is quite animate, and moving around. You wonder why, and what magic 
+has been imbued into it to allow it to do so.
+~
+33 0 0 S
+503 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9510
+bugbear~
+a baby bugbear~
+A baby bugbear is here, looking around for a larger one
+~
+The bugbear doesn't look TOO tough, though it most assuredly is not the strength of a 
+normal babe.
+~
+33 0 0 S
+506 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#0
+
+
+
+#OBJECTS
+#9500
+sword~
+a black sword~
+A very dark, black sword lies here~
+~
+5 80 8193
+0 10 12 3
+5 0 0
+A
+17 10
+A
+1 2
+#9501
+bedroll~
+a small bedroll~
+A small bedroll is here, near a few others~
+~
+12 0 0
+0 1 6 11
+5 0 0
+#9502
+breastplate~
+breastplate~
+A breastplate is lying here.~
+~
+9 2 9
+0 0 0 0
+10 10000 0
+A
+17 30
+A
+1 2
+A
+18 5
+A
+19 5
+#9503
+helmet~
+a helmet~
+A helmet is lying here.~
+~
+9 2 17
+0 0 0 0
+6 10000 0
+A
+17 20
+A
+4 2
+A
+3 2
+A
+18 5
+A
+19 5
+#9504
+sleeves~
+a pair of sleeves~
+A pair of sleeves are lying here.~
+~
+9 2 257
+0 0 0 0
+7 10000 0
+A
+17 20
+A
+2 2
+A
+18 5
+A
+19 5
+#9505
+leggings~
+a pair of leggings~
+A pair of leggings are lying here.~
+~
+9 2 33
+0 0 0 0
+7 10000 0
+A
+17 20
+A
+5 2
+A
+18 5
+A
+19 5
+#9506
+gauntlets~
+a pair of gauntlets~
+A pair of gauntlets are lying here.~
+~
+9 2 129
+0 0 0 0
+5 10000 0
+A
+17 15
+A
+1 2
+A
+18 5
+A
+19 5
+#9507
+boots~
+a pair of boots~
+A pair of boots are lying here.~
+~
+9 2 65
+0 0 0 0
+5 10000 0
+A
+17 15
+A
+14 75
+A
+18 5
+A
+19 5
+#9508
+bracer~
+a black bracer~
+A bracer is lying here.~
+~
+9 2 4097
+0 0 0 0
+3 10000 0
+A
+17 15
+A
+18 5
+A
+19 5
+#9509
+long sword longsword~
+a longsword~
+A longsword is lying here.~
+~
+5 16386 8193
+57034 20 30 3
+6 10000 0
+A
+12 50
+A
+13 50
+A
+18 10
+A
+19 10
+#9510
+buckler~
+a buckler~
+A buckler is lying here.~
+~
+9 2 16385
+0 0 0 0
+10 10000 0
+A
+17 50
+A
+18 5
+A
+19 5
+#9511
+ring~
+a ring~
+A ring is lying here.~
+~
+9 2 3
+0 0 0 0
+1 10000 0
+A
+18 5
+A
+19 5
+#9512
+collar~
+a collar~
+A collar is lying here.~
+~
+9 2 5
+0 0 0 0
+2 10000 0
+A
+18 5
+A
+19 5
+#0
+
+
+
+#ROOMS
+#9500
+Dimly Lit Tunnel~
+You are standing in a small tunnel leading north from the caves.
+You aren't quite sure what's ahead, as it's still dark, but it 
+might not be too much longer before there are more caves. The 
+other caves are back south.
+~
+0 13 0
+D0
+~
+~
+0 -1 9501
+D2
+~
+~
+0 -1 9221
+S
+#9501
+Dimly Lit Tunnel~
+The tunnel continues. You wonder how much farther to the end... 
+if you will ever see light again, or if anyone will even find you.
+~
+0 9 0
+D0
+~
+~
+0 -1 9502
+D2
+~
+~
+0 -1 9500
+S
+#9502
+Dimly Lit Tunnel~
+The tunnel curves from here, that much at least you can see from 
+the glowing lichen and moss around. Looking around the bend, you 
+can see that it continues for a short way before opening into a cave.
+~
+0 8 0
+D1
+~
+~
+0 -1 9503
+D2
+~
+~
+0 -1 9501
+S
+#9503
+Widening Tunnel~
+The tunnel is almost ended. Just ahead you can see a cave, though 
+from here you can't tell how large it is. The opening to the cave 
+has small stalactites, which reminds one of teeth. You ponder the 
+wisdom of continuing.
+~
+0 8 0
+D1
+~
+~
+0 -1 9504
+D3
+~
+~
+0 -1 9502
+S
+#9504
+Large Cave~
+The cave is huge! From your vantage point in the tunnel, you couldn't 
+tell just how big it is. Up above, the cave ceiling disappears into 
+darkness. There are three new tunnels branching off the far walls. 
+One north, south, and continuing east.
+~
+0 8 0
+D0
+~
+~
+0 -1 9505
+D1
+~
+~
+0 -1 9506
+D2
+~
+~
+0 -1 9507
+D3
+~
+~
+0 -1 9503
+S
+#9505
+Dark Tunnel~
+The tunnel is so dark, you need to rely on your light once more. 
+Right in front of you, you can see a bend so sharp that it cuts off 
+all view of the rest of the tunnel, leaving just the far wall. You 
+can continue west through the tunnel, or go back south into the cave.
+~
+0 9 0
+D2
+~
+~
+0 -1 9504
+D3
+~
+~
+0 -1 9508
+S
+#9506
+Bright Tunnel~
+The tunnel is suprisingly bright from the glowing vegitation. More than 
+that, the tunnel itself appears to have been painted a bright purple. 
+You wonder who did it, and if they are still there.
+~
+0 8 0
+D1
+~
+~
+0 -1 9521
+D3
+~
+~
+0 -1 9504
+S
+#9507
+Tight Tunnel~
+You are standing in an extremely tight tunnel. You can barely stretch 
+without cutting yourself off a wall. You hope that it doesn't get much 
+smaller as you continue.
+~
+0 8 0
+D0
+~
+~
+0 -1 9504
+S
+#9508
+Wide Tunnel~
+This is quite a comfortable tunnel. The plant life give off a nice 
+light, the tunnel is more than wide enough, and time seems to slow 
+under the rocks. To the north is a small cave, and the tunnel 
+continues west.
+~
+0 8 0
+D0
+~
+~
+0 -1 9509
+D1
+~
+~
+0 -1 9505
+D3
+~
+~
+0 -1 9510
+S
+#9509
+A Small Cave~
+This cave isn't very large, but rather cozy. As you walk in, you 
+notice a bedroll nearby. Obviously someone has been here lately. 
+The only way out is back south.
+~
+0 8 0
+D2
+~
+~
+0 -1 9508
+S
+#9510
+Wide Tunnel~
+As you continue down the tunnel, which is gradually increasing into 
+another cave, you notice a pond up ahead. It seems to be healthy enough.
+~
+0 8 0
+D1
+~
+~
+0 -1 9508
+D3
+~
+~
+0 -1 9511
+S
+#9511
+Near a Pond~
+The pond sparkles in the soft light of the plant life, and you wonder 
+how deep it is. It certainly looks quite dark blue, suggesting a large 
+depth. There are scuff marks everywhere from passing creatures stopping 
+for a drink.
+~
+0 8 0
+D0
+~
+~
+0 -1 9512
+D1
+~
+~
+0 -1 9510
+S
+#9512
+An Intersection of Tunnels~
+There are tunnels branching off in the four basic directions of 
+a compass. You wonder where each leads. This seems to be a 
+fairly large place.
+~
+0 8 0
+D0
+~
+~
+0 -1 9515
+D1
+~
+~
+0 -1 9513
+D2
+~
+~
+0 -1 9511
+D3
+~
+~
+0 -1 9514
+S
+#9513
+A Small Cave~
+This cave isn't much. A normal dome shape, it pretty much 
+sits there, doing nothing where a tunnel might have fit better. 
+You do notice one thing out of place. On the floor, there is a large 
+circular scorch mark. You wonder what it was from.
+~
+0 8 0
+D3
+~
+~
+0 -1 9512
+S
+#9514
+Storage Cave~
+The cave is full of little nooks and crannies, great for storage. 
+You can see a few bits of bad food and dirty rags in a far corner. 
+The former moss and lichens giving off light is not present here.
+~
+0 9 0
+D1
+~
+~
+0 -1 9512
+S
+#9515
+The Tunnel Continues~
+The tunnel that you have already passed through to the south, 
+is back. You see a turn up a little higher. The intersection 
+is back south.
+~
+0 8 0
+D0
+~
+~
+0 -1 9516
+D2
+~
+~
+0 -1 9512
+S
+#9516
+Turn in the Tunnel~
+The tunnel turns sharply again to the east, and seems to connect 
+to another one further on. You wonder if it's from the other 
+intersection way back when.
+~
+0 8 0
+D1
+~
+~
+0 -1 9517
+D2
+~
+~
+0 -1 9515
+S
+#9517
+Before an Intersection~
+Directly before you in the next room is a T intersection. The 
+southern tunnel seems to have come a long way. You can't see 
+much north from here.
+~
+0 8 0
+D1
+~
+~
+0 -1 9518
+D3
+~
+~
+0 -1 9516
+S
+#9518
+T-Intersection~
+This intersection isn't much very interesting, though a large 
+boulder against the far wall is curious. How did it get here? 
+Why is it here? What's the point of life? Who even cares?
+~
+0 8 0
+D0
+~
+~
+0 -1 9519
+D2
+~
+~
+0 -1 9520
+D3
+~
+~
+0 -1 9517
+S
+#9519
+A Large Tunnel~
+The tunnel leads straight up to a wall, where it then turns to 
+the right and left. All you can see are branches coming off of 
+the tunnels towards either end.
+~
+0 8 0
+D1
+~
+~
+0 -1 9527
+D2
+~
+~
+0 -1 9518
+D3
+~
+~
+0 -1 9528
+S
+#9520
+Tunnel Connection~
+This is the tunnel connecting to the older one. When you glance 
+south, you can tell the difference in age. The other tunnel is a 
+lot smoother from the water, whereas this tunnel is craggy and broken.
+~
+0 8 0
+D0
+~
+~
+0 -1 9518
+D2
+~
+~
+0 -1 9526
+S
+#9521
+Bright Tunnel~
+This is getting wearing. Too bright, too long. What ever happened 
+to the pretty darkness? Darkness is always fun, walking into the 
+tunnel walls and all. The tunnel curves to the north here.
+~
+0 8 0
+D0
+~
+~
+0 -1 9522
+D3
+~
+~
+0 -1 9506
+S
+#9522
+Darkening Tunnel~
+Finally, the brightness is dimming, returning to the now usual darkness. 
+Though you cannot see what's ahead, it is more comforting than the 
+revealing light.
+~
+0 8 0
+D0
+~
+~
+0 -1 9523
+D2
+~
+~
+0 -1 9521
+S
+#9523
+Pitch-Black Tunnel~
+The tunnel shockingly lost light quickly. Now it's a bit TOO dark. 
+No matter, just so long as you don't run into too many walls, you 
+should be fine.
+~
+0 9 0
+D1
+~
+~
+0 -1 9524
+D2
+~
+~
+0 -1 9522
+S
+#9524
+A Medium Sized Cave~
+The cave is not overly large, but is more comfortable in size. 
+It's still incredibly dark, but there's not much that can be done to 
+change that. There are little marks all along the walls, as if claws 
+went against them.
+~
+0 9 0
+D0
+~
+~
+0 -1 9525
+D3
+~
+~
+0 -1 9523
+S
+#9525
+A Small Tunnel~
+The new tunnel isn't very large, but not incredibly cramped as it 
+apparently easily could have been. It's not the usual circle tunnel, 
+but more triangular in shape. Rather interesting, if hard to move near 
+the sides. At least the dim light is back once again.
+~
+0 8 0
+D2
+~
+~
+0 -1 9524
+D3
+~
+~
+0 -1 9526
+S
+#9526
+Turn in the Tunnel~
+The tunnel is a bit large at this turn than before, and more circular, 
+but still not quite right. You can't really place a finger on it, but 
+you feel as if someone's been here.
+~
+0 8 0
+D0
+~
+~
+0 -1 9520
+D1
+~
+~
+0 -1 9525
+S
+#9527
+Sleeping Quarters~
+You are in the only eastern area for sleep in this area. Farther to 
+the east appears to be a dining area. Perhaps you should go ahead 
+and check it out.
+~
+0 8 0
+D1
+~
+~
+0 -1 9547
+D3
+~
+~
+0 -1 9519
+S
+#9528
+Sleeping Quarters~
+Two small caves, north and south, are here apparently for sleeping. 
+More are down to the west, many more. You wonder who's place you 
+have stumbled into.
+~
+0 8 0
+D0
+~
+~
+0 -1 9529
+D1
+~
+~
+0 -1 9519
+D2
+~
+~
+0 -1 9530
+S
+#9529
+Sleeping Rooms~
+All around you are different bedrolls, and more caves branching off 
+for others to sleep. How many are there?
+~
+0 8 0
+D0
+~
+~
+0 -1 9531
+D1
+~
+~
+0 -1 9532
+D2
+~
+~
+0 -1 9528
+D3
+~
+~
+0 -1 9533
+S
+#9530
+Sleeping Rooms~
+You are standing in one of the many areas for sleeping or relaxation. 
+Yet you still do not know who lives here. Maybe you'll find out before 
+you leave.
+~
+0 8 0
+D0
+~
+~
+0 -1 9528
+S
+#9531
+Sleeping Rooms~
+Many Many Many Many Many Many Many Many sleeping rooms. Seems to be rather 
+excessive, but at least there's no lack of space.
+~
+0 8 0
+D1
+~
+~
+0 -1 9535
+D2
+~
+~
+0 -1 9529
+S
+#9532
+Sleeping Rooms~
+This room is larger than the others, and actually decorated on the far 
+wall. Perhaps it's the room of someone important?
+~
+0 8 0
+D0
+~
+~
+0 -1 9535
+D3
+~
+~
+0 -1 9529
+S
+#9533
+Sleeping Rooms~
+Yet more rooms. When will this end? There must be an awful lot of things 
+around, whatever they are. Maybe they can blend in like a chameleon. 
+Perhaps that's it. Or perhaps not.
+~
+0 8 0
+D1
+~
+~
+0 -1 9529
+D3
+~
+~
+0 -1 9534
+S
+#9534
+West End of the Rooms~
+This is the end, on this side, of the sleeping rooms. Each room, so far 
+as you can tell, is able to hold several people. Since there are several 
+bedrolls in each room.
+~
+0 8 0
+D1
+~
+~
+0 -1 9533
+S
+#9535
+Back Tunnels~
+These are the dark back tunnels behind the sleeping rooms. Perhaps for 
+an escape, or more likely so they don't have to step on everyone.
+~
+0 9 0
+D1
+~
+~
+0 -1 9536
+D2
+~
+~
+0 -1 9532
+D3
+~
+~
+0 -1 9531
+S
+#9536
+Back Tunnels~
+The tunnel continues, having only interconnected once so far. You wonder 
+where these will bring you. Up ahead, you can see several more large caves.
+~
+0 9 0
+D1
+~
+~
+0 -1 9537
+D3
+~
+~
+0 -1 9535
+S
+#9537
+Cave Intersection~
+There are two caves leading off of the tunnel, one north, and one south. 
+The one south is somewhat smaller, but appears to continue on. The back 
+tunnels continue east.
+~
+0 9 0
+D0
+~
+~
+0 -1 9538
+D2
+~
+~
+0 -1 9539
+D3
+~
+~
+0 -1 9536
+S
+#9538
+A Large Cave~
+This cave is fairly large, and a strangely square shaped room. 
+It's curious, as it seems to be actually a natural formation, and not 
+carved that way by whoever lives in these caves.
+~
+0 9 0
+D2
+~
+~
+0 -1 9537
+S
+#9539
+A Small Cave~
+This cave isn't too large, but not cramped as some are. There isn't much 
+to see, a bit of debris, a few scratches, a large piller connecting the 
+floor to the ceiling, and that's about it. There's another one to the south.
+~
+0 9 0
+D0
+~
+~
+0 -1 9537
+D2
+~
+~
+0 -1 9540
+S
+#9540
+A Strange Cave~
+This cave is very odd. You don't know what it is, but the very walls seem 
+to glow orange, and a deep throbbing fills the room, as if great machinery 
+is working below. You wonder what it's really from.
+~
+0 9 0
+D0
+~
+~
+0 -1 9539
+D1
+~
+~
+0 -1 9542
+D3
+~
+~
+0 -1 9541
+S
+#9541
+A Short Trail~
+You wandered onto what appears to be a trail. You wonder where it goes, 
+what it's purpose is, and why it's there. Maybe no reason. Maybe the makers 
+were just bored, so decided to make a trail of gold, for this is surely what 
+it is. Gold is used as bricks in the ground for the trail. It continues on west.
+~
+0 9 0
+D1
+~
+~
+0 -1 9540
+S
+#9542
+A Dropoff~
+There is a huge dropoff here. To the north, you can see the rest of the 
+small path in which you need to take. Immediately in front of you is a huge canyon, 
+splitting the tunnel in two. It's much too wide to jump across, and you would surely 
+die if you fell. The safest rout is back you came, but it is possible to continue north.
+~
+0 9 0
+D0
+~
+~
+0 -1 9543
+D3
+~
+~
+0 -1 9540
+S
+#9543
+Along the Canyon~
+The canyon stretches to the end as far as the eye can see. You wonder if you would 
+ever find the end of it. Perhaps there will be another tunnel you can get into 
+farther ahead.
+~
+0 9 0
+D0
+~
+~
+0 -1 9544
+D2
+~
+~
+0 -1 9542
+S
+#9544
+Along the Canyon~
+You must be very careful in this area of it, indeed. The rocks tumble down the canyon 
+as you walk, and your hold on the edge seems tenous indeed. Hopefully you can get past 
+here without mishap.
+~
+0 9 0
+D0
+~
+~
+0 -1 9545
+D2
+~
+~
+0 -1 9543
+S
+#9545
+Along the Canyon~
+You think you might detect a darkening against the western wall a little up ahead 
+as you follow the small passage left due to the canyon. You're lucky you didn't 
+fall, but will your luck hold out?
+~
+0 9 0
+D0
+~
+~
+0 -1 9546
+D2
+~
+~
+0 -1 9544
+S
+#9546
+Along the Canyon~
+There appears to be a small passage just to the west. It would be a tight fit, 
+but it seems easier than wandering up ahead and chancing a fall.
+~
+0 9 0
+D0
+~
+~
+0 -1 9551
+D2
+~
+~
+0 -1 9545
+D3
+~
+~
+0 -1 9550
+S
+#9547
+Dinning Cave~
+You are standing in the middle of the dinning area for these people. To the north 
+is the kitchen, south is a storage area for food. There doesn't appear to be much 
+left from here. There is a small candle on the table giving off light.
+~
+0 8 0
+D0
+~
+~
+0 -1 9548
+D2
+~
+~
+0 -1 9549
+D3
+~
+~
+0 -1 9527
+S
+#9548
+Kitchen Cave~
+This is the kitchen. There's not much to it. On the eastern wall, there is a small 
+oven, and counters on the west wall. That's about it. Again there is a candle, on 
+the counters this time. The only way is back south.
+~
+0 8 0
+D2
+~
+~
+0 -1 9547
+S
+#9549
+Storage Cave~
+The cave isn't much. Small, and cluttered full of little barrels. After a quick 
+look, you can tell that all are empty, the covers torn off and scattered all over 
+the floor.
+~
+0 8 0
+D0
+~
+~
+0 -1 9547
+S
+#9550
+A Cave~
+This isn't a very impressive cave. There are tunnels branching off everywhere, all 
+to the same types of caves. There seems to be little deviation.
+~
+0 8200 0
+D0
+~
+~
+0 -1 9553
+D1
+~
+~
+0 -1 9546
+D2
+~
+~
+0 -1 9554
+D3
+~
+~
+0 -1 9552
+S
+#9551
+End of the Canyon~
+This is the end of the large canyon. Unfortunately, though it finally ends, so does 
+the path. Straight ahead is a wall. The only way is back south.
+~
+0 8 0
+D2
+~
+~
+0 -1 9546
+S
+#9552
+A Cave~
+This isn't a very impressive cave. There are tunnels branching off everywhere, all to 
+the same types of caves. There seems to be little deviation.
+~
+0 8200 0
+D0
+~
+~
+0 -1 9555
+D1
+~
+~
+0 -1 9550
+D2
+~
+~
+0 -1 9556
+D3
+~
+~
+0 -1 9556
+S
+#9553
+A Cave~
+This isn't a very impressive cave. There are tunnels branching off everywhere, all 
+to the same types of caves. There seems to be little deviation.
+~
+0 8200 0
+D0
+~
+~
+0 -1 9554
+D2
+~
+~
+0 -1 9550
+S
+#9554
+A Cave~
+This isn't a very impressive cave. There are tunnels branching off everywhere, all 
+to the same types of caves. There seems to be little deviation.
+~
+0 8200 0
+D0
+~
+~
+0 -1 9550
+D2
+~
+~
+0 -1 9553
+D3
+~
+~
+0 -1 9552
+S
+#9555
+A Cave~
+This isn't a very impressive cave. There are tunnels branching off everywhere, all 
+to the same types of caves. There seems to be little deviation.
+~
+0 8200 0
+D1
+~
+~
+0 -1 9550
+D2
+~
+~
+0 -1 9552
+S
+#9556
+A Cave~
+This isn't a very impressive cave. There are tunnels branching off everywhere, all 
+to the same types of caves. There seems to be little deviation.
+~
+0 8200 0
+D0
+~
+~
+0 -1 9552
+D3
+~
+~
+0 -1 9557
+S
+#9557
+A Cave~
+This isn't a very impressive cave. There are tunnels branching off everywhere, all to 
+the same types of caves. There seems to be little deviation.
+~
+0 8200 0
+D0
+~
+~
+0 -1 9553
+D1
+~
+~
+0 -1 9552
+D2
+~
+~
+0 -1 9556
+D3
+~
+~
+0 -1 9558
+S
+#9558
+End of the Caves~
+You finally made it out of all those caves. How annoying they were. Good thing 
+you found your way out. You wonder what's around here.
+~
+0 8 0
+D0
+~
+~
+0 -1 9559
+D1
+~
+~
+0 -1 9557
+S
+#9559
+Thin Tunnel~
+This tunnel isn't very large. You have enough space to dodge if you're forced to 
+fight, but it just barely. At least the ceiling is higher than usual, so you can 
+stand straight.
+~
+0 9 0
+D0
+~
+~
+0 -1 9560
+D2
+~
+~
+0 -1 9558
+S
+#9560
+Thin Tunnel~
+The tunnel continues from where you started. There's yet another bend up ahead 
+towards the left. You ponder where it might take you, or if you should just 
+leave now.
+~
+0 9 0
+D2
+~
+~
+0 -1 9559
+D3
+~
+~
+0 -1 9561
+S
+#9561
+End of the Thin Tunnel~
+You're before a very large cave. You can't see the other end. There's debris all 
+along, most of it bones. There appears to have been a massive fight in this place, 
+at several different times. Some are extremely old, yet others appear quite fresh.
+~
+0 9 0
+D1
+~
+~
+0 -1 9560
+D3
+~
+~
+0 -1 9562
+S
+#9562
+Large Cave~
+You are standing in the middle of this huge cave. The bones still litter the ground, 
+and everywhere you step, you hear the small crunching of bones and tiny insects under 
+your feet. You hope this place ends soon.
+~
+0 9 0
+D1
+~
+~
+0 -1 9561
+D3
+~
+~
+0 -1 9563
+S
+#9563
+West End of the Cave~
+You finally made it to the very end of the cave. There's not much different, except 
+for on the wall of a cave, there is a pentagram ingraved, stained with blood, and 
+quite large. You wonder what they used it for.
+~
+0 9 0
+D1
+~
+~
+0 -1 9562
+S
+#0
+
+
+
+#SPECIALS
+S
+
+
+
+#RESETS
+M 0 9500 15 9500
+M 0 9500 15 9501
+M 0 9500 15 9502
+M 0 9500 15 9503
+M 0 9500 15 9504
+M 0 9500 15 9500
+M 0 9500 15 9500
+M 0 9501 15 9502
+M 0 9501 15 9502
+M 0 9501 15 9503
+M 0 9501 15 9504
+M 0 9501 15 9502
+M 0 9501 15 9502
+M 0 9502 15 9504
+M 0 9502 15 9504
+M 0 9502 15 9504
+M 0 9503 15 9508
+M 0 9503 15 9508
+M 0 9503 15 9508
+M 0 9503 15 9508
+M 0 9503 15 9508
+M 0 9503 15 9505
+M 0 9503 15 9509
+M 0 9503 15 9528
+M 0 9503 15 9530
+M 0 9503 15 9529
+M 0 9510 15 9518
+M 0 9510 15 9519
+M 0 9510 15 9519
+M 0 9510 15 9519
+M 0 9510 15 9519
+M 0 9507 1 9547
+E 0 9500 0 14
+M 0 9508 50 9548
+M 0 9502 50 9549
+M 0 9507 1 9535
+E 0 9500 0 14
+M 0 9509 10 9537
+M 0 9509 10 9538
+M 0 9509 10 9539
+M 0 9509 10 9543
+M 0 9505 1 9558
+E 0 9502 0 4
+E 0 9503 0 5
+E 0 9504 0 9
+E 0 9505 0 6
+E 0 9506 0 8
+E 0 9507 0 7
+E 0 9508 0 12
+E 0 9508 0 13
+E 0 9509 0 14
+E 0 9510 0 15
+G 0 9511 0
+E 0 9511 0 1
+E 0 9512 0 2
+E 0 9512 0 3
+M 0 9504 10 9557
+M 0 9504 10 9552
+M 0 9504 10 9556
+M 0 9504 10 9550
+M 0 9504 10 9553
+M 0 9504 10 9554
+M 0 9504 10 9557
+M 0 9504 10 9557
+M 0 9504 10 9558
+M 0 9504 10 9558
+M 0 9509 10 9560
+M 0 9506 10 9559
+M 0 9507 2 9562
+M 0 9506 10 9562
+M 0 9506 10 9562
+M 0 9508 10 9562
+M 0 9509 10 9562
+M 0 9510 10 9562
+M 0 9508 10 9562
+M 0 9510 10 9524
+M 0 9500 10 9523
+M 0 9500 10 9522
+M 0 9502 10 9521
+M 0 9506 10 9507
+M 0 9506 10 9507
+M 0 9506 10 9507
+M 0 9506 10 9507
+M 0 9506 10 9507
+O 0 9501 0 9527
+O 0 9501 0 9527
+O 0 9501 0 9527
+O 0 9501 0 9528
+O 0 9501 0 9528
+O 0 9501 0 9528
+O 0 9501 0 9530
+O 0 9501 0 9530
+O 0 9501 0 9530
+O 0 9501 0 9529
+O 0 9501 0 9529
+O 0 9501 0 9529
+O 0 9501 0 9532
+O 0 9501 0 9532
+O 0 9501 0 9532
+O 0 9501 0 9534
+O 0 9501 0 9534
+O 0 9501 0 9534
+O 0 9501 0 9533
+O 0 9501 0 9533
+O 0 9501 0 9533
+O 0 9501 0 9531
+O 0 9501 0 9531
+O 0 9501 0 9531
+M 0 9509 10 9531
+M 0 9509 10 9531
+M 0 9509 10 9531
+M 0 9509 10 9531
+M 0 9509 10 9531
+S
+
+
+
+#SHOPS
+0
+
+
+
+#$

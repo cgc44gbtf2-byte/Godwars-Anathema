@@ -1,0 +1,119 @@
+#AREADATA
+Name        KaVir   Artifacts~
+Builders    None~
+VNUMs       29500 29530
+End
+
+
+
+#MOBILES
+#0
+
+
+
+#OBJECTS
+#29500
+artifact ring hitting~
+the Ring of Hitting~
+A small ring practically glows with power here.~
+~
+9 1 3
+25 0 0 14
+1 0 0
+A
+18 300
+#29501
+artifact ring damage~
+the Ring of Damage~
+A small ring practically glows with power here.~
+~
+9 1 3
+25 0 0 15
+1 0 0
+A
+19 300
+#29502
+artifact draconic aura~
+a Draconic Aura~
+A light flickers in the area, giving off the impression of a Dragon.~
+~
+9 0 1025
+50 0 0 8
+1 0 0
+A
+17 50
+A
+19 50
+A
+18 50
+A
+13 5000
+#29503
+artifact mirror shades~
+the #0Mirror Shades#n of the #7Gods#n~
+A pair of mirrored black shades are here, screaming out for you to pick them up.~
+~
+9 0 32769
+25 0 0 18
+1 0 0
+#29504
+artifact scimitar magebane~
+a Runic Scimitar named 'Magebane'~
+A heavily runed scimitar here is repulsing magic.~
+~
+5 0 8193
+20031 50 100 2
+1 0 0
+A
+12 -5000
+A
+18 50
+A
+19 50
+#29505
+artifact sword kas~
+the Sword of Kas~
+A long serrated blade is on the ground, waiting to tear through flesh.~
+~
+5 0 8193
+15000 50 100 3
+1 0 0
+A
+19 150
+A
+18 50
+#29506
+artifact periapt protection~
+the Periapt of Protection~
+A holy necklace lies here radiating light.~
+~
+9 1 5
+25 0 0 21
+1 0 0
+A
+17 500
+#0
+
+
+
+#ROOMS
+#0
+
+
+
+#SPECIALS
+S
+
+
+
+#RESETS
+S
+
+
+
+#SHOPS
+0
+
+
+
+#$

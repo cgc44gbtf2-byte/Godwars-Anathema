@@ -1,0 +1,1270 @@
+#AREADATA
+Name        Carreau Mud School~
+Builders    None~
+VNUMs       3700 3760
+End
+
+
+
+#MOBILES
+#3700
+school worker~
+An Anathema mud school worker~
+A mud school worker is standing here.
+~
+He wears a long black robe and a black beret. You shouldn't attack him.
+~
+49 136 0 S
+50 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#3701
+Panther~
+The sleek panther~
+A sleek black panther is here, walking around the edge of the pit
+~
+His smooth black fur shines in the light as he bares his teeth at you. You
+really should flee.
+~
+49 8 0 S
+5 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#3702
+monster~
+the monster~
+There is a monster sitting here
+~
+He looks completely disinterested in life. Maybe you should kill it.
+~
+17 0 0 S
+2 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#3703
+monster wimpy~
+the wimpy monster~
+There is a wimpy monster hiding in the corner.
+~
+It's hiding in a corner. Kill it
+~
+17 0 0 S
+2 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#3704
+monster aggressive~
+the aggressive monster~
+There is a monster sitting here
+~
+He looks up and attacks you !
+~
+81 8397372 0 S
+2 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#3705
+Monster~
+the wimpy monster~
+A wimpy monster sits here, looking annoyed
+~
+He attacked you, so kill it !
+~
+81 0 0 S
+2 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#3706
+monster~
+a big monster~
+There is a big monster hulking over your form, drooling on your arm
+~
+This is one of the monsters the school has collected for you. Kill it.
+~
+17 512 0 S
+2 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#3707
+worker teacher man~
+A mud school worker~
+A mud school worker is sitting here, resting his legs.
+~
+He looks tired, Better leave him alone.
+~
+49 136 0 S
+50 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#3710
+lizard~
+the lizard~
+A lizard slithers up to you.
+~
+It flicks out it tongue, and starts to eat a leaf
+~
+33 0 0 S
+5 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#3711
+pygmy monkey~
+a pygmy monkey~
+A monkey throws a peice of rotten fruit at you as you pass
+~
+It's fur is a silvery color, and as you look at it it throws a chunk of banana
+at you.
+~
+33 0 0 S
+5 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#3712
+frog~
+a frog~
+A frog is sitting here, staring at you.
+~
+RIBBIT!
+~
+33 0 0 S
+2 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#3713
+bug~
+a bug~
+A brightly colored bug is crawling past your foot
+~
+You could smash it with your foot, in fact, why don't you ?
+~
+33 0 0 S
+5 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#3715
+jaguar~
+A Jaguar~
+A jaguar is prowling here
+~
+The jaguar look up at you and lets out a low growl. Better leave it alone
+~
+33 32768 0 S
+10 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#3720
+man short~
+The zombie of a schoolworker~
+A hideous looking man is here, grinning at you
+~
+The man is horrible to look at. He is short, is only wearing tatters of his
+bloodstained uniform, and his skin is a sickly greenish-grey color. You feel
+a strong urge to kill this creature.
+~
+17 1049256 0 S
+20 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#0
+
+
+
+#OBJECTS
+#0
+
+
+
+#ROOMS
+#3700
+#0The Entrance to Mud School#n~
+#0The room you now stand in is musty, and dust hangs in the air. Light streams
+down into the room from a single window in the ceiling. This is the Anathema
+School. Type north to continue into the school. A stone arch leads south, into
+a heavily forested area.
+~
+0 4 0
+D0
+You see the doorway into the Mud School Building.
+~
+~
+0 -1 3701
+D2
+You see the one way door into the Arena of Mud School.
+~
+door~
+0 -1 3744
+D5
+You see the Temple at Maraden.
+~
+~
+0 -1 3001
+S
+#3701
+A hallway in the Anathema School~
+You are now standing in a musty room. The walls are made of a heavy
+grey stone. The room is lit by a window in the east wall.  A sign on the wall
+beckons your attention, type look sign to read it. An archway leads south,
+back to the entryroom, while the hallway continues west.
+~
+0 36 0
+E
+sign~
+#0Welcome to the Anathema Mud School.
+
+As you walk through the school, you will see signs like this. Type 'look sign'
+to view it. This school will teach you basic commands which will help you to
+interact with the world around you. The first of these commands are the
+Movement commands. They are as follows:
+North
+South
+East
+West
+Up
+Down
+
+These commands move you in a direction. Specifically, the one mentioned.
+~
+D2
+You see a path into another room.
+~
+~
+0 -1 3700
+D3
+You see a path into another room.
+~
+~
+0 -1 3702
+S
+#3702
+#0A formless void~
+You are now standing, or should I say floating, in a formless void. You cannot
+see anything, but you sense exits in all directions. You must try all the
+directions before you can find the exit to this room.
+~
+0 36 0
+D0
+You see the room north that will lead you to the next section.
+~
+~
+0 0 3703
+D1
+You see a room.
+~
+~
+0 0 3701
+D2
+You see a room.
+~
+~
+0 0 3705
+D3
+You see a room.
+~
+~
+0 0 3704
+D4
+You see a room.
+~
+~
+0 0 3708
+D5
+You see a room.
+~
+~
+0 0 3707
+S
+#3703
+#0The exit from the Void.~
+You are standing in a room, It's walls are made of a smooth stone. The void is
+to the south, not that'd you'd wish to go back. A doorway heads north. A crude
+wooden sign is on the wall.
+~
+0 12 0
+E
+sign~
+Greetings Again.
+This time we will learn about the score command. Score shows you all about
+yourself, and is very useful. Take a moment to look around on the score screen.
+~
+D0
+You see the next station ahead.
+~
+~
+0 -1 3709
+D2
+You see the central room.
+~
+~
+0 0 3702
+S
+#3704
+#0The formless void~
+You are still floating in the void, and you can tell this doesn't lead to the
+exit. A sign floating in the void tells you to head east, back to the main
+section.
+~
+0 12 0
+D1
+You see the central room.
+~
+~
+0 0 3702
+S
+#3705
+#0The formless void~
+Nope, not the exit. A booming voice tells you to head north, back to the hub.
+~
+0 12 0
+E
+sign~
+Just go north to the central room.
+~
+D0
+You see the central room.
+~
+~
+0 0 3702
+S
+#3707
+#0The formless void~
+You are floatin in a formless void. A table and chairs floats past, 2 old men
+playing chess on it. One of them looks up and states "Sorry, this isn't the
+way to the exit. Oh, Earl it's your turn". They then float off. The way back
+to the hub is up.
+~
+0 12 0
+D4
+You see the central room.
+~
+~
+0 0 3702
+S
+#3708
+#0The formless void~
+You are still floating in a formless void, but this section of it fills you
+with a sense of dread. A yellow sulfuric mist fills the room, snd you feel you
+should leave. The way back to the hub is down.
+~
+0 12 0
+D5
+You see the central room.
+~
+~
+0 0 3702
+S
+#3709
+#0The combat training room~
+This room is made from blocks of red marble, and the floor is covered in sand.
+Blood is splattered across the floor, and a pit in the center of the room has
+a ladder leading down into it. It contains a monster. A metal sign is posted
+on the wall, you had better read it.
+~
+0 12 0
+E
+sign~
+Greetings, and welcom to combat training.
+
+The first step is knowing what you can fight safely.  Use the command
+Consider to figure out if you can kill a monster.  Avoid attacking monsters
+that can injure you easily.
+
+The second step is knowing when to run. A monster has been placed in the pit.
+It is too powerful for you to kill, but it probably won't kill you.Enter
+the pit, then consider him, then type kill to attack him.  After some
+combat, type flee to escape from the monster. That will return you to this
+room. After you try that, go west to continue your training.
+~
+D3
+You see the next station of Mud School.
+~
+~
+0 -1 3711
+D5
+You see a cage.
+~
+~
+0 0 3710
+S
+#3710
+#0The pit~
+You are in a pit with a monster. The ladder leads back up, and a metal sign is
+on the wall.
+~
+0 8 0
+E
+sign~
+Remember what we went over ? Type Kill blob, then
+when you are ready to stop fighting, type flee, until you flee and are out of
+here.
+~
+D4
+You see a safe room up.
+~
+~
+0 0 3709
+S
+#3711
+#0A hallway in Combat School~
+This room is made of black stone, and has a staircase leading down into a
+large room. A sign is posted above the staircase.
+~
+0 12 0
+E
+sign~
+Greetings, and Welcome to the next section.
+
+Here you will get to kill real monsters(or mobs as they are usually called).
+You need to kill them, because they will give you much needed Exp.
+~
+D1
+You see the next station of Mud School.
+~
+~
+0 0 3709
+D5
+You see the combat hall.
+~
+~
+0 0 3712
+S
+#3712
+#0The Monster Storeroom~
+You are now standing in the Monster Storeroom.  Each of the cardinal exits
+have monsters in them. A sign is clearly posted, and it is suggested that you
+look at it. When you have finished killing the monsters, head down.
+~
+0 12 0
+E
+sign~
+Greetings, and Welcome to the Monster Storeroom. In this section of Mud
+School, the fine members of the School have gathered several monster for you
+to kill. Kill them, and if you wish, you may take their equipment.
+
+After you kill each monster, remember to get your newly won treasure out of
+the monster's corpse. Use the command get all corpse to retreive it from the
+corpse. After that you should sacrifice the corpse, so that other players will
+not be able to track you.
+
+Between battles, you WILL need to regenerate hp by sleeping or resting.
+You may Rest to regenerate Hps, or you can Sleep. Sleep will regen you faster,
+but you will not be able to use that many commands while you sleep.
+~
+D0
+You see the aggressive monster inside!
+~
+~
+0 -1 3713
+D1
+You see the unmodified monster inside!
+~
+~
+0 -1 3716
+D2
+You see the wimpy monster inside!
+~
+~
+0 -1 3715
+D3
+You see the aggressive wimpy monster inside!
+~
+~
+0 -1 3714
+D5
+You see the next station below.
+~
+~
+0 -1 3717
+S
+#3713
+#0A Storeroom fit for a Monster~
+This room is spotless, even though it contains a monster. A tray of food and a
+dish of water is attached to the wall, while a bed of rags is in the corner.
+An exit leads south.
+~
+0 8 0
+D2
+You see the Cage Room.
+~
+~
+0 -1 3712
+S
+#3714
+#0A Monster room~
+This room has the scattered bones of adventures covering the floor, but the
+monster itself looks very sickly. An exit leads east.
+~
+0 8 0
+D1
+You see the Cage Room.
+~
+~
+0 -1 3712
+S
+#3715
+#0An empty room~
+This room is spotlessly clean, and it is empty. The only thing in the room is
+the monster. An exit leads north.
+~
+0 8 0
+E
+sign~
+There is a wimpy monster in this room.  Kill him and get out of here fast!
+Remember to loot and sacrifice the corpse.
+~
+D0
+You see the Cage Room.
+~
+~
+0 -1 3712
+S
+#3716
+#0A monster room~
+This room resembles a cave, and is filled with moss and ferns. You can hear
+running water, but you can't determine the source. An exit leads west.
+~
+0 8 0
+D3
+You see the Cage Room.
+~
+~
+0 -1 3712
+S
+#3717
+#0The next section of the School~
+This room looks as if it's been unused for quite some time. The exit to the
+south leads to a closed store, a ladder leads back up to the monster room. Or
+you could head east along a passage to the next section.
+~
+0 12 0
+D1
+You see the next station of Mud School.
+~
+door~
+0 -1 3719
+D2
+You see the Shop.
+~
+~
+0 0 3718
+D4
+You see the Cage room.
+~
+~
+0 -1 3712
+S
+#3718
+#0The Store in Mud School~
+The store reeks of rotting meat and fruit. The stone walls and wooden shelves
+are coated in a thick layer of dust. Light barely shows through a window,
+coated with dust and cobwebs, set high in the wall. The counter has a large
+"CLOSED" sign sitting on it, a spiderweb hooked to one end. A faded sign is
+behind the counter. The doorways out leads north.
+~
+0 8 0
+E
+sign~
+The sign is barely readable, but reads as follows:
+
+   By   - Buy smeng fm te soreper.
+   Lis  - The sorekeeper ill te y ws fo e.
+   aue - Te str will te h he wll ve o y f
+           tm
+   Sell  - Se at tmt h sorekeeper.
+~
+D0
+You see the only exit out of here.
+~
+~
+0 0 3717
+S
+#3719
+#0A passageway~
+The passageway is just wide enough for one person to squeeze through. A thin
+beam of light penetrates the darkness. You can head back west to the room, or
+east into a small room.
+~
+0 12 0
+D1
+You see the next station of Mud School.
+~
+door~
+0 -1 3721
+D3
+You see the room you just came from.
+~
+door~
+0 -1 3717
+S
+#3721
+#0The small room~
+This room is small, dark, musty and cramped. A small pedestal in the center
+has been overturned, and a short man stands on it. The only exit is north.
+~
+0 8 0
+D0
+You see the Arena ahead.
+~
+gate~
+0 -1 3722
+S
+#3722
+South Wall of the jungle temple~
+You are standing before a tall stone wall. Nothing can pass over it, and it
+borders the whole temple. All the plant life near it it short, as if trying to
+keep people from seeing over the wall. If you wish to exit the temple at any
+time, go Up.
+~
+0 8 0
+D0
+~
+~
+0 0 3729
+D1
+~
+~
+0 0 3725
+D3
+~
+~
+0 0 3723
+D4
+You see the EXIT.
+~
+~
+0 0 3760
+S
+#3723
+South Wall of the jungle temple~
+You are standing before a huge wall, made of a dark grey stone. The plant life
+around here is stunted, as if someone wished to keep people from seeing over
+the wall.
+~
+0 8 0
+D0
+~
+~
+0 0 3728
+D1
+~
+~
+0 0 3722
+D3
+~
+~
+0 0 3724
+D4
+You see the EXIT.
+~
+~
+0 0 3760
+S
+#3724
+South West Corner of the jungle temple~
+You are standing infront of the south west corner of the wall. A shredded tent
+and the remains of a campfire is here. The tent fabric is splattered with
+blood, and something was pulled into the forest.
+~
+0 8 0
+D0
+~
+~
+0 0 3727
+D1
+~
+~
+0 0 3723
+D4
+You see the EXIT.
+~
+~
+0 0 3760
+S
+#3725
+South Wall of the jungle temple~
+You are standing before a large stone wall, too tall to climb. You think you
+can see a man walking along the top, but you can't be sure.
+~
+0 8 0
+D0
+~
+~
+0 0 3730
+D1
+~
+~
+0 0 3726
+D3
+~
+~
+0 0 3722
+D4
+You see the EXIT.
+~
+~
+0 0 3760
+S
+#3726
+South East Corner of the jungle temple~
+You are standing near the south east corner of the temple wall. A burnt down
+hut is here, still smoldering. A set of charred bones poke out of the ashes.
+~
+0 8 0
+D0
+~
+~
+0 0 3731
+D3
+~
+~
+0 0 3725
+D4
+You see the EXIT.
+~
+~
+0 0 3760
+S
+#3727
+West Wall of the jungle~
+~
+0 8 0
+D0
+~
+~
+0 0 3732
+D1
+~
+~
+0 0 3728
+D2
+~
+~
+0 0 3724
+D4
+You see the EXIT.
+~
+~
+0 0 3760
+S
+#3728
+Arena~
+You are in the Arena.  Remember, if you wish to get out of this Arena, just
+go up.  Ceilings can barely be seen in this huge Arena.  You feel as if you are
+being watched by some divine being.
+~
+0 8 0
+D0
+~
+~
+0 0 3733
+D1
+~
+~
+0 0 3729
+D2
+~
+~
+0 0 3723
+D3
+~
+~
+0 0 3727
+D4
+You see the EXIT.
+~
+~
+0 0 3760
+S
+#3729
+Arena~
+You are in the Arena.  Remember, if you wish to get out of this Arena, just
+go up.  Ceilings can barely be seen in this huge Arena.  You feel as if you are
+being watched by some divine being.
+~
+0 8 0
+D0
+~
+~
+0 0 3734
+D1
+~
+~
+0 0 3730
+D2
+~
+~
+0 0 3722
+D3
+~
+~
+0 0 3728
+D4
+You see the EXIT.
+~
+~
+0 0 3760
+S
+#3730
+Arena~
+You are in the Arena.  Remember, if you wish to get out of this Arena, just
+go up.  Ceilings can barely be seen in this huge Arena.  You feel as if you are
+being watched by some divine being.
+~
+0 8 0
+D0
+~
+~
+0 0 3735
+D1
+~
+~
+0 0 3731
+D2
+~
+~
+0 0 3725
+D3
+~
+~
+0 0 3729
+D4
+You see the EXIT.
+~
+~
+0 0 3760
+S
+#3731
+East Wall of Arena~
+You are in the Arena.  Remember, if you wish to get out of this Arena, just
+go up.  Ceilings can barely be seen in this huge Arena.  You feel as if you are
+being watched by some divine being.
+~
+0 8 0
+D0
+~
+~
+0 0 3736
+D2
+~
+~
+0 0 3726
+D3
+~
+~
+0 0 3730
+D4
+You see the EXIT.
+~
+~
+0 0 3760
+S
+#3732
+West Wall of Arena~
+You are in the Arena.  Remember, if you wish to get out of this Arena, just
+go up.  Ceilings can barely be seen in this huge Arena.  You feel as if you are
+being watched by some divine being.
+~
+0 8 0
+D0
+~
+~
+0 0 3737
+D1
+~
+~
+0 0 3733
+D2
+~
+~
+0 0 3727
+D4
+You see the EXIT.
+~
+~
+0 0 3760
+S
+#3733
+Arena~
+You are in the Arena.  Remember, if you wish to get out of this Arena, just
+go up.  Ceilings can barely be seen in this huge Arena.  You feel as if you are
+being watched by some divine being.
+~
+0 8 0
+D0
+~
+~
+0 0 3738
+D1
+~
+~
+0 0 3734
+D2
+~
+~
+0 0 3728
+D3
+~
+~
+0 0 3732
+D4
+You see the EXIT.
+~
+~
+0 0 3760
+S
+#3734
+Center of Arena~
+You are in the Arena.  Remember, if you wish to get out of this Arena, just
+go up.  Ceilings can barely be seen in this huge Arena.  You feel as if you are
+being watched by some divine being.  There is a BIG SIGN here.
+~
+0 8 0
+D0
+~
+~
+0 0 3739
+D1
+~
+~
+0 0 3735
+D2
+~
+~
+0 0 3729
+D3
+~
+~
+0 0 3733
+D4
+You see the EXIT.
+~
+~
+0 0 3760
+S
+#3735
+Arena~
+You are in the Arena.  Remember, if you wish to get out of this Arena, just
+go up.  Ceilings can barely be seen in this huge Arena.  You feel as if you are
+being watched by some divine being.
+~
+0 8 0
+D0
+~
+~
+0 0 3740
+D1
+~
+~
+0 0 3736
+D2
+~
+~
+0 0 3730
+D3
+~
+~
+0 0 3734
+D4
+You see the EXIT.
+~
+~
+0 0 3760
+S
+#3736
+East Wall of Arena~
+You are in the Arena.  Remember, if you wish to get out of this Arena, just
+go up.  Ceilings can barely be seen in this huge Arena.  You feel as if you are
+being watched by some divine being.
+~
+0 8 0
+D0
+~
+~
+0 0 3741
+D2
+~
+~
+0 0 3731
+D3
+~
+~
+0 0 3735
+D4
+You see the EXIT.
+~
+~
+0 0 3760
+S
+#3737
+West Wall of Arena~
+You are in the Arena.  Remember, if you wish to get out of this Arena, just
+go up.  Ceilings can barely be seen in this huge Arena.  You feel as if you are
+being watched by some divine being.
+~
+0 8 0
+D0
+~
+~
+0 0 3742
+D1
+~
+~
+0 0 3738
+D2
+~
+~
+0 0 3732
+D4
+You see the EXIT.
+~
+~
+0 0 3760
+S
+#3738
+Arena~
+You are in the Arena.  Remember, if you wish to get out of this Arena, just
+go up.  Ceilings can barely be seen in this huge Arena.  You feel as if you are
+being watched by some divine being.
+~
+0 8 0
+D0
+~
+~
+0 0 3743
+D1
+~
+~
+0 0 3739
+D2
+~
+~
+0 0 3733
+D3
+~
+~
+0 0 3737
+D4
+You see the EXIT.
+~
+~
+0 0 3760
+S
+#3739
+Arena~
+You are in the Arena.  Remember, if you wish to get out of this Arena, just
+go up.  Ceilings can barely be seen in this huge Arena.  You feel as if you are
+being watched by some divine being.
+~
+0 8 0
+D0
+~
+~
+0 0 3744
+D1
+~
+~
+0 0 3740
+D2
+~
+~
+0 0 3734
+D3
+~
+~
+0 0 3738
+D4
+You see the EXIT.
+~
+~
+0 0 3760
+S
+#3740
+Arena~
+You are in the Arena.  Remember, if you wish to get out of this Arena, just
+go up.  Ceilings can barely be seen in this huge Arena.  You feel as if you are
+being watched by some divine being.
+~
+0 8 0
+D0
+~
+~
+0 0 3745
+D1
+~
+~
+0 0 3741
+D2
+~
+~
+0 0 3735
+D3
+~
+~
+0 0 3739
+D4
+You see the EXIT.
+~
+~
+0 0 3760
+S
+#3741
+East Wall of Arena~
+You are in the Arena.  Remember, if you wish to get out of this Arena, just
+go up.  Ceilings can barely be seen in this huge Arena.  You feel as if you are
+being watched by some divine being.
+~
+0 8 0
+D2
+~
+~
+0 0 3736
+D3
+~
+~
+0 0 3740
+D4
+You see the EXIT.
+~
+~
+0 0 3760
+S
+#3742
+North West Corner of Arena~
+You are in the Arena.  Remember, if you wish to get out of this Arena, just
+go up.  Ceilings can barely be seen in this huge Arena.  You feel as if you are
+being watched by some divine being.
+~
+0 8 0
+D1
+~
+~
+0 0 3743
+D2
+~
+~
+0 0 3737
+D4
+You see the EXIT.
+~
+~
+0 0 3760
+S
+#3743
+North Wall of Arena~
+You are in the Arena.  Remember, if you wish to get out of this Arena, just
+go up.  You can barely see the ceiling.  You feel as if you are being watched
+by some divine being.
+~
+0 8 0
+D1
+~
+~
+0 0 3744
+D2
+~
+~
+0 0 3738
+D3
+~
+~
+0 0 3742
+D4
+You see the EXIT.
+~
+~
+0 0 3760
+S
+#3744
+North Wall of Arena~
+You are in the Arena.  Remember, if you wish to get out of this Arena, just
+go up.  Ceilings can barely be seen in this huge Arena.  You feel as if you are
+being watched by some divine being.
+~
+0 8 0
+D1
+~
+~
+0 0 3745
+D2
+~
+~
+0 0 3739
+D3
+~
+~
+0 0 3743
+D4
+You see the EXIT.
+~
+~
+0 0 3760
+S
+#3745
+North Wall of Arena~
+You are in the Arena.  Remember, if you wish to get out of this Arena, just
+go up.  Ceilings can barely be seen in this huge Arena.  You feel as if you are
+being watched by some divine being.
+~
+0 8 0
+D2
+~
+~
+0 0 3740
+D3
+~
+~
+0 0 3744
+D4
+You see the EXIT.
+~
+~
+0 0 3760
+S
+#3760
+The bamboo room~
+This room is hovering 300 feet above the ground. You look out of the window
+and see the jungle spread out underneath you. Oddly, you still cannot see over
+the wall. A small ladder leads up into the Temple of Maraden.
+~
+0 12 0
+D4
+You see the Temple of Midgaard.
+~
+~
+0 0 3001
+S
+#0
+
+
+
+#SPECIALS
+M 3707 spec_cast_adept Load to: A mud school worker
+M 3720 spec_poison Load to: The zombie of a schoolworker
+S
+
+
+
+#RESETS
+M 0 3700 1 3701
+M 0 3701 1 3710
+M 0 3702 1 3716
+M 0 3703 1 3715
+M 0 3704 1 3713
+M 0 3705 1 3714
+M 0 3710 15 3742
+M 0 3712 15 3726
+M 0 3713 15 3724
+M 0 3707 1 3712
+M 0 3720 1 3721
+M 0 3715 5 3726
+M 0 3711 5 3730
+M 0 3713 5 3733
+S
+
+
+
+#SHOPS
+0
+
+
+
+#$

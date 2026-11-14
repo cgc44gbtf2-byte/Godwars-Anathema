@@ -1,0 +1,205 @@
+#AREADATA
+Name        Imms    Immortal Rooms~
+Builders    None~
+VNUMs       29000 29099
+End
+
+
+
+#MOBILES
+#29001
+no name~
+(no short description)~
+(no long description)~
+~
+1 0 0 S
+1 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#0
+
+
+
+#OBJECTS
+#29005
+locket~
+a locket~
+A locket engraved "Amo siempre"~
+~
+9 0 5
+0 0 0 0
+0 0 0
+#29006
+chocolate godiva~
+a heart-shaped piece of Godiva chocolate~
+A piece of Godiva chocolate. Its just calling your name!~
+~
+19 8192 16385
+100 0 0 0
+0 0 0
+#0
+
+
+
+#ROOMS
+#29000
+Start of imm rooms~
+~
+0 17412 0
+D0
+~
+~
+0 0 29002
+D3
+~
+~
+0 0 29007
+S
+#29001
+#rAkuma#n's Office in the #PBouncing Bosom Tavern#n~
+This small office is a barren place.  In the middle of the room is a small desk,
+with a very comfortable looking chair behind it.  On top of this desk is almost
+nothing, just a small name plate that reads "Akuma, Head CEO".  On the walls are
+two framed documents.  One seems to be a deed to the Bouncing Bosoms Tavern.
+The other is an archaic document which reads "Akuma, on this blessed day, has
+led the mighty elven forces of Aramul toward victory against the evil human
+empire of 'SennaNight'.  All hail Lord Akuma, reclaimer of 859 gold pieces."
+All in all, this is a rather strange room.  Also you notice a recent addition to
+the room.  Behind the desk, in one corner of the room is a large bed.  The soft,
+silk sheets are rumpled, the bed unmade, and the light around the bed is
+slightly dimmer then the ever-present light of the rest of the room.  Barely
+visible through the darkness surrounding the bed, there seems to be a word
+engraved into the footboard...
+~
+0 24584 0
+E
+word~
+The word 'Chaos' is engraved into the hard oak of the bed's footboard.
+~
+D1
+~
+~
+0 0 29005
+D3
+~
+~
+0 0 29000
+S
+#29002
+Trelin's N00b Nook~
+You enter the room and smell a faint stench emanating from the walls. 
+You think you recognize it, but can't quite place it.  You notice a desk in
+the corner of the room with blank paperwork piled on it.  Perhaps the owner
+had better get to work?  
+~
+0 17408 0
+D0
+~
+~
+0 0 29003
+D2
+~
+~
+0 0 29000
+S
+#29003
+Ace's Velcro Pit of Despair~
+#0A velcro wall the length of one side of the room sits forebearingly,
+the remains of several players hanging from the spiny stickers, a dismal
+reminder of what happens when Ace has a bad day.  #n 
+~
+0 24577 0
+D0
+~
+~
+0 0 29004
+D2
+~
+~
+0 0 29002
+S
+#29004
+#gChamber of the truly #01337#n~
+#0Here in this chamber the truly 1337 sit and #0ponder existance.  Being
+as 1337 as they are, there is #0no need to tarry with the smaller people. 
+So this place was #0created all for them.  In the center, a throne reserved
+for the #0owner of the room, Peregrinus.  A very large table also sits here,
+with #0ornately decorated thrones sitting all around it.  Obviously for the
+#0other 1337 immortals.  
+~
+0 12 0
+D2
+~
+~
+0 0 29003
+S
+#29005
+#PChaos' Confession Booth#n~
+Several #ocouches#n and #ochairs#n form a semi circle with an array of #Psex toys#n 
+scattered around.  Pictures depicting nude couples posing in several "#rKuma 
+Sutra#n" poses adorn the walls.  A #Wsign#n hangs on the wall bearing an important
+message.
+In the center of this, #WChaos#n sits waiting for all you to provide her with 
+all the luscious details she desires.
+~
+0 12 0
+E
+sign~
+The sign reads "#WDo not #Bjudge#W, lest you be #Bjudged#W.#n"
+~
+S
+#29006
+Dude's Bassoon Studio~
+This room is a scene of complete disorganization. The floor has been 
+nearly covered with cane shavings. Pieces of music lie scattered all 
+around the room from the wiesenborn etude book, to the Mozart 
+bassoon concerto and the stadio excerpt book. A large table holds an 
+odd variety of tools. Some of the tools are fairly common, knives, 
+pliers, files, but some of the others can only be described as, 
+strange. A large book entitled "Treatise on the Battle Versus Pure 
+Evil" lies on the desk. A bassoon lies set up on a stand in one of 
+the corners of the room.
+~
+0 16388 0
+S
+#29007
+Shane's place~
+Just a lil ol place, nothing big really besides the massive waterbed and
+huge entertainment center that take up the majority of the room.  
+~
+0 16384 0
+D1
+~
+~
+0 0 29000
+S
+#29008
+#LFestering Corruption#n~
+You appear to be standing in an enormous
+festering wound, in the center of this great
+oozing mass of flesh lies a throne, sculpted from
+hardened mucus.
+~
+0 25100 0
+S
+#0
+
+
+
+#SPECIALS
+S
+
+
+
+#RESETS
+M 0 15233 1 29008
+S
+
+
+
+#SHOPS
+0
+
+
+
+#$

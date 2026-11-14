@@ -1,0 +1,1731 @@
+#AREADATA
+Name        Haif    Town~
+Builders    None~
+VNUMs       9900 9976
+End
+
+
+
+#MOBILES
+#9900
+Gatekeeper~
+a gatekeeper~
+The Gatekeeper is standing here, falling asleep on his feet
+~
+The gatekeeper is quite clueless. He doesn't even see you walk by, he's too far gone. 
+Maybe if you push him over, he'll wake up.
+~
+49 0 0 S
+1255 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9901
+urchin~
+an urchin~
+A grimy looking urchin is wandering around here, picking up scraps
+~
+The urchin looks rather unkept. Reaking of alcohol, he wanders around picking up all 
+sorts of trash on the ground
+~
+161 0 0 S
+1598 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9902
+Mage shopkeeper~
+mage shopkeeper~
+The mage shopkeeper, asleep, is quite oblivious to anything around him
+~
+The mage is oblivious to anything aroudn him. He doesn't look too tough.
+~
+49 0 0 S
+1337 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9903
+Weapon smith~
+Weapon Smith~
+The smith looks at you threateningly
+~
+The smith looks tough. That's one fellow you wouldn't want to bother.
+~
+49 0 0 S
+1600 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9904
+Shopkeeper~
+Shopkeeper~
+The shopkeeper isn't paying you any attention
+~
+The shopkeeper of this cluttered place doesn't look impressive. If anything, 
+he looks like the shop he keeps.
+~
+49 0 0 S
+1381 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9905
+Watch dog watchdog~
+Watchdog~
+The watchdog stands here, barking at you loudly
+~
+The annoying dog is apparently keeping an eye out for any intruders. His piercing howl 
+has to be waking up the household.
+~
+113 0 0 S
+1498 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9906
+Butler~
+the butler~
+The Butler is wandering around, looking for things to do
+~
+The butler is dressed like, well, a butler. Full suit with tails, he wanders around the household.
+~
+33 0 0 S
+1257 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9907
+Cook~
+the cook~
+The cook stands here, hovering over the stove
+~
+The cook is grimy looking. In serious need of a bath, you don't want to touch anything 
+she might cook.
+~
+49 0 0 S
+1598 0 0 0d0+0 0d0+0
+0 0
+0 0 2
+#9908
+Parent male~
+The Parent~
+This parent is on the bed, sleeping contentedly
+~
+He doesn't look like much. Sleeping on the bed, it's not hard to sneak up behind him.
+~
+49 0 0 S
+1409 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9909
+Parent~
+the parent~
+The parent lays on the bed, dreaming dreams of her children
+~
+This parent looks a lot tougher than her male counterpart. You wonder why. Maybe she abuses him.
+~
+49 0 0 S
+1509 0 0 0d0+0 0d0+0
+0 0
+0 0 2
+#9910
+child~
+A small child~
+A child sleeps here, looking mean
+~
+This child looks quite mean. You probably wouldn't want to cross it's path, 
+you might end up with a frog down your pants.
+~
+49 0 0 S
+1504 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9911
+Guest~
+The guest~
+The elf looks experianced in adventuring
+~
+The Elf has little armor, but his longswords look quite impressive. 
+Maybe you should reconsider bugging him.
+~
+49 0 0 S
+1587 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9912
+Archer~
+Archer~
+The archer stands here at an arrow slit, looking bored
+~
+The archer isn't too impressive. All he has is his bow, he doesn't appear to even 
+have arrows for it.
+~
+113 40 0 S
+1545 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9913
+Theif~
+Theif~
+The theif is hiding here, peering about for targets
+~
+The theif doesn't look impressive. Doesn't even look as if he could steal something. 
+You should just walk away.
+~
+49 65536 0 S
+1281 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9914
+Drunkard~
+Drunkard~
+The drunkard wanders around, dazed
+~
+The drunk isn't paying attention to anything but his feet. As you watch, he walks into 
+a wall before continuing on.
+~
+33 0 0 S
+1611 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9915
+Doll~
+A doll~
+A doll is here in the corner, forgotten
+~
+The doll doesn't look like much. As you stare at it, it appears to move..
+~
+49 0 0 S
+1287 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#0
+
+
+
+#OBJECTS
+#9900
+coat rack~
+a coat rack~
+A small coatrack, one of many, is here~
+~
+12 0 16384
+0 1 6 11
+5 0 0
+#9901
+chandelier~
+a chandalier~
+A large chandalier is on the roof, giving off a bright light~
+~
+1 0 16384
+0 1 6 11
+5 0 0
+#9902
+table~
+a table~
+A large, square table is here in the middle of the floor~
+~
+12 0 16384
+0 1 6 11
+5 0 0
+#9903
+stove~
+a stove~
+A small, black stove is here in the corner~
+~
+15 0 16384
+0 1 6 11
+5 0 0
+#9904
+cheese~
+a piece of cheese~
+A small piece of cheese is here on the cask of ale~
+~
+19 0 16385
+0 1 6 11
+5 0 0
+#9905
+ale cask~
+a cask of ale~
+A large cask of ale is here in the corner~
+~
+25 0 1
+0 1 6 11
+20 0 0
+#9906
+bed~
+a bed~
+A small bed is here, against the far wall~
+~
+12 0 16384
+0 1 6 11
+5 0 0
+#9907
+queen bed~
+a queen bed~
+A queen sized bed is here against the wall~
+~
+12 0 16384
+0 1 6 11
+5 0 0
+#9908
+bed king~
+a king bed~
+A king sized bed is in the corner~
+~
+12 0 16384
+0 1 6 11
+5 0 0
+#9909
+king bed~
+a king bed~
+A king sized bed is at the foot of the other~
+~
+12 0 16384
+0 1 6 11
+5 0 0
+#9910
+rocker~
+a rocker~
+A small rocker sits here in the middle of the room~
+~
+12 0 1
+0 1 6 11
+15 0 0
+#9911
+fountain~
+a fountain~
+A large, worn down fountain is here, gurgling water~
+~
+25 0 16384
+0 1 6 11
+5 0 0
+#9912
+Halbred~
+a large halbred~
+A large halbred lays on it's side here. Looks like a good weapon.~
+~
+5 0 8193
+0 15 30 2
+20 0 0
+A
+19 2
+A
+18 2
+A
+1 3
+#9913
+silver longsword~
+a silvery longsword~
+A very sharp longsword is here~
+~
+5 64 8193
+0 15 25 3
+5 0 0
+A
+4 2
+A
+17 -10
+#9914
+Collar~
+a spiked collar~
+A spiked collar is here~
+~
+9 4096 5
+10 1 6 11
+5 0 0
+#9915
+broadsword~
+a large broadsword~
+A large broadsword is here~
+~
+5 0 8193
+0 10 15 3
+5 0 0
+#9916
+Bow~
+a small wooden bow~
+A small wooden bow is here~
+~
+5 0 8193
+0 1 6 5
+5 0 0
+#9917
+rock~
+a small rock~
+A small rock is here in the street~
+~
+13 0 16385
+0 1 6 11
+5 0 0
+#9918
+Hood~
+a small, chain-link hood~
+A chain link hood is here~
+~
+9 0 17
+15 1 6 11
+5 0 0
+A
+5 1
+#9919
+leather belt~
+a small, black leather belt~
+A black leather belt is here~
+~
+9 0 2049
+10 1 6 11
+5 0 0
+A
+18 3
+A
+2 1
+#9920
+spiked gauntlets~
+a pair of spiked gauntlets~
+Spiked gauntlets are here~
+~
+9 0 129
+15 1 6 11
+5 0 0
+#9921
+bottle ale~
+a small bottle of ale~
+A small bottle of ale is here~
+~
+25 128 16385
+0 1 6 11
+5 0 0
+#9922
+small toy~
+a small toy~
+A small toy is here~
+~
+13 128 1
+0 1 6 11
+5 0 0
+#9923
+leather backpack~
+a small leather backpack~
+A small leather backpack is here~
+~
+15 128 1025
+25 1 6 11
+5 0 0
+#9924
+butcher knife~
+a wicked looking butcher knife~
+A large knife is here~
+~
+5 0 8193
+0 15 20 2
+5 0 0
+#9925
+apron~
+a white cloth apron~
+A white cloth apron is here~
+~
+9 0 1025
+25 1 6 11
+5 0 0
+#9926
+dagger~
+a sharp dagger~
+A sharp dagger is here~
+~
+5 0 8193
+0 1 6 4
+5 0 0
+A
+2 0
+#9927
+robe~
+a black robe~
+A black robe lies here~
+~
+9 0 1025
+15 1 6 11
+5 0 0
+A
+12 25
+#0
+
+
+
+#ROOMS
+#9900
+A dark path~
+You are standing in a very dark path. All around are large coniferous trees. 
+To the east the path continues. You can still go back while you have the chance.
+~
+0 1 3
+D1
+The path fades away behind you.~
+east~
+0 -1 9901
+D3
+The path brightens.~
+~
+0 -1 8906
+S
+#9901
+A dark path~
+As you continue down the path, you notice a slight shift in the trees. Before were 
+pure coniferous trees. Now it's included with a small mixture of others. You wonder 
+where you are going.
+~
+0 1 3
+D1
+The path continues this direction.~
+east~
+0 -1 9902
+D3
+The path fades away behind you.~
+west~
+0 -1 9900
+S
+#9902
+End of dark path~
+You have reached the end of the dark path. Before you stands a small village. 
+You wonder what could be in there.
+~
+0 0 2
+D1
+The end of the path.~
+west~
+0 -1 9903
+D3
+The path continues this direction.~
+west~
+0 -1 9901
+S
+#9903
+Gates to Town~
+You are standing before the west gates into the city. The only thing worth noting is 
+the disrepair of the walls. It looks like they havn't been in use for a long time.
+~
+0 0 1
+D1
+The large gates into town.~
+west~
+0 -1 9904
+D3
+The end of the path.~
+west~
+0 -1 9902
+S
+#9904
+City Street~
+You are standing on the city street. North is a road along the edge of the walls. 
+You can continue east into the city or back where you came.
+~
+0 0 1
+D0
+The Wall Road is this way.~
+~
+0 -1 9906
+D1
+~
+~
+0 -1 9905
+D2
+~
+~
+0 -1 9911
+D3
+The large gates into town.~
+west~
+0 -1 9903
+S
+#9905
+City Street~
+You are standing before two shops. One to the south, and one to the north. The road 
+continues east, with west back towards the gates.
+~
+0 0 1
+D0
+~
+~
+0 -1 9942
+D1
+~
+~
+0 -1 9941
+D2
+~
+~
+0 -1 9943
+D3
+~
+~
+0 -1 9904
+S
+#9906
+Western Wall Road~
+This is the road along the north end of the city. The large walls stand to your left, 
+and to the right are the backs of buildings. The wall road continues north.
+~
+0 0 1
+D0
+~
+~
+0 -1 9907
+D2
+The Wall Road is this way.~
+~
+0 -1 9904
+S
+#9907
+Western Wall Road~
+You're continuing on the wall road. The road is in bad disrepair, with crumbled cobble 
+stones, and large cracks down the center. You can continue north or return south.
+~
+0 0 1
+D0
+~
+~
+0 -1 9908
+D2
+~
+~
+0 -1 9906
+S
+#9908
+Western Wall Road~
+The road just keeps getting worse and worse. As you walk you need to jump over large 
+rocks that are in the middle of the path.
+~
+0 0 1
+D0
+~
+~
+0 -1 9909
+D2
+~
+~
+0 -1 9907
+S
+#9909
+Western Wall Road~
+At last, some improvement. At least you can walk properly now. Still need to kick some 
+small stones out of the way though.
+~
+0 0 1
+D0
+~
+~
+0 -1 9910
+D2
+~
+~
+0 -1 9908
+S
+#9910
+North-West Wall Road Corner~
+You are standing at a corner of roads. above you is a watch tower. You can continue 
+east along the northern wall road, or back south along the western.
+~
+0 0 1
+D1
+~
+~
+0 -1 9917
+D2
+~
+~
+0 -1 9909
+D4
+~
+~
+0 -1 9916
+S
+#9911
+Western Wall Road~
+You are standing on the first part of the south-west wall road. The road continues south, 
+or you can return to the main street north.
+~
+0 0 1
+D0
+~
+~
+0 -1 9904
+D2
+~
+~
+0 -1 9912
+S
+#9912
+Western Wall Road~
+This road is in fairly good repair. There are a few cracks, but nothing worth noticing. 
+As you walk, a few rats scurry across your feet.
+~
+0 0 1
+D0
+~
+~
+0 -1 9911
+D2
+~
+~
+0 -1 9913
+S
+#9913
+Western Wall road~
+Oddly enough, this road is in extremely good repair. There aren't even a few small stones. 
+You wonder who sweeps up around here.
+~
+0 0 1
+D0
+~
+~
+0 -1 9912
+D2
+~
+~
+0 -1 9914
+S
+#9914
+Western Wall Road~
+You wish you were on the other part of the road. There isn't even one from what you 
+can tell, just a few rocks and a path. Maybe it'll improve again...
+~
+0 0 1
+D0
+~
+~
+0 -1 9913
+D2
+~
+~
+0 -1 9915
+S
+#9915
+South-West Wall Corner~
+You're standing at the south-west corner of the wall roads. Above you is a watch tower. 
+You can continue east, return north, or take a look inside the tower.
+~
+0 0 1
+D0
+~
+~
+0 -1 9914
+D1
+~
+~
+0 -1 9951
+D4
+~
+~
+0 -1 9969
+S
+#9916
+Watch Tower~
+You are standing inside a watch tower. Below you is the corner of roads. There are 
+small slits for windows, fitted with bows. A few of the bowmen are here on watch.
+~
+0 0 1
+D5
+~
+~
+0 -1 9910
+S
+#9917
+Northern Wall road~
+You are walking along the northern part of the city. The walls are still much too high 
+for you to see on the other side. To the west you can see a high watch tower, 
+to the east the road continues on.
+~
+0 0 1
+D1
+~
+~
+0 -1 9919
+D3
+~
+~
+0 -1 9910
+S
+#9919
+Northern Wall Road~
+Finally something other than endless walls and backs of buildings. The house south of you 
+has a back door. You can continue east, return west, or take a looksee in the house.
+~
+0 0 1
+D1
+~
+~
+0 -1 9920
+D3
+~
+~
+0 -1 9917
+S
+#9920
+Intersection with Main Street and Wall Road~
+This is the intersection with the main road, and the northern gates. You can go south 
+onto the main road, north out of the town, continue east, or return west.
+~
+0 0 1
+D0
+~
+~
+0 -1 9923
+D1
+~
+~
+0 -1 9921
+D2
+~
+~
+0 -1 9922
+D3
+~
+~
+0 -1 9919
+S
+#9921
+Northern Wall Road~
+You are nearing the end of the city limits. You wonder why it was built how it was. 
+Doesn't look very efficient...
+~
+0 0 1
+D1
+~
+~
+0 -1 9939
+D3
+~
+~
+0 -1 9920
+S
+#9922
+Main Street~
+You are walking along the main street. To the west is a priest's hall. You can continue 
+south, or go north to the intersection.
+~
+0 0 1
+D0
+~
+~
+0 -1 9920
+D2
+~
+~
+0 -1 9931
+S
+#9923
+North Gates~
+You stand before the northern gates. You can continue on out of the city, or return south.
+~
+0 0 1
+D2
+~
+~
+0 -1 9920
+S
+#9924
+North-East Wall Road Corner~
+You are standing at the north-eastern corner of the city. There is a watch tower directly 
+above you. You can enter up, continue on south, or return west.
+~
+0 0 1
+D2
+~
+~
+0 -1 9926
+D3
+~
+~
+0 -1 9939
+D4
+~
+~
+0 -1 9925
+S
+#9925
+Watch Tower~
+You are standing in a watch tower. There are small arrow slits all over the place. 
+A few archers stand guard here. The only exit is back you came.
+~
+0 0 1
+D5
+~
+~
+0 -1 9924
+S
+#9926
+Eastern Wall Road~
+You are standing on the eastern wall road. Unfortunately, there are few houses, so the 
+road isn't in very good shape.
+~
+0 0 1
+D0
+~
+~
+0 -1 9924
+D2
+~
+~
+0 -1 9927
+S
+#9927
+Eastern Wall Road~
+This part of the road is much like the last. Disrepair, dirty, puddle filled, 
+and very ugly. You might as well continue south to see, and hope, if the road 
+will become neater.
+~
+0 0 1
+D0
+~
+~
+0 -1 9926
+D2
+~
+~
+0 -1 9928
+S
+#9928
+Eastern Wall Road~
+Alas, it isn't any better. You can see the city street far to the south. 
+Maybe if you run you can get there before tripping over a stone...
+~
+0 0 1
+D0
+~
+~
+0 -1 9927
+D2
+~
+~
+0 -1 9929
+S
+#9929
+Eastern Wall Road~
+At last. A part of the road with better repair. Perhaps it's due to the fact that the 
+main city street is directly south.
+~
+0 0 1
+D0
+~
+~
+0 -1 9928
+D2
+~
+~
+0 -1 9930
+S
+#9930
+City Street~
+You are standing in a wide, cobble stoned street. To the east are the eastern gates. 
+You can take a stroll into the city, or walk around the border of it.
+~
+0 0 1
+D0
+~
+~
+0 -1 9929
+D1
+~
+~
+0 -1 9961
+D2
+~
+~
+0 -1 9960
+D3
+~
+~
+0 -1 9938
+S
+#9931
+Main Street~
+This is the best repair street there is in this grimy town. Here and there you trip 
+over loose stones, but it's not too bad.
+~
+0 0 1
+D0
+~
+~
+0 -1 9922
+D2
+~
+~
+0 -1 9932
+S
+#9932
+Main Street~
+What a boring street. Though it's not bad design, there's nothing worthwhile on it.
+~
+0 0 1
+D0
+~
+~
+0 -1 9931
+D2
+~
+~
+0 -1 9933
+S
+#9933
+Main Street~
+This is the beginning of the north part of Main Street. To the south is the intersection. 
+Main street continues north.
+~
+0 0 1
+D0
+~
+~
+0 -1 9932
+D2
+~
+~
+0 -1 9934
+S
+#9934
+Main street Intersection~
+This is the intersection to the ally. To the west, in the distance, you can see the 
+gates in. In the middle of the intersection is a large fountain of water, worn down 
+like the rest of this town.
+~
+0 0 1
+D0
+~
+~
+0 -1 9933
+D1
+~
+~
+0 -1 9935
+D2
+~
+~
+0 -1 9945
+D3
+~
+~
+0 -1 9940
+S
+#9935
+City Street~
+The cobble stone on this street is rather loose, but workable. It seems rather well worn.
+~
+0 0 1
+D1
+~
+~
+0 -1 9936
+D3
+~
+~
+0 -1 9934
+S
+#9936
+City Street~
+There isn't much to see. To the west is the intersection which has a fountain, but here 
+there's nothing to look at but broken buildings.
+~
+0 0 1
+D1
+~
+~
+0 -1 9937
+D3
+~
+~
+0 -1 9935
+S
+#9937
+City Street~
+The garbage is starting to build up. Some debris from a large house fell here, and is 
+right in the way.
+~
+0 0 1
+D1
+~
+~
+0 -1 9938
+D3
+~
+~
+0 -1 9936
+S
+#9938
+City Street~
+At last. You can finally see the end of this miserable town. You just want to run and 
+leave this place, but there's always the chance on tripping on a loose stone.
+~
+0 0 1
+D1
+~
+~
+0 -1 9930
+D3
+~
+~
+0 -1 9937
+S
+#9939
+Northern Wall Road~
+You are standing on the wall road. To the east is your usual watch tower. You might as 
+well go have a look.
+~
+0 0 1
+D1
+~
+~
+0 -1 9924
+D3
+~
+~
+0 -1 9921
+S
+#9940
+City Street~
+You are standing before a shop to the north. You can't tell what it's for from outside.
+~
+0 0 1
+D0
+~
+~
+0 -1 9944
+D1
+~
+~
+0 -1 9934
+D3
+~
+~
+0 -1 9941
+S
+#9941
+City Street~
+You are standing on a rather well repaired street, though it could still use a lot of work.
+~
+0 0 1
+D1
+~
+~
+0 -1 9940
+D3
+~
+~
+0 -1 9905
+S
+#9942
+Mage Shop~
+This is the mage shop. There isn't too much to it. A mage is behind a counter, asleep.
+~
+0 8 0
+D2
+~
+~
+0 -1 9905
+S
+#9943
+Weapon Shop~
+A smity is standing here, looking rather large and forboding. The room itself is cluttered 
+with weapons.
+~
+0 8 0
+D0
+~
+~
+0 -1 9905
+S
+#9944
+A Cluttered Shop~
+This shop doesn't appear to be much. There is unidentified objects everywhere. 
+You wonder what you can buy here.
+~
+0 9 0
+D2
+~
+~
+0 -1 9940
+S
+#9945
+Small Ally~
+The ally continues on. To the south-west you can see the large mansion, or at least the 
+lights from it.
+~
+0 1 1
+D0
+~
+~
+0 -1 9934
+D2
+~
+~
+0 -1 9946
+S
+#9946
+Ally Intersection~
+There is a small house to the west, dark and foreboding. You wonder what it is doing there.
+~
+0 1 1
+D0
+~
+~
+0 -1 9945
+D2
+~
+~
+0 -1 9947
+D3
+~
+~
+0 -1 9962
+S
+#9947
+Small Ally~
+As the ally continues, you begin to worry about theives. This seems to be the perfect 
+hidy-hole for the lower life sort of life.
+~
+0 1 1
+D0
+~
+~
+0 -1 9946
+D2
+~
+~
+0 -1 9948
+S
+#9948
+Small Ally~
+The ally is just wide enough for you to get through. On either side are packs of 
+garbage, and perhaps a bum here or there.
+~
+0 1 1
+D0
+~
+~
+0 -1 9947
+D2
+~
+~
+0 -1 9949
+S
+#9949
+Southern Wall Road~
+Finally, something to end the boredom. To the north, there appears to be a small side street.
+~
+0 0 1
+D0
+~
+~
+0 -1 9948
+D1
+~
+~
+0 -1 9952
+D3
+~
+~
+0 -1 9950
+S
+#9950
+Southern Wall Road~
+As you continue down the street, it begins to look worse and worse. Perhaps you 
+should find a way to leave the city.
+~
+0 0 1
+D1
+~
+~
+0 -1 9949
+D3
+~
+~
+0 -1 9951
+S
+#9951
+Southern Wall Road~
+The road continues on from this wall. The street isn't in too bad of disrepair, 
+though it could still use some work.
+~
+0 0 1
+D1
+~
+~
+0 -1 9950
+D3
+~
+~
+0 -1 9915
+S
+#9952
+Southern Wall Road~
+You continue on down the road, keeping an eye on the wall above you should it happen 
+to decide to crumble as you walk by.
+~
+0 0 1
+D1
+~
+~
+0 -1 9953
+D3
+~
+~
+0 -1 9949
+S
+#9953
+Southern Wall Road~
+You are walking under a small bridge over to a building. You wonder what the point is.
+~
+0 0 1
+D1
+~
+~
+0 -1 9954
+D3
+~
+~
+0 -1 9952
+S
+#9954
+Southern Wall Road~
+You are walking along. Atop the wall, a small stone falls near you, and you hasten 
+your progress across this street.
+~
+0 0 1
+D1
+~
+~
+0 -1 9955
+D3
+~
+~
+0 -1 9953
+S
+#9955
+Southern Wall Road~
+Finally you see the end of this road. Unfortunately, you still have to get there. 
+You can't wait to finally leave this place.
+~
+0 0 1
+D1
+~
+~
+0 -1 9956
+D3
+~
+~
+0 -1 9954
+S
+#9956
+South-East Corner~
+You are standing at the south-eastern corner of the wall. Above you is the normal 
+watchtower which serves absolutly no purpose, but is there anyways.
+~
+0 0 1
+D0
+~
+~
+0 -1 9957
+D3
+~
+~
+0 -1 9955
+D4
+~
+~
+0 -1 9970
+S
+#9957
+Eastern Wall Road~
+This is the eastern Wall Road. Not much better than any others. South is the corner, 
+and watchtower.
+~
+0 0 1
+D0
+~
+~
+0 -1 9958
+D2
+~
+~
+0 -1 9956
+S
+#9958
+Eastern Wall Road~
+This road is just plain ugly. Cracks everywhere, and fallen stones from the wall. 
+The wall doesn't look much better. In fact, it looks like it can fall any moment.
+~
+0 0 1
+D0
+~
+~
+0 -1 9959
+D2
+~
+~
+0 -1 9957
+S
+#9959
+Eastern Wall Road~
+Disinteresting. That's what comes to mind on this part of the road. Nothing, and no 
+one are around, and you just feel like laying down and dying.
+~
+0 0 1
+D0
+~
+~
+0 -1 9960
+D2
+~
+~
+0 -1 9958
+S
+#9960
+Eastern Wall Road~
+Finally. Up ahead you can see the end of this stupid, stupid road. Hopefully it'll 
+lead to a gate, and you can get out of here.
+~
+0 0 1
+D0
+~
+~
+0 -1 9930
+D2
+~
+~
+0 -1 9959
+S
+#9961
+Eastern Gates~
+You are standing before the east gates. Two guards are standing here, looking quite bored.
+~
+0 0 1
+D1
+~
+~
+0 0 9600
+D3
+~
+~
+0 -1 9930
+S
+#9962
+Foyer~
+The foyer of this rather large mansion, larger than it appeared from outside, 
+is filled with light from a chandeleir above.
+~
+0 8 0
+D0
+~
+~
+0 -1 9965
+D1
+~
+~
+0 -1 9946
+D2
+~
+~
+0 -1 9966
+D3
+~
+~
+0 -1 9963
+S
+#9963
+Dining Room~
+This is a rather pretty dining room. Above is another chandeleir, filled with tiny 
+candles. There is a large table in the middle of the room.
+~
+0 8 0
+D0
+~
+~
+0 -1 9967
+D1
+~
+~
+0 -1 9962
+D2
+~
+~
+0 -1 9968
+D3
+~
+~
+0 -1 9964
+S
+#9964
+Kitchen~
+This is a large kitchen, yet only has one stove. There is a single candle in this 
+room, lighting it.
+~
+0 8 0
+D1
+~
+~
+0 -1 9963
+S
+#9965
+Hallway~
+A short hallway is here, leading into the playroom apparently. Perhaps you should go 
+see who's there.
+~
+0 8 0
+D0
+~
+~
+0 -1 9971
+D2
+~
+~
+0 -1 9962
+S
+#9966
+Closet~
+This is a rather large closet. There are coatracks everywhere. It seems that the 
+people who live here appear to expecting a lot of company.
+~
+0 8 0
+D0
+~
+~
+0 -1 9962
+S
+#9967
+Stairway~
+This is a large stayway, going up to the bedrooms. It's rather dark in here, despite 
+the light coming from the dining room.
+~
+0 9 0
+D2
+~
+~
+0 -1 9963
+D4
+~
+~
+0 -1 9972
+S
+#9968
+Pantry~
+This is a small pantry. Only a few things are here, some apples, meat, a cask of ale.
+~
+0 8 0
+D0
+~
+~
+0 -1 9963
+S
+#9969
+Watch Tower~
+You are standing on the south-west watch tower. Two archers are stationed here, 
+looking over the city.
+~
+0 0 0
+D5
+~
+~
+0 -1 9915
+S
+#9970
+Watch Tower~
+You are standing at the south-east watch tower. The two archers stationed here appear 
+to be sleeping.
+~
+0 0 0
+D5
+~
+~
+0 -1 9956
+S
+#9971
+The Playroom~
+This is a small playroom, with rockers, and other small toys for the young. 
+There is also a small dummy off the the side.
+~
+0 8 0
+D2
+~
+~
+0 -1 9965
+S
+#9972
+Top of the Stairs~
+You are standing at the end of the stairs. To the south there is a small hallway.
+~
+0 8 0
+D2
+~
+~
+0 -1 9973
+D5
+~
+~
+0 -1 9967
+S
+#9973
+Small Hallway~
+This is the small hallway leading to the bedrooms. There are three, one south, west, and east.
+~
+0 8 0
+D0
+~
+~
+0 -1 9972
+D1
+~
+~
+0 -1 9974
+D2
+~
+~
+0 -1 9975
+D3
+~
+~
+0 -1 9976
+S
+#9974
+Children's Bedroom~
+This is the small children's bedroom. Both are sleeping right now, you wonder if you 
+should bother them.
+~
+0 8 0
+D3
+~
+~
+0 -1 9973
+S
+#9975
+Guest Bedroom~
+This is the guest bedroom. There is one bed, occupied by an elf. It's a boring room, 
+sparcely furnished.
+~
+0 8 0
+D0
+~
+~
+0 -1 9973
+S
+#9976
+Parent's Bedroom~
+This is the parent's bedroom.... oddly enough, there are four beds, in order of boy, 
+girl, boy, girl. All are occupied.
+~
+0 8 0
+D1
+~
+~
+0 -1 9973
+S
+#0
+
+
+
+#SPECIALS
+M 9900 spec_guard Load to: a gatekeeper
+M 9901 spec_janitor Load to: an urchin
+M 9902 spec_cast_mage Load to: mage shopkeeper
+M 9905 spec_fido Load to: Watchdog
+M 9913 spec_thief Load to: Theif
+S
+
+
+
+#RESETS
+O 0 9903 0 9964
+O 0 9902 0 9963
+O 0 9904 0 9968
+O 0 9905 0 9968
+O 0 9908 0 9976
+O 0 9909 0 9976
+O 0 9906 0 9974
+O 0 9907 0 9975
+O 0 9900 0 9966
+O 0 9901 0 9962
+O 0 9910 0 9971
+O 0 9911 0 9934
+M 0 9900 4 9903
+E 0 9912 0 14
+E 0 9918 0 5
+M 0 9900 4 9903
+E 0 9912 0 14
+E 0 9918 0 5
+M 0 9912 3 9916
+E 0 9916 0 14
+E 0 9918 0 5
+M 0 9912 1 9916
+E 0 9916 0 14
+E 0 9918 0 5
+M 0 9900 4 9961
+E 0 9918 0 5
+E 0 9912 0 14
+M 0 9900 4 9961
+E 0 9918 0 5
+E 0 9912 0 14
+M 0 9912 1 9925
+E 0 9918 0 5
+E 0 9916 0 14
+M 0 9912 1 9925
+E 0 9918 0 5
+E 0 9916 0 14
+M 0 9900 1 9923
+E 0 9918 0 5
+E 0 9912 0 14
+M 0 9900 1 9923
+E 0 9918 0 5
+E 0 9912 0 14
+M 0 9912 1 9969
+E 0 9918 0 5
+E 0 9916 0 14
+M 0 9912 1 9969
+E 0 9918 0 5
+E 0 9916 0 14
+M 0 9912 1 9970
+E 0 9918 0 5
+E 0 9916 0 14
+M 0 9912 1 9970
+E 0 9918 0 5
+E 0 9916 0 14
+M 0 9905 1 9962
+E 0 9914 0 2
+M 0 9915 1 9971
+M 0 9907 1 9964
+E 0 9924 0 14
+E 0 9925 0 10
+M 0 9910 1 9974
+G 0 9922 0
+M 0 9911 1 9975
+E 0 9923 0 10
+E 0 9913 0 14
+M 0 9908 2 9976
+M 0 9909 2 9976
+M 0 9913 1 9947
+E 0 9926 0 14
+M 0 9913 1 9933
+E 0 9926 0 14
+M 0 9913 1 9927
+E 0 9926 0 14
+M 0 9914 1 9938
+G 0 9921 0
+M 0 9914 1 9937
+G 0 9921 0
+M 0 9901 1 9934
+M 0 9901 1 9941
+M 0 9901 1 9913
+M 0 9901 1 9949
+M 0 9901 1 9954
+M 0 9904 1 9944
+E 0 9926 0 14
+M 0 9903 1 9943
+E 0 9918 0 5
+E 0 9920 0 8
+E 0 9915 0 14
+M 0 9902 1 9942
+E 0 9927 0 10
+M 0 9906 1 9963
+G 0 9921 0
+M 0 9913 1 9946
+M 0 9913 1 9940
+S
+
+
+
+#SHOPS
+0
+
+
+
+#$
