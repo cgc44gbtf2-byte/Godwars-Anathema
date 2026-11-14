@@ -84,7 +84,9 @@ void do_colors( CHAR_DATA *ch, char *argument )
 	 get_color(ch, PURPLE_MAGIC), get_color(ch, RED_MAGIC), get_color(ch, BLUE_MAGIC),
 	 get_color(ch, GREEN_MAGIC), get_color(ch, YELLOW_MAGIC), get_color(ch, BLACK_MAGIC));
 	stc(buf, ch);
-	stc("To improve type \"colors <color>\".\n\r", ch);
+	stc("View ranks: colors (free).\n\r"
+    "Train: colors <purple/red/blue/green/yellow/black>\n\r"
+    "Training buys one rank immediately: 10 x next rank primal; maximum 5.\n\r", ch);
 	return;
     }
 

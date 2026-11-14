@@ -136,6 +136,13 @@ values are regression-tested, not rebalanced. NPC and immortal caps differ.
   passives and combat are unchanged. Full-engine fixtures check 198 read-only
   menu views and 132 insufficient/exact-cost and cap boundaries across both
   variants; an exact source inverse preserves every non-help byte.
+- **Sorcerer training help:** `colors` explicitly labels its free rank view
+  and lists all six accepted colors. `colors <color>` immediately buys one
+  rank for the existing 10 x next rank primal cost, up to rank 5. Only the
+  help string changed; training, book handling, spell costs
+  and combat remain unchanged. Full-engine fixtures check 72 read-only
+  views and 72 insufficient/exact-cost and cap boundaries across all colors;
+  the exact source inverse preserves every non-help byte.
 
 ## Verification boundaries
 

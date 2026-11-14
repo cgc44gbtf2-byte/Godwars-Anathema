@@ -4,7 +4,9 @@ from pathlib import Path
 import re
 import unittest
 
-from class_help_source import HIGHLAND_GUIDANCE, NINJA_GUIDANCE, PROOFS, without_class_help
+from class_help_source import (
+    HIGHLAND_GUIDANCE, NINJA_GUIDANCE, SORCERER_GUIDANCE, PROOFS, without_class_help,
+)
 from elemental_help_source import ELEMENT_HELP
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,6 +18,21 @@ def blob(text):
 
 
 class ClassHelpCatalog(unittest.TestCase):
+    def test_sorcerer_training_guidance_matches_command_colors_cost_and_cap(self):
+        commands = re.findall(
+            r'\{\s*"([^"]+)"\s*,\s*(do_\w+)',
+            (ROOT / "Genesis/src/interp.c").read_text().split("social_table")[0])
+        self.assertEqual(next(fn for cmd, fn in commands if cmd.startswith("colors")),
+                         "do_colors")
+        source = (ROOT / "Genesis/src/classes/sorcerer/sorcerer.c").read_text()
+        body = source.split("void do_colors(", 1)[1].split("\nvoid ", 1)[0]
+        for color in ("purple", "red", "blue", "green", "yellow", "black"):
+            self.assertIn(color, SORCERER_GUIDANCE)
+            self.assertIn(f'!str_cmp(argument, "{color}")', body)
+        self.assertIn("10 x next rank primal; maximum 5.", SORCERER_GUIDANCE)
+        self.assertIn("cost = 10 * (get_color(ch, color) + 1);", body)
+        self.assertIn("get_color(ch, color) >= 5", body)
+
     def test_ninja_training_guidance_uses_registered_command_and_existing_cost(self):
         commands = re.findall(
             r'\{\s*"([^"]+)"\s*,\s*(do_\w+)',

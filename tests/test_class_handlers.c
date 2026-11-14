@@ -59,6 +59,56 @@ static void costless(void)
 
 static void command(const char *name);
 
+static void test_sorcerer_training_help(void)
+{
+    static const struct { char *name; int color; } colors[] = {
+        {"purple", PURPLE_MAGIC}, {"red", RED_MAGIC}, {"blue", BLUE_MAGIC},
+        {"green", GREEN_MAGIC}, {"yellow", YELLOW_MAGIC}, {"black", BLACK_MAGIC}
+    };
+    unsigned views = 0, purchases = 0;
+    for (size_t c = 0; c < sizeof(colors) / sizeof(colors[0]); ++c)
+    for (int rank = 0; rank <= 5; ++rank)
+    {
+        for (int invalid = 0; invalid <= 1; ++invalid)
+        {
+            fresh(CLASS_SORCERER);
+            player.colors[colors[c].color] = rank;
+            actor.wait = 7;
+            CHAR_DATA expected = actor;
+            PC_DATA expected_pc = player;
+            do_colors(&actor, invalid ? "unknown" : "");
+            assert(!memcmp(&actor, &expected, sizeof(actor)));
+            assert(!memcmp(&player, &expected_pc, sizeof(player)));
+            assert(strstr(output, "View ranks: colors (free)."));
+            assert(strstr(output, "Train: colors <purple/red/blue/green/yellow/black>"));
+            assert(strstr(output, "10 x next rank primal; maximum 5."));
+            ++views;
+        }
+        for (int enough = 0; enough <= 1; ++enough)
+        {
+            fresh(CLASS_SORCERER);
+            player.colors[colors[c].color] = rank;
+            const long cost = (rank + 1) * 10;
+            actor.primal = cost - !enough;
+            actor.wait = 7;
+            CHAR_DATA expected = actor;
+            PC_DATA expected_pc = player;
+            const bool accepted = enough && rank < 5;
+            expected.primal -= accepted ? cost : 0;
+            expected_pc.colors[colors[c].color] += accepted;
+            do_colors(&actor, colors[c].name);
+            assert(!memcmp(&actor, &expected, sizeof(actor)));
+            assert(!memcmp(&player, &expected_pc, sizeof(player)));
+            if (rank == 5) assert(strstr(output, "already have the maximum"));
+            else if (enough) assert(strstr(output, "You use"));
+            else assert(strstr(output, "You need"));
+            ++purchases;
+        }
+    }
+    assert(views == 72 && purchases == 72);
+    puts("Sorcerer: 72 free help views and 72 training cost/cap boundaries passed");
+}
+
 static void test_ninja_training_help(void)
 {
     static const struct { char *name; int path; } paths[] = {
@@ -437,6 +487,7 @@ int main(void)
     assert(string_space); top_string = string_space;
     current_time = 123456;
     init_mm();
+    test_sorcerer_training_help();
     test_ninja_training_help();
     test_highlander_training_help();
     test_highlander_flash();

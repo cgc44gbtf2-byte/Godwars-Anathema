@@ -52,7 +52,16 @@ NINJA_GUIDANCE = (
     '    "Train: principle <sora/chikyu/ningenno> improve\\n\\r"\n'
     '    "Training buys one rank immediately: 10 x next rank primal; maximum 10.\\n\\r", ch);\n'
 )
+SORCERER_GUIDANCE = (
+    '\tstc("View ranks: colors (free).\\n\\r"\n'
+    '    "Train: colors <purple/red/blue/green/yellow/black>\\n\\r"\n'
+    '    "Training buys one rank immediately: 10 x next rank primal; maximum 5.\\n\\r", ch);'
+)
 PROOFS = [
+    ("Genesis/src/classes/sorcerer/sorcerer.c",
+     "e44a6b703dbf47456776c2207ac4ee70ff7e8956", [
+         (SORCERER_GUIDANCE, '\tstc("To improve type \\"colors <color>\\".\\n\\r", ch);'),
+     ]),
     ("Genesis/src/classes/ninja/ninja.c",
      "7425898de585ebbac6d4500cf861f6c40cf721c3", [
          (NINJA_GUIDANCE, ""),

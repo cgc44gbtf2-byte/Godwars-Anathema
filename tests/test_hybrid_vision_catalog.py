@@ -44,6 +44,8 @@ OLD_VISION="""void do_vision( CHAR_DATA *ch, char *argument )
 
 """
 def without_sorcerer_vision_adapter(text):
+    from class_help_source import without_class_help
+    text = without_class_help(text)
     assert text.count(NEW_VISION)==1
     return text.replace(NEW_VISION,OLD_VISION,1)
 
