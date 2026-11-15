@@ -1535,13 +1535,14 @@ struct	char_data
     unsigned int        save_pending;
     long		timer;
     long		wait;
-    /* Transient combat state; never serialized into player saves. */
+    /* Transient runtime state; never serialized into player saves. */
     long                combat_pause;
     unsigned long       gargoyle_reflection_id; /* Runtime only; clear_char resets it. */
     long                stun_immunity;
     long                highland_guard;
     long                highland_riposte;
     long                highland_counter_reuse;
+    long                quicksand_timer;
     long		pkill;
     long		pdeath;
     long		mkill;
@@ -2742,6 +2743,7 @@ DECLARE_DO_FUN(do_bloodrage);
 DECLARE_DO_FUN(do_potency);
 DECLARE_DO_FUN(do_theftvitae);
 DECLARE_DO_FUN(do_cauldronblood);
+DECLARE_DO_FUN(do_quicksand);
 long get_blood_potency args((CHAR_DATA *ch));
 void vampire_clear_offer args((CHAR_DATA *ch));
 DECLARE_DO_FUN( do_telekinetics );

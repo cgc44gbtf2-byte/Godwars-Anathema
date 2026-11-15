@@ -400,6 +400,8 @@ void char_from_room( CHAR_DATA *ch )
 	return;
     }
 
+    ch->quicksand_timer = 0;
+
     if ( !IS_NPC(ch) )
 	--ch->in_room->area->nplayer;
 

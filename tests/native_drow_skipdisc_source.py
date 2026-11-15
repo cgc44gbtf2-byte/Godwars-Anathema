@@ -22,6 +22,8 @@ def once(text, new, old):
     return text.replace(new, old, 1)
 
 def without_native_drow_skipdisc(text):
+    from quicksand_source import without_quicksand
+    text = without_quicksand(text)
     # Independent room-map storage is not part of the historical class header.
     # Only the exact reviewed addition is stripped; mutations remain visible.
     text = text.replace(

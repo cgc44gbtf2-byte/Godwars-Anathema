@@ -5,12 +5,45 @@ import re
 import unittest
 from test_class_layout import ROOT,SRC,make_values
 from werewolf_source import without_werewolf_stage
+from quicksand_source import without_quicksand
 
 def blob(text):
     raw=text.encode()
     return hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
 
 class WerewolfCommandsCatalog(unittest.TestCase):
+    def test_quicksand_inverse_preserves_all_other_runtime_bytes(self):
+        for path,expected in (
+            ("act_move.c","83cb8b9819d7205bee50c7a27323390adfb59b6d"),
+            ("classes/werewolf/werewolf.c","b8c06b3ab7df6129f0cc1aafa76e14e080eaaf42"),
+            ("classes/werewolf/wwtribe.c","9e3d18f7a70157010da5a80d411ced498a63d422"),
+            ("combat_status.c","103048b2fcf8d20745b2602d6fe5c56d34aa132d"),
+            ("handler.c","fe6fa8189fea2cb77c3f64c0b6d2c493ddd94bad"),
+            ("interp.c","d957a400db811b8e70e3ac9998eddafe4d85e6b9"),
+            ("merc.h","45a7b0627763364f37ff55697df6fd9e409f8f62"),
+        ):
+            with self.subTest(path=path):
+                text=(SRC/path).read_text()
+                old=without_quicksand(text)
+                self.assertEqual(blob(old),expected)
+                self.assertEqual(without_quicksand(old),old)
+                self.assertNotEqual(blob(without_quicksand(text+"\n/* mutation */\n")),expected)
+        source=(SRC/"classes/werewolf/wwtribe.c").read_text()
+        with self.assertRaises(AssertionError):
+            without_quicksand(source.replace("victim->quicksand_timer = 20;",
+                                             "victim->quicksand_timer = 200;",1))
+
+    def test_quicksand_uses_loaded_character_pulses_and_no_saved_flags(self):
+        code=(SRC/"combat_status.c").read_text()
+        self.assertIn("for (ch = char_list; ch != NULL; ch = ch->next)",code)
+        self.assertIn("--ch->quicksand_timer == 0",code)
+        comm=(SRC/"comm.c").read_text()
+        self.assertEqual(comm.count("        combat_status_update();"),2)
+        for path in ("save.c","update.c"):
+            self.assertNotIn("quicksand_timer",(SRC/path).read_text())
+        helpfile=(ROOT/"Genesis/area/class.hlp").read_text()
+        self.assertIn("20 pulses; costs 1 mana. <quicksand>",helpfile)
+
     def test_native_scope_restores_exact_prior_modules(self):
         for path,expected in (
             ("classes/werewolf/werewolf.c","7dc28aead30f5407cc3ec2f3e2c657ed0fe0c788"),
@@ -66,11 +99,11 @@ class WerewolfCommandsCatalog(unittest.TestCase):
             missing.update(fn for fn in re.findall(
                 r"^void\s+(do_\w+)\s*\(",path.read_text(),re.M)
                 if fn not in entries)
-        self.assertEqual(missing,{"do_quicksand","do_lycaon","do_reach",
+        self.assertEqual(missing,{"do_lycaon","do_reach",
                                  "do_wrath","do_mastery","do_invisibility"})
         menu=(SRC/"classes/werewolf/werewolf.c").read_text().split(
             "void do_wwpowers(",1)[1].split("void do_gifts(",1)[0]
-        for label in ("Quicksand[disabled]","Lycaon[disabled]",
+        for label in ("Quicksand","Lycaon[disabled]",
                       "Reach[unavailable]","Wrath[unavailable]",
                       "Mastery[unavailable]","Invisibility[unavailable]",
                       "Totemgift[unimplemented]"):
@@ -134,7 +167,7 @@ class WerewolfCommandsCatalog(unittest.TestCase):
             if label==".\\n\\r" or "[" in label:continue
             words=label.split(":")[-1].strip().split()
             if words:active.append(words[0].casefold())
-        self.assertEqual(len(active),58)
+        self.assertEqual(len(active),59)
         self.assertEqual(len(set(active)),len(active))
 
 if __name__=="__main__":

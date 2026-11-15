@@ -2,21 +2,22 @@
 
 Scope: the 105 native Werewolf help slots, their command registrations,
 rank gates, passive consumers, and overlap descriptions. This began as a
-help/test-only change. The Disquiet restoration below is the sole newly
-implemented gift; training costs, rank caps and existing permissions remain
-unchanged. Its saved affect identity advances compatibility to save epoch 4.
+help/test-only change. Disquiet and Quicksand were subsequently restored as
+described below; training costs and rank caps remain unchanged. Disquiet's
+saved affect identity advances compatibility to save epoch 4; Quicksand is
+runtime-only and adds no saved affect or identifier.
 
 ## Status legend
 
 | Marker | Meaning | Slots |
 | --- | --- | ---: |
-| A: command | A registered handler contains gameplay behavior; not a safety certification | 58 |
+| A: command | A registered handler contains gameplay behavior; not a safety certification | 59 |
 | P: auto | A passive has an identified production consumer | 28 |
 | G: upgrade | Modifies an existing command, not an extra automatic action | 1 |
 | V: unverified | No matching dedicated effect located; absence is not proven universally | 9 |
 | U: unimplemented | No separate implemented gift found for that slot | 3 |
 | X: unavailable | Legacy handler exists but is not registered for player commands | 4 |
-| D: disabled | Unregistered legacy handler also explicitly has no gameplay effect | 2 |
+| D: disabled | Unregistered legacy handler also explicitly has no gameplay effect | 1 |
 
 `wwpowers` is a command list, not proof that every listed command works.
 Disquiet was the identified registered stub in the initial audit. It now has
@@ -43,7 +44,7 @@ short descriptions and command spellings are in `Genesis/area/class.hlp`.
 | Fianna | A A A A A | Form Illusion 3, Clone Object 4, Balor's Gaze 5; no Spriggan body form |
 | Get of Fenris | P P P U P | Flee blocking scales from rank 1; acid blood at 3, not a Thor command |
 | Glass Walkers | A A A A A | Read Aura is inspection, not a vision toggle; Surge attacks eligible room targets |
-| Red Talons | V V P D D | Claw-parry claims not verified; combat rage ceiling at 3; two disabled handlers |
+| Red Talons | V V P A D | Claw-parry claims not verified; combat rage ceiling at 3; Quicksand snare at 4; Lycaon disabled |
 | Shadow Lords | P A A A A | Clap is active; Dominator drains rage; no separate Open Wounds power |
 | Silent Striders | P V P U X | Initiative at 1 and 3; no verified Fortitude consumer or distinct rank-4 gift |
 | Silver Fangs | V V X A X | Shield 4; Wrath/Mastery unavailable; no implemented Luna's Avenger body form |
@@ -68,8 +69,8 @@ short descriptions and command spellings are in `Genesis/area/class.hlp`.
 ## Overlaps and remaining risks
 
 Grandmother's Touch uses the same Mother handler and cooldown. It is an upgrade,
-not a second healing trigger. There are 58 unique canonical registered names
-in the gift menu, including the restored Disquiet.
+not a second healing trigger. There are 59 unique canonical registered names
+in the gift menu, including the restored Disquiet and Quicksand.
 
 Get of Fenris 1, Shadow Lords 1 and Philodox 3 retain their separate +100
 damage-cap contributions. Lupus 3, Children of Gaia 2 and Stargazers 4 retain
@@ -113,7 +114,7 @@ of those projects. No foreign C code has been imported.
 | Invisibility | EM/GW2k6/Myth/TSOB register `do_invisibility`; EM invokes the existing invisibility spell | Anathema already has a handler but no player binding. Re-enabling requires permission, visibility ownership and cleanup review, not a blind alias |
 | Luna's Avenger | AtD/LoC `garou.c:do_lunasavenger`; `GAROU_AVENGER` is read in their combat damage paths | A real body-form candidate, not a drop-in. Foreign slot/rank differs and Anathema's existing Shield must not be displaced; hybrid form ownership/balance still need design |
 | Lambent Flame | AtD `garou.c:do_lambent`, registered through `data/commands.dat` | An active room-blinding action, not the missing native rank-2 avoidance passive; different rank, costs and target checks |
-| Quicksand | AtD `do_quicksand` is data-registered and spends gnosis to toggle `WOLF_QUICKSAND` | Only toggle/message and expiry consumers located. No movement/combat slowdown consumer verified; not a proven complete replacement |
+| Quicksand | AtD `do_quicksand` is data-registered and spends gnosis to toggle `WOLF_QUICKSAND` | The native Red Talons 4 version is now a temporary, single-target movement snare; the archived toggle was not copied because its flag had no verified consumer here |
 | Totem Gift | GWLow5/LoC contain declarations of `do_totemgift` | A prototype is not an implementation; no complete matching handler found |
 | Scream of Gaia | Several projects register `do_scream`, but the examined handlers require Vampire/Melpominee powers | Same command name, wrong class/power. Not evidence of a completed Werewolf Scream of Gaia |
 | Lycaon / other unverified passives | No matching complete native-equivalent implementation established in this pass | Keep honest gap labels; do not invent behavior or infer implementation from help text |

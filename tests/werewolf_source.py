@@ -20,6 +20,8 @@ def spans(text):
             for i,match in enumerate(matches)}
 
 def without_werewolf_stage(text):
+    from quicksand_source import without_quicksand
+    text=without_quicksand(text)
     from werewolf_lifecycle_source import without_werewolf_lifecycle_stage
     text=without_werewolf_lifecycle_stage(text)
     raw=DATA.read_bytes()

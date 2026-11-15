@@ -185,6 +185,148 @@ static void menus(void)
     assert(strstr(outputs[0],"Each purchase trains one rank immediately"));
 }
 
+static void quicksand_fixture(void)
+{
+    wolf_fixture(0,0);
+    pcs[0].tribes[TRIBE_RED_TALONS]=4;
+    for(int n=0;n<3;n++)pcs[n].flag=FLAG_PK;
+    actors[0].mana=1;
+    REMOVE_BIT(room.room_flags,ROOM_SAFE);
+}
+
+static void quicksand_guards(void)
+{
+    do_quicksand(NULL,NULL);
+    for(int mode=0;mode<26;mode++){
+        quicksand_fixture();
+        const char *command="beta";
+        switch(mode){
+        case 0:actors[0].mana=0;break;
+        case 1:command="alpha";break;
+        case 2:command="missing";break;
+        case 3:command="";break;
+        case 4:command="beta extra";break;
+        case 5:SET_BIT(room.room_flags,ROOM_SAFE);break;
+        case 6:pcs[0].tribes[TRIBE_RED_TALONS]=3;break;
+        case 7:actors[0].class=CLASS_MAGE;break;
+        case 8:SET_BIT(actors[0].act,ACT_IS_NPC);break;
+        case 9:actors[0].pcdata=NULL;break;
+        case 10:actors[0].in_room=NULL;break;
+        case 11:actors[0].position=POS_SLEEPING;break;
+        case 12:actors[0].wait=1;break;
+        case 13:actors[0].combat_pause=1;break;
+        case 14:actors[1].desc=NULL;break;
+        case 15:pcs[1].flag|=FLAG_AFK;break;
+        case 16:SET_BIT(actors[1].affected_by,AFF_ETHEREAL);break;
+        case 17:actors[1].level=LEV_ST;break;
+        case 18:pcs[1].flag=0;break;
+        case 19:actors[1].pcdata=NULL;break;
+        case 20:actors[1].hit=0;break;
+        case 21:actors[1].position=POS_STUNNED;break;
+        case 22:SET_BIT(actors[1].act,ACT_IS_NPC|ACT_NOKILL);break;
+        case 23:SET_BIT(actors[1].itemaffect,ITEMA_PEACE);break;
+        case 24:pcs[0].player_load_failed=1;break;
+        case 25:SET_BIT(actors[0].affected_by,AFF_CHARM);
+                actors[0].master=&actors[1];break;
+        }
+        CHAR_DATA before[3];PC_DATA pc_before[3];
+        memcpy(before,actors,sizeof before);memcpy(pc_before,pcs,sizeof pc_before);
+        do_quicksand(actors,(char *)command);
+        assert(actors[0].mana==before[0].mana&&actors[0].wait==before[0].wait);
+        assert(actors[0].quicksand_timer==0&&actors[1].quicksand_timer==0);
+        assert(actors[0].fighting==before[0].fighting);
+        assert(!memcmp(pc_before,pcs,sizeof pc_before));
+    }
+}
+
+static void quicksand(void)
+{
+    quicksand_guards();
+    quicksand_fixture();
+    ROOM_INDEX_DATA destination={0};
+    EXIT_DATA exit={0};
+    destination.area=&area;destination.name="Snare destination";
+    destination.description="A private destination.\n\r";destination.light=1;
+    exit.to_room=&destination;room.exit[DIR_NORTH]=&exit;
+
+    execute("quicksand beta");
+    assert(actors[0].mana==0&&actors[1].quicksand_timer==20);
+    assert(actors[1].class==CLASS_NONE&&actors[1].morph[0]=='\0');
+    assert(actors[0].wait==12);
+
+    actors[0].mana=1;
+    execute("quicksand beta");
+    assert(actors[0].mana==1&&actors[0].wait==0&&actors[1].quicksand_timer==20);
+    move_char(&actors[1],DIR_NORTH);
+    assert(actors[1].in_room==&room&&strstr(outputs[1],"quicksand holds you fast"));
+
+    actors[1].desc=NULL;
+    for(int pulse=0;pulse<19;pulse++)combat_status_update();
+    assert(actors[1].quicksand_timer==1);
+    actors[1].desc=&descs[1];
+    combat_status_update();
+    assert(actors[1].quicksand_timer==0);
+    move_char(&actors[1],DIR_NORTH);
+    assert(actors[1].in_room==&destination);
+    char_from_room(&actors[1]);char_to_room(&actors[1],&room);
+
+    actors[0].mana=1;
+    execute("quicksand beta");
+    assert(actors[1].quicksand_timer==20);
+    char_from_room(&actors[1]);
+    assert(actors[1].quicksand_timer==0);
+    char_to_room(&actors[1],&room);
+
+    quicksand_fixture();
+    SET_BIT(actors[1].act,ACT_IS_NPC);actors[1].pcdata=NULL;
+    actors[1].desc=NULL;
+    do_quicksand(actors,"beta");
+    assert(actors[1].quicksand_timer==20&&actors[0].mana==0);
+    for(int pulse=0;pulse<20;pulse++)combat_status_update();
+    assert(actors[1].quicksand_timer==0);
+
+    quicksand_fixture();
+    pcs[2].tribes[TRIBE_RED_TALONS]=4;actors[2].class=CLASS_WEREWOLF;
+    do_quicksand(actors,"beta");combat_status_update();
+    long mana=actors[2].mana;
+    do_quicksand(&actors[2],"beta");
+    assert(actors[1].quicksand_timer==19&&actors[2].mana==mana&&actors[2].wait==0);
+}
+
+static void quicksand_persistence(void)
+{
+    char cwd[4096],root[]="/tmp/anathema-quicksand-XXXXXX";
+    assert(getcwd(cwd,sizeof cwd)&&mkdtemp(root)&&!chdir(root));
+    assert(!mkdir("player",0700)&&!mkdir("backup",0700)&&!mkdir("run",0700));
+    assert(!chdir("run"));
+    string_space=malloc(4*1024*1024);assert(string_space);top_string=string_space;
+    quicksand_fixture();
+    DESCRIPTOR_DATA d={0};
+    assert(!load_char_obj(&d,"Snarefixture"));
+    CHAR_DATA *saved=d.character;
+    saved->level=LEV_AWA;saved->class=CLASS_NONE;
+    saved->hit=saved->max_hit=50000;saved->mana=saved->max_mana=50000;
+    saved->pcdata->flag=FLAG_PK;saved->in_room=&room;saved->desc=&d;
+    saved->next_in_room=room.people;room.people=saved;
+    do_quicksand(actors,"Snarefixture");
+    assert(saved->quicksand_timer==20&&save_char_obj_checked(saved));
+    assert(saved->quicksand_timer==20);
+    room.people=saved->next_in_room;
+    saved->next_in_room=NULL;saved->desc=NULL;saved->in_room=NULL;free_char(saved);
+    for(int brief=0;brief<2;brief++){
+        memset(&d,0,sizeof d);
+        assert(brief?load_char_short(&d,"Snarefixture"):load_char_obj(&d,"Snarefixture"));
+        saved=d.character;
+        assert(!saved->pcdata->player_load_failed&&saved->quicksand_timer==0);
+        assert(saved->class==CLASS_NONE&&saved->morph[0]=='\0');
+        saved->desc=NULL;saved->in_room=NULL;free_char(saved);
+    }
+    assert(!unlink("../player/Snarefixture"));(void)unlink("../backup/Snarefixture");
+    free(string_space);string_space=top_string=NULL;
+    assert(!chdir("..")&&!rmdir("run")&&!rmdir("player")&&!rmdir("backup"));
+    assert(!chdir(cwd)&&!rmdir(root));
+}
+
 /* Deliberately malformed internal calls reproduce old failures separately;
  * actual player command regression tests above always use the interpreter. */
 static void safety_case(int mode)
@@ -221,10 +363,13 @@ int main(int argc,char **argv)
         safety_case(atoi(argv[2]));return 0;
     }
     unsigned prices=advancement_grid();
-    advancement_guards();shifting();menus();
+    advancement_guards();shifting();menus();quicksand();
     for(int i=0;i<6;i++)safety_case(i);
+    quicksand_persistence();
     puts("Werewolf commands:1539 advancement boundary cases across19 native/"
          "ordered-hybrid contexts; doubled primal/XP/cumulative kills, zero quest "
-         "requirements, real shift/Rage/Calm and menu checks;6 safety cases passed.");
+         "requirements, real shift/Rage/Calm and menu checks;6 safety cases; "
+         "Quicksand 26 rejection guards, movement, 20-pulse NPC/link-dead expiry, "
+         "non-refresh, relocation cleanup and full/short reloads passed.");
     return prices==1539?0:1;
 }

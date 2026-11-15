@@ -73,6 +73,11 @@ void move_char( CHAR_DATA *ch, long door )
         return;
     }
 
+    if (ch->quicksand_timer > 0) {
+        stc("The quicksand holds you fast; you cannot move that way.\n\r", ch);
+        return;
+    }
+
     if (IS_NPC(ch)) strcpy(dispname,ch->short_descr);
     else if (ch->morph[0] == '\0') strcpy(dispname,ch->name);
     else strcpy(dispname,ch->morph);

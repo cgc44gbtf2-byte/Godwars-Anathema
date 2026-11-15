@@ -34,6 +34,8 @@ EDITS={
 }
 
 def without_werewolf_room_stage(text):
+    from quicksand_source import without_quicksand
+    text=without_quicksand(text)
     from gargoyle_source import without_gargoyle_stage
     text = without_gargoyle_stage(text)
     changed=False

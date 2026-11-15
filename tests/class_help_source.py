@@ -143,6 +143,8 @@ PROOFS = [
 
 
 def without_class_help(text):
+    from quicksand_source import without_quicksand
+    text = without_quicksand(text)
     for _, _, hunks in PROOFS:
         for new, old in hunks:
             assert text.count(new) <= 1, "Ambiguous class-help inverse"

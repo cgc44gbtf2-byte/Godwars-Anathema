@@ -9,6 +9,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "classes/hybrid/player.h"
 
 void do_breathwyld( CHAR_DATA *ch, char *argument )
 {
@@ -871,7 +872,17 @@ void do_summonnet( CHAR_DATA *ch, char *argument )
 
 void do_quicksand( CHAR_DATA *ch, char *argument )
 {
-    if (!IS_WEREWOLF(ch))
+    CHAR_DATA *victim;
+    char arg[MAX_INPUT_LENGTH], extra[MAX_INPUT_LENGTH];
+
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL ||
+        !hybrid_player_save_valid(ch) || ch->hit <= 0 ||
+        ch->position < POS_FIGHTING || ch->wait > 0 ||
+        IS_COMBAT_PAUSED(ch) ||
+        !combat_character_in_room(ch->in_room, ch))
+        return;
+
+    if (!IS_WEREWOLF(ch) || ch->level < LEV_AWA)
     {
 	stc("Huh?\n\r", ch);
 	return;
@@ -883,7 +894,54 @@ void do_quicksand( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    stc("Power Gutted - Akuma.\n\r", ch);
+    if (argument == NULL) argument = "";
+    argument = one_argument(argument, arg);
+    one_argument(argument, extra);
+    if (arg[0] == '\0' || extra[0] != '\0')
+    {
+stc("Syntax: quicksand <target>.\n\r", ch);
+return;
+    }
+
+    if ((victim = get_char_room(ch, arg)) == NULL)
+    {
+stc("They aren't here.\n\r", ch);
+return;
+    }
+
+    if (victim == ch)
+    {
+stc("You cannot snare yourself in quicksand.\n\r", ch);
+return;
+    }
+
+    if ((!IS_NPC(victim) && (victim->pcdata == NULL ||
+         victim->level < LEV_AWA || get_trust(victim) > LEV_AWA ||
+         !CAN_PK(ch) || !CAN_PK(victim))) ||
+        victim->hit <= 0 || victim->position <= POS_STUNNED ||
+        IS_SET(ch->in_room->room_flags, ROOM_SAFE) ||
+        (IS_AFFECTED(ch, AFF_CHARM) && ch->master == victim) ||
+        is_safe(ch, victim))
+        return;
+
+    if (victim->quicksand_timer > 0)
+    {
+stc("They are already held by quicksand.\n\r", ch);
+return;
+    }
+
+    if (ch->mana < 1)
+    {
+stc("You need at least 1 mana to call the quicksand.\n\r", ch);
+return;
+    }
+
+    ch->mana--;
+    victim->quicksand_timer = 20;
+    act("You draw the earth around $N, trapping $M in quicksand.", ch, NULL, victim, TO_CHAR);
+    act("$n draws the earth around you, trapping you in quicksand.", ch, NULL, victim, TO_VICT);
+    act("$n draws the earth around $N, trapping $M in quicksand.", ch, NULL, victim, TO_NOTVICT);
+    WAIT_STATE(ch, 12);
     return;
 }
 

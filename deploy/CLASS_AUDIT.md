@@ -99,8 +99,9 @@ values are regression-tested, not rebalanced. NPC and immortal caps differ.
   mechanics invented.
 - **Stun Fist:** restored in the subsequent guarded-restoration pass described
   below. The historical six-second command-only delay was not re-enabled.
-- **Quicksand / Lycaon:** explicitly gutted in `wwtribe.c`. No speculative
-  implementation or re-enablement.
+- **Quicksand / Lycaon:** Quicksand is restored as a temporary Red Talons 4
+  movement snare with a transient timer; Lycaon remains disabled rather than
+  changing a target's saved form or identity.
 - **Teach discipline:** subsequently replaced with guarded EM-style teaching
   in `vampire.c`: free at rank 3, explicit named student acceptance, and
   checked persistence. See the subsequent port notes below.
@@ -266,8 +267,8 @@ the caster or overdraw the victim. This regression reproduced the pre-fix bug.
 
 ## All-ten-class runtime follow-up
 
-The source catalog contains 580 registered command names (547 distinct
-handlers) and 113 named skill records. The 15 primary class source files
+The source catalog contains 587 registered command names (554 distinct
+handlers) and 114 named skill records. The 15 primary class source files
 contain 259 command-handler definitions; shared abilities in `more.c`, magic,
 combat and class/stat helpers also matter. Catalog counts are not claims that
 every command has been playtested. The audit examined registration, advertised
@@ -276,7 +277,7 @@ names/ranks, resources and lifetime-sensitive attack paths across all classes.
 | Class | Follow-up findings and coverage |
 | --- | --- |
 | Vampire | Corrected advertised names (`beastwithin`, `horrid`, `empathy`, `malleable`), several unlock ranks, and the missing Potence-7 `fist` listing. Object-form recovery covered below. |
-| Werewolf | Fixed Falling Touch's victim access after lethal damage; marked gutted Quicksand/Lycaon disabled in listings. `powers` no longer appends an erroneous “Huh?” after the Werewolf listing. |
+| Werewolf | Fixed Falling Touch's victim access after lethal damage; restored Quicksand as a transient movement snare while Lycaon remains disabled. `powers` no longer appends an erroneous “Huh?” after the Werewolf listing. |
 | Sorcerer | Existing safety and independent AoE damage regressions retained; no additional confirmed class-specific defect in this pass. |
 | Drow | Acid Bolt respects explicit/invalid names. Crossbow's scoped ranged view restores origin on protected/missing targets, extraction and missing sleep skill, without movement hooks cancelling stealth/darkness/silence. |
 | Highlander | Bash checks self/safety before combat and applies victim lag before potentially extracting damage. Explicit names do not silently fall back to another opponent. |
@@ -323,7 +324,7 @@ the catalog check prevents advertising an empty spell as player-castable.
 
 ### Still unverified or deliberately unresolved
 
-- Quicksand/Lycaon and Malkavian mapping are not restored.
+- Lycaon and Malkavian mapping are not restored.
 - Full multiplayer balance, sustained regeneration/feeding, equipment-heavy
   matchups and generic indirect lag behavior outside the guarded powers remain.
 - Combat resource transfers are not multi-character durable transactions.

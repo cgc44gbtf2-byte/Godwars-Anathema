@@ -52,7 +52,16 @@ not the unrelated Mage `ward` command; `reshapeobject`, `spiritguardian`,
 `halosun`, `formillusion`, `shroudnight`, `clapthunder`, and `paralyzingstare` are the explicit command
 names rather than ambiguous or nonexistent abbreviations.
 
-Totemgift and Scream are unimplemented. Quicksand and Lycaon remain disabled. Reach,
+Totemgift and Scream are unimplemented. Red Talons 4 Quicksand is a
+single-target snare: `quicksand <target>` costs 1 mana and applies 12 pulses
+of caster recovery. It blocks ordinary door movement for 20 pulses (about
+five seconds), not attacks, spell travel or staff relocation. It clears on
+expiry, room departure, logout/reload or copyover; it is never saved.
+Self, missing, protected, staff and non-PK player targets are rejected before
+payment or recovery. Safe rooms are always protected, and recasting cannot
+refresh an active snare, including one applied by another attacker.
+Loaded NPCs and link-dead characters use the same pulse expiry.
+Lycaon remains disabled. Reach,
 Wrath, Mastery, and Invisibility have source handlers but are **unavailable**:
 they are not registered as player commands and have not been exposed through
 this compatibility fix. In particular, the old Mastery implementation needs a

@@ -257,7 +257,7 @@ if (get_tribe(ch, TRIBE_GET_OF_FENRIS) >= 4) strcat(buf, " Scream[unimplemented]
     if (get_tribe(ch, TRIBE_RED_TALONS) >= 1)
     {
 	strcpy(buf, "Red Talons:");
-if (get_tribe(ch, TRIBE_RED_TALONS) >= 4) strcat(buf, " Quicksand[disabled]");
+if (get_tribe(ch, TRIBE_RED_TALONS) >= 4) strcat(buf, " Quicksand");
 if (get_tribe(ch, TRIBE_RED_TALONS) >= 5) strcat(buf, " Lycaon[disabled]");
 	strcat(buf, ".\n\r");
 	stc(buf, ch);

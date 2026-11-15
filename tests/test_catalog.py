@@ -97,7 +97,9 @@ class CatalogChecks(unittest.TestCase):
 
     def test_disabled_gifts_are_not_advertised_as_working(self):
         source = (SRC / "classes/werewolf/werewolf.c").read_text()
-        for label in ("Quicksand[disabled]", "Lycaon[disabled]"):
+        self.assertIn("Quicksand", source)
+        self.assertIn('"quicksand",\tdo_quicksand', (SRC / "interp.c").read_text())
+        for label in ("Lycaon[disabled]",):
             self.assertTrue(label in source, f"missing explicit disabled label: {label}")
 
     def test_skill_names_are_unique(self):
