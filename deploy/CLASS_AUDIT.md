@@ -88,8 +88,9 @@ values are regression-tested, not rebalanced. NPC and immortal caps differ.
   and advertised description, rather than silently charging 10.
 - Mage ability listings now reveal the implemented third-rank powers at
   rank 3 rather than incorrectly waiting until rank 4.
-- Monk training text uses the registered `aurashot` name and labels
-  `stunfist` as disabled, not as an available working stun.
+- Monk training text uses the registered `aurashot` name. Stun Fist was
+  subsequently restored with the guarded behavior documented below; its
+  current listing names `stunfist` and the existing 5,000-mana cost.
 
 ## Missing, obsolete and deliberately disabled
 
@@ -160,6 +161,13 @@ values are regression-tested, not rebalanced. NPC and immortal caps differ.
   and caps: a selected breed, auspice, or tribe gift costs 10 x next rank
   primal up to rank 5; other gifts cost 15 x next rank up to rank 4. Gift
   selection, training prices, and combat behavior are unchanged.
+- **Vampire discipline help:** `discipline` distinguishes its free menu from
+  immediate rank purchases and explains the existing clan-dependent prices
+  and caps in the training table above. Gargoyles see the Visceratika cap;
+  other Vampires see the Thaumaturgy cap, without advertising the replaced
+  discipline. Full-engine fixtures check 108 read-only views and 216 training
+  boundaries. Training, activation and character data are unchanged; these
+  checks do not diagnose an offline player's reported classing problem.
 
 ## Verification boundaries
 
