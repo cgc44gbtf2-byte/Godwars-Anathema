@@ -1543,6 +1543,7 @@ struct	char_data
     long                highland_riposte;
     long                highland_counter_reuse;
     long                quicksand_timer;
+    long                lycaon_timer;
     long		pkill;
     long		pdeath;
     long		mkill;
@@ -2744,6 +2745,8 @@ DECLARE_DO_FUN(do_potency);
 DECLARE_DO_FUN(do_theftvitae);
 DECLARE_DO_FUN(do_cauldronblood);
 DECLARE_DO_FUN(do_quicksand);
+DECLARE_DO_FUN(do_lycaon);
+void werewolf_clear_lycaon(CHAR_DATA *ch);
 long get_blood_potency args((CHAR_DATA *ch));
 void vampire_clear_offer args((CHAR_DATA *ch));
 DECLARE_DO_FUN( do_telekinetics );

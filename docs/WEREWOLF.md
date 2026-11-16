@@ -61,7 +61,14 @@ Self, missing, protected, staff and non-PK player targets are rejected before
 payment or recovery. Safe rooms are always protected, and recasting cannot
 refresh an active snare, including one applied by another attacker.
 Loaded NPCs and link-dead characters use the same pulse expiry.
-Lycaon remains disabled. Reach,
+Red Talons 5 `lycaon <target>` temporarily changes an eligible PK target's
+displayed appearance to “A wolf” for 30 pulses, costs 1000 mana, and cannot
+refresh another active Lycaon. It does not grant wolf-form combat stats or
+change class, race, saved identity, or powers. Targets already polymorphed or
+with another morph, active wolfman form, AFK, offline, ethereal, or protected
+status are rejected. The transient appearance is omitted from saves and
+restored automatically on expiry; it does not clear when the target moves
+rooms. Reach,
 Wrath, Mastery, and Invisibility have source handlers but are **unavailable**:
 they are not registered as player commands and have not been exposed through
 this compatibility fix. In particular, the old Mastery implementation needs a

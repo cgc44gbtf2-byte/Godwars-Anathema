@@ -2,26 +2,30 @@
 
 Scope: the 105 native Werewolf help slots, their command registrations,
 rank gates, passive consumers, and overlap descriptions. This began as a
-help/test-only change. Disquiet and Quicksand were subsequently restored as
+help/test-only change. Disquiet, Quicksand and Lycaon were subsequently restored as
 described below; training costs and rank caps remain unchanged. Disquiet's
 saved affect identity advances compatibility to save epoch 4; Quicksand is
-runtime-only and adds no saved affect or identifier.
+runtime-only and adds no saved affect or identifier. Lycaon is runtime-only;
+its temporary display morph and polymorph bit are omitted from saves.
 
 ## Status legend
 
 | Marker | Meaning | Slots |
 | --- | --- | ---: |
-| A: command | A registered handler contains gameplay behavior; not a safety certification | 59 |
+| A: command | A registered handler contains gameplay behavior; not a safety certification | 60 |
 | P: auto | A passive has an identified production consumer | 28 |
 | G: upgrade | Modifies an existing command, not an extra automatic action | 1 |
 | V: unverified | No matching dedicated effect located; absence is not proven universally | 9 |
 | U: unimplemented | No separate implemented gift found for that slot | 3 |
 | X: unavailable | Legacy handler exists but is not registered for player commands | 4 |
-| D: disabled | Unregistered legacy handler also explicitly has no gameplay effect | 1 |
+| D: disabled | Unregistered legacy handler also explicitly has no gameplay effect | 0 |
 
 `wwpowers` is a command list, not proof that every listed command works.
 Disquiet was the identified registered stub in the initial audit. It now has
 the explicitly selected hitroll/damroll effect, rather than the EM calm effect.
+Red Talons 5 Lycaon is a transient display-only wolf appearance, not a form
+grant: it costs 1000 mana, lasts 30 pulses, and never alters saved identity or
+wolf-form combat stats.
 
 ## All trees, in rank order
 
@@ -44,7 +48,7 @@ short descriptions and command spellings are in `Genesis/area/class.hlp`.
 | Fianna | A A A A A | Form Illusion 3, Clone Object 4, Balor's Gaze 5; no Spriggan body form |
 | Get of Fenris | P P P U P | Flee blocking scales from rank 1; acid blood at 3, not a Thor command |
 | Glass Walkers | A A A A A | Read Aura is inspection, not a vision toggle; Surge attacks eligible room targets |
-| Red Talons | V V P A D | Claw-parry claims not verified; combat rage ceiling at 3; Quicksand snare at 4; Lycaon disabled |
+| Red Talons | V V P A A | Claw-parry claims not verified; combat rage ceiling at 3; Quicksand snare at 4; transient appearance curse at 5 |
 | Shadow Lords | P A A A A | Clap is active; Dominator drains rage; no separate Open Wounds power |
 | Silent Striders | P V P U X | Initiative at 1 and 3; no verified Fortitude consumer or distinct rank-4 gift |
 | Silver Fangs | V V X A X | Shield 4; Wrath/Mastery unavailable; no implemented Luna's Avenger body form |
@@ -69,8 +73,8 @@ short descriptions and command spellings are in `Genesis/area/class.hlp`.
 ## Overlaps and remaining risks
 
 Grandmother's Touch uses the same Mother handler and cooldown. It is an upgrade,
-not a second healing trigger. There are 59 unique canonical registered names
-in the gift menu, including the restored Disquiet and Quicksand.
+not a second healing trigger. There are 60 unique canonical registered names
+in the gift menu, including the restored Disquiet, Quicksand and Lycaon.
 
 Get of Fenris 1, Shadow Lords 1 and Philodox 3 retain their separate +100
 damage-cap contributions. Lupus 3, Children of Gaia 2 and Stargazers 4 retain
@@ -117,7 +121,7 @@ of those projects. No foreign C code has been imported.
 | Quicksand | AtD `do_quicksand` is data-registered and spends gnosis to toggle `WOLF_QUICKSAND` | The native Red Talons 4 version is now a temporary, single-target movement snare; the archived toggle was not copied because its flag had no verified consumer here |
 | Totem Gift | GWLow5/LoC contain declarations of `do_totemgift` | A prototype is not an implementation; no complete matching handler found |
 | Scream of Gaia | Several projects register `do_scream`, but the examined handlers require Vampire/Melpominee powers | Same command name, wrong class/power. Not evidence of a completed Werewolf Scream of Gaia |
-| Lycaon / other unverified passives | No matching complete native-equivalent implementation established in this pass | Keep honest gap labels; do not invent behavior or infer implementation from help text |
+| Other unverified passives | No dedicated effect or consumer was confirmed for the remaining entries | Keep honest gap labels; do not infer implementation from help text |
 | Reach / Wrath / Mastery | Native handlers already exist but are unbound. Foreign `wrath`/`mastery` names also occur in Angel, Shadow or legend systems | Name collisions are not Werewolf implementations and must not be imported as substitutes |
 
 For Razor Claws, some related snapshots only expose flag/display changes in the

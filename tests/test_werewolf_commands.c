@@ -293,6 +293,149 @@ static void quicksand(void)
     assert(actors[1].quicksand_timer==19&&actors[2].mana==mana&&actors[2].wait==0);
 }
 
+static void lycaon_fixture(void)
+{
+    wolf_fixture(0,0);
+    pcs[0].tribes[TRIBE_RED_TALONS]=5;
+    for(int n=0;n<3;n++)pcs[n].flag=FLAG_PK;
+    actors[0].mana=2000;
+    REMOVE_BIT(room.room_flags,ROOM_SAFE);
+}
+
+static void lycaon_guards(void)
+{
+    for(int mode=0;mode<27;mode++){
+        lycaon_fixture();
+        const char *command="beta";
+        char oversized[MAX_INPUT_LENGTH+16];
+        memset(oversized,'x',sizeof oversized-1);oversized[sizeof oversized-1]='\0';
+        switch(mode){
+        case 0:actors[0].mana=999;break;
+        case 1:command="alpha";break;
+        case 2:command="missing";break;
+        case 3:command="";break;
+        case 4:command="beta extra";break;
+        case 5:SET_BIT(room.room_flags,ROOM_SAFE);break;
+        case 6:pcs[0].tribes[TRIBE_RED_TALONS]=4;break;
+        case 7:actors[0].class=CLASS_MAGE;break;
+        case 8:SET_BIT(actors[0].act,ACT_IS_NPC);break;
+        case 9:actors[0].pcdata=NULL;break;
+        case 10:actors[0].in_room=NULL;break;
+        case 11:actors[0].position=POS_SLEEPING;break;
+        case 12:actors[0].wait=1;break;
+        case 13:actors[0].combat_pause=1;break;
+        case 14:actors[1].desc=NULL;break;
+        case 15:pcs[1].flag|=FLAG_AFK;break;
+        case 16:SET_BIT(actors[1].affected_by,AFF_ETHEREAL);break;
+        case 17:actors[1].level=LEV_ST;break;
+        case 18:pcs[1].flag=0;break;
+        case 19:SET_BIT(actors[1].act,ACT_IS_NPC);actors[1].pcdata=NULL;break;
+        case 20:
+            SET_BIT(actors[1].affected_by,AFF_POLYMORPH);
+            actors[1].morph=str_dup("A masked person");break;
+        case 21:
+            actors[1].lycaon_timer=12;
+            actors[1].morph=str_dup("A wolf");
+            SET_BIT(actors[1].affected_by,AFF_POLYMORPH);break;
+        case 22:actors[1].morph=str_dup("a shadow");break;
+        case 23:SET_BIT(actors[1].act,PLR_WOLFMAN);break;
+        case 24:pcs[0].flag=0;break;
+        case 25:pcs[1].player_load_failed=1;break;
+        case 26:command=oversized;break;
+        }
+        CHAR_DATA before[3];PC_DATA pc_before[3];
+        memcpy(before,actors,sizeof before);memcpy(pc_before,pcs,sizeof pc_before);
+        do_lycaon(actors,(char *)command);
+        assert(actors[0].mana==before[0].mana&&actors[0].wait==before[0].wait);
+        assert(actors[1].lycaon_timer==before[1].lycaon_timer);
+        assert(actors[1].affected_by==before[1].affected_by);
+        assert(actors[1].morph==before[1].morph);
+        assert(!memcmp(pc_before,pcs,sizeof pc_before));
+    }
+}
+
+static void lycaon(void)
+{
+    lycaon_guards();
+    lycaon_fixture();
+    ROOM_INDEX_DATA destination={0};
+    destination.area=&area;destination.name="Lycaon destination";
+    destination.description="A private destination.\n\r";destination.light=1;
+    PC_DATA before_target=pcs[1];
+    long polyaff=actors[1].polyaff, class_id=actors[1].class;
+    execute("lycaon beta");
+    assert(actors[0].mana==1000&&actors[0].wait==12&&actors[1].lycaon_timer==30);
+    assert(!strcmp(actors[1].morph,"A wolf"));
+    assert(IS_AFFECTED(&actors[1],AFF_POLYMORPH));
+    assert(actors[1].class==class_id&&actors[1].polyaff==polyaff);
+    assert(!memcmp(&pcs[1],&before_target,sizeof before_target));
+    assert(!IS_SET(actors[1].act,PLR_WOLFMAN));
+
+    actors[0].mana=2000;
+    execute("lycaon beta");
+    assert(actors[0].mana==2000&&actors[0].wait==0&&actors[1].lycaon_timer==30);
+
+    char_from_room(&actors[1]);
+    assert(actors[1].lycaon_timer==30&&!strcmp(actors[1].morph,"A wolf"));
+    char_to_room(&actors[1],&destination);
+    for(int pulse=0;pulse<29;pulse++)combat_status_update();
+    assert(actors[1].lycaon_timer==1&&IS_AFFECTED(&actors[1],AFF_POLYMORPH));
+    char_from_room(&actors[1]);
+    assert(actors[1].lycaon_timer==1&&!strcmp(actors[1].morph,"A wolf"));
+    char_to_room(&actors[1],&room);
+    combat_status_update();
+    assert(actors[1].lycaon_timer==0&&actors[1].morph[0]=='\0');
+    assert(!IS_AFFECTED(&actors[1],AFF_POLYMORPH));
+    assert(strstr(outputs[1],"natural appearance returns"));
+}
+
+static void lycaon_persistence(void)
+{
+    char cwd[4096],root[]="/tmp/anathema-lycaon-XXXXXX";
+    assert(getcwd(cwd,sizeof cwd)&&mkdtemp(root)&&!chdir(root));
+    assert(!mkdir("player",0700)&&!mkdir("backup",0700)&&!mkdir("run",0700));
+    assert(!chdir("run"));
+    string_space=malloc(4*1024*1024);assert(string_space);top_string=string_space;
+    lycaon_fixture();
+    DESCRIPTOR_DATA d={0};
+    assert(!load_char_obj(&d,"Lycaonfixture"));
+    CHAR_DATA *saved=d.character;
+    saved->level=LEV_AWA;saved->class=CLASS_NONE;
+    saved->hit=saved->max_hit=50000;saved->mana=saved->max_mana=50000;
+    saved->pcdata->flag=FLAG_PK;saved->in_room=&room;saved->desc=&d;
+    saved->next_in_room=room.people;room.people=saved;
+    do_lycaon(actors,"Lycaonfixture");
+    assert(saved->lycaon_timer==30&&IS_AFFECTED(saved,AFF_POLYMORPH));
+    assert(save_char_obj_checked(saved));
+    assert(saved->lycaon_timer==30&&IS_AFFECTED(saved,AFF_POLYMORPH));
+    FILE *fp=fopen("../player/Lycaonfixture","rb");assert(fp);
+    char line[2048];bool morph_empty=FALSE,affected_clean=FALSE;
+    while(fgets(line,sizeof line,fp)){
+        if(!strncmp(line,"Morph",5))morph_empty=!strcmp(line,"Morph        ~\n");
+        if(!strncmp(line,"AffectedBy",10)){
+            long bits=-1;assert(sscanf(line,"AffectedBy %li",&bits)==1);
+            affected_clean=!IS_SET(bits,AFF_POLYMORPH);
+        }
+        assert(strstr(line,"lycaon_timer")==NULL);
+    }
+    assert(!fclose(fp)&&morph_empty&&affected_clean);
+    room.people=saved->next_in_room;
+    saved->next_in_room=NULL;saved->desc=NULL;saved->in_room=NULL;free_char(saved);
+    for(int brief=0;brief<2;brief++){
+        memset(&d,0,sizeof d);
+        assert(brief?load_char_short(&d,"Lycaonfixture"):load_char_obj(&d,"Lycaonfixture"));
+        saved=d.character;
+        assert(!saved->pcdata->player_load_failed&&saved->lycaon_timer==0);
+        assert(saved->class==CLASS_NONE&&saved->morph[0]=='\0');
+        assert(!IS_AFFECTED(saved,AFF_POLYMORPH));
+        saved->desc=NULL;saved->in_room=NULL;free_char(saved);
+    }
+    assert(!unlink("../player/Lycaonfixture"));(void)unlink("../backup/Lycaonfixture");
+    free(string_space);string_space=top_string=NULL;
+    assert(!chdir("..")&&!rmdir("run")&&!rmdir("player")&&!rmdir("backup"));
+    assert(!chdir(cwd)&&!rmdir(root));
+}
+
 static void quicksand_persistence(void)
 {
     char cwd[4096],root[]="/tmp/anathema-quicksand-XXXXXX";
@@ -363,13 +506,15 @@ int main(int argc,char **argv)
         safety_case(atoi(argv[2]));return 0;
     }
     unsigned prices=advancement_grid();
-    advancement_guards();shifting();menus();quicksand();
+    advancement_guards();shifting();menus();quicksand();lycaon();
     for(int i=0;i<6;i++)safety_case(i);
-    quicksand_persistence();
+    quicksand_persistence();lycaon_persistence();
     puts("Werewolf commands:1539 advancement boundary cases across19 native/"
          "ordered-hybrid contexts; doubled primal/XP/cumulative kills, zero quest "
          "requirements, real shift/Rage/Calm and menu checks;6 safety cases; "
          "Quicksand 26 rejection guards, movement, 20-pulse NPC/link-dead expiry, "
-         "non-refresh, relocation cleanup and full/short reloads passed.");
+         "non-refresh, relocation cleanup and full/short reloads; Lycaon 27 rejection "
+         "guards, one-thousand-mana cost, appearance-only 30-pulse expiry and save "
+         "masking passed.");
     return prices==1539?0:1;
 }

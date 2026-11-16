@@ -99,11 +99,11 @@ class WerewolfCommandsCatalog(unittest.TestCase):
             missing.update(fn for fn in re.findall(
                 r"^void\s+(do_\w+)\s*\(",path.read_text(),re.M)
                 if fn not in entries)
-        self.assertEqual(missing,{"do_lycaon","do_reach",
+        self.assertEqual(missing,{"do_reach",
                                  "do_wrath","do_mastery","do_invisibility"})
         menu=(SRC/"classes/werewolf/werewolf.c").read_text().split(
             "void do_wwpowers(",1)[1].split("void do_gifts(",1)[0]
-        for label in ("Quicksand","Lycaon[disabled]",
+        for label in ("Quicksand","Lycaon",
                       "Reach[unavailable]","Wrath[unavailable]",
                       "Mastery[unavailable]","Invisibility[unavailable]",
                       "Totemgift[unimplemented]"):
@@ -167,7 +167,7 @@ class WerewolfCommandsCatalog(unittest.TestCase):
             if label==".\\n\\r" or "[" in label:continue
             words=label.split(":")[-1].strip().split()
             if words:active.append(words[0].casefold())
-        self.assertEqual(len(active),59)
+        self.assertEqual(len(active),60)
         self.assertEqual(len(set(active)),len(active))
 
 if __name__=="__main__":

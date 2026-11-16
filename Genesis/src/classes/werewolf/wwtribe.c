@@ -949,13 +949,16 @@ return;
 void do_lycaon( CHAR_DATA *ch, char *argument )
 {
     CHAR_DATA *victim;
-    char arg[MSL];
+    char arg[MAX_INPUT_LENGTH], extra[MAX_INPUT_LENGTH];
 
-    one_argument(argument,arg);
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL ||
+        !hybrid_player_save_valid(ch) || ch->hit <= 0 ||
+        ch->position < POS_FIGHTING || ch->wait > 0 ||
+        IS_COMBAT_PAUSED(ch) ||
+        !combat_character_in_room(ch->in_room, ch))
+        return;
 
-    if (IS_NPC(ch)) return;
-
-    if (!IS_WEREWOLF(ch))
+    if (!IS_WEREWOLF(ch) || ch->level < LEV_AWA)
     {
 	stc("Huh?\n\r",ch);
 	return;
@@ -967,9 +970,17 @@ void do_lycaon( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    if (arg[0] == '\0')
+    if (argument == NULL) argument = "";
+    if (strlen(argument) >= sizeof arg)
     {
-	stc("Curse whom?\n\r",ch);
+stc("That target name is too long.\n\r",ch);
+return;
+    }
+    argument = one_argument(argument, arg);
+    one_argument(argument, extra);
+    if (arg[0] == '\0' || extra[0] != '\0')
+    {
+stc("Syntax: lycaon <target>.\n\r",ch);
 	return;
     }
 
@@ -979,13 +990,46 @@ void do_lycaon( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    if (is_safe(ch,victim)) return;
+    if (victim == ch)
+    {
+stc("You cannot curse yourself with Lycaon.\n\r",ch);
+return;
+    }
 
-    stc("This power has been gutted.\n\r", ch);
+    if (!combat_pair_in_room(ch->in_room, ch, victim) ||
+        IS_NPC(victim) || victim->pcdata == NULL ||
+        !hybrid_player_save_valid(victim) ||
+        victim->level < LEV_AWA || get_trust(victim) > LEV_AWA ||
+        !CAN_PK(ch) || !CAN_PK(victim) ||
+        victim->desc == NULL || victim->desc->connected != CON_PLAYING ||
+        IS_SET(victim->pcdata->flag, FLAG_AFK) ||
+        victim->hit <= 0 || victim->position <= POS_STUNNED ||
+        IS_SET(ch->in_room->room_flags, ROOM_SAFE) ||
+        IS_SET(victim->act, PLR_WOLFMAN) ||
+        IS_AFFECTED(victim, AFF_POLYMORPH) ||
+        IS_AFFECTED(victim, AFF_ETHEREAL) ||
+        victim->morph == NULL || victim->morph[0] != '\0' ||
+        victim->lycaon_timer > 0 ||
+        is_safe(ch, victim))
+    {
+        stc("You cannot curse that target with Lycaon.\n\r",ch);
+        return;
+    }
 
-/*    stc("You sneer as you force them into the form of a wolf.\n\r",ch);
-    act("$n sneers as $e concentrates on $N",ch,NULL,victim,TO_NOTVICT);
-    act("$n sneers as $e concentrates on you.",ch,NULL,victim,TO_VICT);*/
+    if (ch->mana < 1000)
+    {
+stc("Curse of Lycaon costs 1000 mana.\n\r",ch);
+return;
+    }
+
+    ch->mana -= 1000;
+    victim->morph = str_dup("A wolf");
+    SET_BIT(victim->affected_by, AFF_POLYMORPH);
+    victim->lycaon_timer = 30;
+    act("You curse $N, forcing $M into wolf form.", ch, NULL, victim, TO_CHAR);
+    act("$n curses you, forcing you into wolf form.", ch, NULL, victim, TO_VICT);
+    act("$n curses $N, forcing $M into wolf form.", ch, NULL, victim, TO_NOTVICT);
+    WAIT_STATE(ch, 12);
 
     return;
 }

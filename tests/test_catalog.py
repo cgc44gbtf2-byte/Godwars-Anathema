@@ -95,12 +95,14 @@ class CatalogChecks(unittest.TestCase):
             selected = next(fn for command, fn in commands if command.startswith(name))
             self.assertEqual(selected, handler, name)
 
-    def test_disabled_gifts_are_not_advertised_as_working(self):
+    def test_restored_gifts_are_registered_and_lycaon_is_active(self):
         source = (SRC / "classes/werewolf/werewolf.c").read_text()
         self.assertIn("Quicksand", source)
-        self.assertIn('"quicksand",\tdo_quicksand', (SRC / "interp.c").read_text())
-        for label in ("Lycaon[disabled]",):
-            self.assertTrue(label in source, f"missing explicit disabled label: {label}")
+        interp = (SRC / "interp.c").read_text()
+        self.assertRegex(interp, r'\{\s*"quicksand"\s*,\s*do_quicksand')
+        self.assertIn("Lycaon", source)
+        self.assertRegex(interp, r'\{\s*"lycaon"\s*,\s*do_lycaon')
+        self.assertNotIn("Lycaon[disabled]", source)
 
     def test_skill_names_are_unique(self):
         source = (SRC / "const.c").read_text().split("skill_table", 1)[1]

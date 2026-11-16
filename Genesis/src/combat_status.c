@@ -3,6 +3,7 @@
  * Never decrement these from descriptor processing or violence_update. */
 #include <sys/types.h>
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
 #include "merc.h"
 #include "guardian.h"
@@ -41,6 +42,18 @@ bool combat_target_live(CHAR_DATA *ch, CHAR_DATA *victim)
     return ch != NULL && combat_pair_in_room(ch->in_room, ch, victim);
 }
 
+void werewolf_clear_lycaon(CHAR_DATA *ch)
+{
+    if (ch == NULL || ch->lycaon_timer <= 0) return;
+    ch->lycaon_timer = 0;
+    if (!IS_NPC(ch) && ch->morph != NULL && !str_cmp(ch->morph, "A wolf"))
+    {
+        free_string(ch->morph);
+        ch->morph = str_dup("");
+        REMOVE_BIT(ch->affected_by, AFF_POLYMORPH);
+    }
+}
+
 void combat_status_update(void)
 {
     CHAR_DATA *ch;
@@ -59,6 +72,14 @@ void combat_status_update(void)
             stc("You pull free of the quicksand.\n\r", ch);
             act("$n pulls free of the quicksand.", ch, NULL, NULL, TO_ROOM);
         }
+        if (ch->lycaon_timer == 1)
+        {
+            stc("The curse fades and your natural appearance returns.\n\r", ch);
+            act("$n's wolf form fades away.", ch, NULL, NULL, TO_ROOM);
+            werewolf_clear_lycaon(ch);
+        }
+        else if (ch->lycaon_timer > 1)
+            --ch->lycaon_timer;
         if (IS_NPC(ch) || !hybrid_power_parent(ch, CLASS_HIGHLANDER)
             || ch->fighting == NULL)
             ch->highland_guard = ch->highland_riposte = 0;

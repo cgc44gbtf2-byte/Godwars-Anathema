@@ -348,7 +348,8 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
     fprintf( fp, "Description  %s~\n",	ch->description		);
     fprintf( fp, "Lord         %s~\n",	ch->lord		);
     fprintf( fp, "Clan         %s~\n",	ch->clan		);
-    fprintf( fp, "Morph        %s~\n",	ch->morph		);
+    fprintf( fp, "Morph        %s~\n",
+        ch->lycaon_timer > 0 ? "" : ch->morph);
     fprintf( fp, "Createtime   %s~\n",	ch->createtime		);
     fprintf( fp, "Lasttime     %s~\n",	ch->lasttime		);
     fprintf( fp, "Lasthost     %s~\n",	ch->lasthost		);
@@ -394,7 +395,8 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
         guardian_saved_more(ch, monk_favour_saved_more(ch, &time_info)));
     monk_favour_write(fp, ch, &time_info);
     fprintf( fp, "Xtra         %li\n",  ch->xtra		);
-    fprintf( fp, "AffectedBy   %li\n",	ch->affected_by		);
+    fprintf( fp, "AffectedBy   %li\n",
+        ch->lycaon_timer > 0 ? ch->affected_by & ~AFF_POLYMORPH : ch->affected_by);
     fprintf( fp, "Spheres      %li %li %li %li %li %li %li %li %li\n",
          ch->spheres[0], ch->spheres[1], ch->spheres[2], ch->spheres[3],
          ch->spheres[4], ch->spheres[5], ch->spheres[6], ch->spheres[7],

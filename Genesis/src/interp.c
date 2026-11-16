@@ -469,6 +469,7 @@
    { "preserve",	do_preservation,POS_STANDING,	 LEV_AWA,  LOG_NORMAL	},
    { "primalanger",	do_primalanger, POS_FIGHTING,    LEV_AWA,  LOG_NORMAL 	},
    { "quicksand",	do_quicksand,	POS_FIGHTING,	 LEV_AWA,  LOG_NORMAL	},
+   { "lycaon",		do_lycaon,	POS_FIGHTING,	 LEV_AWA,  LOG_NORMAL	},
    { "rage",		do_rage,	POS_FIGHTING,	 LEV_AWA,  LOG_NORMAL	},
    { "regenerate",	do_regenerate,	POS_DEAD,	 LEV_AWA,  LOG_NORMAL	},
    { "reshapeobject",	do_reshape,	POS_STANDING,	 LEV_AWA,  LOG_NORMAL	},

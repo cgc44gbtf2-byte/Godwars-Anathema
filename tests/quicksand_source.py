@@ -26,6 +26,8 @@ OLD = '''void do_quicksand( CHAR_DATA *ch, char *argument )
 
 
 def without_quicksand(text):
+    from lycaon_source import without_lycaon
+    text = without_lycaon(text)
     match = re.search(r"void do_quicksand\(.*?(?=\nvoid do_|\Z)", text, re.S)
     if match:
         digest = hashlib.sha256(match[0].encode()).hexdigest()

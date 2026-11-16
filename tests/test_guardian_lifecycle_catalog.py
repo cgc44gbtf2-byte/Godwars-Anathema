@@ -20,6 +20,8 @@ def without_guardian_lifecycle_save(text):
     return once(text,"                guardian_reconcile(ch);\n","")
 
 def without_hybrid_forms_save(text):
+    from lycaon_source import without_lycaon
+    text=without_lycaon(text)
     text=once(text,
         "    if (ch->pcdata->hybrid_present) {\n"
         "        hybrid_state_write(fp, &ch->pcdata->hybrid);\n"
