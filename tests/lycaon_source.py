@@ -53,6 +53,8 @@ def _replace_once(text, old, new):
     return text.replace(old, new, 1)
 
 def without_lycaon(text):
+    from scream_gaia_source import without_scream_gaia
+    text = without_scream_gaia(text)
     if "void do_lycaon(" in text:
         match = re.search(r"void do_lycaon\(.*?(?=\nvoid do_|\Z)", text, re.S)
         assert match

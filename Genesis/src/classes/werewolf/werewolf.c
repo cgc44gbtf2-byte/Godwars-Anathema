@@ -240,7 +240,7 @@ if (get_tribe(ch, TRIBE_FIANNA) >= 3) strcat(buf, " Formillusion");
     if (get_tribe(ch, TRIBE_GET_OF_FENRIS) >= 1)
     {
 	strcpy(buf, "Get of Fenris:");
-if (get_tribe(ch, TRIBE_GET_OF_FENRIS) >= 4) strcat(buf, " Scream[unimplemented]");
+if (get_tribe(ch, TRIBE_GET_OF_FENRIS) >= 4) strcat(buf, " Screamgaia");
 	strcat(buf, ".\n\r");
 	stc(buf, ch);
     }

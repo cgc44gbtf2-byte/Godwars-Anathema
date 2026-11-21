@@ -436,6 +436,82 @@ static void lycaon_persistence(void)
     assert(!chdir(cwd)&&!rmdir(root));
 }
 
+static void screamgaia_fixture(void)
+{
+    wolf_fixture(0,0);
+    pcs[0].tribes[TRIBE_GET_OF_FENRIS]=4;
+    pcs[0].flag=pcs[1].flag=FLAG_PK;
+    pcs[2].flag=0;
+    actors[0].mana=STUN_FIST_COST;
+    REMOVE_BIT(room.room_flags,ROOM_SAFE);
+}
+
+static void screamgaia(void)
+{
+    screamgaia_fixture();
+    actors[2].leader=&actors[0];
+    SET_BIT(actors[2].act,ACT_IS_NPC);
+    actors[2].pcdata=NULL;
+    actors[2].desc=NULL;
+    actors[0].hit=actors[1].hit=actors[2].hit=50000;
+    actors[1].position=actors[2].position=POS_FIGHTING;
+    long target_hit=actors[1].hit, mobile_hit=actors[2].hit;
+    execute("screamgaia");
+    assert(actors[0].mana==0&&actors[0].combat_pause==STUN_FIST_RECOVERY);
+    assert(actors[1].combat_pause==STUN_FIST_DURATION);
+    assert(actors[1].stun_immunity==STUN_FIST_IMMUNITY);
+    assert(actors[2].combat_pause==0&&actors[2].stun_immunity==0);
+    assert(actors[1].hit==target_hit&&actors[2].hit==mobile_hit);
+    assert(actors[1].position==POS_FIGHTING&&actors[1].in_room==&room);
+    assert(strstr(outputs[0],"stunning Scream of Gaia"));
+    assert(strstr(outputs[1],"interrupting your actions"));
+    assert(!strstr(outputs[2],"stagger"));
+
+    actors[0].mana=STUN_FIST_COST;
+    actors[0].combat_pause=0;
+    execute("screamgaia");
+    assert(actors[0].mana==STUN_FIST_COST);
+    assert(actors[1].combat_pause==STUN_FIST_DURATION);
+
+    for(int pulse=0;pulse<STUN_FIST_IMMUNITY;pulse++)
+        combat_status_update();
+    assert(actors[1].combat_pause==0&&actors[1].stun_immunity==0);
+    actors[0].combat_pause=0;
+    execute("screamgaia");
+    assert(actors[0].mana==0&&actors[1].combat_pause==STUN_FIST_DURATION);
+
+    screamgaia_fixture();
+    SET_BIT(actors[1].act,ACT_IS_NPC);
+    actors[1].pcdata=NULL;
+    actors[1].desc=NULL;
+    execute("screamgaia");
+    assert(actors[0].mana==0&&actors[1].combat_pause==STUN_FIST_DURATION);
+}
+
+static void screamgaia_rejections(void)
+{
+    for(int mode=0;mode<10;mode++){
+        screamgaia_fixture();
+        switch(mode){
+        case 0: actors[0].mana=STUN_FIST_COST-1;break;
+        case 1: SET_BIT(room.room_flags,ROOM_SAFE);break;
+        case 2: pcs[0].tribes[TRIBE_GET_OF_FENRIS]=3;break;
+        case 3: actors[0].class=CLASS_MAGE;break;
+        case 4: SET_BIT(actors[1].act,ACT_IS_NPC);actors[1].pcdata=NULL;actors[1].desc=NULL;SET_BIT(actors[1].act,ACT_NOKILL);break;
+        case 5: pcs[1].flag=0;break;
+        case 6: actors[1].leader=&actors[0];actors[2].leader=&actors[0];break;
+        case 7: actors[1].combat_pause=1;break;
+        case 8: actors[1].stun_immunity=1;break;
+        case 9: actors[1].position=POS_SLEEPING;break;
+        }
+        do_screamgaia(actors,"ignored");
+        assert(actors[0].mana==STUN_FIST_COST-(mode==0?1:0));
+        assert(actors[0].combat_pause==0);
+        assert(actors[1].combat_pause==(mode==7?1:0));
+        assert(actors[1].stun_immunity==(mode==8?1:0));
+    }
+}
+
 static void quicksand_persistence(void)
 {
     char cwd[4096],root[]="/tmp/anathema-quicksand-XXXXXX";
@@ -507,6 +583,7 @@ int main(int argc,char **argv)
     }
     unsigned prices=advancement_grid();
     advancement_guards();shifting();menus();quicksand();lycaon();
+    screamgaia_rejections();screamgaia();
     for(int i=0;i<6;i++)safety_case(i);
     quicksand_persistence();lycaon_persistence();
     puts("Werewolf commands:1539 advancement boundary cases across19 native/"
@@ -515,6 +592,7 @@ int main(int argc,char **argv)
          "Quicksand 26 rejection guards, movement, 20-pulse NPC/link-dead expiry, "
          "non-refresh, relocation cleanup and full/short reloads; Lycaon 27 rejection "
          "guards, one-thousand-mana cost, appearance-only 30-pulse expiry and save "
-         "masking passed.");
+         "masking; Scream of Gaia ten rejection cases, room target filtering, "
+         "one-pulse stun and immunity recovery passed.");
     return prices==1539?0:1;
 }

@@ -103,6 +103,8 @@ class CatalogChecks(unittest.TestCase):
         self.assertIn("Lycaon", source)
         self.assertRegex(interp, r'\{\s*"lycaon"\s*,\s*do_lycaon')
         self.assertNotIn("Lycaon[disabled]", source)
+        self.assertIn("Screamgaia", source)
+        self.assertRegex(interp, r'\{\s*"screamgaia"\s*,\s*do_screamgaia')
 
     def test_skill_names_are_unique(self):
         source = (SRC / "const.c").read_text().split("skill_table", 1)[1]

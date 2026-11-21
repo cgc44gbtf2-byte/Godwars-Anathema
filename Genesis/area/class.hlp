@@ -1016,7 +1016,7 @@ Related Helps: Tribes, and Werewolf.
 1: Visage of Fenris - Adds 100 to the Werewolf damage cap. <auto>
 2: Halt the Coward's Flight - Chance to block fleeing scales with tribe rating, starting at rank 1. <auto>
 3: Acid Blood - Feeding on your blood can burn the feeder. <auto>
-4: Scream of Gaia - No working command is implemented. <unimplemented>
+4: Scream of Gaia - Interrupts eligible foes in the room for one pulse; costs 5000 mana. <screamgaia>
 5: Hero's Stand - Prevents punch/hurl. <auto>
 
 Related Helps: Tribes, and Werewolf.

@@ -99,9 +99,10 @@ values are regression-tested, not rebalanced. NPC and immortal caps differ.
   mechanics invented.
 - **Stun Fist:** restored in the subsequent guarded-restoration pass described
   below. The historical six-second command-only delay was not re-enabled.
-- **Quicksand / Lycaon:** Quicksand is a temporary Red Talons 4 movement snare;
-  Lycaon is a Red Talons 5, 30-pulse display-only wolf curse whose morph is not
-  written to saves or character identity fields.
+- **Quicksand / Lycaon / Scream of Gaia:** Quicksand is a temporary Red Talons 4
+  movement snare; Lycaon is a Red Talons 5, 30-pulse display-only wolf curse
+  whose morph is not written to saves or character identity fields. Get of
+  Fenris 4 Scream of Gaia interrupts eligible room foes briefly without damage.
 - **Teach discipline:** subsequently replaced with guarded EM-style teaching
   in `vampire.c`: free at rank 3, explicit named student acceptance, and
   checked persistence. See the subsequent port notes below.

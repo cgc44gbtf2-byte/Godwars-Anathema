@@ -2747,6 +2747,7 @@ DECLARE_DO_FUN(do_cauldronblood);
 DECLARE_DO_FUN(do_quicksand);
 DECLARE_DO_FUN(do_lycaon);
 void werewolf_clear_lycaon(CHAR_DATA *ch);
+DECLARE_DO_FUN(do_screamgaia);
 long get_blood_potency args((CHAR_DATA *ch));
 void vampire_clear_offer args((CHAR_DATA *ch));
 DECLARE_DO_FUN( do_telekinetics );

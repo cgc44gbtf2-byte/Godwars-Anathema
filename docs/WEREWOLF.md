@@ -52,7 +52,11 @@ not the unrelated Mage `ward` command; `reshapeobject`, `spiritguardian`,
 `halosun`, `formillusion`, `shroudnight`, `clapthunder`, and `paralyzingstare` are the explicit command
 names rather than ambiguous or nonexistent abbreviations.
 
-Totemgift and Scream are unimplemented. Red Talons 4 Quicksand is a
+Totemgift remains unimplemented. Get of Fenris 4 `screamgaia` interrupts
+eligible foes in the room for one pulse, costs 5000 mana, and gives the caster
+two pulses of recovery. A target cannot be interrupted again for six pulses;
+the shout does not damage, move, or stun allies, safe targets, non-PK players,
+or anyone already recovering. Red Talons 4 Quicksand is a
 single-target snare: `quicksand <target>` costs 1 mana and applies 12 pulses
 of caster recovery. It blocks ordinary door movement for 20 pulses (about
 five seconds), not attacks, spell travel or staff relocation. It clears on

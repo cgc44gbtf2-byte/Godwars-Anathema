@@ -12,11 +12,11 @@ its temporary display morph and polymorph bit are omitted from saves.
 
 | Marker | Meaning | Slots |
 | --- | --- | ---: |
-| A: command | A registered handler contains gameplay behavior; not a safety certification | 60 |
+| A: command | A registered handler contains gameplay behavior; not a safety certification | 61 |
 | P: auto | A passive has an identified production consumer | 28 |
 | G: upgrade | Modifies an existing command, not an extra automatic action | 1 |
 | V: unverified | No matching dedicated effect located; absence is not proven universally | 9 |
-| U: unimplemented | No separate implemented gift found for that slot | 3 |
+| U: unimplemented | No separate implemented gift found for that slot | 2 |
 | X: unavailable | Legacy handler exists but is not registered for player commands | 4 |
 | D: disabled | Unregistered legacy handler also explicitly has no gameplay effect | 0 |
 
@@ -26,6 +26,10 @@ the explicitly selected hitroll/damroll effect, rather than the EM calm effect.
 Red Talons 5 Lycaon is a transient display-only wolf appearance, not a form
 grant: it costs 1000 mana, lasts 30 pulses, and never alters saved identity or
 wolf-form combat stats.
+Get of Fenris 4 Scream of Gaia is a non-damaging room interruption: 5000 mana,
+one pulse of target interruption, six pulses of target stun immunity, and two
+pulses of caster recovery. It affects only eligible foes, not allies or safe
+targets, and cannot refresh an active interruption.
 
 ## All trees, in rank order
 
@@ -46,7 +50,7 @@ short descriptions and command spellings are in `Genesis/area/class.hlp`.
 | Bone Gnawers | P P A A V | Poison-spell resistance and rating-scaled soak; no separate Survivor effect verified |
 | Children of Gaia | A P A A A | Avoidance/armor 2, Dazzle 3, Guardian warning 4; Guardian is not a summoned pet |
 | Fianna | A A A A A | Form Illusion 3, Clone Object 4, Balor's Gaze 5; no Spriggan body form |
-| Get of Fenris | P P P U P | Flee blocking scales from rank 1; acid blood at 3, not a Thor command |
+| Get of Fenris | P P P A P | Flee blocking scales from rank 1; acid blood at 3; Scream of Gaia interrupts eligible foes |
 | Glass Walkers | A A A A A | Read Aura is inspection, not a vision toggle; Surge attacks eligible room targets |
 | Red Talons | V V P A A | Claw-parry claims not verified; combat rage ceiling at 3; Quicksand snare at 4; transient appearance curse at 5 |
 | Shadow Lords | P A A A A | Clap is active; Dominator drains rage; no separate Open Wounds power |
@@ -73,8 +77,9 @@ short descriptions and command spellings are in `Genesis/area/class.hlp`.
 ## Overlaps and remaining risks
 
 Grandmother's Touch uses the same Mother handler and cooldown. It is an upgrade,
-not a second healing trigger. There are 60 unique canonical registered names
-in the gift menu, including the restored Disquiet, Quicksand and Lycaon.
+not a second healing trigger. There are 61 unique canonical registered names
+in the gift menu, including the restored Disquiet, Quicksand, Lycaon and
+Scream of Gaia.
 
 Get of Fenris 1, Shadow Lords 1 and Philodox 3 retain their separate +100
 damage-cap contributions. Lupus 3, Children of Gaia 2 and Stargazers 4 retain

@@ -103,7 +103,7 @@ class WerewolfCommandsCatalog(unittest.TestCase):
                                  "do_wrath","do_mastery","do_invisibility"})
         menu=(SRC/"classes/werewolf/werewolf.c").read_text().split(
             "void do_wwpowers(",1)[1].split("void do_gifts(",1)[0]
-        for label in ("Quicksand","Lycaon",
+        for label in ("Quicksand","Lycaon","Screamgaia",
                       "Reach[unavailable]","Wrath[unavailable]",
                       "Mastery[unavailable]","Invisibility[unavailable]",
                       "Totemgift[unimplemented]"):
@@ -117,7 +117,7 @@ class WerewolfCommandsCatalog(unittest.TestCase):
             if label==".\\n\\r" or "[" in label:continue
             words=label.split(":")[-1].strip().split()
             if words:self.assertIn(words[0].lower(),commands,label)
-        self.assertIn("Scream[unimplemented]",menu)
+        self.assertNotIn("Scream[unimplemented]",menu)
         self.assertNotIn("get_auspice(ch, TRIBE_",menu)
 
     def test_engine_suite_and_saved_format_unchanged(self):
@@ -167,7 +167,7 @@ class WerewolfCommandsCatalog(unittest.TestCase):
             if label==".\\n\\r" or "[" in label:continue
             words=label.split(":")[-1].strip().split()
             if words:active.append(words[0].casefold())
-        self.assertEqual(len(active),60)
+        self.assertEqual(len(active),61)
         self.assertEqual(len(set(active)),len(active))
 
 if __name__=="__main__":

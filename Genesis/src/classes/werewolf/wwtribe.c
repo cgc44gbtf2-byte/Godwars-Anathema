@@ -1034,6 +1034,108 @@ return;
     return;
 }
 
+void do_screamgaia( CHAR_DATA *ch, char *argument )
+{
+    CHAR_DATA *victim, *victim_next;
+    ROOM_INDEX_DATA *cast_room;
+    bool found_target = FALSE;
+
+    (void)argument;
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL ||
+        !hybrid_player_save_valid(ch) || ch->hit <= 0 ||
+        ch->position < POS_FIGHTING || ch->wait > 0 ||
+        IS_COMBAT_PAUSED(ch) ||
+        !combat_character_in_room(ch->in_room, ch))
+        return;
+
+    if (!IS_WEREWOLF(ch) || ch->level < LEV_AWA)
+    {
+        stc("Huh?\n\r", ch);
+        return;
+    }
+
+    if (get_tribe(ch, TRIBE_GET_OF_FENRIS) < 4)
+    {
+        stc("You require Get of Fenris 4 to use Scream of Gaia.\n\r", ch);
+        return;
+    }
+
+    cast_room = ch->in_room;
+    if (IS_SET(cast_room->room_flags, ROOM_SAFE))
+    {
+        stc("You cannot use Scream of Gaia in a safe room.\n\r", ch);
+        return;
+    }
+
+    for (victim = cast_room->people; victim != NULL; victim = victim_next)
+    {
+        victim_next = victim->next_in_room;
+        if (victim == ch ||
+            !combat_pair_in_room(cast_room, ch, victim) ||
+            !IS_AWAKE(victim) || victim->position <= POS_STUNNED ||
+            IS_COMBAT_PAUSED(victim) || victim->stun_immunity > 0 ||
+            is_same_group(ch, victim))
+            continue;
+
+        if (!IS_NPC(victim) &&
+            (victim->pcdata == NULL || !hybrid_player_save_valid(victim) ||
+             victim->level < LEV_AWA || get_trust(victim) > LEV_AWA ||
+             !CAN_PK(ch) || !CAN_PK(victim) ||
+             victim->desc == NULL || victim->desc->connected != CON_PLAYING ||
+             IS_SET(victim->pcdata->flag, FLAG_AFK)))
+            continue;
+
+        if (!is_safe(ch, victim))
+        {
+            found_target = TRUE;
+            break;
+        }
+    }
+
+    if (!found_target)
+    {
+        stc("There are no foes here you can interrupt.\n\r", ch);
+        return;
+    }
+
+    if (ch->mana < STUN_FIST_COST)
+    {
+        stc("Scream of Gaia costs 5000 mana.\n\r", ch);
+        return;
+    }
+
+    ch->mana -= STUN_FIST_COST;
+    ch->combat_pause = STUN_FIST_RECOVERY;
+    stc("You unleash a stunning Scream of Gaia!\n\r", ch);
+
+    for (victim = cast_room->people; victim != NULL; victim = victim_next)
+    {
+        victim_next = victim->next_in_room;
+        if (victim == ch ||
+            !combat_pair_in_room(cast_room, ch, victim) ||
+            !IS_AWAKE(victim) || victim->position <= POS_STUNNED ||
+            IS_COMBAT_PAUSED(victim) || victim->stun_immunity > 0 ||
+            is_same_group(ch, victim))
+            continue;
+
+        if (!IS_NPC(victim) &&
+            (victim->pcdata == NULL || !hybrid_player_save_valid(victim) ||
+             victim->level < LEV_AWA || get_trust(victim) > LEV_AWA ||
+             !CAN_PK(ch) || !CAN_PK(victim) ||
+             victim->desc == NULL || victim->desc->connected != CON_PLAYING ||
+             IS_SET(victim->pcdata->flag, FLAG_AFK)))
+            continue;
+
+        if (is_safe(ch, victim))
+            continue;
+
+        victim->combat_pause = STUN_FIST_DURATION;
+        victim->stun_immunity = STUN_FIST_IMMUNITY;
+        act("$n's roar staggers you, interrupting your actions!", ch, NULL, victim, TO_VICT);
+        act("$n's roar staggers $N.", ch, NULL, victim, TO_NOTVICT);
+    }
+}
+
 void do_clap( CHAR_DATA *ch, char *argument )
 {
     char      arg[MAX_INPUT_LENGTH];
