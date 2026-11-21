@@ -1,0 +1,865 @@
+#AREADATA
+Name        Haif    Midge Tribe~
+Builders    Haif~
+VNUMs       100 129
+End
+
+
+
+#MOBILES
+#101
+midge~
+a midge~
+An ugly midge is walking along.
+~
+An incredibly ugly midge is strolling along here in an odd, black hat.
+You have this huge urge to crush him.
+~
+33 0 0 S
+4 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#102
+midge~
+a midge~
+A midge is here, picking black berries.
+~
+A small midge is quietly picking berries.  He seems to hardly notice you.
+~
+17 0 0 S
+10 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#103
+arkadilis midge~
+Arkadilis Midge~
+Arkadilis midge is here, grumbling about something or another.
+~
+Arkadilis midge is here, talking to himself again.
+He appears to know a lot, but nobody can really tell.
+~
+33 0 0 S
+14 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#104
+markella midge~
+Markella Midge~
+Markella Midge is here, destroying another house.
+~
+Markella Midge is in the process of destroying yet another poor home.
+You feel like just killing him and stopping it.
+~
+33 0 0 S
+4 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#105
+sella midge~
+Sella Midge~
+Sella Midge is standing here dazed.
+~
+Sella appears to be dreaming. Alas for his stupidity.
+~
+33 0 0 S
+17 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#106
+horkanet midge~
+Horkanet Midge~
+Horkanet Midge is standing here, flipping a coin.
+~
+Horkanet flips his coins, deciding who to kill.
+He doesn't look so tough. Kill him.
+~
+33 0 0 S
+14 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#107
+gorgenna midge~
+Grogenna Midge~
+Gorgenna Midge is spouting obsenities.
+~
+Gorgenna is tired of everything, you, himself, and this whole stinking world.
+Put him out of his misery.
+~
+33 0 0 S
+8 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#108
+jonsthenetic midge~
+Jonsthenetic Midge~
+Jonsthenetic Midge is standing here, holding a spork.
+~
+Jonsthenetic is holding the two ends of his spork.
+Be a friend, and help him figure out how to put it together.
+Or... you can just kill him.
+~
+33 0 0 S
+1 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#109
+midgette~
+Midgette~
+Midgette is here, looking just as ugly as the rest.
+~
+Midgette is one of the ugliest things on this side.
+You don't want to know what she'll charge.
+~
+33 0 0 S
+15 0 0 0d0+0 0d0+0
+0 0
+0 0 2
+#110
+partha midge~
+Partha Midge~
+Partha Midge is attempting magic here.
+~
+Partha Midge hates everyone who interrupts him. Even other midges.
+You have a tough decision. To bug, or not to bug.
+On the other hand, maybe it's not so tough after all.
+~
+33 0 0 S
+9 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#111
+gaglemorph~
+Gaglemoph~
+Gaglemorph is here, trying to befriend the midges.
+~
+Gaglemorph is entirely too friendly. You detest watching him run after the midges.
+You turn away in disgust, and decide he's probably better off dead.
+~
+17 0 0 S
+20 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#112
+Anthana~
+Anthana~
+Anthana, Gaglemorph's bugwort is here.
+~
+Athana, Gaglemorph's bugwort is here. Alas for the ugly.
+Utterly pathetic, just like Gaglemorph, he tries to rub against your leg.
+~
+17 0 0 S
+3 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#0
+
+
+
+#OBJECTS
+#100
+rotten bunch berries blackberries~
+a bunch of rotten blackberries~
+A bunch of oozing blackberries lie here.~
+~
+26 0 1
+8 0 0 82
+2 50 0
+#101
+beret~
+a small beret~
+A black, grimy beret is lying here.~
+~
+9 1 -32767
+1 0 0 0
+2 500 0
+A
+4 1
+#102
+midge top hat tophat~
+a midge top hat~
+A midge top hat has been left here.~
+~
+9 0 17
+3 0 0 0
+2 50 0
+#103
+axe small~
+a small axe~
+A small axe has been dropped here.~
+~
+5 0 8193
+0 2 5 3
+2 2000 0
+#104
+necklace bone~
+a small bone necklace~
+A small bone necklace is lying on the ground.~
+~
+9 1 5
+1 0 0 0
+2 500 0
+A
+3 1
+#105
+pink potion~
+a pink potion~
+A pink potion is barely visible on the ground.~
+~
+10 0 1
+6 1 14 0
+2 500 0
+#106
+wand~
+a small bent wand~
+A small bent wand lies on the ground.~
+~
+3 0 16385
+5 1 1 5
+2 500 0
+#107
+key~
+a tiny key~
+A tiny key is lying on the ground.~
+~
+18 0 1
+2 0 0 0
+2 50 0
+#108
+well~
+a midge well~
+A small, eroded midge  well is here.~
+~
+25 0 0
+50 50 0 0
+500 3000 0
+#109
+key~
+a small key~
+A key to Gaglemorph's door lies here.~
+~
+18 0 1
+2 0 0 0
+2 50 0
+#0
+
+
+
+#ROOMS
+#101
+Mist Shrowded Path~
+This path is made of crushed granite with curious brown streaks in it.
+The path continues north to a tribe, or south to the west gate.
+~
+0 0 3
+D0
+The path continues toward the tribe.
+~
+~
+0 -1 102
+D2
+The path back toward the forest.
+~
+~
+0 -1 3040
+S
+#102
+Mist Shrowded Path~
+This section of the road is badly worn and frequently traversed.  There is
+faint muttering to the north.  The road back to the forest lies to the south.
+~
+0 4 3
+D0
+The path continues toward the tribe.
+~
+~
+0 -1 103
+D2
+The mist shrowded path.
+~
+~
+0 -1 101
+S
+#103
+Mist Shrowded Path~
+This section of the road is badly worn and frequently traversed.  muttering is
+getting louder to the north.  The road back to the forest lies to the south.
+~
+0 0 3
+D0
+The entrance to the midge tribe.
+~
+~
+0 -1 104
+D2
+The mist shrowded path.
+~
+~
+0 -1 102
+S
+#104
+Entrance to the Midge Tribe~
+You stand at the entrance to a tiny tribe.  You can see across the whole
+tribe easily.  Little black creatures with dark hats and boots and little 
+pointy tails scamper about.  They curse continuously.  The contstant
+muttering is getting on your nerves and you have the urge to squash them.
+~
+0 0 2
+D0
+Black Road
+~
+~
+0 -1 105
+D2
+Mist Shrowded Path
+~
+~
+0 -1 103
+S
+#105
+Black Road~
+You are way too big to be using this road.  But who cares.  Who's gonna stop
+you?  These little black midges?  The obsenities are growing intense.  Your ears
+are starting to turn red.  Black Road continues to the north, west, and east.
+There is still time to turn back and go south.
+~
+0 0 1
+D0
+Black Road
+~
+~
+0 -1 106
+D1
+Black Road
+~
+~
+0 -1 110
+D2
+Entrance to the Midge Tribe
+~
+~
+0 -1 104
+D3
+Black Road
+~
+~
+0 -1 111
+S
+#106
+Black Road~
+You continue to travel down Black Road.  Isn't it just dirty?  Black road
+continues its depressing path to the dark north, dark west, and dark south.
+A rotten home lies to the sad east.
+~
+0 0 1
+D0
+Black Road
+~
+~
+0 -1 107
+D1
+Rotten Home
+~
+~
+0 -1 120
+D2
+Black Road
+~
+~
+0 -1 105
+D3
+Black Road
+~
+~
+0 -1 112
+S
+#107
+Black Road~
+Oh boy, another depressing road!  Black Road goes north and south here.  There
+is a terrible, mushroom home to the west.  An oozing blackberry patch is to
+the east.
+~
+0 0 1
+D0
+Black Road
+~
+~
+0 -1 108
+D1
+Blackberry Patch
+~
+~
+0 -1 116
+D2
+Black Road
+~
+~
+0 -1 106
+D3
+A Rotten Home
+~
+~
+0 -1 129
+S
+#108
+Black Road~
+Black Road continues to meander here.  It crawls to the south and stumbles to
+an end to the north.  An ugly blackberry patch is to the east.  A stone path lies
+to the west.
+~
+0 0 1
+D0
+Black Road
+~
+~
+0 -1 109
+D1
+Blackberry patch
+~
+~
+0 -1 117
+D2
+Black Road
+~
+~
+0 -1 107
+D3
+A stone path
+~
+~
+0 -1 113
+S
+#109
+Black Road~
+A eroded well lies here in the middle of Black Road.  A fence separates
+the midges from harm to the north, but doesn't do much.  A berry patch
+is to the east.  Black Road continues to to the south and west.
+~
+0 0 1
+E
+Eroded Well~
+A small well is here.  Just the right size if you're a midge.  But big
+enough for you to get some black water from.  I'm sure the midges wont mind.
+~
+D1
+Blackberry Patch
+~
+~
+0 -1 118
+D2
+Black Road
+~
+~
+0 -1 108
+D3
+Black Road
+~
+~
+0 -1 114
+S
+#110
+Black Road~
+A corner of Black Road is where you stand.  A terrible fence blocks passage
+to the east or south.  A degenerate home is to the north.  Black Road goes back
+to the west.
+~
+0 0 1
+D0
+Degenerate Home
+~
+~
+0 -1 119
+D3
+Black Road
+~
+~
+0 -1 105
+S
+#111
+Black Road~
+Western corner of Black Road.  You can continue to tromp down the road
+to the east and north.  You can also storm into a disgusting home  to the south.
+~
+0 0 1
+D0
+Black Road
+~
+~
+0 -1 112
+D1
+Black Road
+~
+~
+0 -1 105
+D2
+Rotten Home
+~
+~
+0 -1 121
+S
+#112
+Black Road~
+There's no place like a midge tribe. A terrible home is to the west.
+Partha Midge's backyard is to the north but you can't go there.
+Black Road continues to the south and east.
+~
+0 0 1
+D1
+Black Road
+~
+~
+0 -1 106
+D2
+Black Road
+~
+~
+0 -1 111
+D3
+Rotten Home
+~
+~
+0 -1 122
+S
+#113
+Stone Path~
+You are walking along an ugly little stone path.  To the south lies Partha
+Midge's house.  A rotten house is to the west.  Black road is to the east.
+Everything is so suffocating here.  You just want to get out.
+~
+0 0 1
+D1
+Black Road
+~
+~
+0 -1 108
+D2
+Partha Midge's House
+~
+door~
+0 107 125
+D3
+Rotten House
+~
+~
+0 -1 123
+S
+#114
+Black Road~
+Yet another part of Black Road.  Hey if you go west its the last
+section of Black Road.  You can go back to the eroded well to the east.
+~
+0 0 1
+D1
+Black Road
+~
+~
+0 -1 109
+D3
+Black Road
+~
+~
+0 -1 115
+S
+#115
+Black Road~
+The last piece of Black Road.  You can go back to Black Road to the east.
+A disgusting, ugly, black, mushroom home is to the south.  In the distance to
+the north you can see Gaglemorph's Castle.
+~
+0 0 1
+D0
+Path to Gaglemorph's Castle
+~
+~
+0 -1 126
+D1
+Black Road
+~
+~
+0 -1 114
+D2
+Rotten Home
+~
+~
+0 -1 124
+S
+#116
+Blackberry Patch~
+Oozing blackberries grow here.  You could probably eat a year's worth of
+blackberries in one sitting, they're so squished.  Black Road is back to
+the west.  Another blackberry patch is to the north.
+~
+0 0 1
+D0
+Blackberry Patch
+~
+~
+0 -1 117
+D3
+Black Road
+~
+~
+0 -1 107
+S
+#117
+Blackberry Patch~
+Another patch of blackberries is growing here.  The smell is driving your
+nostrils crazy.  It's almost as sickening as the midge's.
+Black Road is to the west, while blackberry patches are to the north and south.
+~
+0 0 1
+D0
+Blackberry Patch
+~
+~
+0 -1 118
+D2
+Blackberry Patch
+~
+~
+0 -1 116
+D3
+Black Road
+~
+~
+0 -1 108
+S
+#118
+Blackberry Patch~
+The northernmost of the blackberry patches grows here.  It looks even
+more disgusting than all the rest.  Just take a few; they'll never know.  Black
+Road is to the west.  A blackberry patch is to the south.
+~
+0 0 1
+D2
+Blackberry Patch
+~
+~
+0 -1 117
+D3
+Black Road
+~
+~
+0 -1 109
+S
+#119
+Arkadilis Midge's Home~
+You rip the roof of the home to get a good look inside.  You see
+many sick books.  The print is so small you couldn't even read it
+with a magnifying glass.  I wonder if Arkadilis Midge minds if you
+destroy his home?  Black Road is back to the south.
+~
+0 0 1
+D2
+Black Road
+~
+~
+0 -1 110
+S
+#120
+Markella Midge's Home~
+This home was badly built.  Of course, until you rip it apart you big meany
+you.  Tools are all over the place.  Too small for you to use.  Black Road is
+back to the west.
+~
+0 0 1
+D3
+Black Road
+~
+~
+0 -1 106
+S
+#121
+Horkanet Midge's Home~
+Horkanet is anything but strong.  So is his house.  It actually took you a 
+single try to destroy his house.  Better watch out -- he might be
+a little mad at you.  Black Road is back to the north.
+~
+0 0 1
+D0
+Black Road
+~
+~
+0 -1 111
+S
+#122
+Sella Midge's Home~
+Be vewy vewy quiet.  Sella Midge is probably in a daze.  You see so many
+beds you can't even tell if he is here.  Maybe you should quietly go back to
+Black Road to the east.
+~
+0 0 1
+D1
+Black Road
+~
+~
+0 -1 112
+S
+#123
+Gorgenna Midge's Home~
+This is Gorgena Midge's home.  He is pissed at you.  Of course, he is pissed
+at everyone.  So don't take it bad.  Maybe you'd better leave before he really
+gets mad.  Black Road to the east is your only salvation.
+~
+0 0 1
+D1
+Black Road
+~
+~
+0 -1 113
+S
+#124
+Jonsthenetic Midge's Home~
+You pull the top of his house and it explodes in your face.  That Jonsthenetic
+Midge, what a jerk.  You can hear his confusion as you wipe the ashes off
+your face.  You better get even.  Black Road is to the north.
+~
+0 0 1
+D0
+Black Road
+~
+~
+0 -1 115
+S
+#125
+Partha Midge's Home~
+It's the home of the leader of the midges.  Partha Midge has a terribly decorated
+home.  He takes pride in his work.  You could get to know him or just squash
+him.  If Partha Midge is not here he is probably at Midgette's putting the
+moves on her. Lord only knows why. A stone path lies to the north.
+~
+0 0 1
+D0
+Stone Path
+~
+door~
+0 107 113
+S
+#126
+Path to Gaglemorph's Castle~
+You are walking along a path to Gaglemorph's Castle to the North.
+Black Road lies to the south.
+~
+0 0 1
+D0
+Outside Gaglemorph's Castle
+~
+~
+0 -1 127
+D2
+Black Road
+~
+~
+0 -1 115
+S
+#127
+Outside Gaglemorph's Castle~
+You are standing outside Gaglemorph's Castle.  You can hear him screaming at
+Athana from inside.  You can also hear him praising those wretched midges.
+His Castle is to the north while Black Road is to the south.
+~
+0 0 1
+D0
+Gaglemorph's Castle
+~
+door~
+0 109 128
+D2
+Path to Gaglemorph's Castle
+~
+~
+0 -1 126
+S
+#128
+Gaglemorph's Castle~
+This is Gaglemorph's Castle.  His big black kettle is in the middle of the room.
+Where else would he put it?  The place has only one room.
+~
+0 0 1
+D2
+Outside Gaglemorph's Castle
+~
+door~
+0 109 127
+S
+#129
+Midgette's House~
+This house is conveniently next to Partha Midge.  Makes it easier for Partha
+Midge to sneak over at night.  I hope he uses protection.  I would hate to
+have little midges running around.  The only exit is to the east.
+~
+0 0 1
+D1
+Black Road
+~
+~
+0 -1 107
+S
+#0
+
+
+
+#SPECIALS
+M 101 spec_thief Load to: a midge
+M 102 spec_thief Load to: a midge
+M 103 spec_thief Load to: Arkadilis Midge
+M 104 spec_thief Load to: Markella Midge
+M 105 spec_thief Load to: Sella Midge
+M 106 spec_thief Load to: Horkanet Midge
+M 107 spec_thief Load to: Grogenna Midge
+M 108 spec_thief Load to: Jonsthenetic Midge
+M 109 spec_thief Load to: Midgette
+M 110 spec_cast_mage Load to: Partha Midge
+M 111 spec_cast_cleric Load to: Gaglemoph
+M 112 spec_poison Load to: Anthana
+S
+
+
+
+#RESETS
+O 0 108 0 109
+M 0 102 3 118
+G 0 100 0
+M 0 102 3 117
+G 0 100 0
+M 0 102 3 116
+G 0 100 0
+M 0 101 3 105
+M 0 101 3 110
+G 0 102 0
+M 0 101 3 111
+M 0 101 3 112
+G 0 102 0
+M 0 101 3 107
+M 0 101 3 108
+G 0 102 0
+M 0 101 3 109
+M 0 101 3 104
+G 0 102 0
+M 0 103 1 119
+E 0 101 0 6
+M 0 104 1 120
+E 0 103 0 16
+M 0 105 1 122
+M 0 106 1 121
+E 0 103 0 16
+M 0 107 1 123
+M 0 108 1 124
+M 0 109 1 129
+E 0 104 0 3
+G 0 107 0
+M 0 110 1 125
+G 0 105 0
+G 0 109 0
+M 0 111 1 128
+E 0 106 0 17
+M 0 112 1 128
+S
+
+
+
+#SHOPS
+0
+
+
+
+#$

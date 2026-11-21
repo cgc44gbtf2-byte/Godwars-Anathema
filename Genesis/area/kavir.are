@@ -1,0 +1,469 @@
+#AREADATA
+Name        KaVir   Odds and ends~
+Builders    None~
+VNUMs       30000 30050
+End
+
+
+
+#MOBILES
+#30001
+guardian demon~
+a guardian demon~
+A huge guardian demon stands here, radiating evil.
+~
+He glares at your and flexes his huge clawed hands.
+~
+17 0 0 S
+13 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#30006
+mount~
+a generic mount~
+A generic mount stands here, waiting to be ridden.
+~
+It looks like it would make a good mount...
+~
+17 0 0 S
+10 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#30007
+frog~
+a small green frog~
+A small green frog sits here.
+~
+It's small, green, and intelligent-looking.
+~
+17 552 0 S
+7 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#30008
+raven~
+a raven~
+A raven is flapping around here.
+~
+You notice that it is very intelligent-looking.
+~
+17 524840 0 S
+30 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#30009
+cat~
+a small black cat~
+A small black cat is curled up here.
+~
+It is very cute, and very intelligent-looking.
+~
+17 552 0 S
+22 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#30010
+dog~
+a small brown dog~
+A small brown dog is sitting here.
+~
+It is very cute, and very intelligent-looking.
+~
+17 552 0 S
+1 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#30011
+zombie lord~
+the Zombie Lord~
+The Zombie Lord is here.
+~
+He looks very evil, very intelligent, and very rotten.
+~
+17 552 0 S
+1489 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#30012
+eye eyeball~
+an eyeball~
+An eyeball is lying on the ground.
+~
+It stares right back at you!
+~
+17 552 0 S
+20 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#30013
+mole rat molerat~
+a naked mole rat~
+A naked mole rat scurries around on the floor.
+~
+It looks just like Furry.
+~
+17 552 0 S
+3 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#30014
+yak~
+a great hairy yak~
+A huge, hairy, stinking yak stands here.
+~
+It looks rather fearsome, and smells even worse.
+~
+81 0 0 S
+249 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#30015
+astral projection~
+an astral projection~
+The astral projection of someone is standing here.
+~
+You see a pale, translucent figure.
+~
+17 573992 0 S
+67 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#30016
+clone mirror image~
+a clone~
+The Mirror Image of someone is standing here.
+~
+You see nothing special.
+~
+17 552 0 S
+38 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#0
+
+
+
+#OBJECTS
+#30000
+soul blade~
+a soul blade~
+A soul blade lies here.~
+~
+5 0 8193
+0 10 20 4
+3 60 0
+A
+12 5
+A
+13 5
+A
+14 5
+A
+17 10
+A
+18 5
+A
+19 5
+Q
+$p starts pulsing with energy.~
+$p stops pulsing with energy.~
+You twist the pommel of your soul blade.~
+$p starts pulsing with energy.~
+$p stops pulsing with energy.~
+$n twists the pommel of $s soul blade.~
+50 86
+#30001
+shimmering portal~
+a shimmering portal~
+A shimmering portal floats in the air.~
+~
+27 0 0
+102 0 0 0
+1000 300 0
+#30007
+pool blood %s~
+a pool of blood~
+A pool of spilt blood lies here.~
+~
+25 64 0
+10 10 13 0
+5000 10 0
+#30010
+voodoo doll~
+a voodoo doll~
+A voodoo doll lies here.~
+~
+29 0 16385
+0 0 0 0
+5 100 0
+#30015
+elevator door~
+the elevator door~
+A small door stands against the wall.~
+~
+27 0 0
+30004 0 0 30003
+1000 300 0
+#30016
+elevator door~
+the elevator door~
+A small door stands against the wall.~
+~
+27 0 0
+30003 0 0 30004
+1000 300 0
+#30017
+elevator door~
+the elevator door~
+A small door stands against the wall.~
+~
+27 0 0
+30003 0 3 30005
+1000 300 0
+#30018
+elevator door~
+the elevator door~
+A small door stands against the wall.~
+~
+27 0 0
+30003 0 3 30006
+1000 300 0
+#30019
+elevator door~
+the elevator door~
+A small door stands against the wall.~
+~
+27 0 0
+30003 0 3 30007
+1000 300 0
+#30037
+protoplasm ball~
+a ball of protoplasm~
+A ball of protoplasm floats in the air.~
+~
+13 0 1
+0 0 0 0
+0 0 0
+#30039
+quest card~
+a quest card~
+A small silvery card lies on the floor.~
+~
+34 0 1
+0 0 0 0
+5 5 0
+#30040
+quest machine~
+the quest-making machine~
+A small machine sits on the floor.~
+~
+35 0 0
+0 0 0 0
+5 5 0
+#30041
+broken item~
+A broken item~
+A broken item~
+~
+5 0 1
+0 0 0 0
+0 0 0
+#30042
+ashes dust %s~
+a pile of ashes~
+A pile of ashes lie here.~
+~
+13 0 0
+0 0 0 0
+0 0 0
+#30043
+gate magical rift~
+a swirling rift of energy~
+A swirling rift of energy is floating above the ground here.~
+~
+28 0 0
+0 0 0 0
+1000 250 0
+#0
+
+
+
+#ROOMS
+#30001
+The Dark Crypt~
+You are standing within a small dark crypt.
+~
+0 12 0
+D4
+~
+~
+0 0 30328
+S
+#30002
+The Disconnection Room~
+This is the room where everyone goes just before they quit.  If you are a 
+mortal you should *NOT* be here, so please get out...NOW.
+~
+0 24588 1
+S
+#30003
+#0The Elevator#n~
+You are standing in a nice elevator. It has dark mahogany walls, with a nice grey
+marble floor. A sign over the door reads "#RSTAY OUT#n", while the small brass panel
+next to the door has 4 buttons. They are labeled:
+3rd: #rThe Fishtank#n
+2nd: #0Anchorhead to Malfeas#n
+1st: #0Carreau's room#n
+Ground floor: #rReceptionist#n
+~
+0 16396 7
+T
+|open*~
+~
+~
+all~
+512 0 0
+T
+|close*~
+~
+~
+all~
+1024 0 0
+T
+|ground*bottom*0*~
+~
+~
+all~
+2048 30004 0
+T
+|one*first*1*~
+~
+~
+all~
+2048 30005 0
+T
+|two*second*2*~
+~
+~
+all~
+2048 30006 0
+T
+|three*third*3*~
+~
+~
+all~
+2048 30007 0
+S
+#30004
+Ground floor~
+You are standing on the ground floor.
+~
+0 16396 7
+D0
+~
+~
+0 0 3001
+T
+|open*~
+~
+~
+all~
+512 0 0
+T
+|close*~
+~
+~
+all~
+1024 0 0
+S
+#30005
+#rC#0arreau's room#n~
+~
+0 16908 7
+T
+|open*~
+~
+~
+all~
+512 0 0
+T
+|close*~
+~
+~
+all~
+1024 0 0
+S
+#30006
+#0Anchorhead to Malfeas#n~
+The room you now stand in in is filled with a thick sulfurous smoke. The walls are made
+of green marble, pulsating veins bleeding from large slashin in the walls. The floor
+has a puddle of green goo in the middle of it, and a huge marble doorway leads east, but you
+can't see through it.
+~
+0 16396 8
+T
+|open*~
+~
+~
+all~
+512 0 0
+T
+|close*~
+~
+~
+all~
+1024 0 0
+S
+#30007
+#0The Fishtank~
+The room you are now floating in is filled with water, the glass
+walls allow you to see out over the world. Suddenly you notice that the water
+goes straight up to the ceiling, and there isn't any air. The fish start to gather
+around you, their scales shining in the sunlight.
+
+~
+0 24588 7
+T
+|open*~
+~
+~
+all~
+512 0 0
+T
+|close*~
+~
+~
+all~
+1024 0 0
+S
+#30008
+The object room~
+~
+0 12 1
+S
+#0
+
+
+
+#SPECIALS
+S
+
+
+
+#RESETS
+O 0 30015 0 30003
+O 0 30016 0 30004
+O 0 30017 0 30005
+O 0 30018 0 30006
+O 0 30019 0 30007
+O 0 30040 0 30001
+S
+
+
+
+#SHOPS
+0
+
+
+
+#$

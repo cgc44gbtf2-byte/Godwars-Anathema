@@ -1,0 +1,28 @@
+[Unit]
+Description=Godwars Anathema Discord health alerts
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+ExecStart=/usr/bin/python3 /opt/anathema/deploy/monitor.py --check
+StateDirectory=anathema-monitor
+StateDirectoryMode=0700
+UMask=0077
+TimeoutStartSec=45
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/var/lib/anathema-monitor
+

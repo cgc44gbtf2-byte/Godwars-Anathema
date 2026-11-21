@@ -1,0 +1,1425 @@
+#HELPS
+
+-1 SUMMARY~
+To access any files on this list, type 'help <name>'.  If you know of any 
+helpfiles we have that aren't linked or in need of updating, or wish to make 
+suggestions, leave a note on the personal board to Luto or the staff.
+
+ License Files -	Diku, Merc, Godwars, Godwars-history, Godwars-info.
+ Important Files -	Newbie, Rules, Disclaimer ...
+ Class Files - 		Class, Clan, Reqs, Leaders.
+ Miscellaneous Files -	Stats, Stances, Styles, Experience.
+ PK Files -		Pk, Death, Decapitate, Escape, Status, ...
+~
+
+-1 NEWBIE~
+#7#b#uREAD THIS.  IF YOU DONT YOUR IGNORANCE WILL GET YOU A SLAY.#n
+Welcome to Godwars: Anathema, developed from Genesis and the God Wars lineage.
+Created by LaWaylon (Luto). A few things for newcomers to note.
+
+* Read #Rhelp rules#n.  Ignorance is not an excuse.
+* Take a look at #Ghelp class#n and #Ghelp clan#n.
+* Read the #Cnote boards#n you will find useful information there.  If nothing else, 
+ read the #Cannounce board#n, or you will miss very important information.
+* Please read #Lhelp reqs#n for classing requirements.
+* There are monthly wipes of inactive characters.  Log at least once a month to
+ avoid deletion
+* Many things changed since we were last up.  Most importantly, stats.  Refer
+ to #Phelp stats#n for information on them.
+* You may want to look into #yhelp dirs#n to find directions to good exp areas.
+
+#7#b#u* No we are not looking for more imms and yes there are requirements.#n
+~
+ 
+-1 DIKU~
+.                    Original game idea, concept, and design:
+
+          Katja Nyboe               [Superwoman] (katz@freja.diku.dk)
+          Tom Madsen              [Stormbringer] (noop@freja.diku.dk)
+          Hans Henrik Staerfeldt           [God] (bombman@freja.diku.dk)
+          Michael Seifert                 [Papi] (seifert@freja.diku.dk)
+          Sebastian Hammer               [Quinn] (quinn@freja.diku.dk)
+
+                     Additional contributions from:
+
+Michael Curran  - the player title collection and additional locations.
+Ragnar Loenn    - the bulletin board.
+Bill Wisner     - for being the first to successfully port the game,
+                  uncovering several old bugs, uh, inconsistencies,
+                  in the process.
+
+And: Mads Haar and Stephan Dahl for additional locations.
+
+Developed at: DIKU -- The Department of Computer Science
+                      at the University of Copenhagen.
+~
+
+-1 MERC~
+[Note: this entry may not be removed or altered.  See our license.txt.]
+This mud is based on Merc 2.1, created by Furey, Hatchet, and Kahn.  Merc 2.1
+is available as Merc_21.tar.gz from ftp.tcp.com and ftp.math.okstate.edu.
+E-mail to 'merc-request@kpc.com' to join the merc mailing list.
+
+Thanks to ...
+  ... Diku Mud for starting it all.
+  ... The Free Software Foundation and DJ Delorie for kick-ass tools.
+  ... Copper Mud and Alfa Mud for releasing their code and worlds.
+  ... Aod of Generic for ... well, everything.  You're a hoopy frood, Aod.
+  ... Alander for many ideas and contributions.
+  ... John Brothers of Silly for permission to use Silly code and worlds.
+  ... Zrin for administering the mailing list.
+  ... Abaddon for proofreading our comm.c.
+  ... Hind, Quin, Vic, Diavolo, Oleg, Trienne, and others for porting help.
+  ... Diavolo, Grodyn, Morgenes, and others for code and bug fixes.
+  ... Raff, Doctor, VampLestat, Nirrad, Tyrst, PinkF, Chris, Glop for worlds.
+  ... the players and imps of Mud Dome, Final Mud, Mud Lite, Vego Mud, Rivers
+      of Mud, Ruhr Mud, and Mystic Realms for bug reports, ideas, new code,
+      and hours of enjoyment.
+
+Share and enjoy.
+~
+
+-1 GODWARS~
+----------------------------------------------------------------------
+God Wars was created by Richard Woolcock, aka KaVir.
+Thanks also go to the following people (in order of help given):
+
+...Zarkas, for teaching me how to mud properly.
+...Malice, for getting me into the implementor and coder side of things.
+...Haus, for inspiring me to create a mud without levels.
+...ShadoWeaver, for providing me with my first (and free) site.
+...Rotain, for helping with the code - and the debugging.
+...Calamar, for adding some nifty code that I still don't understand.
+...Stephen from ACK mud, for coding advise and suggestions.
+...Monochrome BBS, for supplying me with a decent free site.
+...Lucifur, for providing a USA mirror site for the USA players.
+...Shaddai, for a mirror site, code snippets and bug reports.
+...Arioch, for comments, suggestions, and help running the mud.
+...Tepic, for writing the web pages, and helping run the mud.
+...Pandora, for trying to bring some semblance of order to the mud.
+----------------------------------------------------------------------
+~
+
+-1 GODWARS-HISTORY~
+Around the end of 1994, I - Richard Woolcock (aka KaVir) - was helping 
+Ben Walding (aka Malice) write a mud called Eternal Conflict.  I supplied
+suggestions, whilst he did almost all of the coding.  In order to help 
+out with the code, I decided to download a copy of Merc 2.1 and 'have a 
+play' with it.  I taught myself how to code in C, but as a side affect I 
+created another mud - God Wars.  The mud was very primitive, but was also 
+quite fun to play on, so I spoke with a friend of mine and managed to get 
+a temporary site - just to show him what I had written.  The mud proved 
+popular, and was offered a permanent site elsewhere.  After about 6 months 
+work, one of the players (who called himself Joker) requested a copy of 
+the mud to help with his University project.  In return for his word that 
+the mud would be for personal use only, I agreed.  He broke his word, and 
+ran the mud as Vampire Wars, making practically no further changes to the 
+code.  A few months later, I began to jointly run a second version of God 
+Wars in the USA, because of the severe lag the American players suffered 
+from whilst playing on the UK based mud.  This mud began developing on its 
+own, until eventually the site owner and his coder fell out, and another
+version of God Wars was created.  In 1997 another copy of Godwars was stolen 
+and given out freely over the net.  Since then I began developing the mud in
+a very different direction - stopping only briefly to create God Wars
+Deluxe, which unfortunately was also stolen and eventually leaked out (thus
+I have now chosen to release it).
+~
+
+-1 GODWARS-INFO~
+This is the God Wars Deluxe code, a cut-down, smoothed out version of 
+Dark City.  Look out for other muds in the series!  God Wars (1995 
+version), God Wars (1996 version), Dark City (my evolved God Wars 
+derivative) and Last City - my current mud, which (at the moment of 
+writing this) is not QUITE ready to play, but is getting close.  
+There are also a number of other God Wars derivatives which were not 
+written by me - for example Sage's "Lords of War" and Aronacus' "Planes 
+of Hades", to name but two.
+
+There may well be other derivatives that I don't know about yet.  Most of
+the current ones come from the Leaked God Wars, although I suspect there
+will soon be some based on the God Wars Deluxe.  Unfortunately the original
+1996 copy of the code was lost (I didn't keep copies of the mud in it's
+different stages - I just kept working on it until one day I decided it
+needed a new name and called it Dark City).  Last City got another rename
+because a movie came out called Dark City and I didn't want people getting
+confused about the theme.
+
+For more information, check out the GODWARS-TREE help file.
+~
+
+-1 GODWARS-TREE~
+This is the official God Wars family tree.
+
+                                                 God Wars (1995)*
+                                                        |
+                                             -----------------------
+                                             |                     |
+                                      God Wars (1996)*        Vampire Wars
+                                             |
+                             ---------------------------------
+                             |                               |
+                 Dark City (pre-wilderness)*          Leaked God Wars
+                             |                               |
+               -----------------------------           -------------
+               |                           |           |           |
+   Dark City (post-wilderness)*    God Wars Deluxe*   LoW        others
+               |                                       |
+           Last City*                            -------------
+                                                 |           |
+                                                PoH        others
+
+* Indicates the version was written by KaVir.
+
+For more information, check out the GODWARS-INFO help file.
+~
+
+
+-1 WIZLIST~
+#L-------------------------------------------------------------------#n
+                            #RA N A T H E M A#n
+#L-------------------------------------------------------------------#n
+Owner / development:
+#R LaWaylon (Luto)#n
+
+Original developers are credited in the greeting and help credits.
+#L-------------------------------------------------------------------#n
+~
+
+-1 GREETING~
+.
+                                   Welcome to
+
+                                #rGodwars#n: #RAnathema#n
+
+                            Created by LaWaylon (Luto)
+             Copyright (c) 2026 LaWaylon (Luto) - Anathema modifications
+
+                Based on Merc 2.1 code by Furey, Hatchet and Kahn
+          Diku Mud was created by Hans Henrick Staerfeldt, Kataja Nyboe,
+                Tom Madsen, Michael Seifert, and Sebastian Hammer
+                          God Wars was created by KaVir
+
+                           Based on the Ethereal Mists
+             coded by Xentoth, Mistif, Tantric, Aristoi, and Maizoon
+
+                         Original Genesis development: Akuma
+
+What do you wish carved upon your tombstone: ~
+
+-1 MOTD~
+#7 Welcome to Godwars: Anathema.#n
+Created by LaWaylon (Luto)
+Copyright (c) 2026 LaWaylon (Luto) - Anathema modifications
+
+Read help rules and help newbie before playing.
+Useful updates: help class, help stances, help styles, help teachdisc,
+help thaumaturgy and help counter.
+For game questions or bug reports, contact Luto or leave a staff note.
+~
+
+-1 RULES~
+Should you see or be involved in any violation of these rules, speak with
+the nearest immortal.  Failing that, direct a note to Luto who will deal
+with the problem at the soonest possible time.
+
+1) No fighting without a PK flag without mutual consent.
+2) Respect the Staff.
+3) Respect other players.
+4) No multiplaying.
+5) Don't be an asshole.
+6) No botting of any kind.
+7) No intentional dropping of link.
+
+Also see 'help disclaimer'.
+For more information refer to help pk, multiplay, asshole, botting, and link-dropping.
+~
+
+-1 DISCLAIMER~
+By continuing to play Anathema you acknowledge that:
+
+(1)  you are willing to abide by the decisions of the Immortals concerning all
+     issues involved in the game, and
+(2)  conversation and situations may arise during the course of play that may 
+     not be suitable for young children.
+
+By these acknowledgments you hereby save and accept Anathema and its 
+Administrators from any and all liability that may arise during gameplay.
+
+You also agree that failure to abide by Immortal decisions may result in the 
+complete termination of your playing priveledges.
+
+By continuing to play here,  you also imply that you are 18 years of age or 
+older, Or have parental consent to play here.
+~
+
+-1 'Pk Flag' Pkme~
+PK is the basis of the mud.  Once you have been flagged PK,
+you give up all rights to complain about casual PK not in
+violation of the rules.  PK which for some reason violates other rules
+will still be dealt with accordingly.
+~
+
+-1 Multiplaying~
+Multiplay is the act of using one of your characters to in any way
+benefit another one of your characters.  Dropping link to give eq/qp,
+using other people to transfer eq/qp, andusing one character to "avenge"
+the death of another one of your characters are all examples of multiplay.
+On the basic level, any interaction between characters controlled by the
+same player is multiplay.  Also defined under multiplay is the sharing
+of characters, and having two people logged in from the same IP.
+You character is your own, you may not sell it, let a friend use it, or
+give it away, such acts are sharing of characters.  Two logged players
+with the same IP, even should they be different people, is also multiplay.
+~
+
+-1 Botting~
+Botting is sending commands to the mud while not at the computer and paying
+attention.  This means through triggers, macros, tickers, or even spammed
+commands.
+~
+
+-1 'Link Dropping' link-dropping~
+Link Dropping is the act of closing your connection during combat to avoid
+being killed or decapitated. Although sometimes people accidentily drop link
+during combat, if you do it repeatedly you will be punished.
+~
+
+-1 Asshole Pbashing spamkilling permamorting~
+Being an asshole includes, but is not limited to, Pbashing, Spam-killing, and
+Perma-morting.  Pbashing is insulting other players.  Spam-killing is the
+repeated killing of another player.  Perma-morting is morting other players
+for long periods of time.  Any form of disrespect and abuse fall into this
+category as well.
+~
+
+
+
+0 Experience~
+Experience is earned by killing mobs and is used to improve your character
+through the use of the train command.  Experience from mobs is based on their
+level and relative strength.  When in a group of two or more, experience is 
+split between the group members by the following method.
+
+XP * 2.5, XP / members.
+
+So, a group with 2 members gets slightly better experience, while a group with
+a lot of members will get a good bit less, but, in theory, if everyone is
+participating every member 'should' be improving the experience output over
+time.
+
+Related Helps: Expmod, Stats, and Train.
+~
+
+
+0 Expmod~
+Expmod is an experience multiplier that Imms can turn on if they feel that the
+players deserve it.  Expmods range in % from 0-250, and can last for up to 300
+minutes, or forever.  Example: if a 200% expmod is active, and you kill a mob
+worth 500 exp, you will earn 1000 exp instead.  Random and Degrading expmods
+can also be activated.  Random will give from 0% to 400% for each kill, and
+Degrading expmod will drop by 25% every 15 minutes until it reaches 100%.
+Expmod also affects Classpoint gain.  Also, if 10 or more players are logged
+on, then there is an additional exp bonus.  Both of these bonuses can be seen
+in the who screen if active.
+
+Related Helps: Experience.
+~
+
+
+0 Stats~
+The stats are Str, Dex, Con, Int, and Wis.  The max you can train in a stat is 
+7 + class reqs.  The XP cost to improve a stat is 10000 * level * level, * 2 if 
+over 5.
+
+Str: Improves damage, Raises damcap.
+Dex: Lowers speed, Raises avoid/break.
+Con: Improves HP regen, Raises soak.
+Int: Improves spell power.
+Wis: Improves Mana regen, Improves saves.
+
+Regen:      Fighting = 50 * stat, Standing = 150 * stat, Resting = 250 * stat,
+            Meditating = 350 * stat.  No PK Fight Timer *= (1 + max (hp|mana) / 20000).
+HP Regen:   Monk Rejuvenation, Werewolf, Ninja Orimasu *= 1.5, Vampire Blood *= 2.
+Mana Regen: Monk Rejuvenation, Mage, Sorcerer *= 1.5.
+
+Related Helps: Experience, Reqs, and Train.
+~
+
+
+0 Train~
+Syntax: train <str/int/wis/dex/con>
+Syntax: train <primal/hp/mana>
+
+Train is used to spend experience on your attributes to make them better.  When
+starting out, all your attributes are at 1, and your hp and mana are at 10000.
+Hp/mana maxes at 100000 and costs your current amount/10 for each point.
+Attribute maxes and costs can be found in help stats.
+
+Related Helps: Experience, and Stats.
+~
+
+
+0 Stances~
+Syntax: stance <stance>
+
+In combat, the stance of the fighter plays a very important role; you can't 
+just stand there and exchange blow for blow unless you are very confident of 
+your ability.  Each fighting stance has advantage and disadvantages, the basic 
+outline of which follows:
+
+Normal Stances:
+BULL: A low aggressive stance.           Bonus: Damage.
+CRAB: A low, defensive fighting stance.  Bonus: Soak.
+MONGOOSE: A light-footed stance.         Bonus: Avoid
+VIPER: A very quick stance.              Bonus: Speed.
+CRANE: A wide, sweeping stance.          Bonus: Break.
+
+Advanced Stances:
+TIGER: An aggressive, quick stance.      Bonuses: Break, Damage.
+ Requires: Bull, Crane.                  Negates: Speed.
+DRAGON: A powerful, balanced stance.     Bonuses: Damage, Soak.
+ Requires: Crab, Bull.                   Negates: Break.
+SWALLOW: An extremely defensive stance.  Bonuses: Soak, Avoid.
+ Requires: Crab, Mongoose.               Negates: Damage.
+MANTIS: A quick, light-footed stance.    Bonuses: Avoid, Speed.
+ Requires: Viper, Mongoose.              Negates: Soak.
+MONKEY: A fast, defense-breaking stance. Bonuses: Speed, Break.
+ Requires: Viper, Crane.                 Negates: Avoid.
+
+Related Helps: Style and Autostance.
+~
+
+0 Autostance~
+Syntax: autostance <stance>
+
+By using autostance you will drop into your set stance automatically
+when you attack something or get attacked by something. This is an
+invaluable command because it allows you eliminate the need to type
+'stance <stance>' every time you initiate combat.
+
+Related Helps: Stance.
+~
+
+0 Style~
+Each style confers a different bonus as listed below.
+
+Unarmed:    - Adds 20% of your skill to avoid and 5% of your skill to break.
+            - Confers a chance of an extra attack at 101+.
+            - Adds 5% more of your skill to avoid even when not using Unarmed
+               style.
+ How to use - Wear no weapons or armor in your hands.
+
+Natural:    - Adds 5% of your skill to avoid and 10% of your skill to break.
+            - Adds extra damage to all attacks.
+ How to use - Wear no weapons or armor in your hands, and use a form with claws.
+               *Used instead of unarmed.  Only for classes with NATURAL claws*
+
+One-handed: - Adds 10% of your skill to avoid and 10% of your skill to break.
+            - Confers a chance of an extra attack at 1+ and 101+.
+ How to use - Wear a weapon in your main hand, and any non-armor in the other.
+
+Shielded:   - Adds 10% of your skill to avoid and 10% of your skill to break.
+            - Reduces damage taken.
+ How to use - Wear armor in your offhand.
+
+Two-handed: - Adds 5% of your skill to avoid and 20% of your skill to break.
+            - Increases damage dealt by weapon attacks.
+ How to use - Wear a weapon in your main hand, and nothing in the other, then
+               type 'grip'.
+
+Two weapon: - Adds 10% of your skill to break.
+            - Confers a chance of an extra main hand attack at 51+ and 151+.
+            - Confers a chance of an offhand attack at 1+ and 101+.
+ How to use - Wear a weapon in each hand. *Only usable by Drow and Ninja*
+
+Related Helps: Style Table, and Stances.
+~
+
+0 'Style Table' 'Weapon Table'~
+Different classes have different maxes in each Weapon and Style as listed below.
+
+/--------v------v------v------v------v------v------v------v------v------v------v------\
+| Skills | Norm | Drag | Drow | Elem | High | Mage | Monk | Ninj | Sorc | Vamp | Wolf |
+>--------+------+------+------+------+------+------+------+------+------+------+------<
+|Unarmed | 100  |      |      |      |      |      | 200  |      |      |      |      |
+|Slash   | 100  |      | 200  |      | 150  |      |      | 150  |      |      | 150  |
+|Pierce  | 100  |      |      |      |      |      |      | 150  |      | 150  |      |
+|Blunt   | 100  |      |      |      |      |      |      |      |      |      |      |
+>--------+------+------+------+------+------+------+------+------+------+------+------<
+| Styles | Norm | Drag | Drow | Elem | High | Mage | Monk | Ninj | Sorc | Vamp | Wolf |
+>--------+------+------+------+------+------+------+------+------+------+------+------<
+|Unarmed | 100  |      |      |      |      |      | 200  | 150  |      |      |      |
+|Natural | N/A  | 150  |      |      |      |      |      |      |      | 100* | 100  |
+|1 Hand  | 100  |      |      |      | 200  |      |      |      | 150  |      |      |
+|Shield  | 100  |      |      | 150  | 200  |      |      |      |      |      |      |
+|2 Hand  | 100  |      |      |      | 200  |      |      |      |      |      |      |
+|2 Weapon| N/A  |      | 150  |      |      |      |      | 100  |      |      |      |
+\--------^------^------^------^------^------^------^------^------^------^------^------/
+
+Related Helps: Style.
+~
+
+
+-1 PARADOX~
+If you decapitate someone below your status range, you will be paradoxed. What 
+this means is that you will be left at mortal recall, mortally wounded, tied up, 
+gagged, blindfolded and given a large lag time so you will not be able to get 
+away right away. The lesson? Don't decap people outside your status range. ;)
+~
+
+-1 CLAIM CALL GIFT LOCATE~ 
+Syntax: claim <object>
+Syntax: call <object>, call all
+Syntax: gift <object> <player>
+Syntax: locate
+
+By claiming an object, that object becomes your personal property.  Using the 'locate' command
+you can find what items currently belong to you and where they are in the mud.  If you are not 
+carrying the item, you can get it back by calling it with the 'call' command.  You can change
+the ownership of your own items by use of the 'gift' command.
+~
+
+
+0 Decapitate~
+Do this to another avatar when they are mortally wounded, and you will 
+suck out some of their lifeforce (represented by 1000exp), making them 
+mortal again.  You may also loot their corpse, of course, and if you are 
+hungry you can even eat their head ;)
+~
+
+
+-1 DEATH~
+When your character dies, you are reincarnated back at the Altar of the Temple
+of Midgaard.  Your corpse is left behind in the room where you were killed,
+together with all of your equipment.  Your gold stays with you.
+
+Any spells which were affecting you are canceled by death.
+
+Following and groups are not affected by death.
+
+Corpses decay after time, and the objects inside corpses decay with them.
+Player corpses last *roughly* 30 hours of game time (15 minutes of real time).
+~
+
+
+-1 ESCAPE~
+This command allows you to transport to the temple of midgaard when 
+mortally wounded.  Unfortunately, it also reduces your mana to 0, and
+informs everyone else on the mud that you are lying defenseless at
+recall...so be careful how you use it.
+~
+
+-1 QUEST TOKEN~
+Syntax: quest <field> <value>
+Syntax: token <value>
+
+QUEST will allow you to spend any quest points you might have.  For a 
+list of the cost (in quest points), type 'quest'.
+
+#0To quest armor/weapons/etc. You will need to complete the following.
+
+#0To create an item: #yquest create (type)
+#0To name the item: #yquest ball name (new name)
+#0To change the short description: #yquest (item name) short (description)
+#0To change the long description: #yquest (item name) long (descrption)#n
+
+You can add various affects and such to the item. Those are easily added
+using #yquest (item name) (quest field) (value).#n
+
+TOKEN will allow you to create a quest token, with the value of the token 
+set to the value specified.  The tokens value must be within 1 and 5000, 
+and it cannot be greater than the number of quest points you currently 
+have.
+
+For information on the QUEST spell, type 'help questspell'.
+New Update -- (Not really new) AC is now positive instead of Negative. Do 
+quest your armor to reflect this.  Thanks.
+~
+
+-1 QUESTCARD COMPLETE RECHARGE~
+Syntax: complete card
+Syntax: complete card <object>
+Syntax: recharge card machine
+
+A quest card requires 4 objects to complete.  To find out what 4 objects 
+you need, type 'complete card'.  When you find these items, you should 
+type 'complete card <object>'.  Once you have completed all 4 items on 
+the card you will be told that you have completed the card.  Then you 
+should go and find the dark crypt, where there is a machine, and type 
+'recharge card machine'.  You will receive a quest token reward, which 
+you should eat, and the card will be recharged with 4 new items to find.
+
+HINT:  Vallandar's tomb can be found by going 2 south, 7 east, 2 north 
+from recall.  Once you have found that area, you should look for the 
+guardian and solve his riddle, enter the portal he creates, and you'll be 
+in the dark crypt.
+~
+
+
+-1 STATUS~
+This represents the 'danger' of the player.  You only have a status if 
+you are level 3.  It grants no extra powers, but is a good measure of 
+how deadly that player is in combat.  Each time you decapitate an 
+Immortal+ (or an Avatar if you are also an Avatar) your status goes up by 
+one and their status goes down by one (to a minimum of zero).  Remember,
+if your status is Immortal or above you gain nothing for decapitating an
+Avatar (except a paradox and an enemy).
+
+See also help on 'statustable'.
+~
+
+-1 STATUSTABLE~
+ Basic Status:              Mage Status:              Ninja Status:
+--------------------------------------------------------------------------------
+     0  = Mortal                0  = Sleeper              0  = Shinobi
+ 1 - 4  = Avatar            1 - 4  = Unschooled       1 - 4  = Genin
+ 5 - 9  = Godling           5 - 9  = Novice           5 - 9  = Chunin
+10 - 14 = Demigod          10 - 14 = Disciplined     10 - 14 = Ninja
+15 - 19 = Lesser God       15 - 19 = Wise            15 - 19 = Shihai
+20 - 24 = Greater God      20 - 24 = Enlightened     20 - 24 = Sensei
+25 +    = Supreme God      25 +    = Transcendent    25 +    = Kami
+
+ Garou Status:              Vampire Status:           Drow Status:
+--------------------------------------------------------------------------------
+     0  = Cub                   0  = Thin-blood           0  = Abbil
+ 1 - 4  = Cliath            1 - 4  = Neonate          1 - 4  = Sargtlin
+ 5 - 9  = Fostern           5 - 9  = Ancilla          5 - 9  = Malla
+10 - 14 = Adren            10 - 14 = Elder           10 - 14 = Yathtallar
+15 - 19 = Athro            15 - 19 = Methuselah      15 - 19 = Ilharess
+20 - 24 = Elder            20 - 24 = Antediluvian    20 - 24 = Ultrin
+25 +    = Chieftan         25 +    = Caine           25 +    = Quarlsharess
+
+ Highlander Status:         Elementalist Status:      Monk Status:
+--------------------------------------------------------------------------------
+     0  = Avatar                0  = Sleeper              0  = Believer
+ 1 - 4  = Swordsman         1 - 4  = Student          1 - 4  = Faithful
+ 5 - 9  = Bladesmaster      5 - 9  = Apprentice       5 - 9  = Devoted
+10 - 14 = Ancient          10 - 14 = Learned         10 - 14 = True Believer
+15 - 19 = Legendary        15 - 19 = Master          15 - 19 = Fanatis
+20 - 24 = Mythical         20 - 24 = Grand Master    20 - 24 = Prophet
+25 +    = Divine Master    25 +    = True Master     25 +    = Saint
+
+ Sorcerer Status:
+--------------------------------------------------------------------------------
+     0  = Wild Talent
+ 1 - 4  = Apprentice
+ 5 - 9  = Adept
+10 - 14 = Mystic
+15 - 19 = Sorcerer
+20 - 24 = Conjurer
+25 +    = Grand Sorcerer
+~
+
+-1 SKILL~
+Syntax: skill | skill <player>
+
+This shows the target player's skill with the weapon they are currently 
+wielding and the stance they are in (if it's a specialised stance).
+
+Weapon skill				 Stance skill
+
+ 1) Totally unskilled.			 1) Totally unskilled.
+ 2) Slightly skilled.			 2) An apprentice.
+ 3) Reasonable.				 3) A trainee.
+ 4) Fairly competent.			 4) A student.
+ 5) Highly skilled.			 5) Fairly experienced.
+ 6) Very dangerous.			 6) Well trained.
+ 7) Extremely deadly.			 7) Highly skilled.
+ 8) An expert.				 8) An expert.
+ 9) A master.				 9) A master.
+10) A grandmaster.			10) A grandmaster.
+
+Note that these are only rough estimates; one master might well be 
+slightly more skilled than another master, and so on.
+
+Note that highlanders get higher in weapon skills than normal people. 
+Their last level is supremely skilled.
+~
+
+-1 SKILLS~
+Here's a list of useful skills and such you may need.
+
+Peek                   Pick                   Sneak
+Berserk                Hurl                   Kick
+
+For a list of spells, type spell.
+~             
+
+-1 HOME~
+To set your recall point, enter the desired room and type 'home here'.  
+From that point on you will recall to that point rather than the Temple 
+of Maraden (although you still go to the Templar Altar if you die).
+
+A home cannot be a safe room.
+~
+
+-1 TICK~
+Many of the game actions are based upon interval timers, including combat,
+most autonomous monster actions, hp/mana regeneration, spell duration,
+weather, and area resetting.
+
+Of these timers, the hp/mana regeneration timer is popularly called the'tick'.
+Ticks on this mud last 60 seconds.
+
+Area resetting happens roughly every 2 minutes if no one is in the area; less
+often (5 minutes) if some one is.  Also note that objects lying on the ground
+will not be regenerated if anyone is in the area when it resets.
+~
+
+-1 !~
+Syntax: !
+
+! repeats the last command you typed.
+~
+
+-1 NORTH SOUTH EAST WEST UP DOWN~
+Syntax: north
+Syntax: south
+Syntax: east
+Syntax: west
+Syntax: up
+Syntax: down
+
+Use these commands to walk in a particular direction.
+~
+
+-1 CAST~
+Syntax: cast <spell> <target>
+
+Before you can cast a spell, you have to practice it.  The more you practice,
+the higher chance you have of success when casting.  Casting spells costs mana.
+The mana cost decreases as your magical ability increases.
+
+The <target> is optional.  Many spells which need targets will use an
+appropriate default target, especially during combat.
+
+If the spell name is more than one word, then you must quote the spell name.
+Example: cast 'cure critic' frag.  Quoting is optional for single-word spells.
+You can abbreviate the spell name.
+
+When you cast an offensive spell, the victim usually gets a saving throw.
+The effect of the spell is reduced or eliminated if the victim makes the
+saving throw successfully.
+
+See also the help sections for individual spells.
+~
+
+-1 EXITS~
+Syntax: exits
+
+Tells you the visible exits of the room you are in.  Not all exits are visible.
+You can use the 'bump' technique to find hidden exits.  (Try to walk in a
+certain direction and see what you bump into).
+~
+
+-1 DROP GET GIVE PUT TAKE~
+Syntax: drop <object>
+Syntax: drop <amount> coins
+Syntax: get  <object>
+Syntax: get  <object> <container>
+Syntax: give <object> <character>
+Syntax: give <amount> coins <character>
+Syntax: put  <object> <container>
+
+DROP drops an object, or some coins, on the ground.
+
+GET gets an object, either lying on the ground, or from a container, or even
+from a corpse.  TAKE is a synonym for get.
+
+GIVE gives an object, or some coins, to another character.
+
+PUT puts an object into a container.
+
+DROP, GET and PUT understand the object names 'ALL' for all objects and
+'ALL.object' for all objects with the same name.
+~
+
+-1 EQUIPMENT INVENTORY~
+Syntax: equipment
+Syntax: inventory
+
+EQUIPMENT lists your equipment (armor, weapons, and held items).
+INVENTORY lists your inventory.
+~
+
+
+-1 BACKSTAB BERSERK BS DISARM KICK PUNCH KILL~
+Syntax: backstab <character>
+Syntax: berserk
+Syntax: disarm
+Syntax: kick
+Syntax: punch    <character>
+Syntax: kill     <character>
+
+KILL starts a fight, and, hopefully, kills something.  BACKSTAB is another way
+to start a fight, used by thieves.  BS is a synonym for BACKSTAB.
+
+BERSERK will make you strike out at every creature in the room.  It will not
+hit players.
+DISARM is an auxiliary fighting command to disarm your opponent.  Similarly,
+KICK will inflict more damage during combat by kicking.
+PUNCH will inflict a small amount of damage, and stun your opponent for a 
+short period of time.  It also has a chance of breaking your opponents 
+nose or jaw.
+
+In order to BACKSTAB, DISARM, KICK or PUNCH successfully, you must practice
+the appropriate skill.
+~
+
+-1 ANSI~
+Syntax: ansi
+
+This will show things in colour.  Spells will appear in their appropriate 
+colour, and important messages will be highlighted.  Your exp (or opponents
+condition if you're fighting), hp, mana and move are shown in scaled colour.
+Scaled colour is represented as follows:
+
+Cyan   : Maximum.
+Yellow : 75% to just below maximum.
+Green  : 50% to just below 75%
+Blue   : 25% to just below 50%
+Red    : Below 25%
+
+ANSI colour can be toggled on and off with the 'ansi' or 'config' commands.
+
+~
+
+-1 COLOR~
+Syntax: say ##rHello.
+        You say, '#rHello.#n'.
+
+You can now have colored messages, title, etc. To do so you must press the
+special character known as the pound sign (##). Use the pound sign in
+conjunction with the special letter code to make colored messages. Below
+is the list of letters and their respective colors.
+
+Bright Colors   / Dark Colors
+#BBlack #n  ##B  ##0  /  ##b  #b  Grey#n
+#RRed   #n  ##R  ##1  /  ##r  #r   Red#n
+#GGreen #n  ##G  ##2  /  ##g  #g Green#n
+#yYellow#n  ##y  ##3  /  ##o  #oOrange#n
+#LBlue  #n  ##L  ##4  /  ##l  #l  Blue#n
+#PPurple#n  ##P  ##5  /  ##p  #pPurple#n
+#CCyan  #n  ##C  ##6  /  ##c  #c  Cyan#n
+#WWhite #n  ##W  ##7  /  ##n  #n Reset#n
+
+Text Modifiers
+#sR#sa#sn#sd#so#sm#n  ##s
+#tBright#n  ##t
+#dDark#n    ##d
+#iItalic#n  ##i
+#uUnderline#n ##u
+#hHighlight#n ##h
+
+Not all of these will work on all mudclients.  zMud and gMud seem to support
+all of them.  If you use these modifiers, don't expect everyone to be able
+to see them right(or at all).
+~
+
+-1 HURL~
+Syntax: hurl <name>
+Syntax: hurl <name> <direction>
+
+This ability allows you to hurl the target into walls, through exits, or 
+through doors.  Hurling someone through an exit does a little damage.  
+Hurling them into walls does twice as much, and hurling them through 
+doors does three times as much.  If you don't specify a direction to hurl 
+the target, it will be random (north, south, east or west).  You cannot 
+hurl someone who is already injured.
+~
+
+-1 SCAN SPY THROW~
+Syntax: scan
+Syntax: spy   <direction>
+Syntax: throw <direction> <target>
+
+SCAN allows you to see all the mobs/players within 1 room of you.
+
+SPY allows you to see all the mobs/players within 3 rooms in a specified 
+direction.
+
+THROW allows you to hurl an object you are holding (in your right hand, 
+or if that's empty left hand) to a target mob/player in a specified 
+direction.  The object can be throw up to 3 rooms.  If it fails to reach 
+the target by that time it will land on the floor.
+
+For information on the SCAN spell, type 'help scanspell'.
+~
+
+0 FLEE RESCUE~
+Syntax: flee
+Syntax: rescue   <character>
+
+Once you start a fight, you can't just walk away from it.  If the fight
+is not going well, you can attempt to FLEE, or another character can
+RESCUE you.  (You can also RECALL, but this is less likely to work,
+and costs more experience points, then fleeing).
+
+If you lose your link during a fight, then your character will keep
+fighting, and will attempt to RECALL from time to time.  Your chances
+of making the recall are reduced, and you will lose much more experience.
+
+In order to RESCUE successfully, you must practice the appropriate skill.
+~
+
+0 EXAMINE LOOK~
+Syntax: look
+Syntax: look    <object>
+Syntax: look    <character>
+Syntax: look    <direction>
+Syntax: look    <keyword>
+Syntax: look in <container>
+Syntax: look in <corpse>
+Syntax: examine <container>
+Syntax: examine <corpse>
+
+LOOK looks at something and sees what you can see.
+
+EXAMINE is short for 'LOOK container' followed by 'LOOK IN container'.
+~
+
+0 ORDER~
+Syntax: order <character> command
+Syntax: order all command
+
+ORDER orders one or all of your charmed followers (including pets) to
+perform any command.  The command may have arguments.  You are responsible
+for the actions of your followers, and others who attack your followers
+will incur the same penalty as if they attacked you directly.
+
+Most charmed creatures lose their aggresive nature (while charmed).
+
+If your charmed creature engages in combat, that will break the charm.
+~
+
+0 REST SLEEP STAND WAKE~
+Syntax: rest
+Syntax: sleep
+Syntax: stand
+Syntax: wake
+
+These commands change your position.  When you REST or SLEEP, you 
+regenerate hit points, mana points, and movement points faster.
+However, you are more vulnerable to attack, and if you SLEEP,
+you won't hear many things happen.
+
+Use STAND or WAKE to come back to a standing position.  You can
+also WAKE other sleeping characters.
+
+For info on the sleep spell, type: 'help sleepspell'.
+~
+
+0 GTELL ; REPLY SAY TELL~
+Syntax: gtell <message>
+Syntax: say   <message>
+Syntax: tell  <character> <message>
+
+All of these commands send messages to other players.  GTELL sends a message to
+all of the characters in your group, wherever they are, even if they are
+sleeping or stunned or dying.  ';' is a synonym for GTELL.
+
+SAY sends a message to all awake players in your room.  The single quote '''
+is a synonym for SAY.
+
+TELL sends a message to one awake player anywhere in the world.
+
+REPLY sends a message to the last player who sent you a TELL.  REPLY will work
+even if you can't see the player, and without revealing their identity.  This
+is handy for talking to invisible or switched immortal players.
+~
+
+0 NOTE 'NOTE WRITE' 'NOTE READ' BOARD 'NOTE SYSTEM' BOARDS~
+Syntax:
+
+board [number|name]                     Shows or changes board.
+note                                    Reads next note.
+note read [number]                      Reads a certain note.
+note remove <number>                    Removes a note written by you.
+note list [number]                      Shows up to number notes.
+note write                              Posts a note.
+note catchup                            Marks all notes in this board
+read.
+
+These commands are used for the new note system. Instead of just one board,
+there are several, each with its special purpose.
+
+Changing between the boards is accomplished using the BOARD command. BOARD
+without any arguments gives you a list of all boards together with number of
+unread message. To change, type BOARD <number> or BOARD <name of the board>.
+
+To read next unread note, type NOTE. To read a note with a specified number,
+type NOTE READ <number>. Typing NOTE while in a board with no unread notes
+shifts you to the next board. Note that unlike the standard note system, a
+note has the same number in NOTE LIST and NOTE READ.
+
+Posting a message is as simple as writing NOTE WRITE. You will be moved
+into interactive mode, where all you see are prompts for the fields like
+To:, From: etc. You will be automatically put AFK while writing a note.
+
+To see the list of the notes in the current board, type NOTE LIST. Typing
+NOTE LIST <number> will list only <number> of the last notes in the area.
+
+You can remove your own note by using NOTE REMOVE <number>. Implementors may
+remove other people's notes. Implementors can also select how many days
+their note is kept before being purged. Purging happens automatically at
+bootup. Purged notes are not deleted, but saved into a file.
+
+To let only immortals see your note, address it to "imm". To let players of
+a specific level and above, address it to that level (no other recipients may
+appear in that case).
+
+This board system was created by Erwin S. Andreasen, erwin@pip.dknet.dk, aka
+Phunk/Drylock and is freely available. The general outlook was based on
+Mystic Adventure's note system (mud.gel.ulaval.ca 4000).
+~
+
+0 CHAT . MUSIC QUESTION ANSWER SHOUT YELL~
+Syntax: chat     <message>
+Syntax: music    <message>
+Syntax: question <message>
+Syntax: answer   <message>
+Syntax: shout    <message>
+Syntax: yell     <message>
+
+These commands send messages through communication channels to other players.
+
+SHOUT sends a message to all awake players in the world.  To curb excessive
+shouting, SHOUT imposes a three-second delay on the shouter.
+
+CHAT, MUSIC, and QUESTION and ANSWER also send messages to all
+interested players.  '.' is a synonym for CHAT.  The QUESTION and ANSWER
+commands both use the same 'question' channel
+
+YELL sends a message to all awake players within your area.
+
+You can use the CHANNELS command to hear, or not hear, any of these channels.
+~
+
+0 EMOTE , POSE SOCIAL~
+Syntax: emote <action>
+Syntax: pose
+
+EMOTE is used to express emotions or actions.  Besides EMOTE, there are
+several dozen built-in social commands, such as CACKLE, HUG, and THANK.
+
+POSE is a variant of EMOTE.
+~
+
+0 HOLD REMOVE WEAR WIELD~
+Syntax: hold   <object>
+Syntax: remove <object>
+Syntax: wear   <object>
+Syntax: wear   all
+Syntax: wield  <object>
+
+Three of these commands will take an object from your inventory and start using
+it as equipment.  HOLD is for light sources, wands, and staves.  WEAR is for
+armor.  WIELD is for weapons.
+
+WEAR ALL will attempt to HOLD, WEAR, or WIELD each suitable item in your
+inventory.
+
+You may not be able to HOLD, WEAR, or WIELD an item if its alignment does not
+match yours, if it is too heavy for you, or if you are not experienced enough
+to use it properly.
+
+REMOVE will take any object from your equipment and put it back into your
+inventory.
+~
+
+0 CHANNELS~
+Syntax: channels
+Syntax: channels +<channel>
+Syntax: channels -<channel>
+
+With no options, CHANNELS shows you your current channels.  With a plus or
+minus sign and an option, CHANNELS turns that channel on or off.
+~
+
+0 CONFIG~
+Syntax: config
+Syntax: config +<option>
+Syntax: config -<option>
+
+This command configures some of your character behavior.  With no options,
+CONFIG shows you your current settings.  With a plus or minus sign and
+an option, CONFIG turns that option on or off.
+
+The options are:
+
+    ANSI       You view things in colour.
+    AUTOEXIT   You automatically see exits.
+    AUTOFOLLOW You try to follow people who flee.
+    AUTOSEARCH You look in corpses after kills.
+    BLANK      You have a blank line before your prompt.
+    BRIEF      You see brief descriptions only.
+    COMBINE    You see object lists in combined format.
+    PROMPT     You have a prompt.
+    SHOWDAM    You see other people damage.
+    TELNETGA   You receive a telnet GA sequence.
+~
+
+0 BUG IDEA TYPO~
+
+If you notice a bug or typo, or just have a spiffy idea that you want to 
+share with the rest of the world, simply go to board 3 of the notes, and 
+post a note there. The immortals will be sure to reply.
+~
+
+0 CREDITS~
+Syntax: credits
+
+This command shows the list of the original Diku Mud implementors.
+Anathema: Created by LaWaylon (Luto).
+Copyright (c) 2026 LaWaylon (Luto) - Anathema modifications only.
+Original Genesis contributors include Akuma, Chaos, Dude, Shane and Corruption.
+Original Diku, Merc, God Wars and Ethereal Mists credits and rights remain
+with their respective authors; this credit does not replace their notices.
+~
+
+0 REPORT SCORE TIME WEATHER~
+Syntax: report
+Syntax: score
+Syntax: time
+Syntax: weather
+
+REPORT shows your current statistics to you and also announces them to other
+players in the room.
+
+SCORE shows detailed statistics to you only.
+
+TIME shows the game time, as well as the time the mud was last started,
+and the current local time for the host computer.
+
+WEATHER shows the current game weather.
+~
+
+0 AREAS COMMANDS SOCIALS~
+Syntax: areas
+Syntax: commands
+Syntax: socials
+
+AREAS shows you all the areas in the game, with the author's name and the
+levels of the mobs that inhabit that area.
+
+COMMANDS shows you all the (non-social) commands available to you.
+
+SOCIALS shows you all the social commands available to you.
+~
+
+0 PROMPT CPROMPT~
+This command allows you to configure your prompt.  The PROMPT command 
+will set your standard prompt.  You also have the option of having a 
+combat prompt, CPROMPT, which will appear while fighting.  If no cprompt 
+is defined, the standard prompt will be used for both conditions.
+The following options are available:
+
+%a %A = Alignment (word/numeric).   %b %B = Beast/Blood.
+%c    = Armour Class.               %f %F = Condition of opponent/tank. 
+%g    = Gold.                       %h %H = Current hp/Max hp.          
+%m %M = Current mana/Max mana.      %n %N = Name of opponent/tank.      
+%p %P = Plus Hitroll/Plus Damroll.  %q    = Quest points.
+%r %R = Room name/Rage.             %s %S = Status (word/numeric).
+%v %V = Current move/Max move.      %x    = Exp.
+%y    = Ability Pts.
+
+To switch your prompt on and off, use 'prompt on' and 'prompt off'.
+For some examples, type 'help prompts'.
+~
+
+0 PROMPTS~
+There are many possible prompts, and everyone will have their own 
+favoured setups.  However, to get you going, here are some examples:
+
+Original normal prompt: [%x exp] <%h/%Hhp %m/%Mm %v/%Vmv>
+Original combat prompt: [%f] <%h/%Hhp %m/%Mm %v/%Vmv>
+Simple prompt: [%hH/%mM/%vV]
+Vampire prompt: [%B Blood] <%hhp %mm %vmv>
+Werewolf prompt: [%R Rage] <%hhp %mm %vmv>
+Combat prompt: [%N:%F/%n:%f]
+Stat prompt: [%xX] [+%pHIT/+%PDAM] [%cAC] [%hH/%mM/%vV]
+
+Remember, you can switch between the default prompts and your customised
+prompts with 'prompt on' and 'prompt off'.  Doing this will not destroy 
+your customised prompts.
+~
+
+0 PRIMAL~
+Primal energy is the ultimate form of energy in the multiverse, the one 
+from which all other energies are derived.  Unfortunately, unlike mana, 
+primal energy is only one use, and is generally used for very powerful 
+spells, such as 'voodoo' (which uses 5 points) and 'quest' (which uses 
+between 1 and 100 points).
+~
+
+0 TIE UNTIE GAG BLINDFOLD~
+Syntax: tie <target>
+Syntax: untie <target>
+Syntax: gag <target>
+Syntax: blindfold <target>
+
+TIE allows you yo tie up another player, who must be stunned, 
+incapitated, or mortally wounded.  While tied up, a players actions are 
+limited - they cannot move, quit, or do many other commands.
+
+UNTIE will untie a player who is currently tied up.  A player cannot 
+untie themself.
+
+GAG places a gag over the mouth of the target player, who must first be 
+tied up.  This command will also remove a gag.  A player can only remove 
+a gag from themself if they are no longer tied up.  It is not possible 
+to talk or use any of the channels while gagged.
+
+BLINDFOLD places a blindfold over the eyes of the target player, who must 
+first be tied up.  The blindfold can also be removed with this command.  
+A player can only remove a blindfold from themself if they are no longer 
+tied up.  Unsurprisingly, blindfolded players cannot see.
+~
+
+
+0 WHO~
+Syntax: who
+Syntax: who <avatar/god>
+
+WHO shows the people currently in the game.  Some people may choose to
+remain unseen and won't appear on the WHO
+ 
+WHO without any arguments shows all of the (visible) people currently playing.
+
+With arguments, WHO can show avatars (level 3's) or gods (level 4's and 5's).
+~
+
+0 WHERE~
+Syntax: where
+Syntax: where <character>
+
+WHERE without an argument tells you the location of visible players in the same
+area as you are.
+
+WHERE with an argument tells you the location of one character with that name
+within your area, including monsters.
+~
+
+0 DESCRIPTION~
+Syntax: description <string>
+Syntax: description + <string>
+
+Sets your long description to the given string.  If the description string
+starts with a '+', the part after the '+' is appended to your current
+description, so that you can make multi-line descriptions.
+~
+
+0 PASSWORD~
+Syntax: password <old-password> <new-password>
+
+PASSWORD changes your character's password.  The first argument must be
+your old password.  The second argument is your new password.
+
+The PASSWORD command is protected against being snooped or logged.
+~
+
+0 TITLE~
+Syntax: title <string>
+
+Sets your title to a given string.
+
+The game supplies a title when your character is created.  You can use 
+TITLE to set your title to something else. 
+~
+
+0 OPEN CLOSE LOCK UNLOCK PICK~
+Syntax: open   <object|direction>
+Syntax: close  <object|direction>
+Syntax: lock   <object|direction>
+Syntax: unlock <object|direction>
+Syntax: pick   <object|direction>
+
+OPEN and CLOSE open and close an object or a door.
+
+LOCK and UNLOCK lock and unlock a closed object or door.  You must have
+the requisite key to LOCK or UNLOCK.
+
+PICK can open some locks without having the key.
+~
+
+
+0 SACRIFICE~
+Syntax: sacrifice <object>
+
+SACRIFICE drains the energy matter from an object, transferring the 
+energy to you in the form of exp.
+~
+
+0 SMOTHER~
+Syntax: smother <name>
+
+This is used to try and smother the flames on a burning player or mob.  
+You can do this on yourself, but it may take several attempts to work.
+~
+
+0 CONSIDER~
+Syntax: consider <character>
+
+CONSIDER tells you what your chances are of killing a character, taking 
+into account hitroll, damroll, armour class and hit points, and giving 
+you an overview of your chances.  If you are considering a player, you 
+will also be informed how skilled they are with their weapon/s, and which 
+stance they are currently using (if any) and how good they are at it.
+
+Please remember that this is only a rough estimate.
+~
+
+0 FOLLOW GROUP~
+Syntax: follow <character>
+Syntax: group
+Syntax: group <character>
+
+FOLLOW starts you following another character.  To stop following anyone else,
+just FOLLOW <yourself>.
+
+GROUP <character> makes someone who is following you a member of your group.
+Group members share experience points from kills and may use the GTELL and
+SPLIT commands.  If anyone in your group is attacked, you will automatically
+join the fight.
+
+If the <character> is already a member of your group, then GROUP will
+kick out the <character> from your group.  Characters can also leave your
+group by using a FOLLOW command to stop following you.
+
+GROUP with no argument shows statistics for each character in your group.
+~
+
+0 HIDE SNEAK VISIBLE~
+Syntax: HIDE
+Syntax: SNEAK
+Syntax: VISIBLE
+
+If you successfully HIDE, then other characters can't see you.  If you 
+attack while hidden, the surprise attack will inflict one and a half 
+times your normal damage (assuming your opponent cannot see you).
+
+If you successfully SNEAK, then you can move in and out of rooms without
+being noticed.
+
+In order to HIDE or SNEAK successfully, you must practice the appropriate
+skill.
+
+VISIBLE cancels your hiding and sneaking, as well as any invisibility,
+making you visible again.
+~
+
+0 QUIT SAVE~
+Syntax: QUIT
+Syntax: SAVE
+
+SAVE saves your character and objects.  You must be a mortal or avatar to
+save.  The game will auto-save your character every few minutes whether you
+save or not.
+
+Some objects, such as keys and potions, may not be saved.
+
+QUIT leaves the game.  You may QUIT anywhere, although there is an experience
+penalty for quitting outside of Midgaard.  When you re-enter the game you will
+be back in the same room.
+
+QUIT automatically does a SAVE, so you can safely leave the game with just one
+command.  Nevertheless it's a good idea to SAVE before QUIT.  If you get into
+the habit of using QUIT without SAVE, and then you play some other mud that
+doesn't save before quitting, you're going to regret it.
+~
+
+
+0 RECALL /~
+Syntax: RECALL
+
+RECALL prays to God for miraculous transportation from where you are back to
+the Temple of Midgaard.  '/' is a synonym for RECALL.
+
+RECALL may take you to a different location if you belong to a clan.
+
+RECALL doesn't work in certain God-forsaken rooms.  Characters afflicted by a
+curse may not recall at all.
+~
+
+
+0 HQ HEADQUARTERS~
+Headquarters are a place for covens and clans to call home.  They may be
+purchased from the imms.  Direct any questions or concerns to Luto on the
+personal board.  Payment is taken after the HQ is created.  All HQs must have at
+least one connection to the mud proper, subject to builder approval.
+
+Pricing:
+ Basic 5 room HQ*:    5000 qp
+ Rooms**:
+  Additional rooms*:  1000 qp
+  Private rooms:      2000 qp
+  Upgrade to Private: 1000 qp
+ Room Flags:
+  no_recall***:       1000 qp
+  safe***:             500 qp
+  darkness:            200 qp
+  indoors:             100 qp
+ Move entrance:       2000 qp
+ Traps****:         100000 qp
+
+   * There must be a walkable path between all rooms, except private rooms.
+There must be at least one room which does not have no_recall, safe, or
+darkness.  HQs may not have more than 1 safe room.
+  ** Max number of rooms is 10.  At all times at least 5 must be non-private
+rooms
+ *** Transporters leading to safe and no_recall rooms will not work.  The "home
+here" command also does not work in these rooms.
+**** Traps are selected by staff using the relatively untouched legacy code
+made.  Traps will be based upon the room description of the room they are placed
+in.
+~
+
+-1 DIRECTIONS DIRS~
+This is a list of some areas and the directions to them from Market Square:
+
+Low Areas:
+Draconia         - 13ws2w2sws3wnw3n2w or 'travel draconian'
+Elemental Canyon - 6e4s2es2eds or 'travel elemental'
+Old Marsh        - 13ws2w2sw3s
+
+Middle Areas:
+Demon Temple     - 6w2n
+Doom             - 4e3n2w6nun
+Elemental Caves  - 6e4s2es2eds4undn3en
+Gnome Daycare    - 6ed2s
+Holy Grove       - 7e
+Templars         - 6ed3n2w2nw2n3e2sd2sw
+
+High Areas:
+Atlantis         - sd
+Drow             - 6e4s2e2s2edwsd
+Haif's Town      - 13e
+Olympus          - 4e3n2w6n2un
+Red Dragon Inn   - 6e4s2es2edwu
+Salvnos          - 6e4s2es2edwu6nd2nd
+Undead Castle    - 4e4n
+~
+
+0 Artifacts~
+Artifacts are powerful, unique, unclaimable items which exist at the whim of 
+immortals.  Under most circumstances, Artifacts have timers, which means they 
+disappear after a set amount of time.  To get an Artifact, participate in 
+Immortal Quests, or kill someone with one.  To see what artifacts are currently 
+in the game, type Artifact.  In addition to any other affects, Artifacts grant 
+a +100 bonus to damcap.
+
+Artifact Listing:
+Ring of Hitting - +300 hitroll, +1 attack per round.
+*Ring of Damage - +300 damroll, +500 damcap.
+Draconic Aura - Sanct, +5000 hp, +100 armor, +50 hit/dam.
+The #0Mirror Shades#n of the #0Gods#n - Allows you to see and find anyone.
+A Runic Scimitar named 'Magebane' - 50% Magic Resist, dispel magic on hit.
+The Sword of Kas - +50 hitroll, +150 damroll, +500 damcap, aggy.
+Periapt of Protection - +500 armor, -500 opponent's damcap.
+
+*Artifact is currently in circulation.
+~
+
+0 $~
+
+#$
