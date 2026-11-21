@@ -87,7 +87,8 @@ class WerewolfCommandsCatalog(unittest.TestCase):
         self.assertIn('do_calm(ch,"")',text)
         self.assertIn("ch->position < POS_STANDING",text)
         self.assertNotIn("SET_BIT",text)
-        self.assertNotIn("do_werewolf(",text)
+        self.assertEqual(text.count("do_werewolf("),1)
+        self.assertIn('do_werewolf(ch,"shift")',text)
         self.assertNotIn("HYBRID_",text)
 
     def test_all_werewolf_handlers_are_registered_or_explicitly_unavailable(self):

@@ -823,12 +823,13 @@ Related Helps: Class, Ranks, Shift, Breeds, Auspices, and Tribes.
 Shift uses the existing native Werewolf war-form mechanics:
 
  shift                         Builds rage, or tries to calm a current war-form.
- shift werewolf|wolf|crinos     Uses rage to enter the native war-form.
- shift human|homid              Uses calm to return toward human form.
+ shift werewolf|wolf|crinos     Instantly enters war-form at 100 rage.
+ shift human|homid              Instantly calms below the 100-rage return point.
 
-Rage builds toward the 100-rage transformation threshold; several uses may be
-needed. Calm requires Children of Gaia 1 and standing, and may also take
-several uses. Existing waits, combat effects and natural reversion still apply.
+Explicit shifts preserve the Children of Gaia 1 and standing requirements for
+returning human, and use the normal transformation and Calm effects. Bare shift
+still builds rage or uses Calm incrementally. Existing combat effects and
+natural reversion still apply.
 
 Glabro, Hispo and a separate Lupus body form are not implemented Shift options.
 This command does not unlock secondary-parent or fused hybrid forms.

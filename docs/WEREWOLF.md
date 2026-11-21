@@ -30,17 +30,16 @@ does not itself enable player conversion or add a secondary advancement UI.
 
 ## Shifting
 
-`shift werewolf` (also `shift wolf` or `shift crinos`) uses the existing Rage
-command. Rage builds by its existing amount and may need several uses before
-reaching 100 and transforming. Transformation retains its native hostile
-effects: use care around other characters. No five-form system, free class
-abilities, or additional combat bonuses have been added.
+`shift werewolf` (also `shift wolf` or `shift crinos`) immediately enters the
+native war form at exactly 100 rage. It retains the normal transformation
+effects and recovery, but this explicit shift does not apply the Ahroun rank-4
+300-rage override. Normal Rage and Primal Anger keep that existing behavior.
 
 `shift human` (also `shift homid`) uses Calm: **Children of Gaia 1** is still
-required, the player must stop fighting and stand, and several uses may be
-needed to reduce rage below the transformation threshold. Bare `shift` chooses
-the direction from the player's current form. The command does not give
-secondary Werewolf hybrids access to a live Werewolf form.
+required and the player must stop fighting and stand. Explicit shift sets rage
+below Calm's 100-rage return point, returning the player to human form
+immediately. Bare `shift` keeps the existing incremental Rage/Calm behavior.
+The command does not give secondary Werewolf hybrids access to a live form.
 
 ## Gift command listings
 

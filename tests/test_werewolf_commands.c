@@ -117,14 +117,9 @@ static void shifting(void)
 {
     wolf_fixture(0,0);
     execute("shift werewolf");
-    assert(pcs[0].wolf>=10&&pcs[0].wolf<=20);
-    assert(!IS_SET(actors[0].act,PLR_WOLFMAN));
-    assert(strstr(outputs[0],"Rage:"));
-    for(int n=0;n<10&&!IS_SET(actors[0].act,PLR_WOLFMAN);n++)
-        execute("shift werewolf");
     assert(IS_SET(actors[0].act,PLR_WOLFMAN));
     assert(IS_VAMPAFF(actors,VAM_CLAWS)&&IS_VAMPAFF(actors,VAM_FANGS));
-    assert(pcs[0].wolf>=100&&pcs[0].wolf<=144);
+    assert(pcs[0].wolf==100&&actors[0].wait==12);
     long rage=pcs[0].wolf;
     execute("shift werewolf");assert(pcs[0].wolf==rage);
     execute("shift human"); /* No free Gaia gift and no forced reversion. */
@@ -134,10 +129,34 @@ static void shifting(void)
     execute("shift human");assert(pcs[0].wolf==rage);
     actors[0].position=POS_STANDING;
     execute("shift human");assert(pcs[0].wolf<rage);
-    for(int n=0;n<12&&IS_SET(actors[0].act,PLR_WOLFMAN);n++)
-        execute("shift human");
     assert(!IS_SET(actors[0].act,PLR_WOLFMAN)&&pcs[0].wolf==0);
     assert(!IS_VAMPAFF(actors,VAM_CLAWS)&&!IS_VAMPAFF(actors,VAM_FANGS));
+    wolf_fixture(0,0);execute("shift wolf");
+    assert(IS_SET(actors[0].act,PLR_WOLFMAN)&&pcs[0].wolf==100);
+    wolf_fixture(0,0);execute("shift crinos");
+    assert(IS_SET(actors[0].act,PLR_WOLFMAN)&&pcs[0].wolf==100);
+    wolf_fixture(0,0);pcs[0].auspice[AUSPICE_AHROUN]=4;
+    execute("shift crinos");
+    assert(IS_SET(actors[0].act,PLR_WOLFMAN)&&pcs[0].wolf==100);
+    wolf_fixture(0,0);pcs[0].auspice[AUSPICE_AHROUN]=4;pcs[0].wolf=400;
+    execute("shift crinos");
+    assert(IS_SET(actors[0].act,PLR_WOLFMAN)&&pcs[0].wolf==100);
+    wolf_fixture(0,0);pcs[0].tribes[TRIBE_CHILDREN_OF_GAIA]=1;
+    pcs[0].wolf=150;SET_BIT(actors[0].act,PLR_WOLFMAN);
+    execute("shift homid");
+    assert(!IS_SET(actors[0].act,PLR_WOLFMAN)&&pcs[0].wolf==0);
+    wolf_fixture(0,0);pcs[0].wolf=-1;
+    execute("shift werewolf");
+    assert(pcs[0].wolf==-1&&!IS_SET(actors[0].act,PLR_WOLFMAN));
+    wolf_fixture(0,0);pcs[0].wolf=LONG_MAX;
+    execute("shift crinos");
+    assert(pcs[0].wolf==LONG_MAX&&!IS_SET(actors[0].act,PLR_WOLFMAN));
+    wolf_fixture(0,0);pcs[0].wolf=-1;SET_BIT(actors[0].act,PLR_WOLFMAN);
+    execute("shift human");
+    assert(pcs[0].wolf==-1&&IS_SET(actors[0].act,PLR_WOLFMAN));
+    wolf_fixture(0,0);pcs[0].auspice[AUSPICE_AHROUN]=4;
+    pcs[0].wolf=75;do_werewolf(actors,"");
+    assert(IS_SET(actors[0].act,PLR_WOLFMAN)&&pcs[0].wolf==300);
     free_string(actors[0].morph);actors[0].morph=str_dup("");
     execute("shift");assert(pcs[0].wolf>=10);
     long before=pcs[0].wolf;
@@ -153,7 +172,7 @@ static void shifting(void)
     wolf_fixture(0,0);pcs[0].wolf=400;
     pcs[0].tribes[TRIBE_CHILDREN_OF_GAIA]=1;
     SET_BIT(actors[0].act,PLR_WOLFMAN);
-    execute("shift human");assert(pcs[0].wolf>=350&&pcs[0].wolf<=375);
+    execute("shift");assert(pcs[0].wolf>=350&&pcs[0].wolf<=375);
 }
 
 static void menus(void)

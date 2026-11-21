@@ -143,6 +143,8 @@ PROOFS = [
 
 
 def without_class_help(text):
+    from shift_source import without_shift
+    text = without_shift(text)
     from quicksand_source import without_quicksand
     text = without_quicksand(text)
     for _, _, hunks in PROOFS:

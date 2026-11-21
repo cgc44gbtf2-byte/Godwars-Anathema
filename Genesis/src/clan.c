@@ -1977,6 +1977,7 @@ void do_werewolf( CHAR_DATA *ch, char *argument )
     CHAR_DATA *member;
     ROOM_INDEX_DATA *room;
     long strike;
+    bool minimum_shift;
     if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL ||
         ch->hit <= 0 || ch->position < POS_FIGHTING ||
         !combat_character_in_room(ch->in_room, ch)) return;
@@ -1986,6 +1987,7 @@ void do_werewolf( CHAR_DATA *ch, char *argument )
     if (!IS_WEREWOLF(ch)) return;
     if (IS_SET(ch->act, PLR_WOLFMAN)) return;
     if (ch->pcdata->wolf < 0 || ch->pcdata->wolf > LONG_MAX - 25) return;
+    minimum_shift = !str_cmp(arg, "shift");
 
     if (IS_POLYAFF(ch, POLY_MASK))
     {
@@ -2031,10 +2033,14 @@ void do_werewolf( CHAR_DATA *ch, char *argument )
         ch->name != NULL ? ch->name : "Unknown");
     free_string(ch->morph);
     ch->morph = str_dup(buf);
-    ch->pcdata->wolf += 25;
-
-    if (get_auspice(ch, AUSPICE_AHROUN) >= 4) ch->pcdata->wolf = 300;
-    else if (ch->pcdata->wolf > 300) ch->pcdata->wolf = 300;
+    if (minimum_shift)
+        ch->pcdata->wolf = 100;
+    else
+    {
+        ch->pcdata->wolf += 25;
+        if (get_auspice(ch, AUSPICE_AHROUN) >= 4) ch->pcdata->wolf = 300;
+        else if (ch->pcdata->wolf > 300) ch->pcdata->wolf = 300;
+    }
 
     update_style(ch);
 

@@ -83,9 +83,8 @@ void do_rage( CHAR_DATA *ch, char *argument )
     return;
 }
 
-/* Compatibility command, not a second transformation system. Rage may need
- * several uses before reaching 100 and still has its native hostile effects.
- * Returning human uses Calm, including Gaia1, posture and recovery rules. */
+/* Explicit shifts cross the existing transformation thresholds immediately;
+ * bare shift retains incremental Rage/Calm behavior. */
 void do_shift( CHAR_DATA *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH], extra[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
@@ -104,7 +103,7 @@ void do_shift( CHAR_DATA *ch, char *argument )
         (arg[0] && str_cmp(arg,"human") && str_cmp(arg,"homid") &&
          str_cmp(arg,"werewolf") && str_cmp(arg,"wolf") && str_cmp(arg,"crinos")))
     {
-        send_to_char("Syntax: shift [werewolf|human]. Uses Rage/Calm, not new forms.\n\r",ch);
+        send_to_char("Syntax: shift [werewolf|wolf|crinos|human|homid].\n\r",ch);
         return;
     }
     human = arg[0] ? (!str_cmp(arg,"human") || !str_cmp(arg,"homid"))
@@ -115,11 +114,30 @@ void do_shift( CHAR_DATA *ch, char *argument )
             send_to_char("You are already human.\n\r",ch);
         else if (ch->position < POS_STANDING)
             send_to_char("You must stop fighting and stand before using Calm.\n\r",ch);
+        else if (arg[0] && ch->pcdata->wolf < 0)
+            send_to_char("Your rage needs staff review.\n\r", ch);
+        else if (arg[0] && get_tribe(ch,TRIBE_CHILDREN_OF_GAIA) < 1)
+            do_calm(ch,"");
+        else if (arg[0])
+        {
+            ch->pcdata->wolf = 99;
+            do_calm(ch,"");
+        }
         else
             do_calm(ch,"");
     }
     else if (IS_SET(ch->act,PLR_WOLFMAN))
         send_to_char("You are already in werewolf form.\n\r",ch);
+    else if (arg[0])
+    {
+        if (ch->pcdata->wolf < 0 || ch->pcdata->wolf > LONG_MAX - 25)
+        {
+            send_to_char("Your rage needs staff review.\n\r", ch);
+            return;
+        }
+        WAIT_STATE(ch,12);
+        do_werewolf(ch,"shift");
+    }
     else
     {
         do_rage(ch,"");
