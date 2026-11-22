@@ -515,6 +515,7 @@
    { "tongue",		do_tongue,	POS_FIGHTING,	 LEV_AWA,  LOG_NORMAL	},
    { "transport",	do_transport,	POS_DEAD,	 LEV_SLE,  LOG_NORMAL	},
    { "tribegifts",	do_tribegifts,	POS_DEAD,	 LEV_AWA,  LOG_NORMAL	},
+   { "totemgift",	do_totemgift,	POS_FIGHTING,	 LEV_AWA,  LOG_NORMAL	},
    { "truedisguise",	do_truedisguise,POS_STANDING,	 LEV_AWA,  LOG_NORMAL	},
    { "umbra",		do_shadowplane,	POS_STANDING,	 LEV_AWA,  LOG_NORMAL	},
    { "umbralvision",	do_shadowsight,	POS_SITTING,	 LEV_AWA,  LOG_NORMAL	},

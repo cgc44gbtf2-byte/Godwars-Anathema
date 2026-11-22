@@ -26,6 +26,8 @@ OLD = '''void do_quicksand( CHAR_DATA *ch, char *argument )
 
 
 def without_quicksand(text):
+    from werewolf_totem_source import without_totem_gift
+    text = without_totem_gift(text)
     from lycaon_source import without_lycaon
     text = without_lycaon(text)
     match = re.search(r"void do_quicksand\(.*?(?=\nvoid do_|\Z)", text, re.S)

@@ -148,7 +148,7 @@ void do_wwpowers( CHAR_DATA *ch, char *argument )
 	if (get_breed(ch, BREED_METIS) >= 2) strcat(buf, " Burrow");
 	if (get_breed(ch, BREED_METIS) >= 3) strcat(buf, " Nightsight");
 	if (get_breed(ch, BREED_METIS) >= 4) strcat(buf, " Porcupine");
-	if (get_breed(ch, BREED_METIS) >= 5) strcat(buf, " Totemgift[unimplemented]");
+	if (get_breed(ch, BREED_METIS) >= 5) strcat(buf, " Totemgift");
 	strcat(buf, ".\n\r");
 	stc(buf, ch);
     }

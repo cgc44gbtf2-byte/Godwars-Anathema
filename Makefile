@@ -83,6 +83,7 @@ TESTS += tests/test_hybrid_scry
 TESTS += tests/test_hybrid_shield
 TESTS += tests/test_hybrid_heighten
 TESTS += tests/test_werewolf_commands
+TESTS += tests/test_werewolf_totem
 TESTS += tests/test_disquiet
 TESTS += tests/test_werewolf_combat
 TESTS += tests/test_werewolf_reactions
@@ -166,6 +167,7 @@ check-layout:
 	python3 tests/test_hybrid_heighten_catalog.py
 	python3 tests/test_werewolf_commands_catalog.py
 	python3 tests/test_werewolf_help_catalog.py
+	python3 tests/test_werewolf_totem_catalog.py
 	python3 tests/test_disquiet_catalog.py
 	python3 tests/test_werewolf_combat_catalog.py
 	python3 tests/test_werewolf_reactions_catalog.py
@@ -237,8 +239,10 @@ test: check-layout $(TESTS)
 
 # Link the real engine, including actual safety, combat and interpreter paths.
 # Only the server entry point is renamed; no real accounts/world files load.
-tests/test_combat_status tests/test_vampire tests/test_basic_buffs tests/test_class_handlers tests/test_vampire_modules tests/test_damage_messages tests/test_transformations tests/test_clans tests/test_class_gear tests/test_drow_ammo tests/test_lifecycle_ownership tests/test_autosave_recovery tests/test_highlander_counter tests/test_stance_style tests/test_admin_gate tests/test_combat_calculations tests/test_combat_damage_death tests/test_telnet tests/test_gmcp: tests/%: tests/%.c $(ENGINE_OBJECTS)
+tests/test_combat_status tests/test_vampire tests/test_basic_buffs tests/test_class_handlers tests/test_vampire_modules tests/test_damage_messages tests/test_transformations tests/test_clans tests/test_class_gear tests/test_drow_ammo tests/test_lifecycle_ownership tests/test_autosave_recovery tests/test_highlander_counter tests/test_stance_style tests/test_admin_gate tests/test_combat_calculations tests/test_combat_damage_death tests/test_telnet tests/test_gmcp tests/test_werewolf_totem: tests/%: tests/%.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
+tests/test_werewolf_totem: tests/test_hybrid_aura.c
 
 tests/test_world_integrity: tests/test_world_integrity.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@

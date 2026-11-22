@@ -879,7 +879,7 @@ Related Helps: Breeds, and Werewolf.
 2: Burrow - Toggles earthmelding; cannot activate while fighting. <burrow>
 3: Eyes of the Cat - Enhanced sight allows vision in the dark. <nightsight>
 4: Gift of the Porcupine - Toggles protective bristles in native war-form. <porcupine>
-5: Totem Gift - No working command is implemented. <unimplemented>
+5: Totem Gift - Summons your tribe's stationary totem; it absorbs up to 10,000 damage for you over 10 pulses, costs 5,000 mana, and fades if you leave. <totemgift>
 
 Related Helps: Breeds, and Werewolf.
 ~

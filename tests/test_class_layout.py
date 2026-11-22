@@ -10,7 +10,7 @@ SRC = ROOT / "Genesis" / "src"
 EXPECTED = {
     "vampire": ("disc", "vampire", "presence", "beast", "state",
                 "obfuscate", "dominate", "chimerstry"),
-    "werewolf": ("werewolf", "wwbreed", "wwauspice", "wwtribe", "instincts"),
+    "werewolf": ("werewolf", "totem", "wwbreed", "wwauspice", "wwtribe", "instincts"),
     "sorcerer": ("sorcerer", "vision"),
     "drow": ("drow",),
     "highlander": ("highland",),

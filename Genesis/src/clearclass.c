@@ -34,6 +34,7 @@ void do_clearclass( CHAR_DATA *ch, char *argument )
     }
     if (clan_block_class_change(victim)) return;
     /* Preserve NPC survival on reset, but release reciprocal and stray links. */
+    werewolf_totem_clear(victim);
     release_character_links(victim,FALSE);
 do_mclear(victim, "self");
     vampire_clear_offer(victim);

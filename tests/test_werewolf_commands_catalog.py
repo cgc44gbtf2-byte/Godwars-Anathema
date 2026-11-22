@@ -107,7 +107,7 @@ class WerewolfCommandsCatalog(unittest.TestCase):
         for label in ("Quicksand","Lycaon","Screamgaia",
                       "Reach[unavailable]","Wrath[unavailable]",
                       "Mastery[unavailable]","Invisibility[unavailable]",
-                      "Totemgift[unimplemented]"):
+                      "Totemgift"):
             self.assertIn(label,menu)
         for label in ("Spiritward","Reshapeobject","Spiritguardian","Halosun","Formillusion",
                       "Shroudnight","Clapthunder","Paralyzingstare"):
@@ -119,10 +119,12 @@ class WerewolfCommandsCatalog(unittest.TestCase):
             words=label.split(":")[-1].strip().split()
             if words:self.assertIn(words[0].lower(),commands,label)
         self.assertNotIn("Scream[unimplemented]",menu)
+        self.assertNotIn("Totemgift[unimplemented]",menu)
         self.assertNotIn("get_auspice(ch, TRIBE_",menu)
 
     def test_engine_suite_and_saved_format_unchanged(self):
         self.assertIn("tests/test_werewolf_commands",make_values(ROOT,"TESTS"))
+        self.assertIn("tests/test_werewolf_totem",make_values(ROOT,"TESTS"))
         test=(ROOT/"tests/test_werewolf_commands.c").read_text()
         for item in ("count==1539","mode<19","hybrid_training_prepare",
                      "SCORE_NUM_QUEST]=0","interpret(actors,command)",
@@ -168,7 +170,7 @@ class WerewolfCommandsCatalog(unittest.TestCase):
             if label==".\\n\\r" or "[" in label:continue
             words=label.split(":")[-1].strip().split()
             if words:active.append(words[0].casefold())
-        self.assertEqual(len(active),61)
+        self.assertEqual(len(active),62)
         self.assertEqual(len(set(active)),len(active))
 
 if __name__=="__main__":

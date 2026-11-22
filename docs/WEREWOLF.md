@@ -51,7 +51,16 @@ not the unrelated Mage `ward` command; `reshapeobject`, `spiritguardian`,
 `halosun`, `formillusion`, `shroudnight`, `clapthunder`, and `paralyzingstare` are the explicit command
 names rather than ambiguous or nonexistent abbreviations.
 
-Totemgift remains unimplemented. Get of Fenris 4 `screamgaia` interrupts
+Metis 5 `totemgift` calls a stationary, non-combat totem named for the
+selected primary tribe. It absorbs up to 10,000 incoming damage for its owner
+over 10 pulses and costs 5,000 mana. The protection and totem end when the
+pool is exhausted, the duration expires, the owner leaves the room, loses
+Metis 5, or loses the Werewolf class. Rejected calls spend no mana or recovery;
+successful calls impose 12 pulses of recovery. Only one totem can protect a
+character at a time. This is an owner-only shield, not a fighting summon or a
+replacement for normal damage safety.
+
+Get of Fenris 4 `screamgaia` interrupts
 eligible foes in the room for one pulse, costs 5000 mana, and gives the caster
 two pulses of recovery. A target cannot be interrupted again for six pulses;
 the shout does not damage, move, or stun allies, safe targets, non-PK players,

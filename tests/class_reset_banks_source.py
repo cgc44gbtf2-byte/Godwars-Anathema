@@ -16,6 +16,8 @@ BLOCK = """    /* These primary banks must not outlive the class being cleared.
 """
 
 def without_class_reset_banks(text):
+    from werewolf_totem_source import without_totem_gift
+    text = without_totem_gift(text)
     if "void do_clearclass(" not in text or BLOCK not in text:
         return text
     assert text.count(BLOCK) == 1

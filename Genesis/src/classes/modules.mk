@@ -10,6 +10,7 @@ CLASS_MODULE_SOURCES = \
   classes/vampire/dominate.c \
   classes/vampire/chimerstry.c \
   classes/werewolf/werewolf.c \
+  classes/werewolf/totem.c \
   classes/werewolf/wwbreed.c \
   classes/werewolf/wwauspice.c \
   classes/werewolf/wwtribe.c \

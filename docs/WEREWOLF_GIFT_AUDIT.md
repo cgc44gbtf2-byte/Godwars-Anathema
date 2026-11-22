@@ -2,21 +2,23 @@
 
 Scope: the 105 native Werewolf help slots, their command registrations,
 rank gates, passive consumers, and overlap descriptions. This began as a
-help/test-only change. Disquiet, Quicksand and Lycaon were subsequently restored as
-described below; training costs and rank caps remain unchanged. Disquiet's
+help/test-only change. Disquiet, Quicksand, Lycaon and Metis Totem Gift were
+subsequently restored as described below; training costs and rank caps remain unchanged. Disquiet's
 saved affect identity advances compatibility to save epoch 4; Quicksand is
 runtime-only and adds no saved affect or identifier. Lycaon is runtime-only;
 its temporary display morph and polymorph bit are omitted from saves.
+Totem Gift uses only transient runtime state: the stationary object, owner's
+barrier pool and pulse timer are not serialized.
 
 ## Status legend
 
 | Marker | Meaning | Slots |
 | --- | --- | ---: |
-| A: command | A registered handler contains gameplay behavior; not a safety certification | 61 |
+| A: command | A registered handler contains gameplay behavior; not a safety certification | 62 |
 | P: auto | A passive has an identified production consumer | 28 |
 | G: upgrade | Modifies an existing command, not an extra automatic action | 1 |
 | V: unverified | No matching dedicated effect located; absence is not proven universally | 9 |
-| U: unimplemented | No separate implemented gift found for that slot | 2 |
+| U: unimplemented | No separate implemented gift found for that slot | 1 |
 | X: unavailable | Legacy handler exists but is not registered for player commands | 4 |
 | D: disabled | Unregistered legacy handler also explicitly has no gameplay effect | 0 |
 
@@ -30,6 +32,11 @@ Get of Fenris 4 Scream of Gaia is a non-damaging room interruption: 5000 mana,
 one pulse of target interruption, six pulses of target stun immunity, and two
 pulses of caster recovery. It affects only eligible foes, not allies or safe
 targets, and cannot refresh an active interruption.
+Metis 5 Totem Gift is a stationary tribe-themed object; it does not fight or
+follow. It costs 5000 mana and absorbs up to 10000 incoming damage for its
+owner over 10 pulses. It clears on pool depletion, expiry, room departure,
+class loss or loss of Metis 5; successful calls impose 12 pulses of recovery,
+while rejected calls do not spend mana or recovery.
 
 ## All trees, in rank order
 
@@ -39,7 +46,7 @@ short descriptions and command spellings are in `Genesis/area/class.hlp`.
 | Tree | Ranks 1–5 | Principal corrections / evidence |
 | --- | --- | --- |
 | Homid | A A A A A | Persuasion 1, Reshape Object 3, restored Disquiet 4; `wwbreed.c` |
-| Metis | A A A A U | Porcupine requires war-form; Totem Gift is not implemented |
+| Metis | A A A A A | Porcupine requires war-form; Totem Gift creates a stationary owner-only barrier |
 | Lupus | A A P A A | Beast Life 4, not shield-piercing scry; elemental attacks do not summon pets |
 | Ragabash | A A P A P | Ordinary track suppression; silver vulnerability modifier, not universal immunity |
 | Theurge | A G A A A | Mother gains self-targeting at 2; Grasp moves both actors; Lobotomy drains mana |
@@ -62,7 +69,8 @@ short descriptions and command spellings are in `Genesis/area/class.hlp`.
 
 ## Source map
 
-- Active Breed handlers: `Genesis/src/classes/werewolf/wwbreed.c`.
+- Active Breed handlers: `Genesis/src/classes/werewolf/wwbreed.c` and
+  `Genesis/src/classes/werewolf/totem.c`.
 - Active Auspice handlers: `Genesis/src/classes/werewolf/wwauspice.c`.
 - Active Tribe handlers: `Genesis/src/classes/werewolf/wwtribe.c`.
 - Shared commands and rank gates: `clan.c`, `more.c`, and `interp.c`.
@@ -77,9 +85,9 @@ short descriptions and command spellings are in `Genesis/area/class.hlp`.
 ## Overlaps and remaining risks
 
 Grandmother's Touch uses the same Mother handler and cooldown. It is an upgrade,
-not a second healing trigger. There are 61 unique canonical registered names
+not a second healing trigger. There are 62 unique canonical registered names
 in the gift menu, including the restored Disquiet, Quicksand, Lycaon and
-Scream of Gaia.
+Scream of Gaia and Metis Totem Gift.
 
 Get of Fenris 1, Shadow Lords 1 and Philodox 3 retain their separate +100
 damage-cap contributions. Lupus 3, Children of Gaia 2 and Stargazers 4 retain
@@ -124,7 +132,7 @@ of those projects. No foreign C code has been imported.
 | Luna's Avenger | AtD/LoC `garou.c:do_lunasavenger`; `GAROU_AVENGER` is read in their combat damage paths | A real body-form candidate, not a drop-in. Foreign slot/rank differs and Anathema's existing Shield must not be displaced; hybrid form ownership/balance still need design |
 | Lambent Flame | AtD `garou.c:do_lambent`, registered through `data/commands.dat` | An active room-blinding action, not the missing native rank-2 avoidance passive; different rank, costs and target checks |
 | Quicksand | AtD `do_quicksand` is data-registered and spends gnosis to toggle `WOLF_QUICKSAND` | The native Red Talons 4 version is now a temporary, single-target movement snare; the archived toggle was not copied because its flag had no verified consumer here |
-| Totem Gift | GWLow5/LoC contain declarations of `do_totemgift` | A prototype is not an implementation; no complete matching handler found |
+| Totem Gift | GWLow5/LoC contain declarations of `do_totemgift` | Implemented natively as a stationary tribe-themed object with an owner-only damage pool; archived declarations were not copied |
 | Scream of Gaia | Several projects register `do_scream`, but the examined handlers require Vampire/Melpominee powers | Same command name, wrong class/power. Not evidence of a completed Werewolf Scream of Gaia |
 | Other unverified passives | No dedicated effect or consumer was confirmed for the remaining entries | Keep honest gap labels; do not infer implementation from help text |
 | Reach / Wrath / Mastery | Native handlers already exist but are unbound. Foreign `wrath`/`mastery` names also occur in Angel, Shadow or legend systems | Name collisions are not Werewolf implementations and must not be imported as substitutes |
@@ -186,7 +194,8 @@ injection deliberately frees synthetic NPCs or moves/interrupts actors; the old
 handlers reproduce sanitizer failures at those boundaries. This establishes
 the callback contract, not every live death script or recycled-address case.
 Ordinary damage ranges, access, costs, weather modes and cooldowns are unchanged.
-No missing power, secondary Werewolf command adapter or new body form is enabled.
+No additional missing power, secondary Werewolf command adapter or new body
+form is enabled.
 
 Body Wrack and Clap additionally guard post-retaliation/death callbacks and
 nonpositive-HP targets. Clap validates cached next members and sends stun feedback

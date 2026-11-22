@@ -285,6 +285,7 @@ void hurt_person( CHAR_DATA *ch, CHAR_DATA *victim, long dam )
     /* Shared HP boundary covers melee and direct book/spell damage once.
      * Never discount signed healing or self-inflicted costs. */
     if (ch != victim) dam = gargoyle_damage(victim, dam);
+    if (ch != victim) dam = werewolf_totem_absorb(victim, dam);
     /* Preserve legacy signed healing without overflowing the HP subtraction. */
     if (dam > 0 && victim->hit < LONG_MIN + dam) victim->hit = LONG_MIN;
     else if (dam < 0 && victim->hit > LONG_MAX + dam) victim->hit = LONG_MAX;

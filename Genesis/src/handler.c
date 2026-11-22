@@ -401,6 +401,11 @@ void char_from_room( CHAR_DATA *ch )
     }
 
     ch->quicksand_timer = 0;
+    if (ch->metis_totem_id != 0)
+    {
+        werewolf_totem_clear(ch);
+        stc("Your tribal totem fades as you leave its room.\n\r", ch);
+    }
 
     if ( !IS_NPC(ch) )
 	--ch->in_room->area->nplayer;

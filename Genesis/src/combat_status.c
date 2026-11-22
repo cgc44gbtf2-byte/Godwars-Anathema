@@ -72,6 +72,7 @@ void combat_status_update(void)
             stc("You pull free of the quicksand.\n\r", ch);
             act("$n pulls free of the quicksand.", ch, NULL, NULL, TO_ROOM);
         }
+        werewolf_totem_update(ch);
         if (ch->lycaon_timer == 1)
         {
             stc("The curse fades and your natural appearance returns.\n\r", ch);
