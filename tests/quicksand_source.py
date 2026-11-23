@@ -26,6 +26,8 @@ OLD = '''void do_quicksand( CHAR_DATA *ch, char *argument )
 
 
 def without_quicksand(text):
+    from reach_source import without_reach
+    text = without_reach(text)
     from werewolf_totem_source import without_totem_gift
     text = without_totem_gift(text)
     from lycaon_source import without_lycaon

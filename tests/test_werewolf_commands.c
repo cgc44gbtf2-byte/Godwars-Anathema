@@ -175,6 +175,115 @@ static void shifting(void)
     execute("shift");assert(pcs[0].wolf>=350&&pcs[0].wolf<=375);
 }
 
+static void reach_fixture(void)
+{
+    wolf_fixture(0,0);
+    pcs[0].tribes[TRIBE_SILENT_STRIDERS]=5;
+    pcs[0].flag=pcs[1].flag=FLAG_PK;
+    actors[0].level=actors[1].level=LEV_AWA;
+    actors[0].mana=4321;
+    SET_BIT(actors[0].affected_by,AFF_SHADOWSIGHT);
+    SET_BIT(actors[1].affected_by,AFF_SHADOWPLANE);
+    REMOVE_BIT(room.room_flags,ROOM_SAFE);
+}
+
+static void reach_guards(void)
+{
+    do_reach(NULL,NULL);
+    for(int mode=0;mode<31;mode++){
+        reach_fixture();
+        const char *command="beta";
+        switch(mode){
+        case 0:command="";break;
+        case 1:command="beta extra";break;
+        case 2:command="missing";break;
+        case 3:SET_BIT(room.room_flags,ROOM_SAFE);break;
+        case 4:pcs[0].tribes[TRIBE_SILENT_STRIDERS]=4;break;
+        case 5:actors[0].class=CLASS_MAGE;break;
+        case 6:SET_BIT(actors[0].act,ACT_IS_NPC);break;
+        case 7:actors[0].pcdata=NULL;break;
+        case 8:actors[0].in_room=NULL;break;
+        case 9:actors[0].hit=0;break;
+        case 10:actors[0].position=POS_SLEEPING;break;
+        case 11:actors[0].wait=1;break;
+        case 12:actors[0].fight_timer=1;break;
+        case 13:actors[0].combat_pause=1;break;
+        case 14:SET_BIT(actors[0].affected_by,AFF_SHADOWPLANE);break;
+        case 15:pcs[0].flag=0;break;
+        case 16:REMOVE_BIT(actors[1].affected_by,AFF_SHADOWPLANE);break;
+        case 17:SET_BIT(actors[1].affected_by,AFF_DEEPUMBRA);break;
+        case 18:actors[1].position=POS_FIGHTING;actors[1].fighting=&actors[2];break;
+        case 19:actors[1].fight_timer=1;break;
+        case 20:pcs[1].flag|=FLAG_AFK;break;
+        case 21:actors[1].desc=NULL;break;
+        case 22:actors[0].fighting=&actors[2];break;
+        case 23:actors[0].level=LEV_SLE;break;
+        case 24:SET_BIT(actors[0].affected_by,AFF_CHARM);
+                actors[0].master=&actors[1];break;
+        case 25:actors[1].hit=0;break;
+        case 26:actors[1].position=POS_STUNNED;break;
+        case 27:pcs[0].player_load_failed=1;break;
+        case 28:command=NULL;break;
+        case 29:command="alpha";break;
+        case 30:REMOVE_BIT(actors[0].affected_by,AFF_SHADOWSIGHT);break;
+        }
+        long mana=actors[0].mana, wait=actors[0].wait;
+        long caster_plane=actors[0].affected_by&AFF_SHADOWPLANE;
+        long victim_affects=actors[1].affected_by;
+        do_reach(actors,(char *)command);
+        assert(actors[0].mana==mana&&actors[0].wait==wait);
+        assert((actors[0].affected_by&AFF_SHADOWPLANE)==caster_plane);
+        assert(actors[1].affected_by==victim_affects);
+    }
+
+    for(int mode=0;mode<6;mode++){
+        reach_fixture();
+        switch(mode){
+        case 0:pcs[1].flag=0;break;
+        case 1:actors[1].level=LEV_IMM;break;
+        case 2:pcs[1].player_load_failed=1;break;
+        case 3:SET_BIT(actors[1].itemaffect,ITEMA_PEACE);break;
+        case 4:
+            SET_BIT(actors[1].act,ACT_IS_NPC|ACT_NOKILL);
+            actors[1].pcdata=NULL;actors[1].desc=NULL;
+            break;
+        case 5:SET_BIT(actors[1].affected_by,AFF_ETHEREAL);break;
+        }
+        long mana=actors[0].mana, wait=actors[0].wait;
+        long caster_plane=actors[0].affected_by&AFF_SHADOWPLANE;
+        long victim_affects=actors[1].affected_by;
+        do_reach(actors,"beta");
+        assert(actors[0].mana==mana&&actors[0].wait==wait);
+        assert((actors[0].affected_by&AFF_SHADOWPLANE)==caster_plane);
+        assert(actors[1].affected_by==victim_affects);
+    }
+}
+
+static void reach(void)
+{
+    reach_guards();
+    reach_fixture();
+    long mana=actors[0].mana;
+    long other_affects=actors[1].affected_by&~AFF_SHADOWPLANE;
+    PC_DATA before=pcs[1];
+    execute("reach beta");
+    assert(actors[0].mana==mana&&actors[0].wait==0);
+    assert(!IS_AFFECTED(&actors[0],AFF_SHADOWPLANE));
+    assert(!IS_AFFECTED(&actors[1],AFF_SHADOWPLANE));
+    assert((actors[1].affected_by&~AFF_SHADOWPLANE)==other_affects);
+    assert(actors[1].in_room==&room&&!memcmp(&pcs[1],&before,sizeof before));
+    assert(strstr(outputs[0],"out of the Umbra"));
+    assert(strstr(outputs[1],"pulls you out of the Umbra"));
+
+    reach_fixture();
+    SET_BIT(actors[1].act,ACT_IS_NPC);
+    actors[1].pcdata=NULL;
+    actors[1].desc=NULL;
+    execute("reach beta");
+    assert(!IS_AFFECTED(&actors[1],AFF_SHADOWPLANE));
+    assert(actors[0].mana==4321&&actors[0].wait==0);
+}
+
 static void menus(void)
 {
     for(int rank=1;rank<=5;rank++){
@@ -601,13 +710,14 @@ int main(int argc,char **argv)
         safety_case(atoi(argv[2]));return 0;
     }
     unsigned prices=advancement_grid();
-    advancement_guards();shifting();menus();quicksand();lycaon();
+    advancement_guards();shifting();reach();menus();quicksand();lycaon();
     screamgaia_rejections();screamgaia();
     for(int i=0;i<6;i++)safety_case(i);
     quicksand_persistence();lycaon_persistence();
     puts("Werewolf commands:1539 advancement boundary cases across19 native/"
          "ordered-hybrid contexts; doubled primal/XP/cumulative kills, zero quest "
-         "requirements, real shift/Rage/Calm and menu checks;6 safety cases; "
+         "requirements, real shift/Rage/Calm and menu checks; guarded rank-5 Reach "
+         "with safe cross-plane target handling and no cost/recovery;6 safety cases; "
          "Quicksand 26 rejection guards, movement, 20-pulse NPC/link-dead expiry, "
          "non-refresh, relocation cleanup and full/short reloads; Lycaon 27 rejection "
          "guards, one-thousand-mana cost, appearance-only 30-pulse expiry and save "

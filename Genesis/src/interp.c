@@ -469,6 +469,7 @@
    { "preserve",	do_preservation,POS_STANDING,	 LEV_AWA,  LOG_NORMAL	},
    { "primalanger",	do_primalanger, POS_FIGHTING,    LEV_AWA,  LOG_NORMAL 	},
    { "quicksand",	do_quicksand,	POS_FIGHTING,	 LEV_AWA,  LOG_NORMAL	},
+   { "reach",		do_reach,	POS_STANDING,	 LEV_AWA,  LOG_NORMAL	},
    { "lycaon",		do_lycaon,	POS_FIGHTING,	 LEV_AWA,  LOG_NORMAL	},
     { "screamgaia",	do_screamgaia,	POS_FIGHTING,	 LEV_AWA,  LOG_NORMAL	},
    { "rage",		do_rage,	POS_FIGHTING,	 LEV_AWA,  LOG_NORMAL	},

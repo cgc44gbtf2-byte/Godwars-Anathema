@@ -80,11 +80,15 @@ change class, race, saved identity, or powers. Targets already polymorphed or
 with another morph, active wolfman form, AFK, offline, ethereal, or protected
 status are rejected. The transient appearance is omitted from saves and
 restored automatically on expiry; it does not clear when the target moves
-rooms. Reach,
-Wrath, Mastery, and Invisibility have source handlers but are **unavailable**:
-they are not registered as player commands and have not been exposed through
-this compatibility fix. In particular, the old Mastery implementation needs a
-separate review of forced-command and staff-target protections before use.
+rooms. Silent Striders 5 `reach <target>` pulls an eligible, non-fighting target
+from the near Umbra,
+while the caster stays in the normal plane. Safe rooms, deep Umbra, protected
+NPCs, and non-PK, AFK, link-dead, or staff players are rejected. It retains the
+existing no-cost/no-recovery behavior; no new saved state is added. The old
+Mastery implementation still needs a separate review of forced-command and
+staff-target protections before use.
+Wrath, Mastery, and Invisibility still have source handlers but remain
+**unavailable** because they are not registered as player commands.
 
 This review covers advancement, shift/Rage/Calm, command registration, gift
 menu gates, malformed gift data and oversized selector/transformation input.
@@ -108,7 +112,9 @@ Shadow Lords 1 and Philodox 3 each contribute a separate 100 damage-cap bonus.
 Those existing, additive bonuses are retained; an overlap is not evidence of
 an accidental duplicate grant. Shared commands such as `heighten`, `scry`,
 `nightsight` and `readaura` are shared entry points, not extra power copies.
-No powers, ranks, prices or combat bonuses were removed by this help audit.
+No existing ranks, prices, or combat bonuses were removed by this audit.
+Reach is a separate restoration of an existing rank-5 handler, not a new rank
+or training-price change.
 
 All 105 gift slots now have a source-review classification; see
 [the gift audit](WEREWOLF_GIFT_AUDIT.md) for evidence and remaining gaps.

@@ -275,7 +275,7 @@ if (get_tribe(ch, TRIBE_RED_TALONS) >= 5) strcat(buf, " Lycaon");
     if (get_tribe(ch, TRIBE_SILENT_STRIDERS) >= 1)
     {
 	strcpy(buf, "Silent Striders:");
-if (get_tribe(ch, TRIBE_SILENT_STRIDERS) >= 5) strcat(buf, " Reach[unavailable]");
+if (get_tribe(ch, TRIBE_SILENT_STRIDERS) >= 5) strcat(buf, " Reach");
 	strcat(buf, ".\n\r");
 	stc(buf, ch);
     }

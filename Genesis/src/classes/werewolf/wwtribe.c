@@ -1601,57 +1601,109 @@ snprintf( buf, sizeof buf, "I command %s to %s", victim->name, action );
 
 void do_reach( CHAR_DATA *ch, char *argument )
 {
-    char arg [MAX_INPUT_LENGTH];  
+    char arg[MAX_INPUT_LENGTH];
     CHAR_DATA *victim;
+    ROOM_INDEX_DATA *cast_room;
+    bool safe;
 
-    argument = one_argument( argument, arg );
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL ||
+        !hybrid_player_save_valid(ch) || ch->hit <= 0 ||
+        ch->position < POS_STANDING || ch->wait > 0 ||
+        ch->fight_timer > 0 || ch->fighting != NULL || IS_COMBAT_PAUSED(ch) ||
+        !combat_character_in_room(ch->in_room, ch))
+        return;
 
-    if ( IS_NPC(ch) ) return;
-
-    if ( !IS_WEREWOLF(ch) ) 
+    if (!IS_WEREWOLF(ch) || ch->level < LEV_AWA)
     {
-	stc("Huh?\n\r",ch);
-	return;
-    }
-
-    if (get_tribe(ch,TRIBE_SILENT_STRIDERS) < 5)
-    {
-	stc("You require Theurge 5 to Reach the Umbra.\n\r",ch);
-	return;
-    }
-
-    if ( arg[0] == '\0' )
-    {
-        stc( "Who do you want to pull with you into Umbra?\n\r", ch );
+        stc("Huh?\n\r", ch);
         return;
     }
 
-    if ( ( victim = get_char_room( ch, arg ) ) == NULL )
+    if (get_tribe(ch, TRIBE_SILENT_STRIDERS) < 5)
     {
-        stc( "They are not here.\n\r", ch );
+        stc("You require Silent Striders 5 to Reach out of the Umbra.\n\r", ch);
         return;
     }
 
-    if (ch == victim)
+    cast_room = ch->in_room;
+    if (IS_SET(cast_room->room_flags, ROOM_SAFE))
     {
-	stc("All you have to do is step sideways.\n\r", ch);
-	return;
+        stc("You cannot use Reach in a safe room.\n\r", ch);
+        return;
+    }
+
+    if (argument == NULL) argument = "";
+    if (strlen(argument) >= sizeof(arg))
+    {
+        stc("Syntax: reach <target>\n\r", ch);
+        return;
+    }
+    argument = one_argument(argument, arg);
+    if (arg[0] == '\0' || argument[0] != '\0')
+    {
+        stc("Syntax: reach <target>\n\r", ch);
+        return;
+    }
+
+    if ((victim = get_char_room(ch, arg)) == NULL)
+    {
+        stc("They are not here.\n\r", ch);
+        return;
+    }
+
+    if (victim == ch)
+    {
+        stc("All you have to do is step sideways.\n\r", ch);
+        return;
     }
 
     if (IS_AFFECTED(ch, AFF_SHADOWPLANE))
     {
-	stc("Not while in the Umbra.\n\r", ch);
-	return;
+        stc("Not while in the Umbra.\n\r", ch);
+        return;
     }
-    if (!IS_AFFECTED(victim, AFF_SHADOWPLANE))
+    if (!combat_character_in_room(cast_room, victim) || victim->hit <= 0 ||
+        victim->position <= POS_STUNNED ||
+        !IS_AFFECTED(victim, AFF_SHADOWPLANE) ||
+        IS_AFFECTED(victim, AFF_DEEPUMBRA) ||
+        victim->position == POS_FIGHTING || victim->fighting != NULL ||
+        victim->fight_timer > 0 ||
+        (IS_AFFECTED(ch, AFF_CHARM) && ch->master == victim))
     {
-	stc("They aren't in the Umbra.\n\r", ch);
-	return;
+        stc("That target cannot be reached from the Umbra.\n\r", ch);
+        return;
     }
 
-    act("You reach toward $N and pull $m out of the Umbra",ch,NULL,victim,TO_CHAR);
-    act("$n reaches toward $N and pulls $m out of the Umbra.",ch,NULL,victim,TO_NOTVICT);
-    act("$n reaches toward you and pulls you out of the Umbra.",ch,NULL,victim,TO_VICT);
+    if (!IS_NPC(victim) &&
+        (victim->pcdata == NULL || !hybrid_player_save_valid(victim) ||
+         victim->level < LEV_AWA || get_trust(victim) > LEV_AWA ||
+         !CAN_PK(ch) || !CAN_PK(victim) || victim->desc == NULL ||
+         victim->desc->connected != CON_PLAYING ||
+         IS_SET(victim->pcdata->flag, FLAG_AFK)))
+    {
+        stc("You cannot reach that protected player.\n\r", ch);
+        return;
+    }
+
+    /*
+     * Ordinary combat safety rejects different planes. Reach is specifically
+     * a near-Umbral transfer, so match the caster's phase only while the
+     * synchronous safety predicate runs, then restore it before any action.
+     */
+    SET_BIT(ch->affected_by, AFF_SHADOWPLANE);
+    safe = is_safe(ch, victim);
+    REMOVE_BIT(ch->affected_by, AFF_SHADOWPLANE);
+    if (safe)
+        return;
+
+    if (!combat_character_in_room(cast_room, ch) || ch->hit <= 0 ||
+        !combat_character_in_room(cast_room, victim) || victim->hit <= 0 ||
+        !IS_AFFECTED(victim, AFF_SHADOWPLANE))
+        return;
+
+    act("You reach toward $N and pull $m out of the Umbra.", ch, NULL, victim, TO_CHAR);
+    act("$n reaches toward $N and pulls $m out of the Umbra.", ch, NULL, victim, TO_NOTVICT);
+    act("$n reaches toward you and pulls you out of the Umbra.", ch, NULL, victim, TO_VICT);
     REMOVE_BIT(victim->affected_by, AFF_SHADOWPLANE);
     return;
 }

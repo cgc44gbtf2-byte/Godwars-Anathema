@@ -1058,7 +1058,7 @@ Related Helps: Tribes, and Werewolf.
 2: Messenger's Fortitude - Upkeep claims resistance, but no dedicated damage modifier was located. <unverified>
 3: Speed Beyond Thought - Adds a further combat initiative improvement. <auto>
 4: Unassigned Silent Strider Gift - No separate rank-4 power was located. <unimplemented>
-5: Reach the Umbra - A legacy handler exists, but no player command is registered. <unavailable>
+5: Reach the Umbra - Pulls an eligible, non-fighting target out of the near Umbra. <reach>
 
 Related Helps: Tribes, and Werewolf.
 ~

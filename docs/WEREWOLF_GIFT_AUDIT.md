@@ -14,12 +14,12 @@ barrier pool and pulse timer are not serialized.
 
 | Marker | Meaning | Slots |
 | --- | --- | ---: |
-| A: command | A registered handler contains gameplay behavior; not a safety certification | 62 |
+| A: command | A registered handler contains gameplay behavior; not a safety certification | 63 |
 | P: auto | A passive has an identified production consumer | 28 |
 | G: upgrade | Modifies an existing command, not an extra automatic action | 1 |
 | V: unverified | No matching dedicated effect located; absence is not proven universally | 9 |
 | U: unimplemented | No separate implemented gift found for that slot | 1 |
-| X: unavailable | Legacy handler exists but is not registered for player commands | 4 |
+| X: unavailable | Legacy handler exists but is not registered for player commands | 3 |
 | D: disabled | Unregistered legacy handler also explicitly has no gameplay effect | 0 |
 
 `wwpowers` is a command list, not proof that every listed command works.
@@ -61,7 +61,7 @@ short descriptions and command spellings are in `Genesis/area/class.hlp`.
 | Glass Walkers | A A A A A | Read Aura is inspection, not a vision toggle; Surge attacks eligible room targets |
 | Red Talons | V V P A A | Claw-parry claims not verified; combat rage ceiling at 3; Quicksand snare at 4; transient appearance curse at 5 |
 | Shadow Lords | P A A A A | Clap is active; Dominator drains rage; no separate Open Wounds power |
-| Silent Striders | P V P U X | Initiative at 1 and 3; no verified Fortitude consumer or distinct rank-4 gift |
+| Silent Striders | P V P U A | Initiative at 1 and 3; no verified Fortitude consumer or distinct rank-4 gift; Reach 5 pulls an eligible near-Umbra target out |
 | Silver Fangs | V V X A X | Shield 4; Wrath/Mastery unavailable; no implemented Luna's Avenger body form |
 | Uktena | A P V X A | Shroudnight 1; underwater movement permission 2; flight claim not verified |
 | Wendigos | A A A P A | Cutting Wind is not typed cold damage; Invoke has specific weather modes |
@@ -72,7 +72,8 @@ short descriptions and command spellings are in `Genesis/area/class.hlp`.
 - Active Breed handlers: `Genesis/src/classes/werewolf/wwbreed.c` and
   `Genesis/src/classes/werewolf/totem.c`.
 - Active Auspice handlers: `Genesis/src/classes/werewolf/wwauspice.c`.
-- Active Tribe handlers: `Genesis/src/classes/werewolf/wwtribe.c`.
+- Active Tribe handlers, including rank-5 Silent Striders Reach:
+  `Genesis/src/classes/werewolf/wwtribe.c`.
 - Shared commands and rank gates: `clan.c`, `more.c`, and `interp.c`.
 - Every `<auto>` slot has an exact production consumer recorded in
   `tests/test_werewolf_help_catalog.py`, including combat, movement, visibility,
@@ -85,8 +86,8 @@ short descriptions and command spellings are in `Genesis/area/class.hlp`.
 ## Overlaps and remaining risks
 
 Grandmother's Touch uses the same Mother handler and cooldown. It is an upgrade,
-not a second healing trigger. There are 62 unique canonical registered names
-in the gift menu, including the restored Disquiet, Quicksand, Lycaon and
+not a second healing trigger. There are 63 unique canonical registered names
+in the gift menu, including the restored Disquiet, Quicksand, Lycaon, Reach,
 Scream of Gaia and Metis Totem Gift.
 
 Get of Fenris 1, Shadow Lords 1 and Philodox 3 retain their separate +100
@@ -135,7 +136,8 @@ of those projects. No foreign C code has been imported.
 | Totem Gift | GWLow5/LoC contain declarations of `do_totemgift` | Implemented natively as a stationary tribe-themed object with an owner-only damage pool; archived declarations were not copied |
 | Scream of Gaia | Several projects register `do_scream`, but the examined handlers require Vampire/Melpominee powers | Same command name, wrong class/power. Not evidence of a completed Werewolf Scream of Gaia |
 | Other unverified passives | No dedicated effect or consumer was confirmed for the remaining entries | Keep honest gap labels; do not infer implementation from help text |
-| Reach / Wrath / Mastery | Native handlers already exist but are unbound. Foreign `wrath`/`mastery` names also occur in Angel, Shadow or legend systems | Name collisions are not Werewolf implementations and must not be imported as substitutes |
+| Reach | Native rank-5 handler restored as the Silent Striders command; it extracts an eligible target from near Umbra under current target-safety rules | No cost/recovery was added; foreign names are not needed |
+| Wrath / Mastery | Native handlers exist but remain unbound. Foreign names also occur in Angel, Shadow or legend systems | Name collisions are not Werewolf implementations and must not be imported as substitutes |
 
 For Razor Claws, some related snapshots only expose flag/display changes in the
 searched paths; the GWLow5 combat consumer is the distinguishing evidence.
@@ -148,6 +150,15 @@ Treat Razor Claws as a separate balance
 decision, and postpone new body forms until the form-ownership integration is
 ready. Review licensing/credits and test native/hybrid caps, shared effects,
 safe targets, persistence and cleanup before any foreign-derived behavior ships.
+
+## Selected Reach restoration
+
+`reach <target>` is Silent Striders 5. It removes only the ordinary near-Umbra
+flag from an eligible same-room, non-fighting target; the caster remains in the
+normal plane. Deep Umbra targets, safe rooms, protected/non-PK/AFK/link-dead
+players, protected NPCs and malformed or removed actors are rejected. The
+existing handler had no mana charge or recovery, so none was introduced. The
+command adds no new serialized state. Rank 4 remains explicitly unassigned.
 
 ## Selected Disquiet restoration
 

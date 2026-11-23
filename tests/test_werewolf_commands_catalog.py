@@ -12,6 +12,26 @@ def blob(text):
     return hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
 
 class WerewolfCommandsCatalog(unittest.TestCase):
+    def test_reach_inverse_preserves_all_other_runtime_and_help_bytes(self):
+        from reach_source import without_reach
+        for path,expected in (
+            ("classes/werewolf/wwtribe.c","aa686020c6f9d4e0d2a452b139c629e2d0be01ee"),
+            ("classes/werewolf/werewolf.c","7665c4350bef29d48c8a83efc8f705ae3f48dbaa"),
+            ("interp.c","aa6cdbe995767636e28abb8143c502b7deed824d"),
+            ("merc.h","6b94eea4bc958cfa64cb9b9d86805f1673937c7c"),
+            ("../area/class.hlp","bcf6a46c9388da330b525674bbd4afe113fbeb2f"),
+        ):
+            with self.subTest(path=path):
+                text=(SRC/path).read_text()
+                restored=without_reach(text)
+                self.assertEqual(blob(restored),expected)
+                self.assertEqual(without_reach(restored),restored)
+                self.assertNotEqual(blob(without_reach(text+"\n/* mutation */\n")),expected)
+        source=(SRC/"classes/werewolf/wwtribe.c").read_text()
+        with self.assertRaises(AssertionError):
+            without_reach(source.replace("safe = is_safe(ch, victim);",
+                                         "safe = FALSE;",1))
+
     def test_quicksand_inverse_preserves_all_other_runtime_bytes(self):
         for path,expected in (
             ("act_move.c","83cb8b9819d7205bee50c7a27323390adfb59b6d"),
@@ -100,12 +120,11 @@ class WerewolfCommandsCatalog(unittest.TestCase):
             missing.update(fn for fn in re.findall(
                 r"^void\s+(do_\w+)\s*\(",path.read_text(),re.M)
                 if fn not in entries)
-        self.assertEqual(missing,{"do_reach",
-                                 "do_wrath","do_mastery","do_invisibility"})
+        self.assertEqual(missing,{"do_wrath","do_mastery","do_invisibility"})
         menu=(SRC/"classes/werewolf/werewolf.c").read_text().split(
             "void do_wwpowers(",1)[1].split("void do_gifts(",1)[0]
         for label in ("Quicksand","Lycaon","Screamgaia",
-                      "Reach[unavailable]","Wrath[unavailable]",
+                      "Reach","Wrath[unavailable]",
                       "Mastery[unavailable]","Invisibility[unavailable]",
                       "Totemgift"):
             self.assertIn(label,menu)
@@ -170,7 +189,7 @@ class WerewolfCommandsCatalog(unittest.TestCase):
             if label==".\\n\\r" or "[" in label:continue
             words=label.split(":")[-1].strip().split()
             if words:active.append(words[0].casefold())
-        self.assertEqual(len(active),62)
+        self.assertEqual(len(active),63)
         self.assertEqual(len(set(active)),len(active))
 
 if __name__=="__main__":

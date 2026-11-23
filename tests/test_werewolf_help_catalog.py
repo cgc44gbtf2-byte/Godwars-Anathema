@@ -14,8 +14,8 @@ UNVERIFIED={("Ahroun",1),("Galliard",2),("Bone Gnawers",5),
             ("Red Talons",1),("Red Talons",2),("Silent Striders",2),
             ("Silver Fangs",1),("Silver Fangs",2),("Uktena",3)}
 UNIMPLEMENTED={("Silent Striders",4)}
-UNAVAILABLE={("Silent Striders",5):"do_reach",("Silver Fangs",3):"do_wrath",
-             ("Silver Fangs",5):"do_mastery",("Uktena",4):"do_invisibility"}
+UNAVAILABLE={("Silver Fangs",3):"do_wrath",("Silver Fangs",5):"do_mastery",
+             ("Uktena",4):"do_invisibility"}
 DISABLED={}
 # Each passive has a production consumer, not merely an upkeep message.
 PASSIVES={
@@ -70,10 +70,10 @@ class WerewolfHelpCatalog(unittest.TestCase):
             "auto","unverified","unimplemented","unavailable","disabled"} else
             x["tag"].split(":")[0] if ":" in x["tag"] else "command"
             for x in rows.values())
-        self.assertEqual(kinds,{"command":62,"auto":28,"unverified":9,
-            "unimplemented":1,"unavailable":4,"upgrade":1})
+        self.assertEqual(kinds,{"command":63,"auto":28,"unverified":9,
+            "unimplemented":1,"unavailable":3,"upgrade":1})
 
-    def test_62_commands_match_menu_at_exact_tree_and_rank(self):
+    def test_63_commands_match_menu_at_exact_tree_and_rank(self):
         text=(SRC/"classes/werewolf/werewolf.c").read_text().split(
             "void do_wwpowers(",1)[1].split("void do_gifts(",1)[0]
         menu={}
@@ -90,7 +90,7 @@ class WerewolfHelpCatalog(unittest.TestCase):
         actual={k:v["tag"] for k,v in rows.items() if re.fullmatch(r"[a-z]+",v["tag"])
                 and v["tag"] not in {"auto","unverified","unimplemented","unavailable","disabled"}}
         self.assertEqual(actual,menu)
-        self.assertEqual(len(set(actual.values())),62)
+        self.assertEqual(len(set(actual.values())),63)
         bindings=dict(re.findall(r'\{\s*"([^"]+)"\s*,\s*(do_\w+)',
                                  (SRC/"interp.c").read_text()))
         definitions="\n".join(p.read_text() for p in SRC.rglob("*.c"))
@@ -120,6 +120,12 @@ class WerewolfHelpCatalog(unittest.TestCase):
             "void do_disquiet(",1)[1].split("void do_spiritward(",1)[0]
         self.assertNotIn('stc("Gutted!',restored)
         self.assertEqual(rows[("Homid",4)]["tag"],"disquiet")
+        self.assertEqual(rows[("Silent Striders",5)]["tag"],"reach")
+        reach=(SRC/"classes/werewolf/wwtribe.c").read_text().split(
+            "void do_reach(",1)[1].split("void do_wrath(",1)[0]
+        self.assertIn("TRIBE_SILENT_STRIDERS",reach)
+        self.assertIn("combat_character_in_room(cast_room, victim)",reach)
+        self.assertIn("safe = is_safe(ch, victim)",reach)
         self.assertEqual(restored.count("affect_to_char(victim, &effect)"),2)
 
     def test_grandmother_is_an_upgrade_not_an_extra_auto_heal(self):

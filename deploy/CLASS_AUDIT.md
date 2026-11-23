@@ -103,6 +103,11 @@ values are regression-tested, not rebalanced. NPC and immortal caps differ.
   movement snare; Lycaon is a Red Talons 5, 30-pulse display-only wolf curse
   whose morph is not written to saves or character identity fields. Get of
   Fenris 4 Scream of Gaia interrupts eligible room foes briefly without damage.
+- **Silent Striders Reach:** rank-5 `reach <target>` restores the existing
+  handler to the player command table. It pulls an eligible, non-fighting
+  near-Umbra target into the normal plane; safe rooms, protected targets,
+  non-PK/AFK/link-dead/staff players, and deep Umbra are rejected. It keeps the
+  handler's existing no-cost/no-recovery behavior and adds no save fields.
 - **Teach discipline:** subsequently replaced with guarded EM-style teaching
   in `vampire.c`: free at rank 3, explicit named student acceptance, and
   checked persistence. See the subsequent port notes below.
