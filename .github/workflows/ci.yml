@@ -60,6 +60,7 @@ jobs:
             exit "$status"
           fi
           python3 tests/test_catalog.py
+          python3 tests/test_sorcerer_catalog.py
       - name: Isolated boot and graceful stop
         run: |
           python3 tests/smoke_shutdown.py
