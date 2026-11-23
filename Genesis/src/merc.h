@@ -2843,6 +2843,7 @@ DECLARE_DO_FUN( do_monk         );
 DECLARE_DO_FUN( do_bridgewalk	);
 DECLARE_DO_FUN( do_grasp	);
 DECLARE_DO_FUN( do_reach);
+DECLARE_DO_FUN( do_wrath);
 
 /* Drow functions */
 DECLARE_DO_FUN(	do_attune	);

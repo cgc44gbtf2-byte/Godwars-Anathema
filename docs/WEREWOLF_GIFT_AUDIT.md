@@ -2,7 +2,8 @@
 
 Scope: the 105 native Werewolf help slots, their command registrations,
 rank gates, passive consumers, and overlap descriptions. This began as a
-help/test-only change. Disquiet, Quicksand, Lycaon and Metis Totem Gift were
+help/test-only change. Disquiet, Quicksand, Lycaon, Scream of Gaia, Metis Totem
+Gift, Reach and Wrath were
 subsequently restored as described below; training costs and rank caps remain unchanged. Disquiet's
 saved affect identity advances compatibility to save epoch 4; Quicksand is
 runtime-only and adds no saved affect or identifier. Lycaon is runtime-only;
@@ -14,12 +15,12 @@ barrier pool and pulse timer are not serialized.
 
 | Marker | Meaning | Slots |
 | --- | --- | ---: |
-| A: command | A registered handler contains gameplay behavior; not a safety certification | 63 |
+| A: command | A registered handler contains gameplay behavior; not a safety certification | 64 |
 | P: auto | A passive has an identified production consumer | 28 |
 | G: upgrade | Modifies an existing command, not an extra automatic action | 1 |
 | V: unverified | No matching dedicated effect located; absence is not proven universally | 9 |
 | U: unimplemented | No separate implemented gift found for that slot | 1 |
-| X: unavailable | Legacy handler exists but is not registered for player commands | 3 |
+| X: unavailable | Legacy handler exists but is not registered for player commands | 2 |
 | D: disabled | Unregistered legacy handler also explicitly has no gameplay effect | 0 |
 
 `wwpowers` is a command list, not proof that every listed command works.
@@ -62,7 +63,7 @@ short descriptions and command spellings are in `Genesis/area/class.hlp`.
 | Red Talons | V V P A A | Claw-parry claims not verified; combat rage ceiling at 3; Quicksand snare at 4; transient appearance curse at 5 |
 | Shadow Lords | P A A A A | Clap is active; Dominator drains rage; no separate Open Wounds power |
 | Silent Striders | P V P U A | Initiative at 1 and 3; no verified Fortitude consumer or distinct rank-4 gift; Reach 5 pulls an eligible near-Umbra target out |
-| Silver Fangs | V V X A X | Shield 4; Wrath/Mastery unavailable; no implemented Luna's Avenger body form |
+| Silver Fangs | V V A A X | Wrath 3 frightens eligible hostile vampires; Shield 4; Mastery unavailable; no implemented Luna's Avenger body form |
 | Uktena | A P V X A | Shroudnight 1; underwater movement permission 2; flight claim not verified |
 | Wendigos | A A A P A | Cutting Wind is not typed cold damage; Invoke has specific weather modes |
 | Stargazers | A P P P P | Hit/damage scaling, rating-based Obfuscate sight, avoidance and probabilistic redirection |
@@ -86,8 +87,8 @@ short descriptions and command spellings are in `Genesis/area/class.hlp`.
 ## Overlaps and remaining risks
 
 Grandmother's Touch uses the same Mother handler and cooldown. It is an upgrade,
-not a second healing trigger. There are 63 unique canonical registered names
-in the gift menu, including the restored Disquiet, Quicksand, Lycaon, Reach,
+not a second healing trigger. There are 64 unique canonical registered names
+in the gift menu, including the restored Disquiet, Quicksand, Lycaon, Reach, Wrath,
 Scream of Gaia and Metis Totem Gift.
 
 Get of Fenris 1, Shadow Lords 1 and Philodox 3 retain their separate +100
@@ -137,7 +138,8 @@ of those projects. No foreign C code has been imported.
 | Scream of Gaia | Several projects register `do_scream`, but the examined handlers require Vampire/Melpominee powers | Same command name, wrong class/power. Not evidence of a completed Werewolf Scream of Gaia |
 | Other unverified passives | No dedicated effect or consumer was confirmed for the remaining entries | Keep honest gap labels; do not infer implementation from help text |
 | Reach | Native rank-5 handler restored as the Silent Striders command; it extracts an eligible target from near Umbra under current target-safety rules | No cost/recovery was added; foreign names are not needed |
-| Wrath / Mastery | Native handlers exist but remain unbound. Foreign names also occur in Angel, Shadow or legend systems | Name collisions are not Werewolf implementations and must not be imported as substitutes |
+| Wrath | Native Silver Fangs 3 handler restored with caster/target guards and the corrected target-Beast check | Retains normal fear, rank-based hit/damage penalties and zero mana cost; 20-pulse recovery only when a target is affected |
+| Mastery | Native handler remains unbound. Foreign names also occur in Angel, Shadow or legend systems | Name collisions are not Werewolf implementations and must not be imported as substitutes |
 
 For Razor Claws, some related snapshots only expose flag/display changes in the
 searched paths; the GWLow5 combat consumer is the distinguishing evidence.
@@ -159,6 +161,25 @@ normal plane. Deep Umbra targets, safe rooms, protected/non-PK/AFK/link-dead
 players, protected NPCs and malformed or removed actors are rejected. The
 existing handler had no mana charge or recovery, so none was introduced. The
 command adds no new serialized state. Rank 4 remains explicitly unassigned.
+
+## Selected Wrath restoration
+
+`wrath` is Silver Fangs 3. Its existing two fear affects reduce hitroll and
+damroll by the learned rank, capped at 5, with the same random 1–2 duration in
+ordinary affect updates. Normal expiry removes them on the update after zero.
+Only eligible hostile, awake, online PK vampires with positive Beast qualify;
+the caster's Beast is no longer used. Safe rooms, allies, protected players,
+peace protection even during combat, incompatible planes, existing fear and
+underflowing stat subtraction are rejected. No mana is charged. The existing
+20-pulse caster recovery now applies only when at least one target is affected.
+This is not a stun or a direct flee/damage command; existing fear consumers are
+unchanged. Normal affect saves and stat restoration are preserved.
+
+Real-engine normal and sanitizer fixtures cover 45 rejection guards, 192
+ordinary casts, 192 arithmetic boundaries, multiple and protected room targets,
+non-refresh across casters, actual expiry, and full/short saved reloads.
+Exact inverse fixtures pin all other production/help bytes to the prior head.
+No new hybrid permission, training price, saved field or migration is introduced.
 
 ## Selected Disquiet restoration
 
@@ -222,8 +243,9 @@ single-target and room-wide). Obedience command input and announcements are
 bounded. A further 912 ordinary engine cases pin existing effects, resistance,
 messages and RNG; controlled callback tests cover extraction/movement of caster,
 target and cached next member. No additional gift or secondary-parent permission
-is enabled. Call of the Wyrm and undispatched Wrath of Gaia were inspected and
-left unchanged; this is not a complete audit of their transformation policies.
+is enabled in that pass. Call of the Wyrm and then-undispatched Wrath of Gaia
+were left unchanged there. Wrath's subsequent guarded restoration is described
+above; Call of the Wyrm's transformation policies remain outside that work.
 
 Galliard utility follow-up: Call of the Wyld now bounds reports and validates
 its room/opponent, while retaining wounded calls and the existing recipients.

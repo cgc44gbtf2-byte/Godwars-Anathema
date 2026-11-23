@@ -108,6 +108,11 @@ values are regression-tested, not rebalanced. NPC and immortal caps differ.
   near-Umbra target into the normal plane; safe rooms, protected targets,
   non-PK/AFK/link-dead/staff players, and deep Umbra are rejected. It keeps the
   handler's existing no-cost/no-recovery behavior and adds no save fields.
+- **Silver Fangs Wrath:** rank-3 `wrath` applies the existing brief fear and
+  rank-based hitroll/damroll penalties to eligible hostile vampires with positive
+  Beast. Caster/target safety and arithmetic guards are enforced. It costs no
+  mana; 20-pulse recovery occurs only when a target is affected. Normal affect
+  expiry, saves and stat restoration remain unchanged; no new save fields.
 - **Teach discipline:** subsequently replaced with guarded EM-style teaching
   in `vampire.c`: free at rank 3, explicit named student acceptance, and
   checked persistence. See the subsequent port notes below.

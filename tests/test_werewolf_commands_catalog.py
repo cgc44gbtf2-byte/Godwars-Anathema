@@ -12,6 +12,26 @@ def blob(text):
     return hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
 
 class WerewolfCommandsCatalog(unittest.TestCase):
+    def test_wrath_inverse_preserves_all_other_runtime_and_help_bytes(self):
+        from wrath_source import without_wrath
+        for path,expected in (
+            ("classes/werewolf/wwtribe.c","ed6fbdd8263e54294e4a6db31a999cf7a83551de"),
+            ("classes/werewolf/werewolf.c","4b25ab7b4dd57c3ae7d280d8eb7339b175aa35cb"),
+            ("interp.c","4ab4f36ecba8a77a3e717f1324a0a2f8b99fca35"),
+            ("merc.h","ed638e2815e95d882cdf503aabc6663ee557316e"),
+            ("../area/class.hlp","52a0e6643e4a8186349cd90879d6731349af9c77"),
+        ):
+            with self.subTest(path=path):
+                text=(SRC/path).read_text()
+                restored=without_wrath(text)
+                self.assertEqual(blob(restored),expected)
+                self.assertEqual(without_wrath(restored),restored)
+                self.assertNotEqual(blob(without_wrath(text+"\n/* mutation */\n")),expected)
+        source=(SRC/"classes/werewolf/wwtribe.c").read_text()
+        with self.assertRaises(AssertionError):
+            without_wrath(source.replace("victim->hitroll < LONG_MIN + rank",
+                                         "victim->hitroll < LONG_MIN",1))
+
     def test_reach_inverse_preserves_all_other_runtime_and_help_bytes(self):
         from reach_source import without_reach
         for path,expected in (
@@ -120,11 +140,11 @@ class WerewolfCommandsCatalog(unittest.TestCase):
             missing.update(fn for fn in re.findall(
                 r"^void\s+(do_\w+)\s*\(",path.read_text(),re.M)
                 if fn not in entries)
-        self.assertEqual(missing,{"do_wrath","do_mastery","do_invisibility"})
+        self.assertEqual(missing,{"do_mastery","do_invisibility"})
         menu=(SRC/"classes/werewolf/werewolf.c").read_text().split(
             "void do_wwpowers(",1)[1].split("void do_gifts(",1)[0]
         for label in ("Quicksand","Lycaon","Screamgaia",
-                      "Reach","Wrath[unavailable]",
+                      "Reach","Wrath",
                       "Mastery[unavailable]","Invisibility[unavailable]",
                       "Totemgift"):
             self.assertIn(label,menu)
@@ -144,6 +164,7 @@ class WerewolfCommandsCatalog(unittest.TestCase):
     def test_engine_suite_and_saved_format_unchanged(self):
         self.assertIn("tests/test_werewolf_commands",make_values(ROOT,"TESTS"))
         self.assertIn("tests/test_werewolf_totem",make_values(ROOT,"TESTS"))
+        self.assertIn("tests/test_werewolf_wrath",make_values(ROOT,"TESTS"))
         test=(ROOT/"tests/test_werewolf_commands.c").read_text()
         for item in ("count==1539","mode<19","hybrid_training_prepare",
                      "SCORE_NUM_QUEST]=0","interpret(actors,command)",
@@ -189,7 +210,7 @@ class WerewolfCommandsCatalog(unittest.TestCase):
             if label==".\\n\\r" or "[" in label:continue
             words=label.split(":")[-1].strip().split()
             if words:active.append(words[0].casefold())
-        self.assertEqual(len(active),63)
+        self.assertEqual(len(active),64)
         self.assertEqual(len(set(active)),len(active))
 
 if __name__=="__main__":

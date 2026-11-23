@@ -87,8 +87,21 @@ NPCs, and non-PK, AFK, link-dead, or staff players are rejected. It retains the
 existing no-cost/no-recovery behavior; no new saved state is added. The old
 Mastery implementation still needs a separate review of forced-command and
 staff-target protections before use.
-Wrath, Mastery, and Invisibility still have source handlers but remain
+Mastery and Invisibility still have source handlers but remain
 **unavailable** because they are not registered as player commands.
+
+Silver Fangs 3 `wrath` frightens eligible hostile vampires in the room whose
+Beast is positive. It applies normal fear and reduces hitroll and damroll by
+the caster's Silver Fangs rank (3–5) for a random duration of 1–2 ordinary
+affect updates; removal happens on the next update after duration reaches zero.
+The effect uses normal fear behavior, not a stun or direct damage.
+It costs no mana and imposes 20 pulses of caster recovery only if at least one
+target is affected. Safe rooms, allies, non-PK/AFK/link-dead/staff players,
+peace protection, incompatible planes, existing fear, and unsafe stat
+subtraction are rejected without recovery. Existing fear cannot be stacked or
+refreshed. The caster's Beast is irrelevant. Normal affect saves, expiry and
+stat restoration are retained; no new save fields or secondary-parent
+Werewolf permissions are added.
 
 This review covers advancement, shift/Rage/Calm, command registration, gift
 menu gates, malformed gift data and oversized selector/transformation input.
@@ -239,9 +252,10 @@ sanitizers (healing/input boundaries and test-only flee/command callbacks).
 These injections establish callback contracts, not a claim that every ordinary
 flee or forced command frees its participants.
 
-Call of the Wyrm and the undispatched Wrath of Gaia were inspected but are
-unchanged: Wyrm's existing visibility/shape toggles are not newly redesigned,
-and Wrath remains unavailable through the command table. Power Surge and Clap
+Call of the Wyrm and the then-undispatched Wrath of Gaia were inspected but
+left unchanged in that pass. Wrath was subsequently restored with the guards
+described above; Wyrm's existing visibility/shape toggles are not redesigned.
+Power Surge and Clap
 retain the earlier safeguards and targeting policies. Character-list integrity,
 same-address recycling, broader forced-command authorization and live scripted
 multiplayer interactions still require separate review.
@@ -264,5 +278,6 @@ treated as a different target.
 The real-engine tests pin 800 ordinary native/original-parent hybrid cases,
 including room changes, messages, flags and RNG, and cover empty/restricted
 worlds, the last eligible room and bounded lookup failures. No new powers or
-secondary-parent Werewolf access are enabled. Call of the Wyrm's transformation
-policies and undispatched Wrath remain outside this change.
+secondary-parent Werewolf access are enabled by the Galliard follow-up. Call of
+the Wyrm's transformation policies remained outside that change; Wrath's
+separate restoration is described above.

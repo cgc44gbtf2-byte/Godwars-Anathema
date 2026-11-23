@@ -62,6 +62,8 @@ OLD = '''void do_reach( CHAR_DATA *ch, char *argument )
 
 
 def without_reach(text):
+    from wrath_source import without_wrath
+    text = without_wrath(text)
     match = re.search(r"void do_reach\(.*?(?=\nvoid do_wrath\()", text, re.S)
     if match:
         current = match.group(0)

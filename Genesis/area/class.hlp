@@ -1066,7 +1066,7 @@ Related Helps: Tribes, and Werewolf.
 0 'Silver Fangs'~
 1: Falcon's Grasp - No rank-specific disarm immunity was verified. <unverified>
 2: Lambent Flame - No dedicated rank-2 avoidance effect was located. <unverified>
-3: Wrath of Gaia - A legacy handler exists, but no player command is registered. <unavailable>
+3: Wrath of Gaia - Frightens eligible nearby vampires with positive Beast, reducing hitroll and damroll by gift rank. <wrath>
 4: Shield - Toggles aura shielding against inspection. <shield>
 5: Mastery - A legacy handler exists, but no player command is registered. <unavailable>
 

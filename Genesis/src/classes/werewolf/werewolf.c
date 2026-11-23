@@ -282,7 +282,7 @@ if (get_tribe(ch, TRIBE_SILENT_STRIDERS) >= 5) strcat(buf, " Reach");
     if (get_tribe(ch, TRIBE_SILVER_FANGS) >= 1)
     {
 	strcpy(buf, "Silver Fangs:");
-if (get_tribe(ch, TRIBE_SILVER_FANGS) >= 3) strcat(buf, " Wrath[unavailable]");
+if (get_tribe(ch, TRIBE_SILVER_FANGS) >= 3) strcat(buf, " Wrath");
 	if (get_tribe(ch, TRIBE_SILVER_FANGS) >= 4) strcat(buf, " Shield");
 if (get_tribe(ch, TRIBE_SILVER_FANGS) >= 5) strcat(buf, " Mastery[unavailable]");
 	strcat(buf, ".\n\r");

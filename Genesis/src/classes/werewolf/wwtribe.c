@@ -1710,61 +1710,89 @@ void do_reach( CHAR_DATA *ch, char *argument )
 
 void do_wrath( CHAR_DATA *ch, char *argument )
 {
-    CHAR_DATA *ich; 
-    CHAR_DATA *fch;
-    AFFECT_DATA af;
-    long sn;
+    CHAR_DATA *victim, *victim_next;
+    ROOM_INDEX_DATA *cast_room;
+    long sn, rank;
+    bool affected_target = FALSE;
 
-    if (IS_NPC(ch)) return;
+    (void)argument;
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL ||
+        !hybrid_player_save_valid(ch) || ch->hit <= 0 ||
+        ch->position < POS_FIGHTING || ch->wait > 0 ||
+        IS_COMBAT_PAUSED(ch) ||
+        !combat_character_in_room(ch->in_room, ch))
+        return;
 
-    if (!IS_WEREWOLF(ch))
+    if (!IS_WEREWOLF(ch) || ch->level < LEV_AWA)
     {
-	stc("Huh?\n\r",ch);
-	return;
+        stc("Huh?\n\r", ch);
+        return;
     }
 
-    if (get_tribe(ch,TRIBE_SILVER_FANGS) < 3)
+    rank = get_tribe(ch, TRIBE_SILVER_FANGS);
+    if (rank < 3)
     {
-	stc("You require Silver Fangs 3 to use Wrath of Gaia.\n\r",ch);
-	return;
+        stc("You require Silver Fangs 3 to use Wrath of Gaia.\n\r", ch);
+        return;
+    }
+
+    cast_room = ch->in_room;
+    if (IS_SET(cast_room->room_flags, ROOM_SAFE))
+    {
+        stc("You cannot use Wrath of Gaia in a safe room.\n\r", ch);
+        return;
     }
 
     if ( ( sn = skill_lookup( "fear" ) ) < 0 )
     {
-	stc( "Bug - please inform Akuma.\n\r", ch );
-	return;
+        stc("Wrath of Gaia is unavailable: the fear affect is missing.\n\r", ch);
+        return;
     }
 
-    stc("You start to howl.\n\r",ch);
-    act("$n starts to howl.",ch,NULL,NULL,TO_ROOM);
-
-    for ( ich = ch->in_room->people; ich != NULL; ich = fch )
+    for (victim = cast_room->people; victim != NULL; victim = victim_next)
     {
-	fch = ich->next_in_room;
-        if (IS_NPC(ich))
-	    continue;
-        if ((!IS_VAMPIRE(ich) || ch->beast <= 0))
-	    continue;
-	if (ich == ch)
-	    continue;
-	if ( IS_AFFECTED(ich, AFF_FEAR) )
-	    continue;
+        victim_next = victim->next_in_room;
+        if (victim == ch || !combat_pair_in_room(cast_room, ch, victim) ||
+            !IS_VAMPIRE(victim) || victim->pcdata == NULL ||
+            !hybrid_player_save_valid(victim) || victim->beast <= 0 ||
+            !IS_AWAKE(victim) || victim->position <= POS_STUNNED ||
+            victim->level < LEV_AWA || get_trust(victim) > LEV_AWA ||
+            !CAN_PK(ch) || !CAN_PK(victim) ||
+            victim->desc == NULL || victim->desc->connected != CON_PLAYING ||
+            IS_SET(victim->pcdata->flag, FLAG_AFK) ||
+            is_same_group(ch, victim) ||
+            (IS_AFFECTED(ch, AFF_CHARM) && ch->master == victim) ||
+            IS_ITEMAFF(ch, ITEMA_PEACE) || IS_ITEMAFF(victim, ITEMA_PEACE) ||
+            IS_AFFECTED(victim, AFF_FEAR) || is_affected(victim, sn) ||
+            victim->hitroll < LONG_MIN + rank ||
+            victim->damroll < LONG_MIN + rank ||
+            is_safe(ch, victim))
+            continue;
 
-	stc("You are overcome by fear.\n\r",ich);
-	act("$n screams in terror!",ich,NULL,NULL,TO_ROOM);
-	af.type      = sn;
-	af.location  = APPLY_HITROLL;
-	af.modifier  = 0 - get_tribe(ch,TRIBE_SILVER_FANGS);
-	af.duration  = number_range(1,2);
-	af.bitvector = AFF_FEAR;
-	affect_to_char( ich, &af );
+        if (!affected_target)
+        {
+            stc("You start to howl.\n\r", ch);
+            act("$n starts to howl.", ch, NULL, NULL, TO_ROOM);
+            affected_target = TRUE;
+        }
 
-	af.location  = APPLY_DAMROLL;
-	af.modifier  = 0 - get_tribe(ch,TRIBE_SILVER_FANGS);
-	affect_to_char( ich, &af );
+        AFFECT_DATA af = {0};
+        af.type      = sn;
+        af.location  = APPLY_HITROLL;
+        af.modifier  = -rank;
+        af.duration  = number_range(1,2);
+        af.bitvector = AFF_FEAR;
+        affect_to_char(victim, &af);
+        af.location  = APPLY_DAMROLL;
+        affect_to_char(victim, &af);
+        stc("You are overcome by fear.\n\r", victim);
+        act("$n screams in terror!", victim, NULL, NULL, TO_ROOM);
     }
-    WAIT_STATE(ch,20);
-    return;
+
+    if (affected_target)
+        WAIT_STATE(ch,20);
+    else
+        stc("There are no vampires here you can frighten.\n\r", ch);
 }
 
 void do_mastery( CHAR_DATA *ch, char *argument )

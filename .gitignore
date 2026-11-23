@@ -113,6 +113,7 @@ tests/test_hybrid_mastery
 tests/test_hybrid_scry
 tests/test_hybrid_shield
 tests/test_werewolf_commands
+tests/test_werewolf_wrath
 tests/test_disquiet
 tests/test_werewolf_combat
 tests/test_werewolf_reactions
