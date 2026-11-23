@@ -31,4 +31,8 @@ if save.count("memset(ch->pcdata->components") < 2: fail("loaders must zero comp
 for needle in ("level", "trust"):
     if re.search(r"ch->%s\s*=" % needle, (src / "classes/sorcerer/apprentice.c").read_text()):
         fail("apprenticeship must not write " + needle)
+area = (root / "Genesis/area/school.are").read_text()
+if not re.search(r"^#3730\nsorctrainer ", area, re.M): fail("school.are lacks the sorctrainer mob 3730")
+if "M 0 3730 1 3700" not in area: fail("sorctrainer is not reset into the Mud School entrance")
+if "sorctrainer" not in (src / "classes/sorcerer/apprentice.c").read_text(): fail("apprentice.c ignores sorctrainer")
 print("sorcerer catalogue: 53 recipes, 11/10/4 components, docs and saves in sync")

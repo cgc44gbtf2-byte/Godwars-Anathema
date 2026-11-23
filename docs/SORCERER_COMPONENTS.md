@@ -91,10 +91,12 @@ State is `pcdata->apprentice[4]`: [0] stage (0 legacy, 1 apprentice, 2 graduated
 - New Sorcerers created through class selection start at stage 1.
 - Commands: `apprentice` (status), `apprentice teach <player>`, `apprentice accept`, `apprentice decline`, `apprentice train` (at an NPC).
 - Player mentor: a graduated or legacy Sorcerer in the room; the apprentice must accept the offer. One lesson per 10 minutes. The apprentice pays 5 primal.
-- NPC trainer: an awake, non-fighting NPC in the room whose name contains `sorctrainer`. Same cooldown, 10 primal.
+- NPC trainer: an awake, non-fighting NPC in the room whose name contains `sorctrainer`. Same cooldown, 10 primal. Shipped trainer: mob 3730 "the Sorcerer trainer" in `school.are`, reset into the Mud School entrance room 3700. Builders can place more by naming a mob with the `sorctrainer` keyword.
 - Graduation: 5 lessons, at least 3 runes, 1 glyph, 1 sigil, and color ranks totalling at least 3. Stage becomes 2 once; a one-time 100 primal reward is guarded by the reward flag.
 - Nothing here touches `ch->level`, trust or staff status. Stage never decreases.
 
 ## Compatibility
 
 New fields zero-initialise in both loaders and are reset by clearclass with colors.
+
+Vision recipes (`mind information targeting` = readaura, `mind information area` = scry) temporarily grant the vision gate for that one call and restore the player's own flags afterwards.

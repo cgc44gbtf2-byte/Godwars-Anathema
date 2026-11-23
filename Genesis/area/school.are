@@ -165,6 +165,18 @@ a strong urge to kill this creature.
 20 0 0 0d0+0 0d0+0
 0 0
 0 0 1
+#3730
+sorctrainer sorcerer trainer~
+the Sorcerer trainer~
+A Sorcerer trainer waits here to guide apprentices.
+~
+She wears midnight robes embroidered with runes. Apprentice Sorcerers may
+type 'apprentice train' here to take lessons. You shouldn't attack her.
+~
+49 136 0 S
+50 0 0 0d0+0 0d0+0
+0 0
+0 0 2
 #0
 
 
@@ -1255,6 +1267,7 @@ M 0 3712 15 3726
 M 0 3713 15 3724
 M 0 3707 1 3712
 M 0 3720 1 3721
+M 0 3730 1 3700
 M 0 3715 5 3726
 M 0 3711 5 3730
 M 0 3713 5 3733

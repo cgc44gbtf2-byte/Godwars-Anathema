@@ -251,8 +251,16 @@ void do_recipe(CHAR_DATA *ch, char *argument)
 
     if (r->mode == RECIPE_SPECIAL)
     {
-        if (!strcmp(r->spell, "readaura")) do_readaura(ch, argument);
-        else if (!strcmp(r->spell, "scry")) do_scry(ch, argument);
+        if (!strcmp(r->spell, "readaura") || !strcmp(r->spell, "scry"))
+        {
+            /* The recipe supplies the vision the original command requires,
+             * for this one call only; the player's own flags are restored. */
+            const long had_vision = IS_ITEMAFF(ch, ITEMA_VISION);
+            SET_BIT(ch->itemaffect, ITEMA_VISION);
+            if (!strcmp(r->spell, "readaura")) do_readaura(ch, argument);
+            else do_scry(ch, argument);
+            if (!had_vision) REMOVE_BIT(ch->itemaffect, ITEMA_VISION);
+        }
         else if (!strcmp(r->spell, "preserve"))
         {
             obj->timer = obj->timer > 0 ? UMIN(200, obj->timer + 24) : 0;

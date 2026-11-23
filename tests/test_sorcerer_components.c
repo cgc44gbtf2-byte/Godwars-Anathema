@@ -111,6 +111,34 @@ static void recipes(void)
     mana=ch->mana;command(ch,"recipe light protection self");long full=mana-ch->mana;
     ch->wait=0;ch->pcdata->components[0]|=1024;mana=ch->mana;
     command(ch,"recipe light protection self");assert(mana-ch->mana<=full);
+    /* vision recipes work for a Sorcerer without the vision item flag */
+    ch->wait=0;ch->mana=51000;
+    assert(!IS_ITEMAFF(ch,ITEMA_VISION));
+    command(ch,"recipe mind information targeting");
+    assert(strstr(output,"trace the runes")&&!strstr(output,"Huh?")&&!IS_ITEMAFF(ch,ITEMA_VISION));
+    ch->wait=0;
+    command(ch,"recipe mind information area");
+    assert(strstr(output,"trace the runes")&&!strstr(output,"Huh?")&&!IS_ITEMAFF(ch,ITEMA_VISION));
+    ch->wait=0;SET_BIT(ch->itemaffect,ITEMA_VISION);
+    command(ch,"recipe mind information targeting");
+    assert(IS_ITEMAFF(ch,ITEMA_VISION));REMOVE_BIT(ch->itemaffect,ITEMA_VISION);
+    /* adapted recipe: charges mana and gives its documented replacement effect */
+    ch->wait=0;ch->mana=51000;mana=ch->mana;
+    command(ch,"recipe fire enhancement object");
+    assert(strstr(output,"trace the runes")&&ch->mana<mana&&ch->wait>0);
+    /* summon needs a named target and no combat; unknown targets cost nothing */
+    ch->wait=0;mana=ch->mana;
+    command(ch,"recipe spirit summoning area");assert(strstr(output,"Summon whom")&&ch->mana==mana);
+    command(ch,"recipe spirit summoning area nobodyhere");assert(strstr(output,"You failed")&&ch->mana==mana);
+    ch->fighting=ch;command(ch,"recipe spirit summoning area someone");
+    assert(strstr(output,"Summon whom")&&ch->mana==mana);ch->fighting=NULL;
+    /* teleport is refused in combat, safe and no-teleport rooms without cost */
+    ch->fighting=ch;command(ch,"recipe spirit transportation self");
+    assert(strstr(output,"cannot do that here")&&ch->mana==mana);ch->fighting=NULL;
+    room.room_flags|=ROOM_SAFE;command(ch,"recipe spirit transportation self");
+    assert(strstr(output,"cannot do that here")&&ch->mana==mana);room.room_flags&=~ROOM_SAFE;
+    room.room_flags|=ROOM_NO_TELEPORT;command(ch,"recipe spirit transportation self");
+    assert(strstr(output,"cannot do that here")&&ch->mana==mana);room.room_flags&=~ROOM_NO_TELEPORT;
     /* non-sorcerer */
     ch->class=CLASS_WEREWOLF;command(ch,"recipe");assert(strstr(output,"Huh?"));ch->class=CLASS_SORCERER;
     /* existing custom-book chanting path still reachable */
