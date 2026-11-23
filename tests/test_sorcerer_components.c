@@ -130,10 +130,14 @@ static void recipes(void)
     ch->wait=0;mana=ch->mana;
     command(ch,"recipe spirit creation object");assert(strstr(output,"Pick slash")&&ch->mana==mana&&ch->wait==0);
     command(ch,"recipe spirit creation object sword");assert(strstr(output,"Pick slash")&&ch->mana==mana);
-    ch->wait=0;ch->mana=1000;
-    command(ch,"recipe water enhancement self");
-    assert(strstr(output,"trace the runes")&&ch->mana>=1000-(5+ch->stats[STAT_INT]*5)*10&&ch->mana<=ch->max_mana);
-    assert(51000-ch->mana>=0);
+    {
+        long lvl=5+ch->stats[STAT_INT]*5,before;
+        ch->wait=0;ch->max_mana=90000;ch->mana=30000;before=ch->mana;
+        command(ch,"recipe water enhancement self");
+        assert(strstr(output,"trace the runes"));
+        assert(ch->mana<before);
+        assert(ch->mana==before-lvl*50+lvl*40);
+    }
     ch->wait=0;ch->mana=51000;mana=ch->mana;
     /* summon needs a named target and no combat; unknown targets cost nothing */
     ch->wait=0;mana=ch->mana;

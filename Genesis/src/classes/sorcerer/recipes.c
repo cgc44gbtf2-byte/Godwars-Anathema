@@ -56,9 +56,10 @@ static long recipe_level(const CHAR_DATA *ch)
 static long recipe_mana(const CHAR_DATA *ch, const SORC_RECIPE *r, long base)
 {
     long cost;
-    /* The spell itself is free; the recipe charges a quarter of the 40 mana
-     * per level it restores so it cannot be a net-free refill. */
-    if (!strcmp(r->spell, "mana")) base = recipe_level(ch) * 10;
+    /* The mana spell is free and restores level*20 per cast (level*40 for the
+     * double cast). The recipe charges level*25 per cast with no Master
+     * discount, so casting it never gains mana: it is a lossy transfer. */
+    if (!strcmp(r->spell, "mana")) return recipe_level(ch) * 25 * r->casts;
     cost = base * r->casts;
     if (sorc_knows(ch, SORC_RUNE, SORC_RUNE_MASTER)) cost = cost * 3 / 4;
     return cost < 1 ? 1 : cost;
