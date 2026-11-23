@@ -85,6 +85,7 @@ TESTS += tests/test_hybrid_heighten
 TESTS += tests/test_werewolf_commands
 TESTS += tests/test_werewolf_totem
 TESTS += tests/test_werewolf_wrath
+TESTS += tests/test_invisibility
 TESTS += tests/test_disquiet
 TESTS += tests/test_werewolf_combat
 TESTS += tests/test_werewolf_reactions
@@ -300,6 +301,9 @@ tests/test_werewolf_commands: tests/test_werewolf_commands.c tests/test_hybrid_a
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_werewolf_wrath: tests/test_werewolf_wrath.c tests/test_hybrid_aura.c $(ENGINE_OBJECTS)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
+tests/test_invisibility: tests/test_invisibility.c tests/test_hybrid_aura.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_disquiet: tests/test_disquiet.c tests/test_hybrid_aura.c $(ENGINE_OBJECTS)

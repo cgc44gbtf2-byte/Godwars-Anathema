@@ -87,8 +87,24 @@ NPCs, and non-PK, AFK, link-dead, or staff players are rejected. It retains the
 existing no-cost/no-recovery behavior; no new saved state is added. The old
 Mastery implementation still needs a separate review of forced-command and
 staff-target protections before use.
-Mastery and Invisibility still have source handlers but remain
-**unavailable** because they are not registered as player commands.
+Mastery still has a source handler but remains **unavailable** because it
+is not registered as a player command.
+
+Uktena 4 `invisibility` grants ordinary timed invisibility, not Obfuscate or
+Mage mind concealment. It costs no mana, DP or primal and imposes 12 pulses of
+recovery on success. Its duration is 24 ordinary affect updates, with removal
+on the following update after zero. Detection and established special-vision
+rules can reveal it; ordinary observers cannot see or target it through normal
+character lookup. The caster must be awake, standing, present in the room,
+not recovering or combat-paused, and have valid player data. Existing
+invisibility cannot be refreshed or duplicated. The full command name avoids
+ambiguity with the separate staff `invis` command.
+
+Spell and worn-equipment invisibility sources now survive removal of another
+source; removing the final source clears the flag. Normal `visible` still
+explicitly reveals the character and strips ordinary invisibility spells.
+Normal affect saves and duration handling are retained. Training or class
+loss does not retroactively cancel an already-cast ordinary timed spell.
 
 Silver Fangs 3 `wrath` frightens eligible hostile vampires in the room whose
 Beast is positive. It applies normal fear and reduces hitroll and damroll by

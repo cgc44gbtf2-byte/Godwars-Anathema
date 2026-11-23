@@ -66,6 +66,8 @@ OLD = '''void do_wrath( CHAR_DATA *ch, char *argument )
 
 
 def without_wrath(text):
+    from invisibility_source import without_invisibility
+    text = without_invisibility(text)
     match = re.search(r"void do_wrath\(.*?(?=\nvoid do_mastery\()", text, re.S)
     if match:
         digest = hashlib.sha256(match[0].encode()).hexdigest()

@@ -1079,7 +1079,7 @@ Related Helps: Tribes, and Werewolf.
 1: Shroud - Toggles magical room darkness; this rating also permits sight in that darkness. <shroudnight>
 2: Spirit of the Fish - Permits underwater movement without breathing equipment. <auto>
 3: Spirit of the Bird - No rank-3 flight-granting effect was located in current source. <unverified>
-4: Invisibility - A legacy handler exists, but no player command is registered. <unavailable>
+4: Invisibility - Ordinary timed concealment, countered by detection; no resource cost. <invisibility>
 5: Fetish Doll - Creates a doll for a valid reciprocal head/owner target. <fetishdoll>
 
 Related Helps: Tribes, and Werewolf.

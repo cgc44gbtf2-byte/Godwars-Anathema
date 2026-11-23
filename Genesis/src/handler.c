@@ -163,6 +163,8 @@ long loc_name( const char *str, char *namelist )
 /*
  * Apply or remove an affect to a character.
  */
+static bool invisibility_granted(CHAR_DATA *ch, const AFFECT_DATA *removed);
+
 void affect_modify( CHAR_DATA *ch, AFFECT_DATA *paf, bool fAdd )
 {
     long mod;
@@ -175,7 +177,11 @@ void affect_modify( CHAR_DATA *ch, AFFECT_DATA *paf, bool fAdd )
     }
     else
     {
+bool invisibility_active = IS_AFFECTED(ch, AFF_INVISIBLE);
 	REMOVE_BIT( ch->affected_by, paf->bitvector );
+if (invisibility_active && IS_SET(paf->bitvector, AFF_INVISIBLE) &&
+    invisibility_granted(ch, paf))
+    SET_BIT(ch->affected_by, AFF_INVISIBLE);
 	mod = 0 - mod;
     }
 
@@ -685,6 +691,21 @@ static bool other_equipment_grants(CHAR_DATA *ch, const OBJ_DATA *removed, long 
     return FALSE;
 }
 
+static bool invisibility_granted(CHAR_DATA *ch, const AFFECT_DATA *removed)
+{
+    for (AFFECT_DATA *af = ch->affected; af != NULL; af = af->next)
+        if (af != removed && IS_SET(af->bitvector, AFF_INVISIBLE)) return TRUE;
+    for (OBJ_DATA *obj = ch->carrying; obj != NULL; obj = obj->next_content) {
+        if (obj->wear_loc == WEAR_NONE) continue;
+        if (equivalent_equipment_spell(equipment_spell(obj)) == 5) return TRUE;
+        for (AFFECT_DATA *af = obj->pIndexData->affected; af != NULL; af = af->next)
+            if (IS_SET(af->bitvector, AFF_INVISIBLE)) return TRUE;
+        for (AFFECT_DATA *af = obj->affected; af != NULL; af = af->next)
+            if (IS_SET(af->bitvector, AFF_INVISIBLE)) return TRUE;
+    }
+    return FALSE;
+}
+
 void refresh_equipment_state(CHAR_DATA *ch)
 {
     long flags = 0, resistance = 0;
@@ -1042,7 +1063,7 @@ if (IS_AFFECTED(ch, AFF_BLIND) && (sn == 4)
 	    act("$n's eyes stop glowing red.",ch,NULL,NULL,TO_ROOM);
 	}
 	else if (IS_AFFECTED(ch, AFF_INVISIBLE) && (sn == 46 || sn == 5)
-		&& !is_affected(ch, 46))
+&& !invisibility_granted(ch, NULL))
 	{
 	    REMOVE_BIT(ch->affected_by, AFF_INVISIBLE);
 	    send_to_char( "You fade into existance.\n\r", ch );
@@ -2090,6 +2111,10 @@ bool can_see( CHAR_DATA *ch, CHAR_DATA *victim )
     if (ch->in_room == NULL || victim->in_room == NULL) return FALSE;
    for (vch = victim->in_room->people; vch != NULL; vch = vch->next_in_room)
 if (hybrid_drow_globe_active(vch)) return FALSE;
+
+    if (IS_AFFECTED(victim, AFF_INVISIBLE) &&
+        !IS_AFFECTED(ch, AFF_DETECT_INVIS) && !effective_holylight(ch))
+        return FALSE;
 
     if (IS_SET(ch->in_room->added_flags, ROOM2_DARKNESS) && !IS_NIGHTSTALKER(ch))
     {

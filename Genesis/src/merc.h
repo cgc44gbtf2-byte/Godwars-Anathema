@@ -2844,6 +2844,7 @@ DECLARE_DO_FUN( do_bridgewalk	);
 DECLARE_DO_FUN( do_grasp	);
 DECLARE_DO_FUN( do_reach);
 DECLARE_DO_FUN( do_wrath);
+DECLARE_DO_FUN( do_invisibility);
 
 /* Drow functions */
 DECLARE_DO_FUN(	do_attune	);

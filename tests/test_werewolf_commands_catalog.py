@@ -12,6 +12,29 @@ def blob(text):
     return hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
 
 class WerewolfCommandsCatalog(unittest.TestCase):
+    def test_invisibility_inverse_and_staff_command_order(self):
+        from invisibility_source import without_invisibility
+        for path,expected in (
+            ("handler.c","60868b8d703b9a25b19a3b34bbc801792bc28c47"),
+            ("classes/werewolf/wwtribe.c","361745c66f6785c5e01dc78209a47fe9a214236b"),
+            ("classes/werewolf/werewolf.c","e266548bb5687c05b30e8d5bcdafb53c5f0e36cd"),
+            ("interp.c","c841cd4a786068f7fd1b79fabaafa62feea92549"),
+            ("merc.h","bd68ec627435f8b8853e251f00cfa9aa00d7c9d3"),
+            ("../area/class.hlp","8ef4e8d8f50eb20a428ca7642bf923096da69d0e"),
+        ):
+            text=(SRC/path).read_text()
+            restored=without_invisibility(text)
+            self.assertEqual(blob(restored),expected)
+            self.assertEqual(without_invisibility(restored),restored)
+            self.assertNotEqual(blob(without_invisibility(text+"\n/* mutation */\n")),expected)
+        source=(SRC/"handler.c").read_text()
+        self.assertNotEqual(blob(without_invisibility(source.replace(
+            "!IS_AFFECTED(ch, AFF_DETECT_INVIS)","IS_AFFECTED(ch, AFF_DETECT_INVIS)",1))),
+            "60868b8d703b9a25b19a3b34bbc801792bc28c47")
+        interp=(SRC/"interp.c").read_text()
+        self.assertLess(interp.index('{ "invis",'),interp.index('{ "invisibility",'))
+        self.assertIn("tests/test_invisibility",make_values(ROOT,"TESTS"))
+
     def test_wrath_inverse_preserves_all_other_runtime_and_help_bytes(self):
         from wrath_source import without_wrath
         for path,expected in (
@@ -140,12 +163,12 @@ class WerewolfCommandsCatalog(unittest.TestCase):
             missing.update(fn for fn in re.findall(
                 r"^void\s+(do_\w+)\s*\(",path.read_text(),re.M)
                 if fn not in entries)
-        self.assertEqual(missing,{"do_mastery","do_invisibility"})
+        self.assertEqual(missing,{"do_mastery"})
         menu=(SRC/"classes/werewolf/werewolf.c").read_text().split(
             "void do_wwpowers(",1)[1].split("void do_gifts(",1)[0]
         for label in ("Quicksand","Lycaon","Screamgaia",
                       "Reach","Wrath",
-                      "Mastery[unavailable]","Invisibility[unavailable]",
+                      "Mastery[unavailable]","Invisibility",
                       "Totemgift"):
             self.assertIn(label,menu)
         for label in ("Spiritward","Reshapeobject","Spiritguardian","Halosun","Formillusion",
@@ -210,7 +233,7 @@ class WerewolfCommandsCatalog(unittest.TestCase):
             if label==".\\n\\r" or "[" in label:continue
             words=label.split(":")[-1].strip().split()
             if words:active.append(words[0].casefold())
-        self.assertEqual(len(active),64)
+        self.assertEqual(len(active),65)
         self.assertEqual(len(set(active)),len(active))
 
 if __name__=="__main__":

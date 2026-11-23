@@ -3,7 +3,7 @@
 Scope: the 105 native Werewolf help slots, their command registrations,
 rank gates, passive consumers, and overlap descriptions. This began as a
 help/test-only change. Disquiet, Quicksand, Lycaon, Scream of Gaia, Metis Totem
-Gift, Reach and Wrath were
+Gift, Reach, Wrath and Uktena Invisibility were
 subsequently restored as described below; training costs and rank caps remain unchanged. Disquiet's
 saved affect identity advances compatibility to save epoch 4; Quicksand is
 runtime-only and adds no saved affect or identifier. Lycaon is runtime-only;
@@ -15,12 +15,12 @@ barrier pool and pulse timer are not serialized.
 
 | Marker | Meaning | Slots |
 | --- | --- | ---: |
-| A: command | A registered handler contains gameplay behavior; not a safety certification | 64 |
+| A: command | A registered handler contains gameplay behavior; not a safety certification | 65 |
 | P: auto | A passive has an identified production consumer | 28 |
 | G: upgrade | Modifies an existing command, not an extra automatic action | 1 |
 | V: unverified | No matching dedicated effect located; absence is not proven universally | 9 |
 | U: unimplemented | No separate implemented gift found for that slot | 1 |
-| X: unavailable | Legacy handler exists but is not registered for player commands | 2 |
+| X: unavailable | Legacy handler exists but is not registered for player commands | 1 |
 | D: disabled | Unregistered legacy handler also explicitly has no gameplay effect | 0 |
 
 `wwpowers` is a command list, not proof that every listed command works.
@@ -64,7 +64,7 @@ short descriptions and command spellings are in `Genesis/area/class.hlp`.
 | Shadow Lords | P A A A A | Clap is active; Dominator drains rage; no separate Open Wounds power |
 | Silent Striders | P V P U A | Initiative at 1 and 3; no verified Fortitude consumer or distinct rank-4 gift; Reach 5 pulls an eligible near-Umbra target out |
 | Silver Fangs | V V A A X | Wrath 3 frightens eligible hostile vampires; Shield 4; Mastery unavailable; no implemented Luna's Avenger body form |
-| Uktena | A P V X A | Shroudnight 1; underwater movement permission 2; flight claim not verified |
+| Uktena | A P V A A | Shroudnight 1; underwater movement permission 2; flight claim not verified; ordinary Invisibility restored at 4 |
 | Wendigos | A A A P A | Cutting Wind is not typed cold damage; Invoke has specific weather modes |
 | Stargazers | A P P P P | Hit/damage scaling, rating-based Obfuscate sight, avoidance and probabilistic redirection |
 
@@ -87,8 +87,8 @@ short descriptions and command spellings are in `Genesis/area/class.hlp`.
 ## Overlaps and remaining risks
 
 Grandmother's Touch uses the same Mother handler and cooldown. It is an upgrade,
-not a second healing trigger. There are 64 unique canonical registered names
-in the gift menu, including the restored Disquiet, Quicksand, Lycaon, Reach, Wrath,
+not a second healing trigger. There are 65 unique canonical registered names
+in the gift menu, including the restored Disquiet, Quicksand, Lycaon, Reach, Wrath, Invisibility,
 Scream of Gaia and Metis Totem Gift.
 
 Get of Fenris 1, Shadow Lords 1 and Philodox 3 retain their separate +100
@@ -130,7 +130,7 @@ of those projects. No foreign C code has been imported.
 | Disquiet | EM `werewolf.c:do_disquiet`, also GW2k6, Myth and TSOB; `MORE_CALM` is consumed in interpreter/update code | Real calming behavior exists. Best first restoration reference; must add current target-safety and lifecycle checks rather than copy it unchanged |
 | Disquiet alternatives | GWLow5 and AtD `garou.c:do_disquiet` apply hitroll/damroll affects | Different debuff design, rank/resource schema and semantics; not interchangeable with the EM version |
 | Razor Claws | GWLow5 `garou.c:do_razorclaws` and `fight.c` explicitly select different damage dice when claws and its flag are set | Real combat reference, but foreign gate is above rank 1 and archived flag declarations are malformed; needs an original, tested adaptation |
-| Invisibility | EM/GW2k6/Myth/TSOB register `do_invisibility`; EM invokes the existing invisibility spell | Anathema already has a handler but no player binding. Re-enabling requires permission, visibility ownership and cleanup review, not a blind alias |
+| Invisibility | EM/GW2k6/Myth/TSOB register `do_invisibility`; EM invokes the existing invisibility spell | Native Uktena 4 restored after shared visibility/ownership fixes and caster-state review; zero resource cost, existing timed affect and recovery preserved |
 | Luna's Avenger | AtD/LoC `garou.c:do_lunasavenger`; `GAROU_AVENGER` is read in their combat damage paths | A real body-form candidate, not a drop-in. Foreign slot/rank differs and Anathema's existing Shield must not be displaced; hybrid form ownership/balance still need design |
 | Lambent Flame | AtD `garou.c:do_lambent`, registered through `data/commands.dat` | An active room-blinding action, not the missing native rank-2 avoidance passive; different rank, costs and target checks |
 | Quicksand | AtD `do_quicksand` is data-registered and spends gnosis to toggle `WOLF_QUICKSAND` | The native Red Talons 4 version is now a temporary, single-target movement snare; the archived toggle was not copied because its flag had no verified consumer here |
@@ -180,6 +180,103 @@ ordinary casts, 192 arithmetic boundaries, multiple and protected room targets,
 non-refresh across casters, actual expiry, and full/short saved reloads.
 Exact inverse fixtures pin all other production/help bytes to the prior head.
 No new hybrid permission, training price, saved field or migration is introduced.
+
+## Remaining Mastery safety audit
+
+Silver Fangs 5 Mastery remains unregistered and unavailable to players. Its
+legacy handler checks primary Werewolf class, gift rank, a nearby Werewolf
+target and strictly lower Garou rank, then passes the remaining text directly
+to the target's interpreter. It has no gift-specific command allowlist or
+forced-command context. This is not an enabled player exploit.
+
+Twenty-two isolated real-engine cases, repeated under ASan/UBSan, used only
+the harmless `config +brief` command to demonstrate the authorization gap.
+The setting changed for a lower-ranked staff target, non-PK players, group
+members, link-dead targets, peace-protected targets and targets in safe rooms.
+A sleeping, dead, recovering or invalid-save caster could invoke the handler
+directly; a sleeping or waiting target could execute this configuration command.
+Existing Dominate resistance did not block it, and `conf +brief` also resolved.
+The ordinary gift-rank, primary-class and equal-Garou-rank denials still worked.
+
+The target interpreter independently rejected AFK, frozen and combat-paused
+targets, but Mastery still charged the caster's 12-pulse recovery. Empty
+command text also charged recovery. No mana was consumed. These findings
+do not establish that every possible forced command succeeds: target trust,
+posture and interpreter protections still apply. Destructive commands were
+not executed, and no live characters, saves or services were used.
+
+Restoration needs an explicit permitted-action policy, target/caster guards
+and callback-safe completion handling. Prefer a small exact action allowlist
+over a blacklist around unrestricted interpretation. No Mastery binding or
+runtime change is part of this audit.
+
+## Initial Uktena Invisibility safety audit
+
+Before restoration, Uktena 4 Invisibility was unregistered. Its legacy handler invokes the
+ordinary `invis` spell directly. This charges no mana, DP or primal, applies
+one 24-update affect and imposes 12 pulses of recovery. It is not a new form
+or a separate concealment system. Rank 3, wrong-primary-class and NPC denials
+work; a normally flagged existing invisibility source is not refreshed.
+
+Sixteen isolated activation cases reproduced missing direct-handler checks:
+dead, sleeping, recovering, AFK, combat-paused and invalid-save casters could
+apply the affect. Ordinary interpreter checks may independently reject some
+of these states, but the handler itself does not enforce them. Safe-room,
+zero-mana and fighting activation also work; those are observed policies,
+not automatically defects for a self-only power. If an invis affect remains
+after its flag is cleared, another activation can duplicate the affect.
+
+The pre-fix shared `can_see` path did not consult ordinary `AFF_INVISIBLE`.
+A normal same-room observer without detection could still see the affected
+Werewolf. This is a shared visibility issue, not a problem confined to an
+unregistered Werewolf command. No claim is made here about every client,
+display or targeting path.
+
+The pre-fix shared affect-removal path also cleared the invisibility flag while an
+invisibility-granting armor item stays equipped. Conversely, removing that
+armor while the ordinary invis spell remains preserved the spell and flag
+in the tested configuration (actual invis skill index 46). Blanket claims
+that all removal orders are broken would be incorrect.
+
+Real affect updates preserved the flag while decrementing 24 to zero and
+removed it on update 25; normal `visible` removed the affect and flag.
+Training loss and a subsequent class change left the ordinary timed spell
+active, rather than treating it as a continuously owned class toggle.
+Full and short saved reloads preserved the affect, duration and flag, and
+stripping the reloaded effect cleaned them. These checks passed normally and
+under ASan/UBSan against the unchanged production engine. Expiry fixtures
+reset idle timers to avoid unrelated automatic logout; persistence used only
+temporary synthetic players. No live characters or services were used.
+
+These results blocked registration until the following restoration. The audit
+itself made no runtime changes; the subsequent fixes preserve separate
+Obfuscate, Kakusu, Mage invisibility and special-vision policies.
+
+## Selected Uktena and shared invisibility restoration
+
+`invisibility` now dispatches to native/original-parent Werewolves with Uktena
+4 or 5. It rejects invalid saves, dead/sleeping/non-standing, absent, AFK,
+recovering and combat-paused casters. Already-invisible characters and existing
+`invis`/`mass invis` affects cannot be refreshed or duplicated, even if a raw flag was lost.
+Safe-room self-casting remains allowed; no mana, DP or primal is charged.
+Success retains 12 pulses of recovery and the ordinary 24-update spell affect,
+removed on the update after zero. Training/class loss retains the already-cast
+spell's normal lifetime. No new fields or hybrid permissions are introduced.
+Staff `invis` remains earlier in the command table to preserve its priority.
+
+Shared ordinary invisibility now hides targets from ordinary observers and
+character lookup. Detect Invisibility, holy sight and existing staff/item-vision
+shortcuts retain their roles; detection does not bypass separate concealment,
+blindness or incompatible-plane rules. This does not redesign other stealth.
+Removing an affect or equipment source retains other live spell, object-affect,
+prototype-affect and implicit equipment invisibility sources. Expiry retains
+equipment invisibility. Existing explicit `visible` reveals are unchanged.
+
+The real-engine fixture checks 150 class/sight cases, 98 two-source/removal-order
+combinations, 19 Uktena rejection cases, rank-4/5 zero-cost casts, non-refresh,
+normal expiry, original-parent access and full/short reloaded cleanup.
+Exact inverse checks reconstruct the preceding six production/help files,
+while preserving all unrelated bytes and the older source proofs.
 
 ## Selected Disquiet restoration
 

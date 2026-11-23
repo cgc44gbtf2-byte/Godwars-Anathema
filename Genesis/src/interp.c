@@ -668,6 +668,7 @@
    { "generation",	do_generation,	POS_DEAD,	LEV_IMM,  LOG_ALWAYS	},
    { "immtalk",		do_immtalk,	POS_DEAD,	LEV_IMM,  LOG_NORMAL	},
    { "invis",		do_invis,	POS_DEAD,	LEV_IMM,  LOG_NORMAL	},
+   { "invisibility",	do_invisibility,POS_STANDING,	 LEV_AWA,  LOG_NORMAL	},
    { "incog",		do_incog,	POS_DEAD,	LEV_IMM,  LOG_NORMAL	},
    { "leaderclear",	do_leaderclear,	POS_DEAD,	LEV_IMM,  LOG_ALWAYS	},
    { "log",		do_log,		POS_DEAD,	LEV_IMM,  LOG_ALWAYS	},

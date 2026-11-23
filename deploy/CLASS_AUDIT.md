@@ -113,6 +113,13 @@ values are regression-tested, not rebalanced. NPC and immortal caps differ.
   Beast. Caster/target safety and arithmetic guards are enforced. It costs no
   mana; 20-pulse recovery occurs only when a target is affected. Normal affect
   expiry, saves and stat restoration remain unchanged; no new save fields.
+- **Uktena Invisibility:** native rank-4 `invisibility` is now guarded and
+  registered without changing its zero resource cost, 24-update affect or
+  12-pulse successful recovery. Shared ordinary invisibility now hides from
+  ordinary observers while honoring detection and established vision rules.
+  Removing one spell/equipment source preserves other invisibility sources;
+  existing explicit reveal behavior, saves and other stealth systems remain.
+  Mastery stays unavailable.
 - **Teach discipline:** subsequently replaced with guarded EM-style teaching
   in `vampire.c`: free at rank 3, explicit named student acceptance, and
   checked persistence. See the subsequent port notes below.

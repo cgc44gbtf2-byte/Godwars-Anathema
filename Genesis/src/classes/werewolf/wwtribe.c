@@ -1905,9 +1905,15 @@ void do_invisibility( CHAR_DATA *ch, char *argument )
 {
     long sn;
 
-    if (IS_NPC(ch)) return;
+    (void)argument;
+    if (ch == NULL || IS_NPC(ch) || ch->pcdata == NULL ||
+        !hybrid_player_save_valid(ch) || ch->hit <= 0 ||
+        ch->position < POS_STANDING || ch->wait > 0 ||
+        IS_COMBAT_PAUSED(ch) || IS_SET(ch->pcdata->flag, FLAG_AFK) ||
+        !combat_character_in_room(ch->in_room, ch))
+        return;
 
-    if (!IS_WEREWOLF(ch))
+    if (!IS_WEREWOLF(ch) || ch->level < LEV_AWA)
     {
 	send_to_char( "Huh?\n\r", ch );
 	return;
@@ -1919,7 +1925,9 @@ void do_invisibility( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    if (IS_AFFECTED(ch, AFF_INVISIBLE))
+    if ((sn = skill_lookup("invis")) < 0) return;
+    if (IS_AFFECTED(ch, AFF_INVISIBLE) || is_affected(ch, sn) ||
+        is_affected(ch, gsn_mass_invis))
     {
 	send_to_char("But you are already invisible!\n\r",ch);
 	return;
@@ -1927,7 +1935,6 @@ void do_invisibility( CHAR_DATA *ch, char *argument )
 
     act( "A look of concentration crosses $n's face.", ch, NULL, NULL, TO_ROOM );
 
-    if ( ( sn = skill_lookup( "invis" ) ) < 0 ) return;
     (*skill_table[sn].spell_fun) ( sn, 50, ch, ch );
     WAIT_STATE( ch, 12 );
     return;

@@ -297,7 +297,7 @@ if (get_tribe(ch, TRIBE_SILVER_FANGS) >= 5) strcat(buf, " Mastery[unavailable]")
     if (get_tribe(ch, TRIBE_UKTENA) >= 1)
     {
 	strcpy(buf, "Uktena: Shroudnight");
-if (get_tribe(ch, TRIBE_UKTENA) >= 4) strcat(buf, " Invisibility[unavailable]");
+if (get_tribe(ch, TRIBE_UKTENA) >= 4) strcat(buf, " Invisibility");
 	if (get_tribe(ch, TRIBE_UKTENA) >= 5) strcat(buf, " Fetishdoll");
 	strcat(buf, ".\n\r");
 	stc(buf, ch);
