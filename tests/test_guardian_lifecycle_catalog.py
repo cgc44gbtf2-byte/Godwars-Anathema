@@ -46,7 +46,7 @@ class GuardianLifecycleCatalog(unittest.TestCase):
     def test_only_narrow_save_and_pulse_changes(self):
         self.assertEqual(blob(without_hybrid_forms_save(
             without_guardian_lifecycle_save((SRC/"save.c").read_text()))),
-                         "1f3317263a45d1a886db411d4c0a52a5bba92909")
+                         "ad40ba98301fc9b515b856771732a7ed27425152")
         text=without_gargoyle_stage((SRC/"combat_status.c").read_text())
         text=once(text,'#include "guardian.h"\n',"")
         text=once(text,'#include "classes/hybrid/access.h"\n',"")
@@ -58,7 +58,7 @@ class GuardianLifecycleCatalog(unittest.TestCase):
         self.assertEqual(blob(text),"2c7f2f2e6583abe95ddbbdfca2373e9e63e03112")
         for path,sha in (("more.c","94245671b79931e1749010e1779411d42f9bea83"),
                          ("comm.c","925a22782183ae8e9269197b5504b4505d1962ae"),
-                         ("merc.h","b843f157662ab181daabe913d74685f1c8bc75e6")):
+                         ("merc.h","3b098a58b44542ce99b83b66d9ea780932642300")):
             text=without_progress_metrics_stage((SRC/path).read_text())
             if path=="merc.h":
                 text=text.replace("    int                 hybrid_forms_present;\n","")

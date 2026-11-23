@@ -237,6 +237,8 @@ do_mclear(victim, "self");
     victim->beginners_luck = 0;
     victim->doublecast_timer = 0;
     memset(victim->pcdata->colors,0,sizeof victim->pcdata->colors);
+    memset(victim->pcdata->components,0,sizeof victim->pcdata->components);
+    memset(victim->pcdata->apprentice,0,sizeof victim->pcdata->apprentice);
     memset(victim->pcdata->absorb,0,sizeof victim->pcdata->absorb);
     victim->class                           = 0;
     /* No secondary identity can survive its original class being reset. */

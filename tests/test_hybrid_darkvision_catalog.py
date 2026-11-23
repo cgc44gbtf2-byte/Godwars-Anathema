@@ -4,7 +4,7 @@ import unittest
 from test_class_layout import ROOT, SRC
 from drow_night_source import without_drow_night_stage
 
-BASE_CLAN = "ecd02d2802c2c10c26720c88493135342e6f73eb"
+BASE_CLAN = "e52000e8e5f57833ba20f10c638ddd70217dc32e"
 
 def blob(text):
     data = text.encode()

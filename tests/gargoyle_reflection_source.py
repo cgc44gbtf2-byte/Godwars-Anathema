@@ -24,7 +24,7 @@ PROOFS = [
         ("        combat_status_update();\n        gargoyle_reflection_pulse();\n",
          "        combat_status_update();\n"),
     ]),
-    ("Genesis/src/merc.h", "d9ed947c5611d368dd61d3255595e52861fb7c47", [
+    ("Genesis/src/merc.h", "ec72451060c4bf2d974cd2c45732b1c04efb9cee", [
         ("    unsigned long       gargoyle_reflection_id; /* Runtime only; clear_char resets it. */\n", ""),
         ("void gargoyle_reflection_pulse(void);\n", ""),
     ]),

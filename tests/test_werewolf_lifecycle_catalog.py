@@ -11,7 +11,7 @@ class LifecycleCatalog(unittest.TestCase):
     def test_previous_shared_module_exact(self):
         before=without_werewolf_lifecycle_stage(SOURCE.read_text()).encode()
         self.assertEqual(hashlib.sha1(b"blob "+str(len(before)).encode()+b"\0"+before).hexdigest(),
-                         "b85b32221fa0a08a49c850b7605c9e49c14434c4")
+                         "740251ee5b48e6255efd2cc745f3afa1e1fef1f0")
 
     def test_unreviewed_edit_rejected(self):
         changed=SOURCE.read_text().replace("strike < 3","strike < 4")

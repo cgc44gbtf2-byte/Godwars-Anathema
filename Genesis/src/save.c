@@ -461,7 +461,11 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
 	fprintf( fp, "Colors       %li %li %li %li %li %li\n",
 	    ch->pcdata->colors[0], ch->pcdata->colors[1], ch->pcdata->colors[2],
 	    ch->pcdata->colors[3], ch->pcdata->colors[4], ch->pcdata->colors[5]);
-	fprintf( fp, "Clandisc     %li %li %li\n",
+	fprintf( fp, "Components   %li %li %li\n",
+    ch->pcdata->components[0], ch->pcdata->components[1], ch->pcdata->components[2]);
+fprintf( fp, "Apprentice   %li %li %li %li\n",
+    ch->pcdata->apprentice[0], ch->pcdata->apprentice[1], ch->pcdata->apprentice[2], ch->pcdata->apprentice[3]);
+fprintf( fp, "Clandisc     %li %li %li\n",
 	    ch->pcdata->cland[0], ch->pcdata->cland[1], ch->pcdata->cland[2]);
         fprintf( fp, "Tribegift    %li %li %li\n",
 	    ch->pcdata->tgift[0], ch->pcdata->tgift[1], ch->pcdata->tgift[2]);
@@ -894,6 +898,8 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
     ch->pcdata->colors[3]		= 0;
     ch->pcdata->colors[4]		= 0;
     ch->pcdata->colors[5]		= 0;
+    memset(ch->pcdata->components, 0, sizeof ch->pcdata->components);
+    memset(ch->pcdata->apprentice, 0, sizeof ch->pcdata->apprentice);
     ch->pcdata->cland[0]		= 0;
     ch->pcdata->cland[1]		= 0;
     ch->pcdata->cland[2]		= 0;
@@ -1214,6 +1220,8 @@ bool load_char_short( DESCRIPTOR_DATA *d, char *name )
     ch->pcdata->colors[3]		= 0;
     ch->pcdata->colors[4]		= 0;
     ch->pcdata->colors[5]		= 0;
+    memset(ch->pcdata->components, 0, sizeof ch->pcdata->components);
+    memset(ch->pcdata->apprentice, 0, sizeof ch->pcdata->apprentice);
     ch->pcdata->cland[0]		= 0;
     ch->pcdata->cland[1]		= 0;
     ch->pcdata->cland[2]		= 0;
@@ -1455,6 +1463,12 @@ if (!numbers_ok) { ch->pcdata->player_load_failed=1; return; }
 	    break;
 
 	case 'A':
+    if ( !str_cmp( word, "Apprentice" ) )
+    {
+for (int ai = 0; ai < 4; ai++) ch->pcdata->apprentice[ai] = fread_number( fp );
+fMatch = TRUE;
+break;
+    }
     if (!str_cmp(word, "AnathemaHybrid")) {
         if (!hybrid_player_read_tail(ch, fp)) return;
         fMatch = TRUE;
@@ -1609,7 +1623,14 @@ for ( ; num && numbers_ok; num--) /* for each of the board saved */
 		break;
 	    }
 
-	    if ( !str_cmp( word, "Colors" ) )
+	    if ( !str_cmp( word, "Components" ) )
+    {
+for (int ci = 0; ci < 3; ci++) ch->pcdata->components[ci] = fread_number( fp );
+fMatch = TRUE;
+break;
+    }
+
+    if ( !str_cmp( word, "Colors" ) )
 	    {
 		ch->pcdata->colors[0] = fread_number( fp );
 		ch->pcdata->colors[1] = fread_number( fp );

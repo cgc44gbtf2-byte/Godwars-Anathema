@@ -16,6 +16,7 @@ BLOCK = """    /* These primary banks must not outlive the class being cleared.
 """
 
 def without_class_reset_banks(text):
+    text=text.replace("    memset(victim->pcdata->components,0,sizeof victim->pcdata->components);\n    memset(victim->pcdata->apprentice,0,sizeof victim->pcdata->apprentice);\n","")
     from werewolf_totem_source import without_totem_gift
     text = without_totem_gift(text)
     if "void do_clearclass(" not in text or BLOCK not in text:

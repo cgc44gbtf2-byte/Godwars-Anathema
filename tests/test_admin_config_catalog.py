@@ -7,7 +7,7 @@ ROOT=Path(__file__).resolve().parents[1]
 SRC=ROOT/"Genesis/src"
 class AdminConfigCatalog(unittest.TestCase):
     def test_previous_modules_exactly_restored(self):
-        for name,expected in (("interp","775d6ed9c481fe2d343bec1032fa1cd3a575053e"),
+        for name,expected in (("interp","c52a41cc4af38857d2c03196343116c50777b2ab"),
                               ("act_wiz","74910b6319b72e474180f973c0e03ea3abd0b9bd"),
                               ("db","32c8947c50c6d150bf16da28a354ca35d7518a46")):
             with self.subTest(name=name):

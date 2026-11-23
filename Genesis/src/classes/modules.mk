@@ -17,6 +17,9 @@ CLASS_MODULE_SOURCES = \
   classes/werewolf/instincts.c \
   classes/sorcerer/sorcerer.c \
   classes/sorcerer/vision.c \
+  classes/sorcerer/components.c \
+  classes/sorcerer/recipes.c \
+  classes/sorcerer/apprentice.c \
   classes/drow/drow.c \
   classes/highlander/highland.c \
   classes/mage/mage.c \

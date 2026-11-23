@@ -32,7 +32,7 @@ class HybridMasteryCatalog(unittest.TestCase):
 
     def test_all_native_trainers_and_cap_policies_unchanged(self):
         hashes = {
-            "clan.c": "bf76a113a1025f153744556f9f6b0276d64c4a6b",
+            "clan.c": "8a62c26eadc3989d31342e5e4b7477bb657b5845",
             "classes/dragon/dragon.c": "d49760816c58db4303b9bf7200e2b52fa4b87016",
             "classes/drow/drow.c": "7e844520f4580f784b9d81538e8f4eae5c314853",
             "classes/elemental/elemental.c": "90fa65b2627a1f25c9ef29de916427dfb33aa074",

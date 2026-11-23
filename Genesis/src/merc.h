@@ -1658,6 +1658,8 @@ struct	pc_data
     long		auspice[5];
     long		tribes[20];
     long		powers[20];
+    long		components[3];
+    long		apprentice[4];
     long		dragskills;
     long		highland[4];
     long		ninja[5];
@@ -2888,6 +2890,9 @@ DECLARE_DO_FUN(	do_tsume	);
 
 /* Sorcerer Functions */
 DECLARE_DO_FUN(	do_chant	);
+DECLARE_DO_FUN(	do_learn	);
+DECLARE_DO_FUN(	do_recipe	);
+DECLARE_DO_FUN(	do_apprentice	);
 DECLARE_DO_FUN(	do_colors	);
 DECLARE_DO_FUN( do_enchant	);
 DECLARE_DO_FUN(	do_sorccreate	);

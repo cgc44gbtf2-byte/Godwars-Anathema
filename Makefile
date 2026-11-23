@@ -35,6 +35,7 @@ TESTS += tests/test_hybrid_healing
 TESTS += tests/test_hybrid_readiness
 TESTS += tests/test_hybrid_books
 TESTS += tests/test_hybrid_colors
+TESTS += tests/test_sorcerer_components
 TESTS += tests/test_hybrid_creation
 TESTS += tests/test_object_strings
 TESTS += tests/test_hybrid_writing
@@ -98,7 +99,7 @@ TESTS += tests/test_werewolf_reversion
 TESTS += tests/test_class_reset
 # Real validators/effective access for older isolated native fixtures too.
 # Never replace hybrid access with permissive stubs just to satisfy linking.
-HYBRID_ACCESS_SOURCES = $(addprefix Genesis/src/classes/hybrid/,registry.c state.c player.c build.c progression.c specialization.c access.c drow_globe.c passives.c books.c forms.c) Genesis/src/classes/sorcerer/vision.c Genesis/src/classes/monk/favour.c Genesis/src/guardian.c
+HYBRID_ACCESS_SOURCES = $(addprefix Genesis/src/classes/hybrid/,registry.c state.c player.c build.c progression.c specialization.c access.c drow_globe.c passives.c books.c forms.c) Genesis/src/classes/sorcerer/vision.c Genesis/src/classes/sorcerer/components.c Genesis/src/classes/sorcerer/recipes.c Genesis/src/classes/sorcerer/apprentice.c Genesis/src/classes/monk/favour.c Genesis/src/guardian.c
 
 all:
 	$(MAKE) -C Genesis/src
@@ -313,6 +314,9 @@ tests/test_hybrid_books: tests/test_hybrid_books.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_hybrid_colors: tests/test_hybrid_colors.c $(ENGINE_OBJECTS)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
+
+tests/test_sorcerer_components: tests/test_sorcerer_components.c $(ENGINE_OBJECTS)
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) $(TEST_FLAGS) $< $(ENGINE_OBJECTS) $(LDFLAGS) $(TEST_LDFLAGS) $(LDLIBS) -o $@
 
 tests/test_hybrid_creation: tests/test_hybrid_creation.c $(ENGINE_OBJECTS)

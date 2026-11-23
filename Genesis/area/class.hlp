@@ -598,6 +598,9 @@ Commands:
 Colors     - Trains a color.
 Write      - Writes a spell onto a page.
 Chant      - Chants a spell out of a book.
+Learn      - Learns runes, glyphs and sigils (learn <rune|glyph|sigil> <name>).
+Recipe     - Casts a fixed recipe from learned components (recipe <rune> <glyph> <sigil> [target]).
+Apprentice - New Sorcerers train under a mentor or trainer; see 'apprentice'.
 Sorccreate - Creates the necessary book writing items.
 Enchant    - Enchants a weapon or armor.
 Vision     - Improves sight.

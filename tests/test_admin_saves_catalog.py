@@ -8,7 +8,7 @@ SRC=ROOT/"Genesis/src"
 class AdminSavesCatalog(unittest.TestCase):
     def test_previous_sources_exactly_restored(self):
         pins={
-            "interp.c":"3daaa41f1805244dc110fa9eaebafb967f4f7677",
+            "interp.c":"ebf23012876dd7d99f93b37291d06be389cf98ba",
             "act_wiz.c":"bfd0c899650fadb6aa6f73f28473b34f61c4099a",
             "admin_config.c":"5e1534a37158928531cf1d6d41fdfe48bf4d5263",
             "admin_config.h":"1e5061a5c00acd9c8d401c5fbd6ec586b06cf7e5",

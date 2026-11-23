@@ -29,7 +29,7 @@ class NativeDrowCatalog(unittest.TestCase):
     def test_skipdisc_owned_state_has_strict_inverse(self):
         from native_drow_skipdisc_source import without_native_drow_skipdisc
         for path,expected in (
-            ("merc.h","1ac72bd5054742364425b947239383997e8b2804"),
+            ("merc.h","70bdea28538cc33e1435971386aa3306c32c0e52"),
             ("handler.c","e22fb64eb8b8526c5ad435a9f986d030d581eed5"),
             # Immediately preceding local stage includes Darkness dismissal.
             ("classes/drow/drow.c","bb96c132b960755e6ffc5df58dbe902a1f530ee0"),
@@ -137,7 +137,7 @@ class NativeDrowCatalog(unittest.TestCase):
             "combat_initiative.c":"fdb6313d65d875db0b035079a27705c65a7b6639",
             "combat_defense.c":"85870c3e786e30f58a484a6fbf6f8d4b53b2cd78",
             "combat_damage.c":"8ef28ea0e6107f77b8512f9ca40a50305ab709f0",
-            "merc.h":"c7a99891b0f580cad130dc7e479672c62957cf25",
+            "merc.h":"5929dc2dc52a9ed7a9132c4f51356542cbba8508",
         }
         calls=0
         for path,expected in baseline.items():

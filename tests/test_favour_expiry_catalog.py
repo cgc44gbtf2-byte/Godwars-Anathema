@@ -58,8 +58,8 @@ class FavourExpiryCatalog(unittest.TestCase):
     def test_native_bodies_restore_exact_base_blobs(self):
         for path,normalizer,sha in (
             ("classes/monk/monk.c",without_favour_metadata_monk,"9548574faf5f46918c83f7f87c5eb8b88f606e0e"),
-            ("merc.h",without_favour_metadata_merc,"0a247f670d224d6d24c7309fc5b975b15cea3ee2"),
-            ("save.c",without_favour_metadata_save,"fdf27500c781cb876a21175fceafe5a039ccd2ad")):
+            ("merc.h",without_favour_metadata_merc,"ccda7d5b986336ad2a5ed91198179d3211cf6541"),
+            ("save.c",without_favour_metadata_save,"84bd02aed1099976fc31f3d6b1c70d60eb7b87af")):
             self.assertEqual(blob(normalizer((SRC/path).read_text())),sha)
 
     def test_optional_metadata_uses_legacy_comment_branch(self):

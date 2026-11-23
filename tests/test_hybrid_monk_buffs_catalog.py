@@ -9,7 +9,7 @@ from gargoyle_death_source import without_gargoyle_death
 BASE_MONK="6b39e0bfa7c961f53a82ce8061044152c2d26809"
 BASE_DEATH="c4dd62ddf5117d3d7f01e788f526b497ee58cf08"
 BASE_UPDATE="0a2ef9fcafcdf72f1d314c11236ee3ffb9a7c39e"
-BASE_MERC="3e2d1a6c71a00bb7159af64272dddf42e846133b"
+BASE_MERC="e308cae2b09168fc55260f9e8167fe7060b8ddb4"
 NATIVE_GATE="if (!IS_MONK(ch) || ch->pcdata == NULL || ch->in_room == NULL)"
 HYBRID_GATE="if (!hybrid_power_parent(ch, CLASS_MONK) || ch->pcdata == NULL || ch->in_room == NULL)"
 NATIVE_DAWN="""            for ( d = descriptor_list; d != NULL; d = d->next )

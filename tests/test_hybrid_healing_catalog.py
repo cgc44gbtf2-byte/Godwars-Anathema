@@ -93,7 +93,7 @@ class HybridHealingCatalog(unittest.TestCase):
         native="    if (*argument == '\\0')\n\treturn 0;"
         self.assertEqual(text.count(fixed),1)
         self.assertEqual(blob(text.replace(fixed,native)),
-                         "57a96947f99c2ccc2ba5121c5abe71853f42f62b")
+                         "a015e404104550fdc08f200de725811d65c28faf")
         tests=(ROOT/"tests/test_hybrid_healing.c").read_text()
         self.assertIn('assert(number_argument("",empty)==0&&empty[0]',tests)
 

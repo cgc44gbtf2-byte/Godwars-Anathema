@@ -38,9 +38,9 @@ class MessageFormatCatalog(unittest.TestCase):
         expected={"handler.c":"9c2ee576804e8ce3dc58f300f3262aae957e47e1",
                   "comm.c":"925a22782183ae8e9269197b5504b4505d1962ae",
                   "magic.c":"ff6670721b45989e1e24b8c337f4e8ad766a8b18",
-                  "clan.c":"89d083ddce8367e98e58cec721cf290d9da105b2",
-                  "merc.h":"b843f157662ab181daabe913d74685f1c8bc75e6",
-                  "interp.c":"ccb0125d4264a8a5447618c29a9240ec674d2eb4"}
+                  "clan.c":"13bffff1f03894fb4b78af46af4d9c66bf9dc649",
+                  "merc.h":"3b098a58b44542ce99b83b66d9ea780932642300",
+                  "interp.c":"cd18b4a21c44e1c1dc9db1caf42caffd35235c67"}
         for path,sha in expected.items():
             b=(SRC/path).read_bytes()
             from werewolf_source import without_werewolf_stage

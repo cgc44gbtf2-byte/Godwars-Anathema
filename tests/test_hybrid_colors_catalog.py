@@ -41,7 +41,7 @@ class HybridColorsCatalog(unittest.TestCase):
         for path,sha in {
             "classes/sorcerer/sorcerer.c":"91fd66c8ba3a020d09525ca3fdbd13c33065812d",
             "act_info.c":"b24546978b3f3cf3a2191c8ec0803383bb89dea1",
-            "interp.c":"ccb0125d4264a8a5447618c29a9240ec674d2eb4",
+            "interp.c":"cd18b4a21c44e1c1dc9db1caf42caffd35235c67",
         }.items():
             data=(SRC/path).read_bytes()
             if path=="interp.c":

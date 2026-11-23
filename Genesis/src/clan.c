@@ -4708,6 +4708,7 @@ if (IS_GARGOYLE(ch))
 	ch->class = CLASS_SORCERER;
 	ch->level = LEV_SOR;
 	ch->vampgen = 4;
+ch->pcdata->apprentice[0] = 1;
 	stc("You are now a #LSorcerer#n.\n\r", ch);	
     }
     else if (!str_cmp(arg1, "monk"))

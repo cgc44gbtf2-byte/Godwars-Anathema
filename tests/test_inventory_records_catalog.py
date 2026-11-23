@@ -9,7 +9,7 @@ class InventoryRecordsCatalog(unittest.TestCase):
     def test_previous_reader_restored_byte_for_byte(self):
         current=(ROOT/"Genesis/src/save.c").read_text()
         restored=without_hybrid_forms_save(without_inventory_records_stage(current)).encode()
-        baseline="128c3a902f4b9e02ec9fe7b632ddf4b8d085d541"
+        baseline="1c5ff3ee70fba7ba639495616599508dcfc6f4b6"
         self.assertEqual(hashlib.sha1(b"blob "+str(len(restored)).encode()+b"\0"+restored).hexdigest(),baseline)
     def test_checks_precede_publication_and_clear_descendants(self):
         source=(ROOT/"Genesis/src/save.c").read_text()

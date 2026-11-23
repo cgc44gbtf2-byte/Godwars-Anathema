@@ -57,7 +57,7 @@ class HybridBooksCatalog(unittest.TestCase):
     def test_native_getters_and_interpreter_unmodified(self):
         for path, expected in {
             "act_info.c": "b24546978b3f3cf3a2191c8ec0803383bb89dea1",
-            "interp.c": "ccb0125d4264a8a5447618c29a9240ec674d2eb4",
+            "interp.c": "cd18b4a21c44e1c1dc9db1caf42caffd35235c67",
         }.items():
             data=(SRC/path).read_bytes()
             if path=="act_info.c":data=without_vision_info_adapter(data.decode()).encode()

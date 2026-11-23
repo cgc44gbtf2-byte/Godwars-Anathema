@@ -11,7 +11,7 @@ EXPECTED = {
     "vampire": ("disc", "vampire", "presence", "beast", "state",
                 "obfuscate", "dominate", "chimerstry"),
     "werewolf": ("werewolf", "totem", "wwbreed", "wwauspice", "wwtribe", "instincts"),
-    "sorcerer": ("sorcerer", "vision"),
+    "sorcerer": ("sorcerer", "vision", "components", "recipes", "apprentice"),
     "drow": ("drow",),
     "highlander": ("highland",),
     "mage": ("mage",),

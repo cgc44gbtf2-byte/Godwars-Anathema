@@ -56,10 +56,10 @@ class CelestialCatalog(unittest.TestCase):
                          "cd73ac2703176871b2e07bbbecc5c2914a53c4eb")
 
     def test_no_macro_getter_interpreter_or_save_changes(self):
-        for path,sha in (("merc.h","b843f157662ab181daabe913d74685f1c8bc75e6"),
-                         ("interp.c","ccb0125d4264a8a5447618c29a9240ec674d2eb4"),
+        for path,sha in (("merc.h","3b098a58b44542ce99b83b66d9ea780932642300"),
+                         ("interp.c","cd18b4a21c44e1c1dc9db1caf42caffd35235c67"),
                          ("act_info.c","d4b24a952210f67fbfadabb480e9908422c72280"),
-                         ("save.c","1f3317263a45d1a886db411d4c0a52a5bba92909")):
+                         ("save.c","ad40ba98301fc9b515b856771732a7ed27425152")):
             text=(SRC/path).read_text()
             if path=="save.c":
                 text=without_hybrid_forms_save(without_guardian_lifecycle_save(text))

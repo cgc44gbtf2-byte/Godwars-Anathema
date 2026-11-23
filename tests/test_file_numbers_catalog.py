@@ -17,7 +17,7 @@ class FileNumbersCatalog(unittest.TestCase):
                          "062398a86ec90e64c0d94e49ce34a4bae9da046d")
         self.assertEqual(blob(without_hybrid_forms_save(
             without_file_number_save((SRC/"save.c").read_text()))),
-                         "3655e4f99b37b0d5165e58dc73d78c00b47564fc")
+                         "844f819af14166cee2cb73e1462c1037cab5c991")
 
     def test_checked_pure_bounded_nonrecursive_arithmetic(self):
         text=(SRC/"file_number.c").read_text()

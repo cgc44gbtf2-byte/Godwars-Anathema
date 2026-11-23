@@ -619,6 +619,9 @@
      */
    { "chant",		do_chant,	POS_FIGHTING,	LEV_SOR,  LOG_NORMAL	},
    { "colors",		do_colors,	POS_DEAD,	LEV_SOR,  LOG_NORMAL	},
+   { "learn",		do_learn,	POS_DEAD,	LEV_SOR,  LOG_NORMAL	},
+   { "recipe",		do_recipe,	POS_FIGHTING,	LEV_SOR,  LOG_NORMAL	},
+   { "apprentice",	do_apprentice,	POS_DEAD,	LEV_SOR,  LOG_NORMAL	},
    { "enchant",		do_enchant,	POS_RESTING,	LEV_SOR,  LOG_NORMAL	},
    { "sorccreate",	do_sorccreate,	POS_RESTING,	LEV_SOR,  LOG_NORMAL	},
    { "vision",		do_vision,	POS_RESTING,	LEV_SOR,  LOG_NORMAL	},

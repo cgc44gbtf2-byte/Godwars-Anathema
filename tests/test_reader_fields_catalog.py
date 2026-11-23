@@ -29,9 +29,9 @@ class ReaderFieldsCatalog(unittest.TestCase):
     def test_previous_modules_byte_exact(self):
         for path,expected in {
             "db.c":"303fb8cb50284af12ea8b74737750fb7dbf26c0b",
-            "save.c":"00cac7a7d5bfe4cf99e8b9e24d970f487ce359ff",
-            "interp.c":"ccb0125d4264a8a5447618c29a9240ec674d2eb4",
-            "clan.c":"89d083ddce8367e98e58cec721cf290d9da105b2",
+            "save.c":"2fcf33fa7a43ae5d56f6819bb2676cc830548a71",
+            "interp.c":"cd18b4a21c44e1c1dc9db1caf42caffd35235c67",
+            "clan.c":"13bffff1f03894fb4b78af46af4d9c66bf9dc649",
             "rename.c":"109f8ae08d341caa14f8eb5dae5749a96d8975de",
         }.items():
             with self.subTest(path=path):

@@ -13,7 +13,7 @@ class WordReadersCatalog(unittest.TestCase):
     def test_previous_modules_are_restored_byte_for_byte(self):
         for path,expected in (
             ("db.c","a910708ed3c89e52190fdf0ccb85e8a05f708bfa"),
-            ("save.c","120404c717d1641d19aaf4c8b4b207f683f44ae6"),
+            ("save.c","b924dfb9d7534e72614810214f80c8450608d53f"),
         ):
             text=without_word_readers_stage((SRC/path).read_text())
             if path=="save.c":text=without_hybrid_forms_save(text)

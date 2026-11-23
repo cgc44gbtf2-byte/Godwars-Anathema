@@ -18,9 +18,9 @@ class WerewolfCommandsCatalog(unittest.TestCase):
             ("handler.c","60868b8d703b9a25b19a3b34bbc801792bc28c47"),
             ("classes/werewolf/wwtribe.c","361745c66f6785c5e01dc78209a47fe9a214236b"),
             ("classes/werewolf/werewolf.c","e266548bb5687c05b30e8d5bcdafb53c5f0e36cd"),
-            ("interp.c","c841cd4a786068f7fd1b79fabaafa62feea92549"),
-            ("merc.h","bd68ec627435f8b8853e251f00cfa9aa00d7c9d3"),
-            ("../area/class.hlp","8ef4e8d8f50eb20a428ca7642bf923096da69d0e"),
+            ("interp.c","f66cc5423740fcdf976f6afed60e31cf015acc47"),
+            ("merc.h","e4c0ad5ff0134c020a4bc7fba5ab9fb57d9c7cc8"),
+            ("../area/class.hlp","b0f867419b5da7df4e09f85e1e1fae5b3ff6357f"),
         ):
             text=(SRC/path).read_text()
             restored=without_invisibility(text)
@@ -40,9 +40,9 @@ class WerewolfCommandsCatalog(unittest.TestCase):
         for path,expected in (
             ("classes/werewolf/wwtribe.c","ed6fbdd8263e54294e4a6db31a999cf7a83551de"),
             ("classes/werewolf/werewolf.c","4b25ab7b4dd57c3ae7d280d8eb7339b175aa35cb"),
-            ("interp.c","4ab4f36ecba8a77a3e717f1324a0a2f8b99fca35"),
-            ("merc.h","ed638e2815e95d882cdf503aabc6663ee557316e"),
-            ("../area/class.hlp","52a0e6643e4a8186349cd90879d6731349af9c77"),
+            ("interp.c","61bb8074c2d39b42275fa735e7be1510b7803e80"),
+            ("merc.h","a47166c0a274e70beb5d3f178662c4fd9a087b3f"),
+            ("../area/class.hlp","599f8623611ab09404c882c8a9514b89a09eac02"),
         ):
             with self.subTest(path=path):
                 text=(SRC/path).read_text()
@@ -60,9 +60,9 @@ class WerewolfCommandsCatalog(unittest.TestCase):
         for path,expected in (
             ("classes/werewolf/wwtribe.c","aa686020c6f9d4e0d2a452b139c629e2d0be01ee"),
             ("classes/werewolf/werewolf.c","7665c4350bef29d48c8a83efc8f705ae3f48dbaa"),
-            ("interp.c","aa6cdbe995767636e28abb8143c502b7deed824d"),
-            ("merc.h","6b94eea4bc958cfa64cb9b9d86805f1673937c7c"),
-            ("../area/class.hlp","bcf6a46c9388da330b525674bbd4afe113fbeb2f"),
+            ("interp.c","71d7b8c829f316d2630ba88b1b609b76f0b9269d"),
+            ("merc.h","ef2a67bcd4bb8b02409b81e2b41710d9156670a8"),
+            ("../area/class.hlp","1657c17b3719222b3d24c3d4e9c3dd74a76c15c7"),
         ):
             with self.subTest(path=path):
                 text=(SRC/path).read_text()
@@ -82,8 +82,8 @@ class WerewolfCommandsCatalog(unittest.TestCase):
             ("classes/werewolf/wwtribe.c","9e3d18f7a70157010da5a80d411ced498a63d422"),
             ("combat_status.c","103048b2fcf8d20745b2602d6fe5c56d34aa132d"),
             ("handler.c","fe6fa8189fea2cb77c3f64c0b6d2c493ddd94bad"),
-            ("interp.c","d957a400db811b8e70e3ac9998eddafe4d85e6b9"),
-            ("merc.h","45a7b0627763364f37ff55697df6fd9e409f8f62"),
+            ("interp.c","55919c3bb51ff6b282e16d9fa99b189665767b05"),
+            ("merc.h","bae3d92e26d1d41b41d76764e07b5538722388b7"),
         ):
             with self.subTest(path=path):
                 text=(SRC/path).read_text()
@@ -111,8 +111,8 @@ class WerewolfCommandsCatalog(unittest.TestCase):
         for path,expected in (
             ("classes/werewolf/werewolf.c","7dc28aead30f5407cc3ec2f3e2c657ed0fe0c788"),
             ("classes/hybrid/training.c","4646c2494470f6427efbba6da69752b32590c2a2"),
-            ("interp.c","ccb0125d4264a8a5447618c29a9240ec674d2eb4"),
-            ("merc.h","b843f157662ab181daabe913d74685f1c8bc75e6")):
+            ("interp.c","cd18b4a21c44e1c1dc9db1caf42caffd35235c67"),
+            ("merc.h","3b098a58b44542ce99b83b66d9ea780932642300")):
             restored=without_werewolf_stage((SRC/path).read_text())
             if path=="interp.c":
                 from reader_fields_source import without_reader_fields_stage

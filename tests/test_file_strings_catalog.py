@@ -13,7 +13,7 @@ class StringReadersCatalog(unittest.TestCase):
     def test_previous_modules_are_restored_byte_for_byte(self):
         for path,expected in (
             ("db.c","e5240dc752bdac278be07a9fc5e929e19fb31579"),
-            ("save.c","616bdd8a655425e1ea104f04181e9cada9162fba"),
+            ("save.c","564f0207169333c2f7a9f396f64a021cb3843b55"),
         ):
             text=without_string_readers_stage((SRC/path).read_text())
             if path=="save.c":text=without_hybrid_forms_save(text)

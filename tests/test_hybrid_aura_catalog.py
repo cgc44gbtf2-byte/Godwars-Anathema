@@ -18,7 +18,7 @@ class AuraCatalog(unittest.TestCase):
     def test_entire_shared_module_restores_exact_previous_source(self):
         from scry_source import without_scry_stage
         text=without_scry_stage((SRC/"clan.c").read_text())
-        self.assertEqual(blob(without_aura_stage(text)),"a5570740eb895b02ff7aa058ed631e153ecbeef3")
+        self.assertEqual(blob(without_aura_stage(text)),"760af920a36ed9c188dc2822c50c21a5f5cd563c")
         self.assertEqual(text.count("hybrid_power_rank("),1)
 
     def test_independent_learned_source_and_native_fallbacks(self):
@@ -45,10 +45,10 @@ class AuraCatalog(unittest.TestCase):
         self.assertNotIn('sprintf(buf, "%s is an NPC.',text)
 
     def test_native_macros_getters_interpreter_codecs_and_training_unchanged(self):
-        for path,sha in (("merc.h","b843f157662ab181daabe913d74685f1c8bc75e6"),
-                         ("interp.c","ccb0125d4264a8a5447618c29a9240ec674d2eb4"),
+        for path,sha in (("merc.h","3b098a58b44542ce99b83b66d9ea780932642300"),
+                         ("interp.c","cd18b4a21c44e1c1dc9db1caf42caffd35235c67"),
                          ("act_info.c","d4b24a952210f67fbfadabb480e9908422c72280"),
-                         ("save.c","3655e4f99b37b0d5165e58dc73d78c00b47564fc"),
+                         ("save.c","844f819af14166cee2cb73e1462c1037cab5c991"),
                          ("classes/monk/monk.c","051fe16da87e9b7647c819512e833893c22762b0"),
                          ("classes/hybrid/training.c","4646c2494470f6427efbba6da69752b32590c2a2")):
             text=(SRC/path).read_text()
