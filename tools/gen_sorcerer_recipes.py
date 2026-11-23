@@ -80,9 +80,9 @@ for k in keys:
     s,reps,mode,cls,note=R[k]
     t.append('| %d | %s | %s | %s | %s | %d | %s | %s |'%(k,RUNES[k//10000],GLYPHS[(k//10)%1000],SIGILS[k%10],s,reps,cls,note))
 extra='''
-All 53 Gathering recipes are present; none was dropped. "Adapted" rows replace a spell that Anathema does not have, or that is an empty stub, with the closest working effect. The Master rune is not part of any recipe key; knowing it cuts every recipe's mana cost by 25 percent.
+All 53 Gathering recipes are present; none was dropped. "Adapted" rows replace a spell that Anathema does not have, or that is an empty stub, with the closest working effect. The Master rune is not part of any recipe key; knowing it cuts every recipe's mana cost by 25 percent, except the mana recipe.
 
-Mana cost is the spell's normal cost multiplied by its casts. Every recipe also applies the spell's wait state.
+Mana cost is the spell's normal cost multiplied by its casts. Every recipe also applies the spell's wait state. The mana recipe is the exception: its spell costs nothing and restores 20 mana per caster level per cast (40 for the double cast), so the recipe charges 25 mana per level per cast (50 per level total) and ignores the Master rune discount. Casting it never gains mana; it is a lossy transfer, most useful on an ally. The soulblade recipe takes the weapon type (slash, pierce or blunt) as its argument and checks it before charging mana.
 '''
 open('docs/SORCERER_COMPONENTS.md','w').write(head+'\n'.join(t)+'\n'+extra+'\n## Apprenticeship'+tail)
 print('ok',len(keys))
