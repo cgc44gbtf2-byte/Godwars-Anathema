@@ -53,7 +53,7 @@ R = {
 2565122:('readaura',1,'SPECIAL','Guarded','Runs the existing readaura command (same-room)'),
 2565128:('identify',1,'OBJ','Guarded','Identify on a carried object'),
 2565124:('scry',1,'SPECIAL','Guarded','Runs the existing scry command'),
-5120018:('soulblade',1,'OBJ','Guarded','Double soulblade limited to one per cast'),
+5120018:('soulblade',1,'ROOM','Guarded','Soulblade: name slash, pierce or blunt'),
 5120044:('summon',1,'SPECIAL','Guarded','Summon needs the target to have summon enabled and keeps every spell restriction'),
 5120161:('teleport',1,'SELF','Guarded','Teleport blocked in combat, safe and no-teleport rooms'),
 5120321:('pass door',1,'SELF','Direct','Pass door'),

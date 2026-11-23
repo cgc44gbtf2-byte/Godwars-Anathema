@@ -44,7 +44,7 @@
     {256, 512, 2, "readaura", 1, RECIPE_SPECIAL, RECIPE_GUARDED, "Runs the existing readaura command (same-room)"}, /* 2565122 mind+information+targeting */
     {256, 512, 4, "scry", 1, RECIPE_SPECIAL, RECIPE_GUARDED, "Runs the existing scry command"}, /* 2565124 mind+information+area */
     {256, 512, 8, "identify", 1, RECIPE_OBJ, RECIPE_GUARDED, "Identify on a carried object"}, /* 2565128 mind+information+object */
-    {512, 1, 8, "soulblade", 1, RECIPE_OBJ, RECIPE_GUARDED, "Double soulblade limited to one per cast"}, /* 5120018 spirit+creation+object */
+    {512, 1, 8, "soulblade", 1, RECIPE_ROOM, RECIPE_GUARDED, "Soulblade: name slash, pierce or blunt"}, /* 5120018 spirit+creation+object */
     {512, 4, 4, "summon", 1, RECIPE_SPECIAL, RECIPE_GUARDED, "Summon needs the target to have summon enabled and keeps every spell restriction"}, /* 5120044 spirit+summoning+area */
     {512, 16, 1, "teleport", 1, RECIPE_SELF, RECIPE_GUARDED, "Teleport blocked in combat, safe and no-teleport rooms"}, /* 5120161 spirit+transportation+self */
     {512, 32, 1, "pass door", 1, RECIPE_SELF, RECIPE_DIRECT, "Pass door"}, /* 5120321 spirit+enhancement+self */

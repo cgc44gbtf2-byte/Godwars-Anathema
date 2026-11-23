@@ -126,6 +126,15 @@ static void recipes(void)
     ch->wait=0;ch->mana=51000;mana=ch->mana;
     command(ch,"recipe fire enhancement object");
     assert(strstr(output,"trace the runes")&&ch->mana<mana&&ch->wait>0);
+    /* soulblade validates its weapon type before charging; mana recipe is not net-free */
+    ch->wait=0;mana=ch->mana;
+    command(ch,"recipe spirit creation object");assert(strstr(output,"Pick slash")&&ch->mana==mana&&ch->wait==0);
+    command(ch,"recipe spirit creation object sword");assert(strstr(output,"Pick slash")&&ch->mana==mana);
+    ch->wait=0;ch->mana=1000;
+    command(ch,"recipe water enhancement self");
+    assert(strstr(output,"trace the runes")&&ch->mana>=1000-(5+ch->stats[STAT_INT]*5)*10&&ch->mana<=ch->max_mana);
+    assert(51000-ch->mana>=0);
+    ch->wait=0;ch->mana=51000;mana=ch->mana;
     /* summon needs a named target and no combat; unknown targets cost nothing */
     ch->wait=0;mana=ch->mana;
     command(ch,"recipe spirit summoning area");assert(strstr(output,"Summon whom")&&ch->mana==mana);

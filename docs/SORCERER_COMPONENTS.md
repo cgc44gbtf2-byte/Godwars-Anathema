@@ -70,7 +70,7 @@ Safety policy (user decision: fix unsafe recipes, do not drop them): global reac
 | 2565122 | mind | information | targeting | readaura | 1 | Guarded | Runs the existing readaura command (same-room) |
 | 2565124 | mind | information | area | scry | 1 | Guarded | Runs the existing scry command |
 | 2565128 | mind | information | object | identify | 1 | Guarded | Identify on a carried object |
-| 5120018 | spirit | creation | object | soulblade | 1 | Guarded | Double soulblade limited to one per cast |
+| 5120018 | spirit | creation | object | soulblade | 1 | Guarded | Soulblade: name slash, pierce or blunt |
 | 5120044 | spirit | summoning | area | summon | 1 | Guarded | Summon needs the target to have summon enabled and keeps every spell restriction |
 | 5120161 | spirit | transportation | self | teleport | 1 | Guarded | Teleport blocked in combat, safe and no-teleport rooms |
 | 5120321 | spirit | enhancement | self | pass door | 1 | Direct | Pass door |

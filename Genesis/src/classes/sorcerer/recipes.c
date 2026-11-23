@@ -48,9 +48,18 @@ static bool recipe_hostile(const SORC_RECIPE *r)
         || !strcmp(r->spell, "gas breath");
 }
 
+static long recipe_level(const CHAR_DATA *ch)
+{
+    return 5 + ch->stats[STAT_INT] * 5;
+}
+
 static long recipe_mana(const CHAR_DATA *ch, const SORC_RECIPE *r, long base)
 {
-    long cost = base * r->casts;
+    long cost;
+    /* The spell itself is free; the recipe charges a quarter of the 40 mana
+     * per level it restores so it cannot be a net-free refill. */
+    if (!strcmp(r->spell, "mana")) base = recipe_level(ch) * 10;
+    cost = base * r->casts;
     if (sorc_knows(ch, SORC_RUNE, SORC_RUNE_MASTER)) cost = cost * 3 / 4;
     return cost < 1 ? 1 : cost;
 }
@@ -65,7 +74,7 @@ static bool foe_legal(CHAR_DATA *ch, CHAR_DATA *victim)
 
 static void cast_once(const SORC_RECIPE *r, long sn, CHAR_DATA *ch, void *vo)
 {
-    long level = 5 + ch->stats[STAT_INT] * 5;
+    long level = recipe_level(ch);
     (*skill_table[sn].spell_fun)(sn, level, ch, vo);
 }
 
@@ -228,6 +237,16 @@ void do_recipe(CHAR_DATA *ch, char *argument)
             }
         }
         break;
+    }
+    if (!strcmp(r->spell, "soulblade"))
+    {
+        char pick[MIL];
+        one_argument(argument, pick);
+        if (str_cmp(pick, "slash") && str_cmp(pick, "pierce") && str_cmp(pick, "blunt"))
+        {
+            stc("Pick slash, pierce, or blunt.\n\r", ch);
+            return;
+        }
     }
     if (!strcmp(r->spell, "teleport")
      && (ch->fighting != NULL || IS_SET(room->room_flags, ROOM_SAFE)
