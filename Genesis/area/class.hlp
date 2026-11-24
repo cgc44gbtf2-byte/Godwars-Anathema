@@ -616,7 +616,152 @@ Find Familiar - Summons an animal for you to command(use [ to give commands).
 Umbra         - Moves you into the Umbral plane. <Not in.  Use the Umbra command>
 Ethereal      - Makes you ethereal. <Not in.  Use an affect spell>
 
-Related Helps: Chants, Writing, and Class.
+Related Helps: Learn, Recipe, Apprentice, Chants, Writing, and Class.
+~
+
+0 Learn Components Runes Glyphs Sigils~
+Syntax: learn
+        learn rune <name>
+        learn glyph <name>
+        learn sigil <name>
+
+Sorcerers combine learned runes, glyphs and sigils to cast fixed recipes.
+Type 'learn' for the catalogue, your known components and next prices.
+Listing is free. Learning spends primal immediately:
+  Rune:  20 x (number of runes already known + 1).
+  Glyph: 10 x (number of glyphs already known + 1), maximum 50 primal.
+  Sigil: 30 primal each.
+Known components cannot be purchased twice.
+
+Runes (11):
+  fire, air, earth, water, dark, light, life, death, mind, spirit, master
+Glyphs (10):
+  creation, destruction, summoning, transformation, transportation,
+  enhancement, reduction, control, protection, information
+Sigils (4):
+  self, targeting, area, object
+
+Learn at least one rune before a glyph, and one glyph before a sigil.
+Master requires all ten other runes. Master is not used as a recipe
+component: knowing it reduces recipe mana costs by 25 percent, except
+for the mana-transfer recipe. Use the full component names.
+
+Before graduation, apprentices can learn at most 3 runes, 2 glyphs and
+2 sigils. Graduate to remove those limits. Learned components persist
+when you save and reload. Existing Sorcerers keep their colors and
+spellbooks; learning components does not replace writing or chanting.
+
+Example (costs 60 primal total when starting with no components):
+  learn rune light
+  learn glyph protection
+  learn sigil self
+  recipe light protection self
+
+Related Helps: Recipe, Apprentice, Sorcerers, Chants, and Writing.
+~
+
+0 Recipe Recipes~
+Syntax: recipe
+        recipe <rune> <glyph> <sigil> [target]
+
+Type 'recipe' for a free list of the fixed recipes you can currently
+cast and their effects. There are 53 combinations. You must know all
+three components; not every combination makes a recipe. Learn more
+components to reveal more recipes. Master is not a recipe ingredient.
+Custom spellbooks and the 'chant' command still work independently.
+
+Targets depend on the effect, not just the sigil's name:
+  Hostile single-target effects need a legal opponent in your room.
+    Omit the target to use your current fighting opponent.
+  Friendly effects usually default to yourself, or accept someone
+    in the same room. Self-only effects cannot target someone else.
+  Identify, preserve and enchant effects need a carried object.
+  Creation and room effects generally need no target.
+Some object-sigil recipes instead grant a protection to the caster.
+
+Examples (learn all three components first):
+  recipe light enhancement self          - sanctuary
+  recipe fire destruction targeting foe - double fireball
+  recipe life enhancement targeting ally - double heal
+  recipe mind information object sword  - identify a carried sword
+  recipe spirit creation object slash   - create one soulblade
+Soulblade takes slash, pierce or blunt, NOT a carried item's name.
+An invalid weapon type is rejected before charging mana.
+
+Costs and recovery:
+  Normally, mana cost is the spell's minimum mana cost x number of
+  casts. Master reduces that total by 25 percent (rounded down).
+  Minimum cost is 1 mana. Readaura, scry and preserve use a base cost
+  of 20 mana (15 with Master). Every cast applies a recovery wait;
+  you cannot cast while recovering, combat-paused or silenced.
+  Spell-specific requirements still apply; a spell can fail after
+  you have paid the recipe's cost.
+
+Mana transfer: 'recipe water enhancement self [ally]'
+  Despite the self sigil, this can target an ally in your room.
+  Let L = 5 + (5 x your Intelligence stat), not your character level.
+  You pay 50 x L mana and the target receives up to 40 x L mana,
+  capped by their maximum. Master gives NO discount on this recipe.
+  It is a lossy transfer, not a free refill; self-casting loses mana.
+
+Safety and special effects:
+  Offensive recipes respect safe rooms and target protections.
+  The flame-bolts recipe hits legal foes fighting you in the room.
+  Summon: 'recipe spirit summoning area <player>'; the target must
+    allow summoning. Do not fight while summoning. Other summon
+    restrictions still apply.
+  Teleport is blocked during combat, in safe rooms and no-teleport
+    rooms. Other teleport restrictions still apply.
+  Preserve extends a timed carried object's timer by 24 ticks,
+    capped at 200; an untimed object stays untimed.
+  Readaura and scry supply vision only for that use, not permanently.
+
+Related Helps: Learn, Apprentice, Sorcerers, Chants, and Writing.
+~
+
+0 Apprentice Apprenticeship Mentor~
+Syntax: apprentice
+        apprentice teach <player>
+        apprentice accept
+        apprentice decline
+        apprentice train
+        apprentice graduate
+
+New Sorcerers begin as apprentices. Type 'apprentice' to see your
+lessons, components and color ranks against graduation requirements.
+Sorcerers from before this system already count as full Sorcerers:
+you keep your colors and spellbooks and need not repeat training.
+
+Player mentor:
+  A full Sorcerer in your room uses 'apprentice teach <yourname>'.
+  Use 'apprentice accept' to consent or 'apprentice decline' to refuse.
+  Offers expire after 2 minutes; the mentor must still be present and
+  able to teach when you accept. Arrange lessons outside combat.
+  Each successful lesson costs the APPRENTICE 5 primal.
+
+NPC trainer:
+  Find the Sorcerer trainer at the Mud School entrance, then type
+  'apprentice train'. The trainer must be awake and not fighting,
+  and you must not be fighting. Each lesson costs you 10 primal.
+
+Both routes share a 10-minute wait between successful lessons.
+You need 5 lessons total; you may use either route or mix them.
+Before graduation you can learn at most 3 runes, 2 glyphs and 2 sigils.
+
+Graduation requires ALL of:
+  5 lessons; at least 3 runes, 1 glyph and 1 sigil; and color ranks
+  adding up to at least 3 across your six colors.
+Use 'colors' to view ranks and 'colors <color>' to train a rank.
+Colors are purple, red, blue, green, yellow and black; each costs
+10 x its next rank in primal, with a maximum rank of 5 per color.
+
+Once ready, use 'apprentice graduate'. A lesson also checks whether
+you qualify for graduation. Graduation removes apprentice learning
+limits and grants a one-time 100 primal reward. It cannot be repeated
+for more rewards and grants no staff status, trust or character levels.
+Your lessons, progress and graduation persist when you save and reload.
+
+Related Helps: Learn, Recipe, Sorcerers, Chants, and Writing.
 ~
 
 0 Chants~

@@ -20,7 +20,7 @@ class WerewolfCommandsCatalog(unittest.TestCase):
             ("classes/werewolf/werewolf.c","e266548bb5687c05b30e8d5bcdafb53c5f0e36cd"),
             ("interp.c","f66cc5423740fcdf976f6afed60e31cf015acc47"),
             ("merc.h","e4c0ad5ff0134c020a4bc7fba5ab9fb57d9c7cc8"),
-            ("../area/class.hlp","b0f867419b5da7df4e09f85e1e1fae5b3ff6357f"),
+            ("../area/class.hlp","e7b10caec9a78ee7e028e0fb374db4703ed5c83e"),
         ):
             text=(SRC/path).read_text()
             restored=without_invisibility(text)
@@ -42,7 +42,7 @@ class WerewolfCommandsCatalog(unittest.TestCase):
             ("classes/werewolf/werewolf.c","4b25ab7b4dd57c3ae7d280d8eb7339b175aa35cb"),
             ("interp.c","61bb8074c2d39b42275fa735e7be1510b7803e80"),
             ("merc.h","a47166c0a274e70beb5d3f178662c4fd9a087b3f"),
-            ("../area/class.hlp","599f8623611ab09404c882c8a9514b89a09eac02"),
+            ("../area/class.hlp","f049922512be296df2fc281728107779c6ecbe48"),
         ):
             with self.subTest(path=path):
                 text=(SRC/path).read_text()
@@ -62,7 +62,7 @@ class WerewolfCommandsCatalog(unittest.TestCase):
             ("classes/werewolf/werewolf.c","7665c4350bef29d48c8a83efc8f705ae3f48dbaa"),
             ("interp.c","71d7b8c829f316d2630ba88b1b609b76f0b9269d"),
             ("merc.h","ef2a67bcd4bb8b02409b81e2b41710d9156670a8"),
-            ("../area/class.hlp","1657c17b3719222b3d24c3d4e9c3dd74a76c15c7"),
+            ("../area/class.hlp","d4cbeb38484cb6a33a3acf7c4af110475b4c4eb6"),
         ):
             with self.subTest(path=path):
                 text=(SRC/path).read_text()
