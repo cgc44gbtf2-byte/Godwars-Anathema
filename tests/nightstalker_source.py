@@ -13,7 +13,7 @@ PROOFS = json.loads(zlib.decompress(base64.b64decode(DATA)))
 for entry in PROOFS:
     if entry[0] == "Genesis/src/clan.c":
         assert entry[1] == "de56f64e972769f46ae56793d1d2830aa868d0f4"
-        entry[1] = "e7788102d62bd58e10bdc2e7ccbb3237ab11be29"
+        entry[1] = "7d803067b25fabb215ee0b9ad4daa7955df2d56f"
 for path, _, hunks in PROOFS:
     if path.endswith("/clans.c"):
         hunks.extend([

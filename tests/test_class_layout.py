@@ -141,6 +141,7 @@ class ClassLayoutChecks(unittest.TestCase):
             "do_awe": "classes/vampire/presence.c",
             "do_humanity": "classes/vampire/beast.c",
             "do_beastlike": "classes/vampire/beast.c",
+            "do_beastwithin": "classes/vampire/beast.c",
             "do_shadowsight": "classes/werewolf/instincts.c",
             "do_rage": "classes/werewolf/instincts.c",
             "do_regenerate": "classes/vampire/state.c",
@@ -158,7 +159,7 @@ class ClassLayoutChecks(unittest.TestCase):
         for fn in ("do_fangs", "do_claws", "do_nightsight", "do_calm",
                    "do_flex", "do_werewolf", "do_unwerewolf", "do_vampire",
                    "do_shadowplane", "do_shield", "do_truesight", "do_scry",
-                   "do_serpent", "do_beckon"):
+                   "do_serpent", "do_beckon", "do_serenity"):
             self.assertEqual(owners[fn], ["clan.c"], fn)
 
     def test_presence_extraction_preserves_exact_handler_bytes(self):
@@ -169,6 +170,12 @@ class ClassLayoutChecks(unittest.TestCase):
         ):
             body = re.search(r"^void do_" + name + r"\(.*?^\}", source, re.M | re.S)[0]
             self.assertEqual(hashlib.sha256(body.encode()).hexdigest(), expected)
+
+    def test_beast_within_extraction_preserves_exact_handler_bytes(self):
+        source = (SRC / "classes/vampire/beast.c").read_text()
+        body = re.search(r"^void do_beastwithin\(.*?^\}", source, re.M | re.S)[0]
+        self.assertEqual(hashlib.sha256(body.encode()).hexdigest(),
+                         "fedde214c996ce66537b23ad27d295b9df64f63e3edb7a9bcfc1d74016c26edf")
 
 
 if __name__ == "__main__":

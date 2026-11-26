@@ -113,6 +113,20 @@ Historical whole-file source proofs are repinned for the two removals without
 loosening their assertions. This is organization and characterization, not
 a claim of new balance testing or a fix to legacy control mechanics.
 
+The next cleanup, after `515a365`, moves `do_beastwithin` byte-for-byte
+into `vampire/beast.c`. Its Vampire Animalism-4 gate, targeting, Beast
+threshold, Protean helper calls, existing Werewolf-target branch, resistance,
+random draws and 12-pulse recovery are unchanged. `do_serenity` remains
+shared because it also serves Children of Gaia Werewolves.
+
+The same runtime fixture characterizes self and named Vampire targets at
+Animalism ranks 0–7 for ordinary Vampires and rank-1/rank-5 Gargoyles,
+including the Beast-19/20 boundary, repeat prevention, timed/willpower
+resistance, self-resistance bypass and already-shifted Werewolf rejection.
+Other-class/NPC caller and Gargoyle statue denials are also covered.
+The successful Werewolf-target transformation branch is preserved by the
+exact-body hash, not newly exercised by this no-save fixture.
+
 | Owning class | Files under `Genesis/src/classes/` | Responsibility |
 | --- | --- | --- |
 | Vampire | `vampire/disc.c`, `vampire/vampire.c`, `vampire/presence.c`, `vampire/beast.c`, `vampire/state.c`, `vampire/obfuscate.c`, `vampire/dominate.c`, `vampire/chimerstry.c` | Disciplines, named teaching/blood powers, Presence, Beast, recovery/melding, invisibility, possession and illusions |

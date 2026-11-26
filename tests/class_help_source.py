@@ -131,7 +131,7 @@ PROOFS = [
      "90fa65b2627a1f25c9ef29de916427dfb33aa074", ELEMENT_HUNKS),
     ("Genesis/src/classes/mage/mage.c",
      "667337169a49331e1ec68678faf4ba6699a573cf", MAGE_HUNKS),
-    ("Genesis/src/clan.c", "ffe7191e328095c3f5c5e03a8f1105ff99cb1dcf", [
+    ("Genesis/src/clan.c", "c37fac67bf9e44175642003fdbddd17dd85c76b1", [
         (VAMPIRE_GUIDANCE, ""),
         (GARGOYLE_HINT, ""),
         ('"You are now a #7Monk#n.\\n\\r"', '"You are now a #7Monk#n.\\nr\\r"'),

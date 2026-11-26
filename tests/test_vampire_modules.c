@@ -267,6 +267,77 @@ static void test_presence_attacks(void)
     }
 }
 
+static void test_beast_within(void)
+{
+    for (int rank = 0; rank <= 7; ++rank)
+    {
+        fresh(CLASS_VAMPIRE);
+        player.powers[DISC_ANIMALISM] = rank;
+        actor.beast = 19;
+        command("beastwithin");
+        assert(player.wolf == 0 && actor.wait == 0 && actor.vampaff == 0);
+        actor.beast = 20;
+        command("beastwithin missing");
+        assert(player.wolf == 0 && actor.wait == 0);
+        command("beastwithin");
+        assert(actor.wait == (rank >= 4 ? 12 : 0));
+        if (rank >= 4)
+        {
+            assert(player.wolf >= 10 && player.wolf <= 20);
+            assert(IS_VAMPAFF(&actor, VAM_FANGS));
+            long wolf = player.wolf;
+            command("beastwithin");
+            assert(player.wolf == wolf && actor.wait == 0);
+        }
+        else assert(player.wolf == 0 && actor.vampaff == 0);
+        resources();
+
+        fresh(CLASS_VAMPIRE);
+        player.powers[DISC_ANIMALISM] = rank;
+        char_from_room(&visitor); char_to_room(&visitor, &home);
+        visitor.class = CLASS_VAMPIRE;
+        visitor.beast = 20;
+        command("beastwithin visitor");
+        assert(actor.wait == (rank >= 4 ? 12 : 0));
+        assert(player.wolf == 0 && actor.vampaff == 0);
+        if (rank >= 4)
+        {
+            assert(guest.wolf >= 10 && guest.wolf <= 20);
+            assert(IS_VAMPAFF(&visitor, VAM_FANGS));
+        }
+        else assert(guest.wolf == 0 && visitor.vampaff == 0);
+        resources();
+    }
+
+    fresh(CLASS_VAMPIRE);
+    player.powers[DISC_ANIMALISM] = 4;
+    char_from_room(&visitor); char_to_room(&visitor, &home);
+    visitor.class = CLASS_VAMPIRE;
+    visitor.beast = 20;
+    guest.resist[WILL_ANIMALISM] = 1;
+    command("beastwithin visitor");
+    assert(guest.wolf == 0 && actor.wait == 0);
+    guest.resist[WILL_ANIMALISM] = 0;
+    guest.resist[0] = RES_ANIMALISM;
+    guest.willpower[0] = 10;
+    command("beastwithin visitor");
+    assert(guest.willpower[0] == 0 && guest.resist[WILL_ANIMALISM] == 60);
+    assert(!IS_WILLPOWER(&visitor, RES_ANIMALISM));
+    assert(guest.wolf == 0 && actor.wait == 0);
+    visitor.class = CLASS_WEREWOLF;
+    SET_BIT(visitor.act, PLR_WOLFMAN);
+    command("beastwithin visitor");
+    assert(guest.wolf == 0 && actor.wait == 0);
+    actor.beast = 20;
+    player.resist[WILL_ANIMALISM] = 60;
+    player.resist[0] = RES_ANIMALISM;
+    player.willpower[0] = 10;
+    command("beastwithin");
+    assert(player.wolf >= 10 && player.wolf <= 20);
+    assert(player.willpower[0] == 10 && actor.wait == 12);
+    resources();
+}
+
 static void test_illusions(void)
 {
     fresh(CLASS_VAMPIRE);
@@ -315,7 +386,8 @@ static void test_class_guards(void)
     const long classes[] = {CLASS_NONE, CLASS_WEREWOLF, CLASS_SORCERER, CLASS_DROW,
         CLASS_HIGHLANDER, CLASS_MAGE, CLASS_DRAGON, CLASS_NINJA, CLASS_MONK, CLASS_ELEM};
     DO_FUN *powers[] = {do_regenerate, do_earthmeld, do_vanish, do_summoning,
-        do_possession, do_mirrorimage, do_control, do_dreadgaze, do_entrancement};
+        do_possession, do_mirrorimage, do_control, do_dreadgaze, do_entrancement,
+        do_beastwithin};
     for (size_t c = 0; c <= sizeof(classes) / sizeof(classes[0]); ++c)
     {
         fresh(c == sizeof(classes) / sizeof(classes[0]) ? CLASS_VAMPIRE : classes[c]);
@@ -350,7 +422,7 @@ static void test_gargoyle_statue_commands(void)
     const char *commands[] = {"regenerate", "earthmeld", "vanish all",
         "summoning visitor", "possession mobile", "mirrorimage",
         "controlillusion mobile", "change bat", "dreadgaze mobile",
-        "entrancement mobile"};
+        "entrancement mobile", "beastwithin"};
     assert(gargoyle_rank == 1 || gargoyle_rank == 5);
     for (size_t i = 0; i < sizeof(commands) / sizeof(commands[0]); ++i)
     {
@@ -384,13 +456,14 @@ int main(void)
     {
         gargoyle_rank = profiles[i];
         test_states(); test_obfuscate(); test_summoning();
-        test_possession(); test_presence_attacks(); test_illusions(); test_class_guards();
+        test_possession(); test_presence_attacks(); test_beast_within();
+        test_illusions(); test_class_guards();
         test_gargoyle_inherited_ranks();
         if (gargoyle_rank) test_gargoyle_statue_commands();
     }
     cleanup();
     puts("vampire module extraction full-engine regressions passed");
     puts("Gargoyle inherited modules: native/rank-1/rank-5 access, resources, "
-         "rank projections and 20 statue-command denials passed");
+         "rank projections and 22 statue-command denials passed");
     return 0;
 }

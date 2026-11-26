@@ -10,7 +10,7 @@ class HybridWebCatalog(unittest.TestCase):
     def test_native_web_safety_repairs_are_exact(self):
         from web_source import without_web_safety
         for path,prior in (
-            ("clan.c","ee94ace97becc505f3a6e9429b00f1aa9083176d"),
+            ("clan.c","2fbd336f53efca5504e254c9a42bdd3b244514fa"),
             ("magic.c","6a1537c329c64056b61563a92ec3d4dbf425fd9a"),
         ):
             text=(SRC/path).read_text()
@@ -30,7 +30,7 @@ class HybridWebCatalog(unittest.TestCase):
     def test_entire_previous_shared_module_restores(self):
         text=without_web_stage((SRC/"clan.c").read_text()).encode()
         self.assertEqual(hashlib.sha1(b"blob "+str(len(text)).encode()+b"\0"+text).hexdigest(),
-                         "d277eb5501ee3d4f114df770e84a8a140a0a620a")
+                         "cad40ef4e794bee2d0fccf3bca7307c99893a39b")
         for old,new in (("WAIT_STATE(ch, 12);","WAIT_STATE(ch, 6);"),
                         ("(sn, 50, ch, victim)","(sn, 60, ch, victim)"),
                         ("NINJA_KI] -= 10","NINJA_KI] -= 5")):

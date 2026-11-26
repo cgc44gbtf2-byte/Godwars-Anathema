@@ -31,7 +31,7 @@ class ReaderFieldsCatalog(unittest.TestCase):
             "db.c":"303fb8cb50284af12ea8b74737750fb7dbf26c0b",
             "save.c":"2fcf33fa7a43ae5d56f6819bb2676cc830548a71",
             "interp.c":"cd18b4a21c44e1c1dc9db1caf42caffd35235c67",
-            "clan.c":"6f60babe32473096ed6ba9fb6b978b726524f2d6",
+            "clan.c":"d82fda8fda0e4e75c947f4d53ed5c0b98f61115e",
             "rename.c":"109f8ae08d341caa14f8eb5dae5749a96d8975de",
         }.items():
             with self.subTest(path=path):
