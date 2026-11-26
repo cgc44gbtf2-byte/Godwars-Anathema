@@ -14,7 +14,7 @@ DATA = (DATA.replace("N1lfj5v", "N1lffj5v")
 PROOFS = json.loads(zlib.decompress(base64.b64decode(DATA)))
 # Sorcerer component work added registry lines to these files after the pins.
 _SORCERER_REPINS = {
-    "4b37069ac6ea00c682e2fc872d55b94ba9178a3b": "17a41d93fcc4a9346bb2db90be456797071f82dd",
+    "4b37069ac6ea00c682e2fc872d55b94ba9178a3b": "60bffbacf4310a381123d0d0cab5f6a310b4c4a8",
     "993c0e67f8409f553bc86db02041569ec8ba27a7": "9e2a9c84ee33cae0cb5476ed515e1f3c002d3752",
     "09bba981a007c09b6b1c59d9bf021ecd31274f01": "9ecc780551438f9736f32566d6bcfee20cf99c3b",
     "a32e09f375e1aa0fc38e53451cbc771847748d4d": "f4047592df979e493dd91062c411d26f366f69cd",

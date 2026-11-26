@@ -92,6 +92,27 @@ familiar/session/logout lifecycle edge case has been audited.
 
 ### Current class-source ownership
 
+The Presence cleanup after `3c838cc` moves `do_entrancement` and
+`do_dreadgaze` from `clan.c` into the existing `vampire/presence.c`.
+Both function bodies are byte-identical to that parent revision, including
+their rank-3/rank-2 gates, resistance checks, follower handling, spell calls,
+messages and recovery. `clan.c` changes only by removing those definitions.
+No new module, command, saved field or gameplay rule is introduced.
+
+Beckon stays in `clan.c`: it deliberately serves both Vampire Animalism and
+Werewolf Lupus. Shared helpers and selfbrid are not changed.
+
+The existing real-engine Vampire module fixture now also characterizes
+Entrancement and Dread Gaze across Presence ranks 0–7 for ordinary Vampires
+and Gargoyles at statue ranks 1 and 5. It checks fear/charm effects, existing
+waits and unchanged resources, missing/self targets, safe-room and follower
+limits, repeated charm, timed and willpower resistance, other-class/NPC
+rejections and statue-command denials. These tests run against the original
+and relocated handlers; byte hashes independently pin the moved bodies.
+Historical whole-file source proofs are repinned for the two removals without
+loosening their assertions. This is organization and characterization, not
+a claim of new balance testing or a fix to legacy control mechanics.
+
 | Owning class | Files under `Genesis/src/classes/` | Responsibility |
 | --- | --- | --- |
 | Vampire | `vampire/disc.c`, `vampire/vampire.c`, `vampire/presence.c`, `vampire/beast.c`, `vampire/state.c`, `vampire/obfuscate.c`, `vampire/dominate.c`, `vampire/chimerstry.c` | Disciplines, named teaching/blood powers, Presence, Beast, recovery/melding, invisibility, possession and illusions |

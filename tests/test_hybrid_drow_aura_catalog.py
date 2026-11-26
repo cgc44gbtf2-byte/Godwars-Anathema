@@ -9,7 +9,7 @@ class DrowAuraCatalog(unittest.TestCase):
         raw=(SRC/"clan.c").read_text()
         restored=without_drow_aura_stage(raw).encode()
         self.assertEqual(hashlib.sha1(b"blob "+str(len(restored)).encode()+b"\0"+restored).hexdigest(),
-                         "35eb192dfdc5a1a1b9d09d48f819d43c93cdff31")
+                         "4e5a18ef3af1996d2653d03a83bdc18e9b139812")
         for old,new in (("const bool free_aura = monk_ready || drow_ready;",
                          "const bool free_aura = drow_ready;"),
                         ("ch->mana -= 500","ch->mana -= 1"),

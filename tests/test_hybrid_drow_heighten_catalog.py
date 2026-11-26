@@ -9,7 +9,7 @@ class DrowHeightenCatalog(unittest.TestCase):
         raw=(SRC/"clan.c").read_text()
         restored=without_drow_heighten_stage(raw).encode()
         self.assertEqual(hashlib.sha1(b"blob "+str(len(restored)).encode()+b"\0"+restored).hexdigest(),
-                         "936179665da3345ca95367eb299b4828ce39c47e")
+                         "bda202e7d6f014dd232567a953d83a546e88106d")
         for old,new in (("heighten_ready = monk_ready || drow_ready","heighten_ready = drow_ready"),
                         ("DROW_SIGHT);","DROW_READ);"),("WAIT_STATE(ch, 6);","WAIT_STATE(ch, 3);")):
             with self.assertRaisesRegex(AssertionError,"Unreviewed"):

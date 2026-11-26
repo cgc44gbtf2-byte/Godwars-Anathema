@@ -7,7 +7,7 @@ from gargoyle_death_source import without_gargoyle_death
 
 BASE = {
     "classes/drow/drow.c": "27c68cdbad00a1fc523212c5d8d94f3bdd9e3c45",
-    "clan.c": "82fafccb9bc91b32f3fb6fe0306998a9ac3d840a",
+    "clan.c": "0c6eb2eff4513bf6cfd65831d9b22802c933ae67",
     "handler.c": "a9387450455381bb240fc00f7961d0074d733f5a",
     "act_info.c": "9a67bebbe7eb3bf4bfee487c66b2cda6f4a8f6d2",
     "update.c": "32fccb75067cd3d70d66dfa818b2e7d29d8d1ca3",

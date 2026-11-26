@@ -68,7 +68,7 @@ NATIVE_READERS={
     "act_info.c":"9329784bc5c9ee2aaa28a45a586120cceac85a4e7a5953479a29885f597cbfa4",
     "kav_info.c":"7033361ae7f06dee67bb381072d513cc252f5f3125b770a86d74a94e885920bc",
     "random.c":"fd82898394fbd0e08dc6df57c8769f215f488b1feb94c1f26c307412865e64b6",
-    "clan.c":"06b8ff5bc2e031e82da26059cb1f4ed423af361061ed0911d067e78ba8d75640",
+    "clan.c":"0c1c0f9fbd8fef390231ca68cad5b71c00711415169ac7afc1d9c57683bd3cbb",
     "classes/werewolf/wwtribe.c":"4f33bcb209a2b9806b131914cdea03d7cdd9d15c250bae891ac0deb3b47ad42b",
     "classes/highlander/highland.c":"487dfa0e94c7c69dd5ad4c627c3ab8587aafd9c8e29ce9c57763ac785416cad6",
     "classes/dragon/dragon.c":"e9e38fd31b24cf9db0da213a82626f6865a2857735e215f1839ccbe4b8e11ef6",

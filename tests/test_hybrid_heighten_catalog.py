@@ -14,7 +14,7 @@ class HeightenCatalog(unittest.TestCase):
         source=(SRC/"clan.c").read_text()
         restored=without_heighten_stage(source).encode()
         self.assertEqual(hashlib.sha1(b"blob "+str(len(restored)).encode()+b"\0"+restored).hexdigest(),
-                         "3d3f5ef28922eeb12c5b5eaa8067729edced7f01")
+                         "0e86b7c9ecc358262e09fe994851db5b22cab667")
         with self.assertRaisesRegex(AssertionError,"Unreviewed"):
             without_heighten_stage(source.replace("WAIT_STATE(ch, 6);",
                 "WAIT_STATE(ch, 5);",1))

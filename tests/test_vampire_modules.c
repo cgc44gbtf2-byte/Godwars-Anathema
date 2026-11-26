@@ -201,6 +201,72 @@ static void test_possession(void)
     assert(actor.wait == 0); resources();
 }
 
+static void test_presence_attacks(void)
+{
+    for (int rank = 0; rank <= 7; ++rank)
+    {
+        fresh(CLASS_VAMPIRE);
+        player.powers[DISC_PRESENCE] = rank;
+        CHAR_DATA *mob = mobile("subject", &home);
+        mob->position = POS_SLEEPING;
+        command("dreadgaze subject");
+        assert(!!IS_AFFECTED(mob, AFF_FEAR) == (rank >= 2));
+        assert(actor.wait == (rank >= 2 ? 12 : 0));
+        command("dreadgaze subject");
+        assert(actor.wait == 0);
+        command("dreadgaze missing"); assert(actor.wait == 0);
+        command("dreadgaze caster"); assert(actor.wait == 0);
+        resources();
+
+        fresh(CLASS_VAMPIRE);
+        player.powers[DISC_PRESENCE] = rank;
+        mob = mobile("subject", &home);
+        mob->stats[STAT_WIS] = -1000;
+        command("entrancement missing"); assert(actor.wait == 0);
+        player.followers = 5;
+        command("entrancement subject");
+        assert(!IS_AFFECTED(mob, AFF_CHARM) && actor.wait == 0);
+        player.followers = 0;
+        home.room_flags = ROOM_SAFE;
+        command("entrancement subject");
+        assert(!IS_AFFECTED(mob, AFF_CHARM) && actor.wait == 0);
+        home.room_flags = 0;
+        for (int attempt = 0; attempt < 32 && !IS_AFFECTED(mob, AFF_CHARM); ++attempt)
+            command("entrancement subject");
+        assert(!!IS_AFFECTED(mob, AFF_CHARM) == (rank >= 3));
+        assert(player.followers == (rank >= 3 ? 1 : 0));
+        assert(actor.wait == (rank >= 3 ? 12 : 0));
+        if (rank >= 3)
+        {
+            assert(mob->master == &actor && !strcmp(mob->lord, actor.name));
+            command("entrancement subject");
+            assert(player.followers == 1 && actor.wait == 0);
+        }
+        resources();
+    }
+
+    const char *commands[] = {"dreadgaze visitor", "entrancement visitor"};
+    for (size_t i = 0; i < sizeof(commands) / sizeof(commands[0]); ++i)
+    {
+        fresh(CLASS_VAMPIRE);
+        player.powers[DISC_PRESENCE] = 5;
+        char_from_room(&visitor); char_to_room(&visitor, &home);
+        player.flag = guest.flag = FLAG_PK;
+        visitor.position = POS_FIGHTING;
+        guest.resist[WILL_PRESENCE] = 1;
+        command(commands[i]);
+        assert(visitor.affected_by == 0 && actor.wait == 0);
+        guest.resist[WILL_PRESENCE] = 0;
+        guest.resist[0] = RES_PRESENCE;
+        guest.willpower[0] = 10;
+        command(commands[i]);
+        assert(guest.willpower[0] == 0 && guest.resist[WILL_PRESENCE] == 60);
+        assert(!IS_WILLPOWER(&visitor, RES_PRESENCE));
+        assert(visitor.affected_by == 0 && actor.wait == 0);
+        resources();
+    }
+}
+
 static void test_illusions(void)
 {
     fresh(CLASS_VAMPIRE);
@@ -249,7 +315,7 @@ static void test_class_guards(void)
     const long classes[] = {CLASS_NONE, CLASS_WEREWOLF, CLASS_SORCERER, CLASS_DROW,
         CLASS_HIGHLANDER, CLASS_MAGE, CLASS_DRAGON, CLASS_NINJA, CLASS_MONK, CLASS_ELEM};
     DO_FUN *powers[] = {do_regenerate, do_earthmeld, do_vanish, do_summoning,
-        do_possession, do_mirrorimage, do_control};
+        do_possession, do_mirrorimage, do_control, do_dreadgaze, do_entrancement};
     for (size_t c = 0; c <= sizeof(classes) / sizeof(classes[0]); ++c)
     {
         fresh(c == sizeof(classes) / sizeof(classes[0]) ? CLASS_VAMPIRE : classes[c]);
@@ -283,7 +349,8 @@ static void test_gargoyle_statue_commands(void)
 {
     const char *commands[] = {"regenerate", "earthmeld", "vanish all",
         "summoning visitor", "possession mobile", "mirrorimage",
-        "controlillusion mobile", "change bat"};
+        "controlillusion mobile", "change bat", "dreadgaze mobile",
+        "entrancement mobile"};
     assert(gargoyle_rank == 1 || gargoyle_rank == 5);
     for (size_t i = 0; i < sizeof(commands) / sizeof(commands[0]); ++i)
     {
@@ -317,13 +384,13 @@ int main(void)
     {
         gargoyle_rank = profiles[i];
         test_states(); test_obfuscate(); test_summoning();
-        test_possession(); test_illusions(); test_class_guards();
+        test_possession(); test_presence_attacks(); test_illusions(); test_class_guards();
         test_gargoyle_inherited_ranks();
         if (gargoyle_rank) test_gargoyle_statue_commands();
     }
     cleanup();
     puts("vampire module extraction full-engine regressions passed");
     puts("Gargoyle inherited modules: native/rank-1/rank-5 access, resources, "
-         "rank projections and 16 statue-command denials passed");
+         "rank projections and 20 statue-command denials passed");
     return 0;
 }

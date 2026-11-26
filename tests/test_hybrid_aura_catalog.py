@@ -18,7 +18,7 @@ class AuraCatalog(unittest.TestCase):
     def test_entire_shared_module_restores_exact_previous_source(self):
         from scry_source import without_scry_stage
         text=without_scry_stage((SRC/"clan.c").read_text())
-        self.assertEqual(blob(without_aura_stage(text)),"760af920a36ed9c188dc2822c50c21a5f5cd563c")
+        self.assertEqual(blob(without_aura_stage(text)),"bae916dff717d3b634fc6e1d1b6e2bdc2b6506f9")
         self.assertEqual(text.count("hybrid_power_rank("),1)
 
     def test_independent_learned_source_and_native_fallbacks(self):

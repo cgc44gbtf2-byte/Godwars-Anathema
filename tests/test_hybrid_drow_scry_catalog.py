@@ -9,7 +9,7 @@ class DrowScryCatalog(unittest.TestCase):
         raw=(SRC/"clan.c").read_text()
         restored=without_drow_scry_stage(raw).encode()
         self.assertEqual(hashlib.sha1(b"blob "+str(len(restored)).encode()+b"\0"+restored).hexdigest(),
-                         "70c0672d3198f52db44027299afde48567bd16dd")
+                         "0f69d2365bd33c47aa77b7fe82a9a7842d5eb710")
         for old,new in (("free_scry = monk_ready || drow_ready","free_scry = drow_ready"),
                         ("hybrid_power_drow(ch, DROW_EYES)","hybrid_power_drow(ch, DROW_READ)"),
                         ("if (IS_MAGE(ch) && !free_scry)","if (IS_MAGE(ch))")):

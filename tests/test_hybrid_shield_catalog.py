@@ -12,7 +12,7 @@ class ShieldCatalog(unittest.TestCase):
     def test_entire_shared_module_restores_exact_parent(self):
         text=without_shield_stage((SRC/"clan.c").read_text()).encode()
         self.assertEqual(hashlib.sha1(b"blob "+str(len(text)).encode()+b"\0"+text).hexdigest(),
-                         "e8cbf0dda64f8039c07260e5151cead594eada9d")
+                         "8262d4f60b9604969770e5f22cb4a3ff1c505f68")
         with self.assertRaisesRegex(AssertionError,"Unreviewed"):
             without_shield_stage((SRC/"clan.c").read_text().replace(
                 'send_to_char("You shield your aura','send_to_char("Changed shield',1))

@@ -1,5 +1,6 @@
 """Structural ownership/build checks, not a gameplay-equivalence proof."""
 import collections
+import hashlib
 import pathlib
 import re
 import subprocess
@@ -146,6 +147,8 @@ class ClassLayoutChecks(unittest.TestCase):
             "do_earthmeld": "classes/vampire/state.c",
             "do_vanish": "classes/vampire/obfuscate.c",
             "do_summoning": "classes/vampire/presence.c",
+            "do_entrancement": "classes/vampire/presence.c",
+            "do_dreadgaze": "classes/vampire/presence.c",
             "do_possession": "classes/vampire/dominate.c",
             "do_mirrorimage": "classes/vampire/chimerstry.c",
             "do_control": "classes/vampire/chimerstry.c",
@@ -155,8 +158,17 @@ class ClassLayoutChecks(unittest.TestCase):
         for fn in ("do_fangs", "do_claws", "do_nightsight", "do_calm",
                    "do_flex", "do_werewolf", "do_unwerewolf", "do_vampire",
                    "do_shadowplane", "do_shield", "do_truesight", "do_scry",
-                   "do_serpent"):
+                   "do_serpent", "do_beckon"):
             self.assertEqual(owners[fn], ["clan.c"], fn)
+
+    def test_presence_extraction_preserves_exact_handler_bytes(self):
+        source = (SRC / "classes/vampire/presence.c").read_text()
+        for name, expected in (
+            ("entrancement", "511161f9f1c529501ef52b3b07d231523f9eef74272d301c7eb526086b29769f"),
+            ("dreadgaze", "e1564526df10f16971b99a412c292db6ab8c192c6cb542075577a5f3d72f92c1"),
+        ):
+            body = re.search(r"^void do_" + name + r"\(.*?^\}", source, re.M | re.S)[0]
+            self.assertEqual(hashlib.sha256(body.encode()).hexdigest(), expected)
 
 
 if __name__ == "__main__":

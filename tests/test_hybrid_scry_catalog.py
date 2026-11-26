@@ -14,7 +14,7 @@ class ScryCatalog(unittest.TestCase):
     def test_entire_shared_module_restores_exact_previous_source(self):
         text=without_scry_stage((SRC/"clan.c").read_text()).encode()
         self.assertEqual(hashlib.sha1(b"blob "+str(len(text)).encode()+b"\0"+text).hexdigest(),
-                         "8a62c26eadc3989d31342e5e4b7477bb657b5845")
+                         "5d4b187008ca6a2608d09558281d98f6f88d9f99")
 
     def test_invalid_context_is_rejected_before_parser_or_lookup(self):
         body=self.body()

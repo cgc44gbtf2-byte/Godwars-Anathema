@@ -60,7 +60,7 @@ class GuardianCatalog(unittest.TestCase):
     def test_macro_getters_consumers_serializers_and_interpreter_unchanged(self):
         for path,sha in (("merc.h","3b098a58b44542ce99b83b66d9ea780932642300"),
                          ("act_info.c","d4b24a952210f67fbfadabb480e9908422c72280"),
-                         ("clan.c","760af920a36ed9c188dc2822c50c21a5f5cd563c"),
+                         ("clan.c","bae916dff717d3b634fc6e1d1b6e2bdc2b6506f9"),
                          ("interp.c","cd18b4a21c44e1c1dc9db1caf42caffd35235c67"),
                          ("save.c","ad40ba98301fc9b515b856771732a7ed27425152")):
             text=(SRC/path).read_text()

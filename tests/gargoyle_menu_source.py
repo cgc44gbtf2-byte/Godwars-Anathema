@@ -1,6 +1,6 @@
 """Exact inverse of Gargoyle menu-only changes; old module pins stay intact."""
 PROOFS = [
-    ("Genesis/src/clan.c", "810e7d21b0943febaadda0d744219d05d1ccd61e", [
+    ("Genesis/src/clan.c", "8a997d3bccbef552e17e1a710dca6feb329c4c4c", [
         ("""    if (gargoyle_visceratika(ch) > 0) {
         long rank = gargoyle_visceratika(ch);
         any_powers = any_commands = TRUE;

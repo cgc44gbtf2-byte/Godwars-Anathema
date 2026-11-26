@@ -38,7 +38,7 @@ class MessageFormatCatalog(unittest.TestCase):
         expected={"handler.c":"9c2ee576804e8ce3dc58f300f3262aae957e47e1",
                   "comm.c":"925a22782183ae8e9269197b5504b4505d1962ae",
                   "magic.c":"ff6670721b45989e1e24b8c337f4e8ad766a8b18",
-                  "clan.c":"13bffff1f03894fb4b78af46af4d9c66bf9dc649",
+                  "clan.c":"6f60babe32473096ed6ba9fb6b978b726524f2d6",
                   "merc.h":"3b098a58b44542ce99b83b66d9ea780932642300",
                   "interp.c":"cd18b4a21c44e1c1dc9db1caf42caffd35235c67"}
         for path,sha in expected.items():
