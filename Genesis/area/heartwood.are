@@ -1,0 +1,309 @@
+#AREADATA
+Name        Therin  Heart Wood Forest~
+Builders    Therin~
+VNUMs       200 299
+End
+
+
+
+#MOBILES
+#203
+man~
+(no short description)~
+(no long description)~
+~
+1 0 0 S
+1 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#205
+male~
+a male villager~
+A male villager is here, looking for something.
+~
+~
+1 0 0 S
+505 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#206
+wolf~
+a vicious wolf~
+A vicious wolf lurks about the room.
+~
+~
+1 0 0 S
+505 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#209
+female~
+a female villager~
+A female villager is here, looking for something.
+~
+~
+1 0 0 S
+0 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#210
+wolf~
+a vicious wolf~
+A vicious wolf lurks around here.
+~
+~
+1 0 0 S
+505 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#0
+
+
+
+#OBJECTS
+#0
+
+
+
+#ROOMS
+#200
+Entrance to Heart Wood Forest~
+Tall trees run from east to west for miles upon miles, making the forest
+stretch out for what seems an eternity.  Tall grasses cover the plains
+before the entrance to the forest.  The entrance itself looks to have been
+cut down by something.  Two large trees have been cut down and are angled
+just right to allow passage into the forest.  
+~
+0 4 0
+D2
+~
+~
+0 0 201
+S
+#201
+A Darkened Path~
+Light barely seeps through the top of the trees, making it almost
+impossible to see.  Rotting trees that have fallen are now blocking the
+eastern and western passages.  Continuing to the south will lead deeper into
+the darkness of Heart Wood.  
+~
+0 0 0
+D0
+~
+~
+0 0 200
+D2
+~
+~
+0 0 202
+S
+#202
+A Darkened Path~
+Light barely seeps through the top of the trees, making it almost
+impossible to see.  Rotting trees that have fallen are now blocking the
+eastern and western passages.  Continuing to the south will lead deeper into
+the darkness of Heart Wood.  
+~
+0 0 0
+D0
+~
+~
+0 0 201
+D2
+~
+~
+0 0 203
+S
+#203
+An Old Intersection~
+Here the trail splits off at this grown over grown intersection.  Trees
+block many of the small passages, and grass covers everything.  To the east
+and west lies a denser forest area.  To the south lies an opening into the
+deepest part in the forest.  
+~
+0 0 0
+D0
+~
+~
+0 0 202
+D1
+~
+~
+0 0 208
+D2
+~
+~
+0 0 212
+D3
+~
+~
+0 0 204
+S
+#204
+Western Passage~
+This is a small turn from the intersection, leading into the western part
+of the forest.  Many trees have fallen here, allowing very little passage to
+the west and north.  High above light shines through alittle brighter than
+before.  
+~
+0 0 0
+D0
+~
+~
+0 0 205
+D1
+~
+~
+0 0 203
+D2
+~
+~
+0 0 207
+D3
+~
+~
+0 0 206
+S
+#205
+Blocked Passage~
+Here the trees have blocked every possible exit to the north.  There are
+a few small trees on the ground, allowing those who come here to rest if
+necessary.  To the south lies the trail back to the intersection.  
+~
+0 0 0
+D2
+~
+~
+0 0 204
+S
+#206
+Blocked Passage~
+Here the trees have blocked every possible exit to the west.  There are a
+few small trees on the ground, allowing those who come here to rest if
+necessary.  To the east lies the trail back to the intersection.  
+~
+0 0 0
+D1
+~
+~
+0 0 204
+S
+#207
+~
+~
+0 0 0
+D0
+~
+~
+0 0 204
+D1
+~
+~
+0 0 212
+S
+#208
+Eastern Passage~
+This is a small turn from the intersection, leading into the eastern part
+of the forest.  Many trees have fallen here, allowing very little passage to
+the east and north.  High above light shines through alittle brighter than
+before.  
+~
+0 0 0
+D0
+~
+~
+0 0 209
+D1
+~
+~
+0 0 210
+D2
+~
+~
+0 0 211
+D3
+~
+~
+0 0 203
+S
+#209
+Blocked Passage~
+Here the trees have blocked every possible exit to the south.  There are
+a few small trees lying about the ground.  To the south lies the trail back
+to the intersection.  
+~
+0 0 0
+D2
+~
+~
+0 0 208
+S
+#210
+Blocked Passage~
+Here the trees have blocked every possible exit to the east.  There are a
+few small trees lying about the ground.  To the west lies the trail back to
+the intersection.  
+~
+0 0 0
+D3
+~
+~
+0 0 208
+S
+#211
+~
+~
+0 0 0
+D0
+~
+~
+0 0 208
+D3
+~
+~
+0 0 212
+S
+#212
+~
+~
+0 0 0
+D0
+~
+~
+0 0 203
+D1
+~
+~
+0 0 211
+D3
+~
+~
+0 0 207
+S
+#0
+
+
+
+#SPECIALS
+S
+
+
+
+#RESETS
+M 0 209 2 209
+M 0 209 2 209
+M 0 205 2 205
+M 0 205 2 205
+M 0 210 3 210
+M 0 210 3 210
+M 0 210 3 210
+S
+
+
+
+#SHOPS
+0
+
+
+
+#$

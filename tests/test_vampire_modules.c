@@ -1,0 +1,504 @@
+/* Real-engine characterization before/after the second clan extraction.
+ * Only synthetic rooms/prototypes/actors. No world or account loading/saves. */
+#include <sys/types.h>
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "../Genesis/src/merc.h"
+
+extern void init_mm(void);
+extern char *string_space, *top_string;
+static CHAR_DATA actor, visitor;
+static PC_DATA player, guest;
+static DESCRIPTOR_DATA descriptor;
+static ROOM_INDEX_DATA home, away, staging;
+static AREA_DATA area;
+static MOB_INDEX_DATA prototype;
+static char output[65536];
+static long gargoyle_rank;
+
+static void cleanup(void)
+{
+    for (CHAR_DATA *ch = char_list, *next; ch != NULL; ch = next)
+    {
+        next = ch->next;
+        if (IS_NPC(ch)) extract_char(ch, TRUE);
+    }
+}
+
+static void fresh(long class)
+{
+    cleanup();
+    clear_char(&actor); clear_char(&visitor);
+    memset(&player, 0, sizeof(player)); memset(&guest, 0, sizeof(guest));
+    memset(&descriptor, 0, sizeof(descriptor)); memset(output, 0, sizeof(output));
+    memset(&home, 0, sizeof(home)); memset(&away, 0, sizeof(away));
+    memset(&staging, 0, sizeof(staging)); memset(&area, 0, sizeof(area));
+    memset(&prototype, 0, sizeof(prototype));
+    memset(room_index_hash, 0, sizeof(room_index_hash));
+    memset(mob_index_hash, 0, sizeof(mob_index_hash));
+    home.vnum = 1; away.vnum = 2; staging.vnum = ROOM_VNUM_DISCONNECTION;
+    ROOM_INDEX_DATA *rooms[] = {&home, &away, &staging};
+    for (size_t i = 0; i < 3; ++i)
+    {
+        rooms[i]->area = &area; rooms[i]->light = 1;
+        rooms[i]->name = "Synthetic room"; rooms[i]->description = "";
+        unsigned bucket = rooms[i]->vnum % MAX_KEY_HASH;
+        rooms[i]->next = room_index_hash[bucket]; room_index_hash[bucket] = rooms[i];
+    }
+    prototype.vnum = MOB_VNUM_CLONE;
+    prototype.act = ACT_IS_NPC; prototype.level = 10; prototype.area = &area;
+    prototype.player_name = prototype.short_descr = str_empty;
+    prototype.long_descr = prototype.description = str_empty;
+    mob_index_hash[prototype.vnum % MAX_KEY_HASH] = &prototype;
+    actor.name = actor.short_descr = "caster"; actor.pcdata = &player;
+    actor.class = class; actor.level = LEV_AWA; actor.vampgen = 9;
+    actor.mana = 1000; actor.primal = 123; actor.style[0] = STYLE_UNARMED;
+    actor.blood[0] = 100; actor.blood[1] = 50;
+    for (int i = STAT_STR; i <= STAT_WIS; ++i) actor.stats[i] = 20;
+    player.cland[0] = player.cland[1] = player.cland[2] = -1;
+    if (class == CLASS_VAMPIRE && gargoyle_rank != 0)
+    {
+        player.cland[0] = VAMPIRE_BUILD_GARGOYLE;
+        player.powers[DISC_THAUMATURGY] = gargoyle_rank;
+        assert(IS_GARGOYLE(&actor));
+    }
+    player.love = player.conding = "";
+    visitor.name = visitor.short_descr = "visitor"; visitor.pcdata = &guest;
+    visitor.level = LEV_AWA; guest.love = guest.conding = "";
+    actor.next = &visitor; char_list = &actor;
+    char_to_room(&actor, &home); char_to_room(&visitor, &away);
+    actor.desc = &descriptor;
+    descriptor.character = &actor; descriptor.connected = CON_PLAYING;
+    descriptor.outbuf = output; descriptor.outsize = sizeof(output);
+    descriptor_list = NULL; first_fight = last_fight = NULL;
+}
+
+static CHAR_DATA *mobile(const char *name, ROOM_INDEX_DATA *room)
+{
+    CHAR_DATA *mob = create_mobile(&prototype);
+    mob->name = str_dup(name); mob->short_descr = str_dup(name);
+    char_to_room(mob, room);
+    return mob;
+}
+
+static void command(const char *input)
+{
+    actor.wait = 0; /* Simulate recovery elapsed between player commands. */
+    snprintf(descriptor.incomm, sizeof(descriptor.incomm), "%s", input);
+    interpret(&actor, descriptor.incomm);
+    descriptor.incomm[0] = '\0';
+}
+
+static void resources(void)
+{
+    assert(actor.mana == 1000 && actor.primal == 123 && actor.hit == 10000);
+    assert(actor.blood[0] == 100 && actor.blood[1] == 50);
+}
+
+static void test_states(void)
+{
+    fresh(CLASS_VAMPIRE);
+    command("regenerate"); assert(player.regenerate == 10 && actor.wait == 0);
+    command("regenerate"); assert(player.regenerate == 0);
+    player.powers[DISC_PROTEAN] = 2;
+    command("earthmeld"); assert(!IS_VAMPAFF(&actor, VAM_EARTHMELDED));
+    player.powers[DISC_PROTEAN] = 3;
+    SET_BIT(actor.affected_by, AFF_FLAMING);
+    command("earthmeld");
+    assert(IS_VAMPAFF(&actor, VAM_EARTHMELDED));
+    assert(!IS_AFFECTED(&actor, AFF_FLAMING));
+    command("earthmeld"); assert(!IS_VAMPAFF(&actor, VAM_EARTHMELDED));
+    assert(actor.wait == 0); resources();
+}
+
+static void test_obfuscate(void)
+{
+    fresh(CLASS_VAMPIRE);
+    CHAR_DATA *following = mobile("following", &home);
+    CHAR_DATA *other = mobile("other", &home);
+    following->leader = &actor;
+    command("vanish"); assert(!IS_VAMPAFF(&actor, VAM_OBFUSCATE));
+    player.powers[DISC_OBFUSCATE] = 1;
+    command("vanish all");
+    assert(IS_VAMPAFF(&actor, VAM_OBFUSCATE));
+    assert(!IS_VAMPAFF(following, VAM_OBFUSCATE));
+    assert(!IS_VAMPAFF(other, VAM_OBFUSCATE) && actor.wait == 12);
+    REMOVE_BIT(actor.vampaff, VAM_OBFUSCATE);
+    player.powers[DISC_OBFUSCATE] = 3;
+    command("vanish all");
+    assert(IS_VAMPAFF(&actor, VAM_OBFUSCATE));
+    assert(IS_VAMPAFF(following, VAM_OBFUSCATE));
+    assert(!IS_VAMPAFF(other, VAM_OBFUSCATE) && actor.wait == 12);
+    resources();
+}
+
+static void test_summoning(void)
+{
+    fresh(CLASS_VAMPIRE);
+    player.powers[DISC_PRESENCE] = 3;
+    SET_BIT(visitor.extra, EXTRA_SUMMON);
+    command("summoning visitor"); assert(visitor.in_room == &away);
+    player.powers[DISC_PRESENCE] = 4;
+    REMOVE_BIT(visitor.extra, EXTRA_SUMMON);
+    command("summoning visitor"); assert(visitor.in_room == &away);
+    SET_BIT(visitor.extra, EXTRA_SUMMON);
+    const long blocked[] = {ROOM_SAFE, ROOM_PRIVATE, ROOM_SOLITARY, ROOM_NO_RECALL};
+    for (size_t i = 0; i < sizeof(blocked) / sizeof(blocked[0]); ++i)
+    {
+        away.room_flags = blocked[i];
+        command("summoning visitor"); assert(visitor.in_room == &away && actor.wait == 0);
+    }
+    away.room_flags = 0; visitor.fighting = &actor;
+    command("summoning visitor"); assert(visitor.in_room == &away);
+    visitor.fighting = NULL; visitor.level = 561;
+    command("summoning visitor"); assert(visitor.in_room == &away);
+    visitor.level = LEV_AWA;
+    command("summoning caster"); assert(actor.wait == 0);
+    command("summoning absent"); assert(actor.wait == 0);
+    command("summoning visitor");
+    assert(visitor.in_room == &home && actor.wait == 12);
+    CHAR_DATA *mob = mobile("summonable", &away);
+    command("summoning summonable");
+    assert(mob->in_room == &home && IS_ACT(mob, ACT_NOEXP));
+    assert(actor.wait == 12); resources();
+}
+
+static void test_possession(void)
+{
+    fresh(CLASS_VAMPIRE);
+    CHAR_DATA *mob = mobile("mobile", &home);
+    player.powers[DISC_DOMINATE] = 2;
+    command("possession mobile"); assert(player.familiar == NULL && mob->wizard == NULL);
+    player.powers[DISC_DOMINATE] = 3;
+    command("possession"); command("possession absent"); command("possession caster");
+    char_from_room(&visitor); char_to_room(&visitor, &home);
+    command("possession visitor");
+    assert(player.familiar == NULL && visitor.wizard == NULL);
+    mob->wizard = &visitor;
+    command("possession mobile"); assert(player.familiar == NULL);
+    mob->wizard = NULL; mob->level = 226;
+    command("possession mobile"); assert(player.familiar == NULL);
+    mob->level = 225;
+    command("possession mobile");
+    assert(player.familiar == mob && mob->wizard == &actor);
+    CHAR_DATA *other = mobile("other", &home);
+    for (int rank = 3; rank <= 7; ++rank)
+    {
+        player.powers[DISC_DOMINATE] = rank;
+        command("possession other");
+        assert(player.familiar == mob && mob->wizard == &actor && other->wizard == NULL);
+    }
+    SET_BIT(other->extra, EXTRA_ILLUSION);
+    player.powers[DISC_CHIMERSTRY] = 5;
+    command("controlillusion other");
+    assert(player.familiar == mob && other->wizard == NULL);
+    extract_char(mob, TRUE);
+    assert(player.familiar == NULL);
+    command("possession other");
+    assert(player.familiar == other && other->wizard == &actor);
+    assert(actor.wait == 0); resources();
+}
+
+static void test_presence_attacks(void)
+{
+    for (int rank = 0; rank <= 7; ++rank)
+    {
+        fresh(CLASS_VAMPIRE);
+        player.powers[DISC_PRESENCE] = rank;
+        CHAR_DATA *mob = mobile("subject", &home);
+        mob->position = POS_SLEEPING;
+        command("dreadgaze subject");
+        assert(!!IS_AFFECTED(mob, AFF_FEAR) == (rank >= 2));
+        assert(actor.wait == (rank >= 2 ? 12 : 0));
+        command("dreadgaze subject");
+        assert(actor.wait == 0);
+        command("dreadgaze missing"); assert(actor.wait == 0);
+        command("dreadgaze caster"); assert(actor.wait == 0);
+        resources();
+
+        fresh(CLASS_VAMPIRE);
+        player.powers[DISC_PRESENCE] = rank;
+        mob = mobile("subject", &home);
+        mob->stats[STAT_WIS] = -1000;
+        command("entrancement missing"); assert(actor.wait == 0);
+        player.followers = 5;
+        command("entrancement subject");
+        assert(!IS_AFFECTED(mob, AFF_CHARM) && actor.wait == 0);
+        player.followers = 0;
+        home.room_flags = ROOM_SAFE;
+        command("entrancement subject");
+        assert(!IS_AFFECTED(mob, AFF_CHARM) && actor.wait == 0);
+        home.room_flags = 0;
+        for (int attempt = 0; attempt < 32 && !IS_AFFECTED(mob, AFF_CHARM); ++attempt)
+            command("entrancement subject");
+        assert(!!IS_AFFECTED(mob, AFF_CHARM) == (rank >= 3));
+        assert(player.followers == (rank >= 3 ? 1 : 0));
+        assert(actor.wait == (rank >= 3 ? 12 : 0));
+        if (rank >= 3)
+        {
+            assert(mob->master == &actor && !strcmp(mob->lord, actor.name));
+            command("entrancement subject");
+            assert(player.followers == 1 && actor.wait == 0);
+        }
+        resources();
+    }
+
+    const char *commands[] = {"dreadgaze visitor", "entrancement visitor"};
+    for (size_t i = 0; i < sizeof(commands) / sizeof(commands[0]); ++i)
+    {
+        fresh(CLASS_VAMPIRE);
+        player.powers[DISC_PRESENCE] = 5;
+        char_from_room(&visitor); char_to_room(&visitor, &home);
+        player.flag = guest.flag = FLAG_PK;
+        visitor.position = POS_FIGHTING;
+        guest.resist[WILL_PRESENCE] = 1;
+        command(commands[i]);
+        assert(visitor.affected_by == 0 && actor.wait == 0);
+        guest.resist[WILL_PRESENCE] = 0;
+        guest.resist[0] = RES_PRESENCE;
+        guest.willpower[0] = 10;
+        command(commands[i]);
+        assert(guest.willpower[0] == 0 && guest.resist[WILL_PRESENCE] == 60);
+        assert(!IS_WILLPOWER(&visitor, RES_PRESENCE));
+        assert(visitor.affected_by == 0 && actor.wait == 0);
+        resources();
+    }
+}
+
+static void test_beast_within(void)
+{
+    for (int rank = 0; rank <= 7; ++rank)
+    {
+        fresh(CLASS_VAMPIRE);
+        player.powers[DISC_ANIMALISM] = rank;
+        actor.beast = 19;
+        command("beastwithin");
+        assert(player.wolf == 0 && actor.wait == 0 && actor.vampaff == 0);
+        actor.beast = 20;
+        command("beastwithin missing");
+        assert(player.wolf == 0 && actor.wait == 0);
+        command("beastwithin");
+        assert(actor.wait == (rank >= 4 ? 12 : 0));
+        if (rank >= 4)
+        {
+            assert(player.wolf >= 10 && player.wolf <= 20);
+            assert(IS_VAMPAFF(&actor, VAM_FANGS));
+            long wolf = player.wolf;
+            command("beastwithin");
+            assert(player.wolf == wolf && actor.wait == 0);
+        }
+        else assert(player.wolf == 0 && actor.vampaff == 0);
+        resources();
+
+        fresh(CLASS_VAMPIRE);
+        player.powers[DISC_ANIMALISM] = rank;
+        char_from_room(&visitor); char_to_room(&visitor, &home);
+        visitor.class = CLASS_VAMPIRE;
+        visitor.beast = 20;
+        command("beastwithin visitor");
+        assert(actor.wait == (rank >= 4 ? 12 : 0));
+        assert(player.wolf == 0 && actor.vampaff == 0);
+        if (rank >= 4)
+        {
+            assert(guest.wolf >= 10 && guest.wolf <= 20);
+            assert(IS_VAMPAFF(&visitor, VAM_FANGS));
+        }
+        else assert(guest.wolf == 0 && visitor.vampaff == 0);
+        resources();
+    }
+
+    fresh(CLASS_VAMPIRE);
+    player.powers[DISC_ANIMALISM] = 4;
+    char_from_room(&visitor); char_to_room(&visitor, &home);
+    visitor.class = CLASS_VAMPIRE;
+    visitor.beast = 20;
+    guest.resist[WILL_ANIMALISM] = 1;
+    command("beastwithin visitor");
+    assert(guest.wolf == 0 && actor.wait == 0);
+    guest.resist[WILL_ANIMALISM] = 0;
+    guest.resist[0] = RES_ANIMALISM;
+    guest.willpower[0] = 10;
+    command("beastwithin visitor");
+    assert(guest.willpower[0] == 0 && guest.resist[WILL_ANIMALISM] == 60);
+    assert(!IS_WILLPOWER(&visitor, RES_ANIMALISM));
+    assert(guest.wolf == 0 && actor.wait == 0);
+    visitor.class = CLASS_WEREWOLF;
+    SET_BIT(visitor.act, PLR_WOLFMAN);
+    command("beastwithin visitor");
+    assert(guest.wolf == 0 && actor.wait == 0);
+    actor.beast = 20;
+    player.resist[WILL_ANIMALISM] = 60;
+    player.resist[0] = RES_ANIMALISM;
+    player.willpower[0] = 10;
+    command("beastwithin");
+    assert(player.wolf >= 10 && player.wolf <= 20);
+    assert(player.willpower[0] == 10 && actor.wait == 12);
+    resources();
+}
+
+static void test_illusions(void)
+{
+    fresh(CLASS_VAMPIRE);
+    command("mirrorimage"); assert(prototype.count == 0 && player.followers == 0);
+    player.powers[DISC_CHIMERSTRY] = 1;
+    for (int i = 1; i <= 5; ++i)
+    {
+        command("mirrorimage");
+        assert(player.followers == i && prototype.count == i);
+        CHAR_DATA *copy = char_list;
+        assert(IS_NPC(copy) && copy->in_room == &home);
+        assert(IS_EXTRA(copy, EXTRA_ILLUSION) && !strcmp(copy->lord, actor.name));
+        assert(copy->level == 50 && copy->hit == actor.hit && copy->max_hit == actor.max_hit);
+        assert(copy->mana == actor.mana && copy->max_mana == actor.max_mana);
+    }
+    command("mirrorimage"); assert(player.followers == 5 && prototype.count == 5);
+    resources();
+    fresh(CLASS_VAMPIRE);
+    CHAR_DATA *mob = mobile("illusion", &home);
+    SET_BIT(mob->extra, EXTRA_ILLUSION);
+    player.powers[DISC_CHIMERSTRY] = 4;
+    command("controlillusion illusion"); assert(player.familiar == NULL);
+    player.powers[DISC_CHIMERSTRY] = 5;
+    char_from_room(&visitor); char_to_room(&visitor, &home);
+    command("controlillusion"); command("controlillusion absent");
+    command("controlillusion caster"); command("controlillusion visitor");
+    assert(player.familiar == NULL);
+    REMOVE_BIT(mob->extra, EXTRA_ILLUSION);
+    command("controlillusion illusion"); assert(player.familiar == NULL);
+    SET_BIT(mob->extra, EXTRA_ILLUSION); mob->wizard = &visitor;
+    command("controlillusion illusion"); assert(player.familiar == NULL);
+    mob->wizard = NULL;
+    command("controlillusion illusion");
+    assert(player.familiar == mob && mob->wizard == &actor);
+    CHAR_DATA *other = mobile("other", &home); SET_BIT(other->extra, EXTRA_ILLUSION);
+    command("controlillusion other");
+    assert(player.familiar == mob && other->wizard == NULL);
+    player.powers[DISC_DOMINATE] = 3;
+    command("possession other");
+    assert(player.familiar == mob && mob->wizard == &actor && other->wizard == NULL);
+    assert(actor.wait == 0); resources();
+}
+
+static void test_true_disguise(void)
+{
+    fresh(CLASS_VAMPIRE);
+    player.powers[DISC_CHIMERSTRY] = 5;
+    char_from_room(&visitor); char_to_room(&visitor, &home);
+    command("truedisguise visitor");
+    assert(!IS_AFFECTED(&actor, AFF_POLYMORPH) && actor.morph[0] == '\0');
+
+    player.powers[DISC_CHIMERSTRY] = 6;
+    command("truedisguise missing");
+    assert(!IS_AFFECTED(&actor, AFF_POLYMORPH));
+    SET_BIT(actor.affected_by, AFF_POLYMORPH);
+    command("truedisguise visitor");
+    assert(!IS_VAMPAFF(&actor, VAM_DISGUISED) && actor.morph[0] == '\0');
+    REMOVE_BIT(actor.affected_by, AFF_POLYMORPH);
+
+    command("truedisguise visitor");
+    assert(IS_AFFECTED(&actor, AFF_POLYMORPH));
+    assert(IS_VAMPAFF(&actor, VAM_DISGUISED) && IS_POLYAFF(&actor, POLY_TRUE));
+    assert(!strcmp(actor.morph, visitor.name));
+    CHAR_DATA *mob = mobile("wolf", &home);
+    free_string(mob->short_descr);
+    mob->short_descr = str_dup("a silver wolf");
+    free_string(mob->long_descr);
+    mob->long_descr = str_dup("A silver wolf stands here.\n\r");
+    command("truedisguise wolf");
+    assert(!strcmp(actor.morph, mob->short_descr));
+    assert(!strcmp(actor.long_descr, mob->long_descr));
+    command("truedisguise caster");
+    assert(!IS_AFFECTED(&actor, AFF_POLYMORPH));
+    assert(!IS_VAMPAFF(&actor, VAM_DISGUISED) && !IS_POLYAFF(&actor, POLY_TRUE));
+    assert(actor.morph[0] == '\0' && actor.long_descr[0] == '\0');
+    resources();
+}
+
+static void test_class_guards(void)
+{
+    const long classes[] = {CLASS_NONE, CLASS_WEREWOLF, CLASS_SORCERER, CLASS_DROW,
+        CLASS_HIGHLANDER, CLASS_MAGE, CLASS_DRAGON, CLASS_NINJA, CLASS_MONK, CLASS_ELEM};
+    DO_FUN *powers[] = {do_regenerate, do_earthmeld, do_vanish, do_summoning,
+        do_possession, do_mirrorimage, do_control, do_dreadgaze, do_entrancement,
+        do_beastwithin, do_truedisguise};
+    for (size_t c = 0; c <= sizeof(classes) / sizeof(classes[0]); ++c)
+    {
+        fresh(c == sizeof(classes) / sizeof(classes[0]) ? CLASS_VAMPIRE : classes[c]);
+        for (int disc = DISC_ANIMALISM; disc <= DISC_MAX; ++disc)
+            player.powers[disc] = 7;
+        if (IS_VAMPIRE(&actor)) { SET_BIT(actor.act, ACT_IS_NPC); actor.pcdata = NULL; }
+        for (size_t p = 0; p < sizeof(powers) / sizeof(powers[0]); ++p)
+            (*powers[p])(&actor, "visitor");
+        assert(actor.vampaff == 0 && player.regenerate == 0 && player.followers == 0);
+        assert(player.familiar == NULL && visitor.in_room == &away && actor.wait == 0);
+        resources();
+    }
+    REMOVE_BIT(actor.act, ACT_IS_NPC); actor.pcdata = &player;
+}
+
+static void test_gargoyle_inherited_ranks(void)
+{
+    fresh(CLASS_VAMPIRE);
+    for (long disc = DISC_ANIMALISM; disc <= DISC_MAX; ++disc)
+        for (long rank = -1; rank <= 8; ++rank)
+        {
+            player.powers[disc] = rank;
+            long expected = disc == DISC_THAUMATURGY && gargoyle_rank ? 0 : rank;
+            assert(get_disc(&actor, disc) == (expected > 7 ? 7 : expected));
+            assert(get_truedisc(&actor, disc) == expected);
+            assert(player.powers[disc] == rank); /* Access must not rewrite training. */
+        }
+}
+
+static void test_gargoyle_statue_commands(void)
+{
+    const char *commands[] = {"regenerate", "earthmeld", "vanish all",
+        "summoning visitor", "possession mobile", "mirrorimage",
+        "controlillusion mobile", "change bat", "dreadgaze mobile",
+        "entrancement mobile", "beastwithin"};
+    assert(gargoyle_rank == 1 || gargoyle_rank == 5);
+    for (size_t i = 0; i < sizeof(commands) / sizeof(commands[0]); ++i)
+    {
+        fresh(CLASS_VAMPIRE);
+        for (long disc = DISC_ANIMALISM; disc <= DISC_MAX; ++disc)
+            if (disc != DISC_THAUMATURGY) player.powers[disc] = 7;
+        CHAR_DATA *mob = mobile("mobile", &home);
+        SET_BIT(mob->extra, EXTRA_ILLUSION);
+        SET_BIT(visitor.extra, EXTRA_SUMMON);
+        SET_BIT(actor.polyaff, POLY_GARGOYLE_STATUE);
+        PC_DATA before = player;
+        int count = prototype.count;
+        command(commands[i]);
+        assert(strstr(output, "You cannot act while a stone statue"));
+        assert(gargoyle_statue(&actor) && actor.wait == 0);
+        assert(actor.polyaff == POLY_GARGOYLE_STATUE && actor.vampaff == 0);
+        assert(actor.affected_by == 0 && visitor.in_room == &away);
+        assert(mob->wizard == NULL && prototype.count == count);
+        assert(memcmp(&before, &player, sizeof(player)) == 0);
+        resources();
+    }
+}
+
+int main(void)
+{
+    string_space = calloc(1, 1024 * 1024);
+    assert(string_space); top_string = string_space;
+    current_time = 123456; init_mm();
+    const long profiles[] = {0, 1, 5};
+    for (size_t i = 0; i < sizeof(profiles) / sizeof(profiles[0]); ++i)
+    {
+        gargoyle_rank = profiles[i];
+        test_states(); test_obfuscate(); test_summoning();
+        test_possession(); test_presence_attacks(); test_beast_within();
+        test_illusions(); test_true_disguise(); test_class_guards();
+        test_gargoyle_inherited_ranks();
+        if (gargoyle_rank) test_gargoyle_statue_commands();
+    }
+    cleanup();
+    puts("vampire module extraction full-engine regressions passed");
+    puts("Gargoyle inherited modules: native/rank-1/rank-5 access, resources, "
+         "rank projections and 22 statue-command denials passed");
+    return 0;
+}

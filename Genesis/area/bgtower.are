@@ -1,0 +1,1488 @@
+#AREADATA
+Name        Mort    Bgreathiou Tower~
+Builders    Mortimer~
+VNUMs       9600 9699
+End
+
+
+
+#MOBILES
+#9601
+Tendraculous~
+Tendraculous~
+A shambling mass of foilage tendrils and teeth rests here.
+~
+~
+17 0 0 S
+792 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#9602
+Vegie Pigmies~
+Vegie Pigmy~
+A minature creature stands here, barring your path with a spear.
+~
+~
+17 0 0 S
+840 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9603
+Bgreathiou Golem Iron~
+Iron Golem~
+An amalgam of iron and steel stands here, emitting a foul gas.
+~
+~
+17 0 0 S
+1209 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#9608
+amethyst dragon~
+Amethyst Dragon~
+Standing proudly here is a large Amethyst Dragon.
+~
+~
+81 98432 0 S
+1183 0 0 0d0+0 0d0+0
+0 0
+0 0 2
+#9609
+ultan bgreathiou~
+Ultan Bgreathiou~
+Standing here is Ultan Bgreathiou, the Drow Sorcerer.
+~
+~
+81 128 0 S
+5010 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9614
+balor beast ~
+Tanar'ri Balor Guard~
+A huge hulking red beast stands here, glowering at you darkly
+~
+~
+81 0 0 S
+3009 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#9617
+mephit ice~
+Ice Mephit~
+A strange mephit made of ice and frost hovers here, giggling
+~
+~
+1 128 0 S
+2506 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#9621
+marilith tanar'ri~
+Tanar'ri Marilith~
+The many armed Tanar'ri Marilith resides here, glaring balefully.
+~
+~
+65 98434 0 S
+2913 0 0 0d0+0 0d0+0
+0 0
+0 0 2
+#9622
+troll abomination~
+Troll Abomination~
+A red skinned troll with wings raises his fists in rage!
+~
+~
+65 128 0 S
+3000 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9623
+ologothian~
+Ologothian~
+Ologothian stands here, grinning wickedly..
+~
+~
+81 8866 0 S
+9991 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9626
+retriever tanar'ri~
+Retriever~
+A spider-like retriver demon skitters forward!
+~
+~
+17 128 0 S
+3473 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9627
+succubi demon~
+Succubus~
+A pale succubus slides in from the shadows, licking her lips.
+~
+~
+1 128 0 S
+4498 0 0 0d0+0 0d0+0
+0 0
+0 0 2
+#9631
+vohzd~
+Vohzd~
+A war-ghoul Vohzd is here.
+~
+~
+1 128 0 S
+7007 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#9635
+bhaatezu~
+Bhaatezu~
+A Bhaatezu stands here, giggling at you.
+~
+~
+65 128 0 S
+2891 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#9636
+xerias~
+Xerias Dartoreth~
+Xerias stands here, covered in living spiders, grinning wickedly.
+~
+~
+17 12450 0 S
+9588 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9642
+servant bgreathiou~
+Servant of House Bgreathiou~
+A servant moves about silently.
+~
+~
+1 32896 0 S
+4989 0 0 0d0+0 0d0+0
+0 0
+0 0 2
+#9652
+orion bgreathiou~
+Orion Bgreathiou~
+A short dark skinned man sits here, sharpening his blade.
+~
+~
+17 98434 0 S
+8003 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9653
+danyeal tedronai bgreathiou~
+Danyeal Tedronai Bgreathiou~
+The son of Ishamael Bgreathiou, Danyeal stands here with a smirk.
+~
+~
+17 622720 0 S
+8482 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9656
+yvonne bgreathiou~
+Yvonne Bgreathiou~
+A woman garbed in a black satin dress regards you cooly.
+~
+~
+1 524418 0 S
+9004 0 0 0d0+0 0d0+0
+0 0
+0 0 2
+#9658
+ishamael bgreathiou~
+Ishamael Bgreathiou~
+The master of this tower stands here, Ishamael Bgreathiou.
+~
+~
+17 98434 0 S
+20001 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9660
+mashadar ~
+Mashadar~
+The black wind, Mashadar howls.
+~
+~
+1 524416 0 S
+14997 0 0 0d0+0 0d0+0
+0 0
+0 0 0
+#9661
+joronas shadowson~
+Joronas Shadowson~
+The man called Joronas stands here, playing with a pair of strange daggers.
+~
+~
+17 128 0 S
+5090 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9662
+healer chaos~
+Healer of Chaos~
+A man muttering chaotic words of health rests here.
+~
+~
+1 130 0 S
+20000 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9663
+priest dischord~
+Priest of Dischord~
+The priest of dischord is here, holding a ball of balefire in hand.
+~
+~
+1 128 0 S
+2000 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#9666
+prisoner~
+Prisoner~
+A prisoner lies huddled in the corner, gibbering insanely.
+~
+~
+65 128 0 S
+3293 0 0 0d0+0 0d0+0
+0 0
+0 0 1
+#0
+
+
+
+#OBJECTS
+#9658
+Armor 1337~
+#0The Armor of teh Ultimate 1337#n~
+A plain suit of robes.~
+~
+9 0 2048
+0 0 0 0
+0 0 0
+A
+19 50000
+A
+18 50000
+A
+17 99999
+#0
+
+
+
+#ROOMS
+#9600
+The Tower Gates~
+A series of intricate iron gates stand here before you.  The clouds that
+roll across the infinite skies are a deep violet, contrasting the dark blue
+heavens, which were once clear as a summers day.  Beyond the gates you can
+see a very elabourate garden, all sorts of floura and fauna kept within the
+towers gates.  The scenery within is a stark difference to what is behind
+you, rocky crags, mountainous peaks, very bleak and forboding.  The tower
+before you seems to stretch on forever ...  
+ 
+You see a sign here, sitting in the wet soil.
+It reads as follows:
+ 
+"Do not proceed any further, for your own sake. This is a true 
+testing ground for the l337.  Only enter here if you truly feel you
+have what it takes.  The things here WILL kick your ass.  If you're feelin
+froggy then leap boys and girls. If not, back your ass up, this isn't 
+for little kids.
+ 
+-- Ishamael Bgreathiou
+Building a Better Wyrm. Building a Better You.
+~
+0 8201 1
+D0
+~
+~
+0 0 9601
+D3
+~
+~
+0 0 9961
+S
+#9601
+The Gardens of Bgreathiou~
+The gates swing shut behind you, and you realize that there is no turning
+back for you.  The sweet scent of honeydew and nightshade fill your
+nostrils, and all around is serenity and calm.  Large trees shade you from
+the sunlight, which is steadily fading, and keep the harsh winds off of your
+face.  Tendrils of strange plants snake into the walkway, coiling up like
+serpents.  The pathway continues on in the only fashion it could take, up to
+the door.  
+~
+0 8192 0
+D0
+~
+~
+0 0 9602
+S
+#9602
+Edge of the Garden~
+The gardens start to pan off into nothingness as you pass them by,
+leaving behind only the faintest hint of their aroma.  Now all you see is
+stone that extends into the very heavens, piercing the sky with its spire. 
+The lights begin to fade, and all that illuminates this place are a pair of
+eyes.  They flicker like fiery balls of protoplasm, contained within the
+shell of something you cannot name.  It is grey, and has no sex or physical
+features to speak of.  It tilts its head once and glares, informing you that
+you have trespassed into the hold of the Great Archsorcerer Bgreathiou.  
+~
+0 8196 0
+D0
+~
+~
+0 0 9603
+S
+#9603
+The Entrance to the Tower of Bgreathiou~
+You now stand directly in front of the double wooden doors that lead into
+the tower that stretches up into eternity.  The stones are all black, not
+charred but black as night nonetheless.  You can hear screams of anguish on
+the wind, cries of mercy and begging of forgiveness fill the ears of all who
+come here.  The skies turn black as well, and bolts of lightning sizzle into
+the ground, but they are green and acidic instead of white hot bolts of
+lightning that you are familiar with.  
+~
+0 0 0
+D0
+~
+~
+0 0 9604
+S
+#9604
+Antechamber~
+You have now entered the chambers of Ishamael Bgreathiou.  The opening
+antechamber is expansive, and very elabourate.  Crimson carpeting touches
+your feet, and banners proudly displaying the many kingdoms who swore fealty
+to him in the past.  Torches barely light this place, and there are a set of
+twin stairwell, and a small corridor directly in front of you.  
+~
+0 24576 0
+D0
+~
+~
+0 0 9605
+D1
+~
+~
+0 0 9614
+D2
+~
+~
+0 0 9603
+D3
+~
+~
+0 0 9610
+S
+#9605
+Corridor~
+You find yourself in a very plain corridor.  Nothing about it is special
+or amazing.  Plain white tile and a very plain set of walls, white in shade.
+~
+0 1 0
+D0
+~
+~
+0 0 9606
+D2
+~
+~
+0 0 9604
+S
+#9606
+Corridor~
+As you walk down the hallway, you notice that the walls seem to radiate
+heat and light, but the color of them swirls and changes, now resembeling a
+more dark violet shade.  
+~
+0 1 0
+D0
+~
+~
+0 0 9607
+D2
+~
+~
+0 0 9605
+S
+#9607
+Corridor~
+The swirlings walls seem to take on a fleshy appearance now, almost as if
+it were alive.  It begins to bubble and boil, stretching and distending in a
+mass of burnt, swollwn flesh, crying out in agony and pain.  
+~
+0 0 0
+D0
+~
+~
+0 0 9608
+D2
+~
+~
+0 0 9606
+S
+#9608
+An Iron Bound Door~
+As you approach the iron bound door, the walls begin to spill off of what
+you used to call the wall and ceiling, and roll into your path, creating a
+wall of human skin, a golem of flesh to bar your path.  You see an eye or
+two pop out of it, to glare at you, and the sickening cries become shouts of
+alarm, warning you to back away from the Keep of Ultan Bgreathiou,
+Infernalist Sorcerer.  
+~
+0 0 0
+D0
+~
+~
+0 0 9609
+D2
+~
+~
+0 0 9607
+S
+#9609
+The Keep of Ultan Bgreathiou~
+Stretched out before you is a strange looking room, built over the top of
+the dungeon crypt.  The walls are charred black, save the spots of blood
+tainting the smooth surface.  A strange symbol was carved into the ground,
+and from it large columns of sickly green flames burst at almost random
+intervals.  A throne rests in the far end of this room, and for once it is
+empty.  Chained to the walls however are creatures of unknown origins, whose
+bodies look as though they were patched together, a conglomerate of pain and
+suffering swirls in these mad beasts eyes.  The chains snap quickly as they
+froth and foam at the mouth, lunging, thirsting for blood.  
+~
+0 0 0
+D2
+~
+~
+0 0 9608
+D5
+~
+~
+0 0 9661
+S
+#9610
+Stairwell~
+The stairwell is huge, curling around the wall to lead upstairs.  
+~
+0 0 0
+D0
+~
+~
+0 0 9611
+D1
+~
+~
+0 0 9604
+S
+#9611
+Stairwell~
+The stairwell continues upwards towards the second floor.  
+~
+0 0 0
+D2
+~
+~
+0 0 9610
+D4
+~
+~
+0 0 9612
+S
+#9612
+Stairwell~
+You have reached the top of the stairs, and are at the doors to a large
+floats in the shadows, playing upon its ghostly viola.  The carpeting that
+leads within is a soft red velvet texture, and all is peace and calm.  
+~
+0 0 0
+D1
+~
+~
+0 0 9613
+D5
+~
+~
+0 0 9611
+S
+#9613
+The Library of Bgreathiou~
+You enter a massive library, as far as the eye can see are shelves upon
+shelves of books, pertaining to all subjects, many that Ishamael wrote
+himself.  The walls extend out in a pattern that seems to ignore the laws of
+space and time.  There are a few chairs sitting in corners and nooks in the
+library, for those who are visiting to read and educate themselves about the
+world surrounding them.  
+~
+0 0 0
+D0
+~
+~
+0 0 9617
+D1
+~
+~
+0 0 9616
+D3
+~
+~
+0 0 9612
+S
+#9614
+Stairwell~
+The stairwell is huge, curling around the wall to lead upstairs.  
+~
+0 0 0
+D0
+~
+~
+0 0 9615
+D3
+~
+~
+0 0 9604
+S
+#9615
+Stairwell~
+The stairwell continues upwards towards the second floor.  
+~
+0 0 0
+D2
+~
+~
+0 0 9614
+D4
+~
+~
+0 0 9616
+S
+#9616
+Stairwell~
+You have reached the top of the stairs, and are at the doors to a large
+library.  A soft tune plays from nowhere at first, then you notice the
+Wraith that floats in the shadows, playing upon its ghostly viola.  The
+carpeting that leads within is a soft red velvet texture, and all is peace
+and calm.  
+~
+0 0 0
+D3
+~
+~
+0 0 9613
+D5
+~
+~
+0 0 9615
+S
+#9617
+Library~
+The library continues on for what seems forever, but off to one side you
+see a tiny office, and off towards your west is a strange standing portal,
+hovering in mid-air.  Passing you by are books of all types, philosphy and
+war, designs for machines and magicks of all types.  
+~
+0 0 0
+D0
+~
+~
+0 0 9620
+D1
+~
+~
+0 0 9618
+D2
+~
+~
+0 0 9613
+D3
+~
+~
+0 0 9619
+S
+#9618
+A small office~
+A small desk sits in this corner, with a small chair to go with it.  A
+portrait of what seems to be a gigantic black mountain piercing the heavens
+with its tip rests on the wall.  Sitting behind this desk is a creature
+wearing all black, who makes no sound as he moves though his voice sounds as
+if it were a snake slithering on dead leaves.  It warns you of your
+tresspass and rises, drawing a long, black blade to strike at you.  
+~
+0 0 0
+D3
+~
+~
+0 0 9617
+S
+#9619
+A strange gateway~
+The once serene background that was the library suddenly fades away to
+black, and the chanting returns, a large portal stands before you now.  It
+is made of a strange spiked wreath, almost as if it were once human flesh. 
+If you peer beyond this and into the portal you see what was in the
+painting, almost as if it were the backyard of hell itself.  Black clouds,
+large black mountains, cries of pain, the sound of whips, fire and bestial
+roars.  
+~
+0 0 0
+D1
+~
+~
+0 0 9617
+S
+#9620
+Library~
+You continue to wander the library, and finally figures are seen, but not
+what one would expect.  Once inanimate objects roam here, chess pieces to be
+exact.  Pawns file books quietly and rooks stand at the ends of bookshelves,
+as do Knights and Bishops.  The list of books seems to extend on and on
+forever, the soft music keeping all things calm and relaxed.  
+~
+0 0 0
+D0
+~
+~
+0 0 9623
+D1
+~
+~
+0 0 9621
+D2
+~
+~
+0 0 9617
+D3
+~
+~
+0 0 9622
+S
+#9621
+Library~
+Deeper into the Library of the Forsaken, you have reached a section
+devoted to the works of Ishamael Bgreathiou, his many books of philosphies
+of various cultures, strategem, and more are contained here.  
+~
+0 0 0
+D3
+~
+~
+0 0 9620
+S
+#9622
+Library~
+You enter a small corner of the library, and a very large table rests
+here.  You see a pair of trollish beasts sitting at this table, grunting
+incoherently.  What they say is irrelevant, as you enter they rise and draw
+large clubs, wildly swinging at you.  
+~
+0 0 0
+D1
+~
+~
+0 0 9620
+S
+#9623
+The Study~
+You reach the end of the Library, and enter another room.  It appears to
+be a quiet study, with a large desk and high backed throne.  This room has
+not quite as many shelves as the library, but in here are relics of the
+past, and many books that have personal significance to the Master.  
+~
+0 0 0
+D1
+~
+~
+0 0 9627
+D2
+~
+~
+0 0 9620
+D3
+~
+~
+0 0 9624
+S
+#9624
+Stairway to the Second Floor~
+You arrive at the foot of a stairwell that splits off into two, and heads
+up the stairs to the next floor.  
+~
+0 0 0
+D1
+~
+~
+0 0 9623
+D4
+~
+~
+0 0 9625
+S
+#9625
+Stairway~
+You continue to climb upwards into the tower.  
+~
+0 0 0
+D4
+~
+~
+0 0 9626
+D5
+~
+~
+0 0 9624
+S
+#9626
+Laboratory of Bgreathiou~
+As you climb the stairs you find a very sterile envirnoment.  A lab
+stands before you, and as you look down into the room you see several little
+cages, containing various creatures.  Beakers, burners, and the scent of the
+dead fills the air, and hanging on several meat hooks are men and women,
+dead or dying, who look as though they have spent days being poked, prodded
+and tormented.  
+~
+0 0 0
+D0
+~
+~
+0 0 9629
+D4
+~
+~
+0 0 9638
+D5
+~
+~
+0 0 9628
+S
+#9627
+Stairway to the Second Floor~
+You arrive at the foot of a stairwell that splits off into two, and heads
+up the stairs to the next floor.  
+~
+0 0 0
+D3
+~
+~
+0 0 9623
+D4
+~
+~
+0 0 9628
+S
+#9628
+Stairway~
+You continue to climb upwards into the tower.  
+~
+0 0 0
+D4
+~
+~
+0 0 9626
+D5
+~
+~
+0 0 9627
+S
+#9629
+Within the Laboratory~
+This Laboratory is sterile and clean.  Everything around you is white or
+silver, the epitome o a safe and clean environment.  There are various
+sealed off rooms to either side of you, which appear to be Cages of some
+sort, for experimentations.  The barrier between the real world and the
+spirit world has been worn so thin in this room that a simple ritual will
+allow passage into the spirit realm.  
+~
+0 0 0
+D0
+~
+~
+0 0 9630
+D1
+~
+~
+0 0 9635
+D2
+~
+~
+0 0 9626
+D3
+~
+~
+0 0 9636
+S
+#9630
+Containment Area~
+You see a sign here, warning you that this area is off limits to everyone.  
+~
+0 0 0
+D0
+~
+~
+0 0 9631
+D1
+~
+~
+0 0 9632
+D3
+~
+~
+0 0 9633
+D5
+~
+~
+0 0 9634
+S
+#9631
+Containment Area~
+~
+0 4 0
+S
+#9632
+Containment Area~
+~
+0 4 0
+S
+#9633
+Containment Area~
+~
+0 4 0
+S
+#9634
+Containment Area~
+~
+0 0 0
+D5
+~
+~
+0 0 9637
+S
+#9635
+Testing Zone~
+This room is a vast contrast to what was outside of it.  Gore spatters
+the walls, and body parts of all sizes litter the ground, small pools of
+ichor and blood gathered around them.  Some manner of beast lives in here,
+an amalgam of animal and man, frothing and snarling at anything that
+intrudes upon his space.  
+~
+0 0 0
+D3
+~
+~
+0 0 9629
+S
+#9636
+A collection of medical text~
+A small nook sits here amid the white sterility of the laboratory.  A
+fairly large pile of books sit here, mostly medical journals and socererous
+text on studies and discoveries that the Master has made on his chimericial
+playthings.         
+~
+0 0 0
+D1
+~
+~
+0 0 9629
+S
+#9637
+Containment Area~
+~
+0 0 0
+D4
+~
+~
+0 0 9634
+S
+#9638
+Stairway to Third Floor~
+A set of elabourate steps lead upwards, towards the third floor of this
+expansive tower.  
+~
+0 0 0
+D4
+~
+~
+0 0 9639
+D5
+~
+~
+0 0 9626
+S
+#9639
+Stairway~
+The stairwell continues to ascend upstairs.
+~
+0 0 0
+D4
+~
+~
+0 0 9640
+D5
+~
+~
+0 0 9638
+S
+#9640
+Stairway~
+You have reached the entrance to the Servants Wing of the Tower.  That or
+you may ascend farther, towards the Main Hall.  
+~
+0 0 0
+D0
+~
+~
+0 0 9641
+D4
+~
+~
+0 0 9649
+D5
+~
+~
+0 0 9639
+S
+#9641
+Servants Wing~
+You are in a very plain hallway, and servants of all shapes and sizes
+mill about, holding linens and dusting fans, amongst other implements of
+cleaning.  They barely acknowledge your glances, and continue about their
+work with a mixture of hatefilled and awed eyes.  
+~
+0 0 0
+D0
+~
+~
+0 0 9642
+D2
+~
+~
+0 0 9640
+S
+#9642
+Servants Hall~
+There are portraits in this part of the hall, but beyond That, the
+whitewashed walls leave much to be desired.  The rooms for the servants are
+here, and further down the hall are the quarters of the Headmaster of the
+Servants Hall.  
+~
+0 0 0
+D0
+~
+~
+0 0 9645
+D1
+~
+~
+0 0 9643
+D2
+~
+~
+0 0 9641
+D3
+~
+~
+0 0 9644
+S
+#9643
+Servants Bedroom~
+This room appears very calm, and you see a pair of small girls sitting on
+the bed, sewing.  Paintings done by them are adorning the wall and the
+canvas.  The carpet is a plain blue, contrasting the lighter shade of the
+walls, And a mirror stands next to a dresser of clothing.  
+~
+0 0 0
+D3
+~
+~
+0 0 9642
+S
+#9644
+Servants Bedroom~
+In the corner of this room stands a rack containing a few small foils and
+rapier, And a young man stands at the window, staring out into nothingness. 
+This room is very plain, with the same furnishings as all the rest 
+~
+0 0 0
+D1
+~
+~
+0 0 9642
+S
+#9645
+Servants Hall~
+The Hallway continues on to the Headmasters Chambers, And more of the
+servants rooms stand open and empty about you.  Or at the very least, they
+appear empty ..  
+~
+0 0 0
+D0
+~
+~
+0 0 9648
+D1
+~
+~
+0 0 9646
+D2
+~
+~
+0 0 9642
+D3
+~
+~
+0 0 9647
+S
+#9646
+Servants Hall~
+This room is dark and uninviting, shado s fi ling it from top to bottom. 
+The furnishings in it seem sparse, moreso than the other rooms, and a young
+man sits in the very middle of the room, on the floor ...                        l 
+~
+0 0 0
+D3
+~
+~
+0 0 9645
+S
+#9647
+Servants Hall~
+This room is empty, devoid of all furnishing and life.  It is a blank
+room with nothing in it whatsoever.  
+~
+0 0 0
+D1
+~
+~
+0 0 9645
+S
+#9648
+Headmasters Quarters~
+You are standing in what appears to be a large office.  A fair sized desk
+and chair sit in the middle against the wall, and the room is barely lit by
+soft candlelight.  Sitting on top of the desk is a huge coiled whip, to go
+with the huge man sitting behind it.  This is the office where all servants
+are indoctrinated, and punished if they step out of line.  
+~
+0 4 0
+S
+#9649
+Stairway to the Fourth Floor~
+This stairwell is even more elabourate than the last, and it leads you up
+to the main hall of Master Bgreathiou 
+~
+0 0 0
+D4
+~
+~
+0 0 9650
+D5
+~
+~
+0 0 9640
+S
+#9650
+Hallway~
+You are standing in a very expansive and strange hallway.  The walls are
+black and the carpet is a odd tinge of violet.  Portraits of those who
+reside here are proudly displayed, You feel an eerie presence surrounding
+you as you enter this hall, Something you cannot place a finger on, almost
+as if you are being watched.  
+~
+0 0 0
+D0
+~
+~
+0 0 9651
+D5
+~
+~
+0 0 9649
+S
+#9651
+Hallway~
+The strange looks of the Hallway continues, and a pair of portraits are
+here.  One of Danyeal Tedronai, son of Ishamael, and Orion, bastard son of
+Ultan Bgreathiou , Who is Master Bgreathiou's brother.  Their doors are made
+of a strange black oak and appear to be closed tightly.  
+~
+0 0 0
+D0
+~
+~
+0 0 9654
+D1
+~
+~
+0 0 9653
+D2
+~
+~
+0 0 9650
+D3
+~
+~
+0 0 9652
+S
+#9652
+The Chambers of Orion Bgreathiou~
+This room is dark, and red flames flicker in the darkness, occasionally
+flaring to reveal a sparsely decorated room.  Drawn onto the wood panel
+floor is a pentacle, with the blood of an animal one would think.  The
+flames dance on each point of the star.  In the midst of these flames sits a
+man with a strange reddish tint to his skin, very leathery.  Wings are
+draped about his shoulders, and in his hands he holds a broad, black staff,
+which he levels at you as you enter.  
+~
+0 0 0
+D1
+~
+~
+0 0 9651
+S
+#9653
+The Quarters of Danyeal Tedronai~
+This room is very extravagant, a broad room with a series of candelabra,
+the room itself having a very strange presence to it.  The bed is large, and
+so is the dresser.  In the corner rests a longsword, heron marked.  Standing
+in front of the door as you walk in is Danyeal himself, looking at you with
+a distrustful glare.  
+~
+0 0 0
+D3
+~
+~
+0 0 9651
+S
+#9654
+Hallway~
+The hallway pans out more, and a pair of larger doors are on either wall,
+one leading into the bed chamber of the Master, and the other into his
+Brothers hold.  As you saw in the torture chambers, men in black robes
+holding in their bare hands the sickly flames of balefire to illuminate your
+path are here, guiding you onward.  
+~
+0 0 0
+D0
+~
+~
+0 0 9657
+D1
+~
+~
+0 0 9655
+D2
+~
+~
+0 0 9651
+D3
+~
+~
+0 0 9656
+S
+#9655
+Ultan Bgreathiou's Bedchamber~
+This room is made of a strange black stone.  The room itself feels alive,
+and as you enter, the door slams shut, and a beast stands in your path, over
+twelve feet tall, flames billowing around him.  His bed is small and looks
+to be uncomfortable, but he doesn't overly seem to mind.  No light
+penetrates this room, only the flames of balefire that surround his
+impressive physical form.  
+~
+0 0 0
+D3
+~
+~
+0 0 9654
+S
+#9656
+The Bedchamber of Ishamael and Yvonne Bgreathiou~
+You have entered the chambers of the Master, but he is not in them. 
+Sitting upon the bed is a tall pale woman garbed in a snug black dress.  The
+room is larger than all the rest, and decoarated with banners of all sorts
+of nations, swords of conquered kings, and gems of all sizes and shapes. 
+This room is a shrine to debauchery itself, in all of its splendor.  The
+only apparant light comes from a balcony, the violet clouds swirling
+absently in the skies.  
+~
+0 0 0
+D1
+~
+~
+0 0 9654
+S
+#9657
+Hallway~
+This hallway suddenly breaks off into a stairwell, leading up towards an
+expansive Dais.  A candle rests atop a pillar in each direction,
+representing the four winds.  
+~
+0 0 0
+D2
+~
+~
+0 0 9654
+D4
+~
+~
+0 0 9658
+S
+#9658
+A Dais~
+The stone dais is raised high over the ground, a monument of stone and
+shadow.  A large altar rests in the middle, a young woman writhing upon it,
+slices methodically placed upon her flesh in a strange pattern.  A powerful
+wind howls here, and it seems to scream and bellow unintelligibily.  Moving
+past the Dais, you see a room that is covered in a inpenetrable blackness.  
+~
+0 16384 0
+D0
+~
+~
+0 0 9659
+D5
+~
+~
+0 0 9657
+S
+#9659
+A room filled with grepshadows~
+This room is completely filled with shadows and a strange inky blackness.
+No light penetrates this, and nothing at all can be seen.  
+~
+0 0 0
+D2
+~
+~
+0 0 9658
+D4
+~
+~
+0 0 9660
+S
+#9660
+The Top of the Tower~
+You reach the very top of the Tower, standing outside in the cool wind. 
+The wind you heard within the Tower seems more potent here, its ramblings
+not quite so random now.  The stars glitter in the sky like diamonds, The
+horrors that you endured within the tower just a dream.  Then, the gate you
+entered at the top shuts, and you find yourself trapped at the top, all you
+can hear is that dull horrid shouting, and beyond it a soft, subtle laughter
+...  
+~
+0 16385 0
+D5
+~
+~
+0 0 9659
+S
+#9661
+The Torture Chambers~
+The hollow screams you heard in the halls return, much more lively here. 
+A man stands amongst a rack of weapons, but instead of picking them out for
+usage, he is impaling himself upon spears, jagged knives and thorned whips. 
+His eyes look dead and lost, and he writhes upon the cross of blades he
+himself forged wordlessly.  When you ponder just why he does not scream out
+you realize that his eyes have been taken away, and his voice box was cut
+out, lips sewn together to prevent a word ever emitting him.  Underneath a
+grate lies an altar of unknown origins, and down the hall are the prisoners
+chambers.  
+~
+0 0 0
+D0
+~
+~
+0 0 9663
+D4
+~
+~
+0 0 9609
+D5
+~
+~
+0 0 9662
+S
+#9662
+A sacrificial Altar~
+An altar stands here, extending fifteen feet into the air.  It seems to
+almost be made of the same stone as the ground and walls around you, shaped
+into existance without the touch of mans tools.  It drips ichor and blood,
+and that fire is here as well, dancing along the altar, and the circle of
+black sand that surrounds it.  This room is dead silent, save the crackling
+of flames, but only for a moment.  The sound of a dull, throaty chant fills
+your ears, the names and words used completely foreign ...  
+~
+0 25601 0
+D4
+~
+~
+0 0 9661
+S
+#9663
+The Prisons of the Damned~
+This place is illuminated by small orbs of balefire being held by men in
+black robes, who do their best to hold back their cries of pain at the
+searing mutating flames they hold.  These men are little more than human
+candleholders for the people damned into existance here.  
+~
+0 0 0
+D0
+~
+~
+0 0 9664
+D2
+~
+~
+0 0 9661
+S
+#9664
+Prisons of the Damned~
+The black stone prison continues on into infinite, the robed men standing
+all the way down the hall , muttering words of curse and agony as they
+clutch bright balls of balefire to illuminate the path for their master.  
+~
+0 0 0
+D1
+~
+~
+0 0 9666
+D2
+~
+~
+0 0 9663
+D3
+~
+~
+0 0 9665
+S
+#9665
+A prison cell~
+This room is much like every other prison cell you've seen here.  A
+monument to the pain of others is what this dungeon appears to be, and the
+cries of anguish and misery are the chorus that fills the Masters ears with
+joy and rapture.  
+~
+0 0 0
+D1
+~
+~
+0 0 9664
+S
+#9666
+A prison cell~
+This is a plain prison cell made of steel and black stone.  The floor is
+puddled with small pools of blood, sweat, and other such things, and the
+prisoner here is huddled in the corner, begging for someone to end his life.
+~
+0 24576 0
+D3
+~
+~
+0 0 9664
+S
+#0
+
+
+
+#SPECIALS
+M 9603 spec_breath_gas Load to: Iron Golem
+M 9608 spec_breath_gas Load to: Amethyst Dragon
+M 9609 spec_breath_any Load to: Ultan Bgreathiou
+M 9614 spec_breath_gas Load to: Tanar'ri Balor Guard
+M 9617 spec_breath_any Load to: Ice Mephit
+M 9623 spec_breath_any Load to: Ologothian
+M 9626 spec_breath_gas Load to: Retriever
+M 9627 spec_breath_gas Load to: Succubus
+M 9636 spec_breath_any Load to: Xerias Dartoreth
+M 9653 spec_guard Load to: Danyeal Tedronai Bgreathiou
+M 9656 spec_cast_cleric Load to: Yvonne Bgreathiou
+M 9658 spec_isha_breg Load to: Ishamael Bgreathiou
+M 9660 spec_breath_any Load to: Mashadar
+M 9661 spec_cast_mage Load to: Joronas Shadowson
+M 9663 spec_cast_cleric Load to: Priest of Dischord
+M 9666 spec_thief Load to: Prisoner
+S
+
+
+
+#RESETS
+M 0 9601 2 9601
+M 0 9601 2 9601
+M 0 9602 2 9602
+M 0 9602 2 9602
+M 0 9603 2 9603
+M 0 9603 2 9603
+M 0 9614 30 9614
+M 0 9614 30 9614
+M 0 9614 30 9610
+M 0 9614 30 9610
+M 0 9608 1 9608
+M 0 9609 1 9609
+M 0 9661 1 9661
+M 0 9663 6 9663
+M 0 9663 6 9663
+M 0 9663 6 9664
+M 0 9663 6 9664
+M 0 9666 10 9666
+M 0 9666 10 9665
+M 0 9666 10 9663
+M 0 9662 1 9662
+M 0 9614 5 9616
+M 0 9614 5 9616
+M 0 9614 5 9612
+M 0 9614 5 9612
+M 0 9617 5 9617
+M 0 9617 5 9617
+M 0 9621 5 9621
+M 0 9621 5 9621
+M 0 9622 2 9622
+M 0 9622 2 9622
+M 0 9623 1 9623
+M 0 9627 2 9623
+M 0 9627 2 9623
+M 0 9626 5 9626
+M 0 9626 5 9626
+M 0 9636 1 9636
+M 0 9635 5 9635
+M 0 9631 5 9631
+M 0 9631 5 9632
+M 0 9631 5 9633
+M 0 9631 5 9634
+M 0 9631 5 9637
+M 0 9642 5 9642
+M 0 9642 5 9642
+M 0 9642 5 9645
+M 0 9642 5 9645
+M 0 9642 5 9646
+M 0 9642 5 9647
+M 0 9631 5 9650
+M 0 9631 5 9650
+M 0 9652 5 9652
+M 0 9653 5 9653
+M 0 9656 5 9656
+M 0 9658 1 9658
+E 0 9658 0 11
+M 0 9660 1 9660
+S
+
+
+
+#SHOPS
+0
+
+
+
+#$
