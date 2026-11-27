@@ -14,6 +14,7 @@ CLASS_MODULE_SOURCES = \
   classes/werewolf/wwbreed.c \
   classes/werewolf/wwauspice.c \
   classes/werewolf/wwtribe.c \
+  classes/werewolf/faeriekin.c \
   classes/werewolf/instincts.c \
   classes/sorcerer/sorcerer.c \
   classes/sorcerer/vision.c \

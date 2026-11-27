@@ -13,6 +13,7 @@
 #include "merc.h"
 #include "classes/hybrid/mastery.h"
 #include "classes/hybrid/access.h"
+#include "classes/werewolf/faeriekin.h"
 
 extern void init_mm(void);
 extern void char_update(void);
@@ -384,6 +385,42 @@ static void spider(void)
     extract_char(pet,TRUE);
     char_from_room(actor);char_to_room(actor,&arena);
     assert(!actor->pcdata->followers);
+}
+
+static void faeriekin(void)
+{
+    long old_class=actor->class;
+    long old_tribe=actor->pcdata->tribes[TRIBE_FIANNA];
+    actor->class=CLASS_WEREWOLF;
+    actor->pcdata->tribes[TRIBE_FIANNA]=2;
+    command("faeriekin");
+    assert(!actor->pcdata->followers&&arena.people==actor);
+    actor->pcdata->tribes[TRIBE_FIANNA]=3;
+    command("faeriekin");
+    CHAR_DATA *spirit=arena.people;
+    assert(spirit!=actor&&IS_NPC(spirit)&&spirit->master==actor);
+    assert(spirit->pIndexData->vnum==MOB_VNUM_FAERIE_SPIRIT);
+    assert(actor->pcdata->followers==1&&IS_AFFECTED(spirit,AFF_CHARM));
+    assert(spirit->hit==2500&&spirit->max_hit==2500&&
+           !str_cmp(spirit->lord,actor->name));
+    AFFECT_DATA *summon=NULL;
+    for(AFFECT_DATA *af=spirit->affected;af;af=af->next)
+        if(af->modifier==MOB_VNUM_FAERIE_SPIRIT)summon=af;
+    assert(summon&&summon->duration==FAERIE_KIN_DURATION);
+    command("faeriekin");
+    assert(actor->pcdata->followers==1&&arena.people==spirit);
+    summon->duration=0;
+    char_update();
+    assert(!actor->pcdata->followers&&arena.people==actor);
+    long bucket=MOB_VNUM_FAERIE_SPIRIT%MAX_KEY_HASH;
+    MOB_INDEX_DATA **link=&mob_index_hash[bucket];
+    while(*link&&(*link)->vnum!=MOB_VNUM_FAERIE_SPIRIT)link=&(*link)->next;
+    assert(*link);MOB_INDEX_DATA *prototype=*link;*link=prototype->next;
+    command("faeriekin");
+    assert(!actor->pcdata->followers&&arena.people==actor);
+    *link=prototype;
+    actor->class=old_class;
+    actor->pcdata->tribes[TRIBE_FIANNA]=old_tribe;
 }
 
 /* Full-HP native stats isolate the summon subtraction from wounded scaling.
@@ -1566,8 +1603,9 @@ int main(int argc,char **argv)
     else if(argc==2&&!strcmp(argv[1],"--report-extreme"))upkeep_check(DROW_ACID,LONG_MAX);
     else if(argc==2&&!strcmp(argv[1],"--training-bounds"))training_and_reports();
     else if(argc==2&&!strcmp(argv[1],"--prayer-menu"))prayer_menu();
+    else if(argc==1)faeriekin();
     else if(argc==2&&!strcmp(argv[1],"--equipment-use")) {
-        prayers();equipment();equipment_use();crossbow_death_cleanup();
+        prayers();equipment();equipment_use();crossbow_death_cleanup();faeriekin();
     }
     else if(argc==2&&!strcmp(argv[1],"--equipment-boundaries")) {
         prayers();equipment_refusal_boundaries();spider_stat_boundaries(-1);

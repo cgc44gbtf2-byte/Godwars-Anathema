@@ -34,6 +34,7 @@
 #include <time.h>
 #include <unistd.h> /* unlink() */
 #include "merc.h"
+#include "classes/werewolf/faeriekin.h"
 #include "file_io.h"
 #include "admin_config.h"
 
@@ -420,6 +421,7 @@
    { "embrace",		do_embrace,	POS_STANDING,	 LEV_AWA,  LOG_NORMAL	},
    { "entrancement",	do_entrancement,POS_STANDING,	 LEV_AWA,  LOG_NORMAL	},
    { "faerielight",	do_faerielight,	POS_STANDING,	 LEV_AWA,  LOG_NORMAL	},
+   { "faeriekin",	do_faeriekin,	POS_STANDING,	 LEV_AWA,  LOG_NORMAL	},
    { "falling",		do_falling,	POS_FIGHTING,	 LEV_AWA,  LOG_NORMAL	},
    { "falseappearance",	do_rename,	POS_STANDING,	 LEV_AWA,  LOG_NORMAL	},
    { "fangs",		do_fangs,	POS_SITTING,	 LEV_AWA,  LOG_NORMAL	},

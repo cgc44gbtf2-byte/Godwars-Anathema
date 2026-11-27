@@ -32,6 +32,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "classes/werewolf/faeriekin.h"
 #include "auxiliary_save.h"
 #include "classes/hybrid/resources.h"
 #include "classes/hybrid/access.h"
@@ -825,6 +826,18 @@ if (ch->spec_fun != 0)
                ;
             else
             {
+               /* Only a Faerie Kin's stamped spirit effect owns this
+                * lifetime. Other guardians and ordinary charms are untouched. */
+               if (IS_NPC(ch) && paf->location == APPLY_NONE &&
+                   paf->modifier == MOB_VNUM_FAERIE_SPIRIT &&
+                   IS_SET(paf->bitvector, AFF_CHARM) &&
+                   paf->type == skill_lookup("guardian"))
+               {
+                  act("$n fades back into the Wyld.",ch,NULL,NULL,TO_ROOM);
+                  extract_char(ch,TRUE);
+                  drop_out = TRUE;
+                  break;
+               }
                /* Only a Drow summon's stamped guardian effect owns this
                 * lifetime. Generic guardians and ordinary charms are not
                 * affected; normal extraction releases the owner's slot. */

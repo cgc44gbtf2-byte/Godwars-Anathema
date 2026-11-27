@@ -101,6 +101,8 @@ PROOFS = [
          ('stc("To improve a gift rating, type: gifts <name>\\n\\r", ch);\n'
           + WEREWOLF_GIFT_GUIDANCE,
           'stc("To improve a gift rating, type: gifts <name>\\n\\r", ch);'),
+         ('if (get_tribe(ch, TRIBE_FIANNA) >= 3) strcat(buf, " Faeriekin");\n',
+          ''),
      ]),
     ("Genesis/src/classes/monk/monk.c",
      "051fe16da87e9b7647c819512e833893c22762b0", [
@@ -131,7 +133,7 @@ PROOFS = [
      "90fa65b2627a1f25c9ef29de916427dfb33aa074", ELEMENT_HUNKS),
     ("Genesis/src/classes/mage/mage.c",
      "667337169a49331e1ec68678faf4ba6699a573cf", MAGE_HUNKS),
-    ("Genesis/src/clan.c", "c37fac67bf9e44175642003fdbddd17dd85c76b1", [
+    ("Genesis/src/clan.c", "5d61b0ee3dd39e33d6a02529d3b795129cadce99", [
         (VAMPIRE_GUIDANCE, ""),
         (GARGOYLE_HINT, ""),
         ('"You are now a #7Monk#n.\\n\\r"', '"You are now a #7Monk#n.\\nr\\r"'),

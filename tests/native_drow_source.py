@@ -88,6 +88,24 @@ DARKNESS_UPKEEP = """    /* Exhaustion precedes subtraction, including corrupt n
 """
 
 def without_native_drow_darkness_upkeep(text):
+    faerie_include = '#include "classes/werewolf/faeriekin.h"\n'
+    if faerie_include in text:
+        text=once(text,faerie_include,"")
+    faerie_expiry = """               /* Only a Faerie Kin's stamped spirit effect owns this
+                * lifetime. Other guardians and ordinary charms are untouched. */
+               if (IS_NPC(ch) && paf->location == APPLY_NONE &&
+                   paf->modifier == MOB_VNUM_FAERIE_SPIRIT &&
+                   IS_SET(paf->bitvector, AFF_CHARM) &&
+                   paf->type == skill_lookup("guardian"))
+               {
+                  act("$n fades back into the Wyld.",ch,NULL,NULL,TO_ROOM);
+                  extract_char(ch,TRUE);
+                  drop_out = TRUE;
+                  break;
+               }
+"""
+    if faerie_expiry in text:
+        text=once(text,faerie_expiry,"")
     if "/* Exhaustion precedes subtraction, including corrupt negative balances. */" in text:
         text=once(text,DARKNESS_UPKEEP,"\t\t    ch->pcdata->classpoints[CP_CURRENT] -= 150;\n")
     return text

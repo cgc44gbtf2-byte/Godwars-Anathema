@@ -1,4 +1,4 @@
-"""Cross-check all 105 Werewolf help slots against native command/effect sources."""
+"""Cross-check all 105 Werewolf rank slots and 106 gift entries."""
 from collections import Counter
 from pathlib import Path
 import re
@@ -56,59 +56,65 @@ def catalog():
     for tree in TREES:
         for m in re.finditer(r"^([1-5]): (.*?) - (.*?) <([^>\n]+)>$",blocks[tree],re.M):
             key=(tree,int(m.group(1)))
-            if key in rows:raise AssertionError("Repeated rank: "+str(key))
-            rows[key]={"name":m.group(2),"description":m.group(3),"tag":m.group(4)}
+            rows.setdefault(key,[]).append(
+                {"name":m.group(2),"description":m.group(3),"tag":m.group(4)})
     return rows
 
 class WerewolfHelpCatalog(unittest.TestCase):
-    def test_all_105_slots_have_explicit_unique_classification(self):
+    def test_all_105_ranks_have_106_explicitly_classified_gifts(self):
         rows=catalog()
         self.assertEqual(set(rows),{(t,r) for t in TREES for r in range(1,6)})
-        self.assertEqual(len({x["name"].casefold() for x in rows.values()}),105)
+        entries=[item for rank_entries in rows.values() for item in rank_entries]
+        self.assertEqual(len(entries),106)
+        self.assertEqual(len({x["name"].casefold() for x in entries}),106)
         kinds=Counter(x["tag"] if x["tag"] in {
             "auto","unverified","unimplemented","unavailable","disabled"} else
             x["tag"].split(":")[0] if ":" in x["tag"] else "command"
-            for x in rows.values())
-        self.assertEqual(kinds,{"command":65,"auto":28,"unverified":9,
+            for x in entries)
+        self.assertEqual(kinds,{"command":66,"auto":28,"unverified":9,
             "unimplemented":1,"unavailable":1,"upgrade":1})
 
     def test_65_commands_match_menu_at_exact_tree_and_rank(self):
         text=(SRC/"classes/werewolf/werewolf.c").read_text().split(
             "void do_wwpowers(",1)[1].split("void do_gifts(",1)[0]
-        menu={}
+        menu=set()
         for m in re.finditer(
             r"if \(get_(?:breed|auspice|tribe)\(ch, \w+\) >= 1\)\n    \{(.*?)\n    \}",
             text,re.S):
             body=m.group(1)
             label=re.search(r'strcpy\(buf, "([^"]+)"\)',body).group(1)
             tree,first=label.split(":",1)
-            if first.strip():menu[(tree,1)]=first.strip().lower()
+            if first.strip():menu.add((tree,1,first.strip().lower()))
             for rank,cmd in re.findall(r'>= ([2-5])\) strcat\(buf, " ([^"]+)"\)',body):
-                if "[" not in cmd:menu[(tree,int(rank))]=cmd.lower()
+                if "[" not in cmd:
+                    menu.update((tree,int(rank),name.lower()) for name in cmd.split())
         rows=catalog()
-        actual={k:v["tag"] for k,v in rows.items() if re.fullmatch(r"[a-z]+",v["tag"])
-                and v["tag"] not in {"auto","unverified","unimplemented","unavailable","disabled"}}
+        actual={(tree,rank,item["tag"]) for (tree,rank),items in rows.items()
+                for item in items if re.fullmatch(r"[a-z]+",item["tag"])
+                and item["tag"] not in {"auto","unverified","unimplemented","unavailable","disabled"}}
         self.assertEqual(actual,menu)
-        self.assertEqual(len(set(actual.values())),65)
+        self.assertEqual(len({command for _,_,command in actual}),66)
         bindings=dict(re.findall(r'\{\s*"([^"]+)"\s*,\s*(do_\w+)',
                                  (SRC/"interp.c").read_text()))
         definitions="\n".join(p.read_text() for p in SRC.rglob("*.c"))
-        for command in actual.values():
+        for _,_,command in actual:
             self.assertIn(command,bindings)
             self.assertRegex(definitions,r"void\s+"+bindings[command]+r"\s*\([^;{}]*\)\s*\{")
 
     def test_each_auto_entry_has_a_real_production_consumer(self):
         rows=catalog()
-        self.assertEqual({k for k,v in rows.items() if v["tag"]=="auto"},set(PASSIVES))
+        self.assertEqual({k for k,items in rows.items()
+                          if any(item["tag"]=="auto" for item in items)},set(PASSIVES))
         for key,(path,needle) in PASSIVES.items():
             with self.subTest(gift=key):
                 self.assertIn(needle,(SRC/path).read_text())
 
     def test_gaps_are_not_sold_as_working_passives_or_commands(self):
         rows=catalog()
+        classified={(key,item["tag"]) for key,items in rows.items() for item in items}
         for tag,keys in (("unverified",UNVERIFIED),("unimplemented",UNIMPLEMENTED),
                          ("unavailable",UNAVAILABLE),("disabled",DISABLED)):
-            self.assertEqual({k for k,v in rows.items() if v["tag"]==tag},set(keys))
+            self.assertEqual({k for k,t in classified if t==tag},set(keys))
         table=(SRC/"interp.c").read_text()
         handlers=set(re.findall(r'\{\s*"[^"]+"\s*,\s*(do_\w+)',table))
         source=(SRC/"classes/werewolf/wwtribe.c").read_text()
@@ -118,10 +124,10 @@ class WerewolfHelpCatalog(unittest.TestCase):
         restored=(SRC/"classes/werewolf/wwbreed.c").read_text().split(
             "void do_disquiet(",1)[1].split("void do_spiritward(",1)[0]
         self.assertNotIn('stc("Gutted!',restored)
-        self.assertEqual(rows[("Homid",4)]["tag"],"disquiet")
-        self.assertEqual(rows[("Silent Striders",5)]["tag"],"reach")
-        self.assertEqual(rows[("Silver Fangs",3)]["tag"],"wrath")
-        self.assertEqual(rows[("Uktena",4)]["tag"],"invisibility")
+        self.assertEqual(rows[("Homid",4)][0]["tag"],"disquiet")
+        self.assertEqual(rows[("Silent Striders",5)][0]["tag"],"reach")
+        self.assertEqual(rows[("Silver Fangs",3)][0]["tag"],"wrath")
+        self.assertEqual(rows[("Uktena",4)][0]["tag"],"invisibility")
         reach=(SRC/"classes/werewolf/wwtribe.c").read_text().split(
             "void do_reach(",1)[1].split("void do_wrath(",1)[0]
         self.assertIn("TRIBE_SILENT_STRIDERS",reach)
@@ -130,7 +136,7 @@ class WerewolfHelpCatalog(unittest.TestCase):
         self.assertEqual(restored.count("affect_to_char(victim, &effect)"),2)
 
     def test_grandmother_is_an_upgrade_not_an_extra_auto_heal(self):
-        row=catalog()[("Theurge",2)]
+        row=catalog()[("Theurge",2)][0]
         self.assertEqual(row["tag"],"upgrade: mother")
         source=(SRC/"classes/werewolf/wwauspice.c").read_text().split(
             "void do_mother(",1)[1].split("void do_pulse(",1)[0]
@@ -139,10 +145,10 @@ class WerewolfHelpCatalog(unittest.TestCase):
 
     def test_protection_descriptions_match_their_limited_consumers(self):
         rows=catalog()
-        self.assertIn("standard poison spell",rows[("Bone Gnawers",1)]["description"])
-        self.assertIn("standard frost-breath spell",rows[("Wendigos",4)]["description"])
-        self.assertIn("underwater movement",rows[("Uktena",2)]["description"])
-        self.assertNotIn("soak",rows[("Children of Gaia",5)]["description"])
+        self.assertIn("standard poison spell",rows[("Bone Gnawers",1)][0]["description"])
+        self.assertIn("standard frost-breath spell",rows[("Wendigos",4)][0]["description"])
+        self.assertIn("underwater movement",rows[("Uktena",2)][0]["description"])
+        self.assertNotIn("soak",rows[("Children of Gaia",5)][0]["description"])
         source=(SRC/"combat_defense.c").read_text()
         wolf=source.split("case CLASS_WEREWOLF:",1)[1].split("case CLASS_HIGHLANDER:",1)[0]
         self.assertNotIn("ITEMA_SUNSHIELD",wolf)

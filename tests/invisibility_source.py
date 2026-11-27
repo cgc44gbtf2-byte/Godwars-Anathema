@@ -28,6 +28,8 @@ GUARD = '''    (void)argument;
 
 
 def without_invisibility(text):
+    from faeriekin_source import without_faeriekin_stage
+    text = without_faeriekin_stage(text)
     match = re.search(r"void do_invisibility\(.*?(?=\nvoid do_fetishdoll\()", text, re.S)
     if match:
         body = match[0]

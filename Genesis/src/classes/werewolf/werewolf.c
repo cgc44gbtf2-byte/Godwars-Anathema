@@ -231,6 +231,7 @@ if (get_tribe(ch, TRIBE_CHILDREN_OF_GAIA) >= 5) strcat(buf, " Halosun");
     {
 	strcpy(buf, "Fianna: Faerielight");
 	if (get_tribe(ch, TRIBE_FIANNA) >= 2) strcat(buf, " Howlbanshee");
+if (get_tribe(ch, TRIBE_FIANNA) >= 3) strcat(buf, " Faeriekin");
 if (get_tribe(ch, TRIBE_FIANNA) >= 3) strcat(buf, " Formillusion");
 	if (get_tribe(ch, TRIBE_FIANNA) >= 4) strcat(buf, " Cloneobject");
 	if (get_tribe(ch, TRIBE_FIANNA) >= 5) strcat(buf, " Balorsgaze");

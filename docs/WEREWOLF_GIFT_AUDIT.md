@@ -57,7 +57,7 @@ short descriptions and command spellings are in `Genesis/area/class.hlp`.
 | Black Furies | A A P P A | Aeolus 2, natural-style poison 3, opening charge 4, Body Wrack 5 |
 | Bone Gnawers | P P A A V | Poison-spell resistance and rating-scaled soak; no separate Survivor effect verified |
 | Children of Gaia | A P A A A | Avoidance/armor 2, Dazzle 3, Guardian warning 4; Guardian is not a summoned pet |
-| Fianna | A A A A A | Form Illusion 3, Clone Object 4, Balor's Gaze 5; no Spriggan body form |
+| Fianna | A A A A A | Faerie Kin and Form Illusion 3, Clone Object 4, Balor's Gaze 5; no Spriggan body form |
 | Get of Fenris | P P P A P | Flee blocking scales from rank 1; acid blood at 3; Scream of Gaia interrupts eligible foes |
 | Glass Walkers | A A A A A | Read Aura is inspection, not a vision toggle; Surge attacks eligible room targets |
 | Red Talons | V V P A A | Claw-parry claims not verified; combat rage ceiling at 3; Quicksand snare at 4; transient appearance curse at 5 |
@@ -74,7 +74,8 @@ short descriptions and command spellings are in `Genesis/area/class.hlp`.
   `Genesis/src/classes/werewolf/totem.c`.
 - Active Auspice handlers: `Genesis/src/classes/werewolf/wwauspice.c`.
 - Active Tribe handlers, including rank-5 Silent Striders Reach:
-  `Genesis/src/classes/werewolf/wwtribe.c`.
+  `Genesis/src/classes/werewolf/wwtribe.c` and
+  `Genesis/src/classes/werewolf/faeriekin.c`.
 - Shared commands and rank gates: `clan.c`, `more.c`, and `interp.c`.
 - Every `<auto>` slot has an exact production consumer recorded in
   `tests/test_werewolf_help_catalog.py`, including combat, movement, visibility,

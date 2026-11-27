@@ -127,10 +127,18 @@ Other-class/NPC caller and Gargoyle statue denials are also covered.
 The successful Werewolf-target transformation branch is preserved by the
 exact-body hash, not newly exercised by this no-save fixture.
 
+The next cleanup moves `do_truedisguise` into `vampire/chimerstry.c`. The
+Chimerstry-6 gate, polymorph/craft restrictions, protected-target check,
+switching between targets, self-reversion and descriptions remain unchanged.
+The existing real-engine fixture checks rank gating, missing targets,
+polymorph rejection, changing to a mobile target and reverting to self.
+Whitespace-normalized source proof pins the moved handler; historical
+whole-file assertions are repinned without relaxing their checks.
+
 | Owning class | Files under `Genesis/src/classes/` | Responsibility |
 | --- | --- | --- |
 | Vampire | `vampire/disc.c`, `vampire/vampire.c`, `vampire/presence.c`, `vampire/beast.c`, `vampire/state.c`, `vampire/obfuscate.c`, `vampire/dominate.c`, `vampire/chimerstry.c` | Disciplines, named teaching/blood powers, Presence, Beast, recovery/melding, invisibility, possession and illusions |
-| Werewolf | `werewolf/werewolf.c`, `werewolf/wwbreed.c`, `werewolf/wwauspice.c`, `werewolf/wwtribe.c`, `werewolf/instincts.c` | Progression/menu, breed/auspice/tribe gifts, Umbral Vision and Rage |
+| Werewolf | `werewolf/werewolf.c`, `werewolf/wwbreed.c`, `werewolf/wwauspice.c`, `werewolf/wwtribe.c`, `werewolf/faeriekin.c`, `werewolf/instincts.c` | Progression/menu, breed/auspice/tribe gifts, Faerie Kin summon, Umbral Vision and Rage |
 | Sorcerer | `sorcerer/sorcerer.c` | Spellbook creation, pages, chanting and associated effects |
 | Drow | `drow/drow.c` | Drow powers, ranks and attunement |
 | Highlander | `highlander/highland.c` | Existing Highlander training, attacks and forging |

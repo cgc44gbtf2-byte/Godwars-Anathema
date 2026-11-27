@@ -87,7 +87,7 @@ class DisquietCatalog(unittest.TestCase):
 
     def test_help_does_not_advertise_stub_or_calm_control(self):
         from test_werewolf_help_catalog import catalog
-        row=catalog()[("Homid",4)]
+        row=catalog()[("Homid",4)][0]
         self.assertEqual(row["tag"],"disquiet")
         self.assertIn("hitroll and damroll",row["description"])
         self.assertNotIn("stub",row["description"].lower())

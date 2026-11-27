@@ -223,7 +223,7 @@ class WerewolfCommandsCatalog(unittest.TestCase):
         self.assertIn("not implemented Shift options",section("Shift"))
         werewolf=helpfile.split("0 Homid~",1)[1].split("0 Vampires~",1)[0]
         names=re.findall(r"(?m)^\d+: ([^\n]+?) - ",werewolf)
-        self.assertEqual(len(names),105)
+        self.assertEqual(len(names),106)
         self.assertEqual(len(set(n.casefold() for n in names)),len(names))
         text=(SRC/"classes/werewolf/werewolf.c").read_text().split(
             "void do_wwpowers(",1)[1].split("void do_gifts(",1)[0]
@@ -233,7 +233,7 @@ class WerewolfCommandsCatalog(unittest.TestCase):
             if label==".\\n\\r" or "[" in label:continue
             words=label.split(":")[-1].strip().split()
             if words:active.append(words[0].casefold())
-        self.assertEqual(len(active),65)
+        self.assertEqual(len(active),66)
         self.assertEqual(len(set(active)),len(active))
 
 if __name__=="__main__":

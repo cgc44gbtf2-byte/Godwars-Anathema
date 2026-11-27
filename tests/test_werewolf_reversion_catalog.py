@@ -14,7 +14,7 @@ def blob(text):
 class ReversionCatalog(unittest.TestCase):
     def test_entire_previous_modules_restore(self):
         for path,expected in (
-            ("clan.c","df26cf61a2d71ff2a6b42c42298ba2fc76be2562"),
+            ("clan.c","60387f559a0bc04587978f0392002619038b7237"),
             ("clearclass.c","4f89fd197023d27531b8fc0aa18f7e4907771d72"),
         ):
             self.assertEqual(blob(without_werewolf_reversion_stage((SRC/path).read_text())),expected)

@@ -381,13 +381,48 @@ static void test_illusions(void)
     assert(actor.wait == 0); resources();
 }
 
+static void test_true_disguise(void)
+{
+    fresh(CLASS_VAMPIRE);
+    player.powers[DISC_CHIMERSTRY] = 5;
+    char_from_room(&visitor); char_to_room(&visitor, &home);
+    command("truedisguise visitor");
+    assert(!IS_AFFECTED(&actor, AFF_POLYMORPH) && actor.morph[0] == '\0');
+
+    player.powers[DISC_CHIMERSTRY] = 6;
+    command("truedisguise missing");
+    assert(!IS_AFFECTED(&actor, AFF_POLYMORPH));
+    SET_BIT(actor.affected_by, AFF_POLYMORPH);
+    command("truedisguise visitor");
+    assert(!IS_VAMPAFF(&actor, VAM_DISGUISED) && actor.morph[0] == '\0');
+    REMOVE_BIT(actor.affected_by, AFF_POLYMORPH);
+
+    command("truedisguise visitor");
+    assert(IS_AFFECTED(&actor, AFF_POLYMORPH));
+    assert(IS_VAMPAFF(&actor, VAM_DISGUISED) && IS_POLYAFF(&actor, POLY_TRUE));
+    assert(!strcmp(actor.morph, visitor.name));
+    CHAR_DATA *mob = mobile("wolf", &home);
+    free_string(mob->short_descr);
+    mob->short_descr = str_dup("a silver wolf");
+    free_string(mob->long_descr);
+    mob->long_descr = str_dup("A silver wolf stands here.\n\r");
+    command("truedisguise wolf");
+    assert(!strcmp(actor.morph, mob->short_descr));
+    assert(!strcmp(actor.long_descr, mob->long_descr));
+    command("truedisguise caster");
+    assert(!IS_AFFECTED(&actor, AFF_POLYMORPH));
+    assert(!IS_VAMPAFF(&actor, VAM_DISGUISED) && !IS_POLYAFF(&actor, POLY_TRUE));
+    assert(actor.morph[0] == '\0' && actor.long_descr[0] == '\0');
+    resources();
+}
+
 static void test_class_guards(void)
 {
     const long classes[] = {CLASS_NONE, CLASS_WEREWOLF, CLASS_SORCERER, CLASS_DROW,
         CLASS_HIGHLANDER, CLASS_MAGE, CLASS_DRAGON, CLASS_NINJA, CLASS_MONK, CLASS_ELEM};
     DO_FUN *powers[] = {do_regenerate, do_earthmeld, do_vanish, do_summoning,
         do_possession, do_mirrorimage, do_control, do_dreadgaze, do_entrancement,
-        do_beastwithin};
+        do_beastwithin, do_truedisguise};
     for (size_t c = 0; c <= sizeof(classes) / sizeof(classes[0]); ++c)
     {
         fresh(c == sizeof(classes) / sizeof(classes[0]) ? CLASS_VAMPIRE : classes[c]);
@@ -457,7 +492,7 @@ int main(void)
         gargoyle_rank = profiles[i];
         test_states(); test_obfuscate(); test_summoning();
         test_possession(); test_presence_attacks(); test_beast_within();
-        test_illusions(); test_class_guards();
+        test_illusions(); test_true_disguise(); test_class_guards();
         test_gargoyle_inherited_ranks();
         if (gargoyle_rank) test_gargoyle_statue_commands();
     }

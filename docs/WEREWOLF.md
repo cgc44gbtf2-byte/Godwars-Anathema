@@ -51,6 +51,10 @@ not the unrelated Mage `ward` command; `reshapeobject`, `spiritguardian`,
 `halosun`, `formillusion`, `shroudnight`, `clapthunder`, and `paralyzingstare` are the explicit command
 names rather than ambiguous or nonexistent abbreviations.
 
+Fianna 3 `faeriekin` summons one modest, charmed spirit for ten minutes.
+Only one follower can be active; the spirit's stats are fixed and the summon
+expires automatically.
+
 Metis 5 `totemgift` calls a stationary, non-combat totem named for the
 selected primary tribe. It absorbs up to 10,000 incoming damage for its owner
 over 10 pulses and costs 5,000 mana. The protection and totem end when the

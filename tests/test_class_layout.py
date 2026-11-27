@@ -11,7 +11,7 @@ SRC = ROOT / "Genesis" / "src"
 EXPECTED = {
     "vampire": ("disc", "vampire", "presence", "beast", "state",
                 "obfuscate", "dominate", "chimerstry"),
-    "werewolf": ("werewolf", "totem", "wwbreed", "wwauspice", "wwtribe", "instincts"),
+    "werewolf": ("werewolf", "totem", "wwbreed", "wwauspice", "wwtribe", "faeriekin", "instincts"),
     "sorcerer": ("sorcerer", "vision", "components", "recipes", "apprentice"),
     "drow": ("drow",),
     "highlander": ("highland",),
@@ -153,6 +153,7 @@ class ClassLayoutChecks(unittest.TestCase):
             "do_possession": "classes/vampire/dominate.c",
             "do_mirrorimage": "classes/vampire/chimerstry.c",
             "do_control": "classes/vampire/chimerstry.c",
+            "do_truedisguise": "classes/vampire/chimerstry.c",
         }
         for fn, path in expected.items():
             self.assertEqual(owners[fn], [path], fn)
@@ -176,6 +177,13 @@ class ClassLayoutChecks(unittest.TestCase):
         body = re.search(r"^void do_beastwithin\(.*?^\}", source, re.M | re.S)[0]
         self.assertEqual(hashlib.sha256(body.encode()).hexdigest(),
                          "fedde214c996ce66537b23ad27d295b9df64f63e3edb7a9bcfc1d74016c26edf")
+
+    def test_true_disguise_extraction_preserves_exact_handler_bytes(self):
+        source = (SRC / "classes/vampire/chimerstry.c").read_text()
+        body = source[source.index("void do_truedisguise("):].strip()
+        normalized = "\n".join(line.strip() for line in body.splitlines())
+        self.assertEqual(hashlib.sha256(normalized.encode()).hexdigest(),
+                         "042920e487c08ff873fbcf7ad06013f91455d9426202569bbae7fba02b272f39")
 
 
 if __name__ == "__main__":
